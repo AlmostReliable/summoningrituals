@@ -23,42 +23,6 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final int recipeTime;
     private final int dayTime;
     @Nullable private final RecipeSacrifices sacrifices;
-
-    public RecipeOutput<?> getOutput() {
-        return output;
-    }
-
-    public NonNullList<Ingredient> getInputs() {
-        return inputs;
-    }
-
-    public Ingredient getCatalyst() {
-        return catalyst;
-    }
-
-    public int getRecipeTime() {
-        return recipeTime;
-    }
-
-    public int getDayTime() {
-        return dayTime;
-    }
-
-    @Nullable
-    public RecipeSacrifices getSacrifices() {
-        return sacrifices;
-    }
-
-    @Nullable
-    public Block getBlockBelow() {
-        return blockBelow;
-    }
-
-    @Nullable
-    public String getWeather() {
-        return weather;
-    }
-
     @Nullable private final Block blockBelow;
     @Nullable private final String weather;
 
@@ -117,5 +81,40 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     @Override
     public RecipeType<?> getType() {
         return Setup.ALTAR_RECIPE.type().get();
+    }
+
+    public RecipeOutput<?> getOutput() {
+        return output;
+    }
+
+    public NonNullList<Ingredient> getInputs() {
+        return inputs;
+    }
+
+    public Ingredient getCatalyst() {
+        return catalyst;
+    }
+
+    public int getRecipeTime() {
+        return recipeTime;
+    }
+
+    public int getDayTime() {
+        return dayTime;
+    }
+
+    @Nullable
+    public RecipeSacrifices getSacrifices() {
+        return sacrifices;
+    }
+
+    @Nullable
+    public Block getBlockBelow() {
+        return blockBelow;
+    }
+
+    @Nullable
+    public String getWeather() {
+        return weather;
     }
 }

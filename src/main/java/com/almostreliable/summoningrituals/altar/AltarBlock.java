@@ -32,6 +32,12 @@ public class AltarBlock extends Block implements EntityBlock {
         return state.setValue(ACTIVE, false);
     }
 
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(ACTIVE);
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -40,18 +46,14 @@ public class AltarBlock extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+        Level level, BlockState state, BlockEntityType<T> type
+    ) {
         if (level.isClientSide) return null;
         return (entityLevel, entityState, entityType, entity) -> {
             if (entity instanceof AltarEntity altar) {
                 altar.tick();
             }
         };
-    }
-
-    @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(ACTIVE);
     }
 }

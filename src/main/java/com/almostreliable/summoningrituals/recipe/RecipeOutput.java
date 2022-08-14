@@ -8,7 +8,7 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 
-public abstract class RecipeOutput<T>  {
+public abstract class RecipeOutput<T> {
 
     private static final String ITEM = "item";
     private static final String COUNT = "count";
@@ -20,18 +20,6 @@ public abstract class RecipeOutput<T>  {
 
     protected RecipeOutput(T entry) {
         this.entry = entry;
-    }
-
-    public void setOffset(Vec3 offset) {
-        this.offset = offset;
-    }
-
-    public void setSpread(Vec3 spread) {
-        this.spread = spread;
-    }
-
-    public T getEntry() {
-        return entry;
     }
 
     public static RecipeOutput<?> fromJson(JsonObject json) {
@@ -47,7 +35,19 @@ public abstract class RecipeOutput<T>  {
         throw new IllegalArgumentException("Invalid recipe output");
     }
 
+    public T getEntry() {
+        return entry;
+    }
+
     public abstract int getCount();
+
+    public void setOffset(Vec3 offset) {
+        this.offset = offset;
+    }
+
+    public void setSpread(Vec3 spread) {
+        this.spread = spread;
+    }
 
     public static class EntityOutput extends RecipeOutput<ResourceLocation> {
 

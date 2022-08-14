@@ -66,6 +66,20 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         onContentsChanged();
     }
 
+    private void onContentsChanged() {
+        parent.setChanged();
+    }
+
+    private void validateSlot(int slot) {
+        if (slot < 0 || slot >= stacks.size()) {
+            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, stacks.size()));
+        }
+    }
+
+    private int getStackLimit(int slot, ItemStack stack) {
+        return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
+    }
+
     @Override
     public int getSlots() {
         return stacks.size();
@@ -145,19 +159,5 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private void setSize(int size) {
         stacks = NonNullList.withSize(size, ItemStack.EMPTY);
-    }
-
-    private void onContentsChanged() {
-        parent.setChanged();
-    }
-
-    private void validateSlot(int slot) {
-        if (slot < 0 || slot >= stacks.size()) {
-            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, stacks.size()));
-        }
-    }
-
-    private int getStackLimit(int slot, ItemStack stack) {
-        return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
     }
 }
