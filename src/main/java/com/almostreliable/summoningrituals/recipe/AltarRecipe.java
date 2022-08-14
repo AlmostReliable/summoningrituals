@@ -111,11 +111,11 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return Setup.ALTAR_RECIPE.getSerializer().get();
+        return Setup.ALTAR_RECIPE.serializer().get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return Setup.ALTAR_RECIPE.getType().get();
+        return Setup.ALTAR_RECIPE.type().get();
     }
 }

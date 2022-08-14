@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 @SuppressWarnings("ConstantConditions")
 public final class Setup {
 
-    private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
     private static final DeferredRegister<Block> BLOCKS = createRegistry(ForgeRegistries.BLOCKS);
     private static final DeferredRegister<Item> ITEMS = createRegistry(ForgeRegistries.ITEMS);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = createRegistry(ForgeRegistries.BLOCK_ENTITIES);
@@ -34,6 +33,7 @@ public final class Setup {
     );
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = createRegistry(ForgeRegistries.RECIPE_SERIALIZERS);
 
+    private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
     private static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register("altar", AltarBlock::new);
     private static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         "altar",
@@ -74,16 +74,7 @@ public final class Setup {
         }
     }
 
-    public static final class RecipeEntry<T extends Recipe<?>> {
-
-        private final RegistryObject<RecipeType<T>> type;
-        private final RegistryObject<RecipeSerializer<T>> serializer;
-
-        private RecipeEntry(RegistryObject<RecipeType<T>> type, RegistryObject<RecipeSerializer<T>> serializer) {
-            this.type = type;
-            this.serializer = serializer;
-        }
-
+    public record RecipeEntry<T extends Recipe<?>>(RegistryObject<RecipeType<T>> type, RegistryObject<RecipeSerializer<T>> serializer) {
         @SuppressWarnings("SameParameterValue")
         private static <T extends Recipe<?>> RecipeEntry<T> register(
             String id, Supplier<? extends RecipeSerializer<T>> serializer
@@ -94,14 +85,6 @@ public final class Setup {
                 }
             });
             return new RecipeEntry<>(type, RECIPE_SERIALIZERS.register(id, serializer));
-        }
-
-        public RegistryObject<RecipeType<T>> getType() {
-            return type;
-        }
-
-        public RegistryObject<RecipeSerializer<T>> getSerializer() {
-            return serializer;
         }
     }
 }
