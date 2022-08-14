@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "summoningrituals:block/altar"
+    },
+    "active=true": {
+      "model": "summoningrituals:block/altar_active"
+    }
+  }
+}
