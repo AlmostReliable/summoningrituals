@@ -15,4 +15,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Summoning-Rituals"
+rootProject.name = "Summoning Rituals"
