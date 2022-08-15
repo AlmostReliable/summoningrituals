@@ -1,18 +1,16 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.function.Consumer;
 
 public class AltarRecipeBuilder {
 
@@ -20,14 +18,15 @@ public class AltarRecipeBuilder {
     private final NonNullList<IngredientStack> inputs;
     @Nullable private Ingredient catalyst;
     private int recipeTime = -1;
-    private final int dayTime = -1;
+    private int dayTime = -1;
     @Nullable private RecipeSacrifices sacrifices;
-    @Nullable private Block blockBelow;
+    @Nullable private BlockState blockBelow;
     @Nullable private String weather;
 
     private AltarRecipeBuilder(RecipeOutput<?> output) {
         this.output = output;
         inputs = NonNullList.create();
+        sacrifices = new RecipeSacrifices();
     }
 
     public static AltarRecipeBuilder entity(ResourceLocation entity, int count) {
@@ -84,8 +83,18 @@ public class AltarRecipeBuilder {
         return this;
     }
 
-    public void build(Consumer<? super FinishedRecipe> consumer) {
-        var namespace = output.getId().getNamespace();
-        var outputId = output.getId().getPath();
+    public AltarRecipeBuilder recipeTime(int recipeTime) {
+        this.recipeTime = recipeTime;
+        return this;
+    }
+
+    public AltarRecipeBuilder dayTime(int dayTime) {
+        this.dayTime = dayTime;
+        return this;
+    }
+
+    public AltarRecipe build(ResourceLocation id) {
+        // TODO: handle nullables and default values
+        return new AltarRecipe(id, output, inputs, catalyst, recipeTime, dayTime, sacrifices, blockBelow, weather);
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
@@ -23,13 +23,13 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final int recipeTime;
     private final int dayTime;
     @Nullable private final RecipeSacrifices sacrifices;
-    @Nullable private final Block blockBelow;
+    @Nullable private final BlockState blockBelow;
     @Nullable private final String weather;
 
     public AltarRecipe(
         ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs,
         Ingredient catalyst, int recipeTime, int dayTime, @Nullable RecipeSacrifices sacrifices,
-        @Nullable Block blockBelow,
+        @Nullable BlockState blockBelow,
         @Nullable String weather
     ) {
         this.recipeId = recipeId;
@@ -109,7 +109,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     }
 
     @Nullable
-    public Block getBlockBelow() {
+    public BlockState getBlockBelow() {
         return blockBelow;
     }
 

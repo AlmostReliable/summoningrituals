@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.google.gson.JsonObject;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -24,24 +25,24 @@ public abstract class RecipeOutput<T> {
         this.entry = entry;
     }
 
-    public static RecipeOutput<ResourceLocation> of(ResourceLocation entity) {
-        return new EntityOutput(entity, 1);
-    }
-
     public static RecipeOutput<ResourceLocation> of(ResourceLocation entity, int count) {
         return new EntityOutput(entity, count);
     }
 
-    public static RecipeOutput<ItemStack> of(ItemStack item) {
-        return new ItemOutput(item);
-    }
-
-    public static RecipeOutput<ItemStack> of(ItemLike item) {
-        return new ItemOutput(new ItemStack(item, 1));
+    public static RecipeOutput<ResourceLocation> of(ResourceLocation entity) {
+        return of(entity, 1);
     }
 
     public static RecipeOutput<ItemStack> of(ItemLike item, int count) {
         return new ItemOutput(new ItemStack(item, count));
+    }
+
+    public static RecipeOutput<ItemStack> of(ItemLike item) {
+        return of(item, 1);
+    }
+
+    public static RecipeOutput<ItemStack> of(ItemStack item) {
+        return new ItemOutput(item);
     }
 
     public static RecipeOutput<?> fromJson(JsonObject json) {
@@ -55,6 +56,30 @@ public abstract class RecipeOutput<T> {
             return new EntityOutput(entity, count);
         }
         throw new IllegalArgumentException("Invalid recipe output");
+    }
+
+    public static RecipeOutput<?> fromNetwork(FriendlyByteBuf buffer) {
+        var i = buffer.readVarInt();
+        if (i == 0) {
+            return new ItemOutput(buffer.readItem());
+        }
+        if (i == 1) {
+            var entity = new ResourceLocation(buffer.readUtf());
+            var count = buffer.readVarInt();
+            return new EntityOutput(entity, count);
+        }
+        throw new IllegalArgumentException("Invalid recipe output type");
+    }
+
+    public void toNetwork(FriendlyByteBuf buffer) {
+        if (entry instanceof ItemStack itemStack) {
+            buffer.writeVarInt(0);
+            buffer.writeItem(itemStack);
+        } else {
+            buffer.writeVarInt(1);
+            buffer.writeUtf(entry.toString());
+            buffer.writeVarInt(getCount());
+        }
     }
 
     public T getEntry() {
