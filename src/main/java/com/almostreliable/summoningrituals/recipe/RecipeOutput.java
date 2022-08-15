@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.recipe;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
@@ -51,8 +52,8 @@ public abstract class RecipeOutput<T> {
             return new ItemOutput(stack);
         }
         if (json.has(ENTITY)) {
-            var entity = new ResourceLocation(json.get(ENTITY).getAsString());
-            var count = json.has(COUNT) ? json.get(COUNT).getAsInt() : 1;
+            var entity = new ResourceLocation(GsonHelper.getAsString(json, ENTITY));
+            var count = GsonHelper.getAsInt(json, COUNT, 1);
             return new EntityOutput(entity, count);
         }
         throw new IllegalArgumentException("Invalid recipe output");

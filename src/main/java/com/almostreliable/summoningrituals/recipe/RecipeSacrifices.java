@@ -8,6 +8,10 @@ import net.minecraft.util.GsonHelper;
 
 public class RecipeSacrifices {
 
+    private static final String ENTITIES = "entities";
+    private static final String HEIGHT = "height";
+    private static final String WIDTH = "width";
+
     private final int width;
     private final int height;
     private final NonNullList<Sacrifice> sacrifices;
@@ -25,9 +29,9 @@ public class RecipeSacrifices {
     }
 
     public static RecipeSacrifices fromJson(JsonObject json) {
-        var width = GsonHelper.getAsInt(json, "width", 1);
-        var height = GsonHelper.getAsInt(json, "height", 1);
-        var entities = GsonHelper.getAsJsonArray(json, "entities");
+        var width = GsonHelper.getAsInt(json, WIDTH, 1);
+        var height = GsonHelper.getAsInt(json, HEIGHT, 1);
+        var entities = json.getAsJsonArray(ENTITIES);
         NonNullList<Sacrifice> sacrifices = NonNullList.create();
         for (var entity : entities) {
             sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
@@ -60,9 +64,13 @@ public class RecipeSacrifices {
     }
 
     private record Sacrifice(ResourceLocation entity, int count) {
+
+        private static final String ENTITY = "entity";
+        private static final String COUNT = "count";
+
         private static Sacrifice fromJson(JsonObject json) {
-            var entity = new ResourceLocation(json.get("entity").getAsString());
-            var count = GsonHelper.getAsInt(json, "count", 1);
+            var entity = new ResourceLocation(GsonHelper.getAsString(json, ENTITY));
+            var count = GsonHelper.getAsInt(json, COUNT, 1);
             return new Sacrifice(entity, count);
         }
 

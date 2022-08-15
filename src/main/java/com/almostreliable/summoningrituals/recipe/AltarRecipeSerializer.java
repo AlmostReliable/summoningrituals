@@ -29,32 +29,32 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
     @Override
     public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-        var output = RecipeOutput.fromJson(json.get(OUTPUT).getAsJsonObject());
+        var output = RecipeOutput.fromJson(json.getAsJsonObject(OUTPUT));
 
         NonNullList<IngredientStack> inputs = NonNullList.create();
         if (json.has(INPUT)) {
-            var inputsJson = json.get(INPUT).getAsJsonArray();
+            var inputsJson = json.getAsJsonArray(INPUT);
             for (var inputJson : inputsJson) {
                 inputs.add(IngredientStack.fromJson(inputJson.getAsJsonObject()));
             }
         }
 
-        var catalyst = Ingredient.fromJson(json.get(CATALYST).getAsJsonObject());
-        var recipeTime = GsonHelper.getAsInt(json, RECIPE_TIME, -1);
+        var catalyst = Ingredient.fromJson(json.getAsJsonObject(CATALYST));
+        var recipeTime = GsonHelper.getAsInt(json, RECIPE_TIME, 100);
         var dayTime = GsonHelper.getAsInt(json, DAY_TIME, -1);
 
         RecipeSacrifices sacrifices = null;
         if (json.has(SACRIFICES)) {
-            sacrifices = RecipeSacrifices.fromJson(json.get(SACRIFICES).getAsJsonObject());
+            sacrifices = RecipeSacrifices.fromJson(json.getAsJsonObject(SACRIFICES));
         }
 
         BlockState blockBelow = null;
         if (json.has(BLOCK_BELOW)) {
-            var blockString = json.get(BLOCK_BELOW).getAsString();
+            var blockString = GsonHelper.getAsString(json, BLOCK_BELOW);
             blockBelow = readBlockFromString(blockString);
         }
 
-        var weather = GsonHelper.getAsString(json, WEATHER, null);
+        var weather = GsonHelper.getAsString(json, WEATHER, "any");
 
         return new AltarRecipe(
             recipeId,
@@ -85,12 +85,12 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         var dayTime = buffer.readVarInt();
 
         RecipeSacrifices sacrifices = null;
-        if (buffer.readUtf().equals(SACRIFICES)) {
+        if (buffer.readBoolean()) {
             sacrifices = RecipeSacrifices.fromNetwork(buffer);
         }
 
         BlockState blockBelow = null;
-        if (buffer.readUtf().equals(BLOCK_BELOW)) {
+        if (buffer.readBoolean()) {
             var blockString = buffer.readUtf();
             blockBelow = readBlockFromString(blockString);
         }
@@ -124,13 +124,17 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         buffer.writeVarInt(recipe.getDayTime());
 
         if (recipe.getSacrifices() != null) {
-            buffer.writeUtf(SACRIFICES);
+            buffer.writeBoolean(true);
             recipe.getSacrifices().toNetwork(buffer);
+        } else {
+            buffer.writeBoolean(false);
         }
 
         if (recipe.getBlockBelow() != null) {
-            buffer.writeUtf(BLOCK_BELOW);
+            buffer.writeBoolean(true);
             buffer.writeUtf(BlockStateParser.serialize(recipe.getBlockBelow()));
+        } else {
+            buffer.writeBoolean(false);
         }
 
         buffer.writeUtf(recipe.getWeather());
