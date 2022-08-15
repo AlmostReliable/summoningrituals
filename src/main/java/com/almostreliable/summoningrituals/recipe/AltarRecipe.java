@@ -16,6 +16,11 @@ import javax.annotation.Nullable;
 
 public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
+    // TODO:
+    // - add effects that are performed after recipe crafting (lighting, weather change)
+    // - add a range for the daytime
+    // - add presets for the crafting animation
+
     private final ResourceLocation recipeId;
     private final RecipeOutput<?> output;
     private final NonNullList<IngredientStack> inputs;
@@ -24,13 +29,13 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final int dayTime;
     @Nullable private final RecipeSacrifices sacrifices;
     @Nullable private final BlockState blockBelow;
-    @Nullable private final String weather;
+    private final String weather;
 
     public AltarRecipe(
         ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs,
         Ingredient catalyst, int recipeTime, int dayTime, @Nullable RecipeSacrifices sacrifices,
         @Nullable BlockState blockBelow,
-        @Nullable String weather
+        String weather
     ) {
         this.recipeId = recipeId;
         this.output = output;
@@ -113,7 +118,6 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return blockBelow;
     }
 
-    @Nullable
     public String getWeather() {
         return weather;
     }

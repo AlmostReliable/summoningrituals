@@ -17,11 +17,11 @@ public class AltarRecipeBuilder {
     private final RecipeOutput<?> output;
     private final NonNullList<IngredientStack> inputs;
     @Nullable private Ingredient catalyst;
-    private int recipeTime = -1;
+    private int recipeTime = 100;
     private int dayTime = -1;
     @Nullable private RecipeSacrifices sacrifices;
     @Nullable private BlockState blockBelow;
-    @Nullable private String weather;
+    private String weather = "any";
 
     private AltarRecipeBuilder(RecipeOutput<?> output) {
         this.output = output;
@@ -90,6 +90,21 @@ public class AltarRecipeBuilder {
 
     public AltarRecipeBuilder dayTime(int dayTime) {
         this.dayTime = dayTime;
+        return this;
+    }
+
+    public AltarRecipeBuilder sacrifices(RecipeSacrifices sacrifices) {
+        this.sacrifices = sacrifices;
+        return this;
+    }
+
+    public AltarRecipeBuilder blockBelow(BlockState blockBelow) {
+        this.blockBelow = blockBelow;
+        return this;
+    }
+
+    public AltarRecipeBuilder weather(String weather) {
+        this.weather = weather;
         return this;
     }
 
