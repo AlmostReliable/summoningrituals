@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -18,43 +19,36 @@ import java.util.Objects;
 
 public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AltarRecipe> {
 
-    private static final String BLOCK_BELOW = "block_below";
-    private static final String CATALYST = "catalyst";
-    private static final String DAY_TIME = "day_time";
-    private static final String INPUT = "input";
-    private static final String OUTPUT = "output";
-    private static final String RECIPE_TIME = "recipe_time";
-    private static final String SACRIFICES = "sacrifices";
-    private static final String WEATHER = "weather";
+    // TODO: check if varInt is the correct thing for serialization
 
     @Override
     public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-        var output = RecipeOutput.fromJson(json.getAsJsonObject(OUTPUT));
+        var output = RecipeOutput.fromJson(json.getAsJsonObject(Constants.OUTPUT));
 
         NonNullList<IngredientStack> inputs = NonNullList.create();
-        if (json.has(INPUT)) {
-            var inputsJson = json.getAsJsonArray(INPUT);
+        if (json.has(Constants.INPUT)) {
+            var inputsJson = json.getAsJsonArray(Constants.INPUT);
             for (var inputJson : inputsJson) {
                 inputs.add(IngredientStack.fromJson(inputJson.getAsJsonObject()));
             }
         }
 
-        var catalyst = Ingredient.fromJson(json.getAsJsonObject(CATALYST));
-        var recipeTime = GsonHelper.getAsInt(json, RECIPE_TIME, 100);
-        var dayTime = GsonHelper.getAsInt(json, DAY_TIME, -1);
+        var catalyst = Ingredient.fromJson(json.getAsJsonObject(Constants.CATALYST));
+        var recipeTime = GsonHelper.getAsInt(json, Constants.RECIPE_TIME, 100);
+        var dayTime = GsonHelper.getAsInt(json, Constants.DAY_TIME, -1);
 
         RecipeSacrifices sacrifices = null;
-        if (json.has(SACRIFICES)) {
-            sacrifices = RecipeSacrifices.fromJson(json.getAsJsonObject(SACRIFICES));
+        if (json.has(Constants.SACRIFICES)) {
+            sacrifices = RecipeSacrifices.fromJson(json.getAsJsonObject(Constants.SACRIFICES));
         }
 
         BlockState blockBelow = null;
-        if (json.has(BLOCK_BELOW)) {
-            var blockString = GsonHelper.getAsString(json, BLOCK_BELOW);
+        if (json.has(Constants.BLOCK_BELOW)) {
+            var blockString = GsonHelper.getAsString(json, Constants.BLOCK_BELOW);
             blockBelow = readBlockFromString(blockString);
         }
 
-        var weather = GsonHelper.getAsString(json, WEATHER, "any");
+        var weather = GsonHelper.getAsString(json, Constants.WEATHER, "any");
 
         return new AltarRecipe(
             recipeId,

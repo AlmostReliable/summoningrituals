@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import net.minecraft.core.BlockPos;
@@ -15,8 +16,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class AltarEntity extends BlockEntity {
 
-    private static final String INVENTORY = "inventory";
-
     private final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
@@ -29,13 +28,13 @@ public class AltarEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains(INVENTORY)) inventory.deserializeNBT(tag.getCompound(INVENTORY));
+        if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(tag.getCompound(Constants.INVENTORY));
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.put(INVENTORY, inventory.serializeNBT());
+        tag.put(Constants.INVENTORY, inventory.serializeNBT());
     }
 
     @Override

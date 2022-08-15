@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -13,10 +14,6 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public abstract class RecipeOutput<T> {
-
-    private static final String COUNT = "count";
-    private static final String ENTITY = "entity";
-    private static final String ITEM = "item";
 
     protected final T entry;
     @Nullable private Vec3 offset;
@@ -47,13 +44,13 @@ public abstract class RecipeOutput<T> {
     }
 
     public static RecipeOutput<?> fromJson(JsonObject json) {
-        if (json.has(ITEM)) {
+        if (json.has(Constants.ITEM)) {
             var stack = ShapedRecipe.itemStackFromJson(json);
             return new ItemOutput(stack);
         }
-        if (json.has(ENTITY)) {
-            var entity = new ResourceLocation(GsonHelper.getAsString(json, ENTITY));
-            var count = GsonHelper.getAsInt(json, COUNT, 1);
+        if (json.has(Constants.ENTITY)) {
+            var entity = new ResourceLocation(GsonHelper.getAsString(json, Constants.ENTITY));
+            var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
             return new EntityOutput(entity, count);
         }
         throw new IllegalArgumentException("Invalid recipe output");

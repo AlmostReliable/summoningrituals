@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.inventory;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -14,10 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import static com.almostreliable.summoningrituals.Utils.f;
 
 public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
-
-    private static final String SLOT = "slot";
-    private static final String SIZE = "size";
-    private static final String ITEMS = "items";
 
     private final AltarEntity parent;
     private final AltarInvWrapper vanillaInv;
@@ -35,24 +32,24 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         for (var slot = 0; slot < stacks.size(); slot++) {
             if (!stacks.get(slot).isEmpty()) {
                 var itemTag = new CompoundTag();
-                itemTag.putInt(SLOT, slot);
+                itemTag.putInt(Constants.SLOT, slot);
                 stacks.get(slot).save(itemTag);
                 tagList.add(itemTag);
             }
         }
         var tag = new CompoundTag();
-        tag.putInt(SIZE, stacks.size());
-        tag.put(ITEMS, tagList);
+        tag.putInt(Constants.SIZE, stacks.size());
+        tag.put(Constants.ITEMS, tagList);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        setSize(tag.contains(SIZE) ? tag.getInt(SIZE) : stacks.size());
-        var tagList = tag.getList(ITEMS, Tag.TAG_COMPOUND);
+        setSize(tag.contains(Constants.SIZE) ? tag.getInt(Constants.SIZE) : stacks.size());
+        var tagList = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
         for (var i = 0; i < tagList.size(); i++) {
             var itemTags = tagList.getCompound(i);
-            var slot = itemTags.getInt(SLOT);
+            var slot = itemTags.getInt(Constants.SLOT);
             if (slot >= 0 && slot < stacks.size()) {
                 stacks.set(slot, ItemStack.of(itemTags));
             }
