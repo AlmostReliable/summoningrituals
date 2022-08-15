@@ -18,7 +18,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     private final ResourceLocation recipeId;
     private final RecipeOutput<?> output;
-    private final NonNullList<Ingredient> inputs;
+    private final NonNullList<IngredientStack> inputs;
     private final Ingredient catalyst;
     private final int recipeTime;
     private final int dayTime;
@@ -27,7 +27,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     @Nullable private final String weather;
 
     public AltarRecipe(
-        ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<Ingredient> inputs,
+        ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs,
         Ingredient catalyst, int recipeTime, int dayTime, @Nullable RecipeSacrifices sacrifices,
         @Nullable Block blockBelow,
         @Nullable String weather
@@ -87,7 +87,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return output;
     }
 
-    public NonNullList<Ingredient> getInputs() {
+    public NonNullList<IngredientStack> getInputs() {
         return inputs;
     }
 
