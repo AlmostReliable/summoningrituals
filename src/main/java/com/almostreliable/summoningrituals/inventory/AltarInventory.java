@@ -10,7 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 import static com.almostreliable.summoningrituals.Utils.f;
 
@@ -61,7 +62,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     @Override
-    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         validateSlot(slot);
         inputs.set(slot, stack);
         onContentsChanged();
@@ -102,16 +103,16 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return inputs.size();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
         return inputs.get(slot);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
         if (stack.isEmpty()) return ItemStack.EMPTY;
         if (!isItemValid(slot, stack)) return stack;
         validateSlot(slot);
@@ -137,7 +138,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0) return ItemStack.EMPTY;
@@ -170,7 +171,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     @Override
-    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
         return true;
     }
 
