@@ -2,7 +2,10 @@ package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
+import com.almostreliable.summoningrituals.Utils;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +27,11 @@ import org.jetbrains.annotations.Nullable;
 public class AltarEntity extends BlockEntity {
 
     public final AltarInventory inventory;
+    // TODO: decide if the cap is needed | if automation is required the catalyst logic needs to be replaced
     private final LazyOptional<AltarInventory> inventoryCap;
+
+    @Nullable private AltarRecipe recipeCache;
+    private int progress;
 
     public AltarEntity(BlockPos pos, BlockState state) {
         super(Setup.ALTAR_ENTITY.get(), pos, state);
@@ -36,20 +43,77 @@ public class AltarEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(tag.getCompound(Constants.INVENTORY));
+        if (tag.contains(Constants.PROGRESS)) progress = tag.getInt(Constants.PROGRESS);
     }
 
     public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
         if (player.getItemInHand(hand).isEmpty()) return InteractionResult.PASS;
+        if (progress > 0) {
+            Utils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
+            return InteractionResult.PASS;
+        }
 
         if (player.isShiftKeyDown()) {
+            if (inventory.getInputs().isEmpty()) {
+                Utils.sendPlayerMessage(player, "no_inputs", ChatFormatting.RED);
+                return InteractionResult.PASS;
+            }
             inventory.setCatalyst(player.getItemInHand(hand));
             player.setItemInHand(hand, ItemStack.EMPTY);
+            handleSummoning(player);
             return InteractionResult.SUCCESS;
         }
 
         var remaining = inventory.insertItem(player.getItemInHand(hand));
         player.setItemInHand(hand, remaining);
         return InteractionResult.SUCCESS;
+    }
+
+    private void handleSummoning(ServerPlayer player) {
+        assert level != null && !level.isClientSide;
+
+        var recipe = findRecipe();
+        if (recipe == null) return;
+
+        // TODO: check weather, daytime, block below, sacrifices
+        if (!checkWeather(recipe.getWeather(), player)) return;
+    }
+
+    @Nullable
+    private AltarRecipe findRecipe() {
+        assert level != null && !level.isClientSide;
+        if (recipeCache != null && recipeCache.matches(inventory.getVanillaInv(), level)) {
+            return recipeCache;
+        }
+        var recipeManager = Utils.getRecipeManager(level);
+        return recipeManager.getRecipeFor(Setup.ALTAR_RECIPE.type().get(), inventory.getVanillaInv(), level)
+            .orElse(null);
+    }
+
+    private boolean checkWeather(String weather, ServerPlayer player) {
+        assert level != null && !level.isClientSide;
+        if (!weather.equals("any")) {
+            switch (weather) {
+                case "rain":
+                    if (!level.isRaining()) {
+                        Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.GOLD);
+                        return false;
+                    }
+                case "thunder":
+                    if (!level.isThundering()) {
+                        Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.GOLD);
+                        return false;
+                    }
+                case "sun":
+                    if (level.isRaining() || level.isThundering()) {
+                        Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.GOLD);
+                        return false;
+                    }
+                default:
+                    throw new IllegalArgumentException("Unknown weather: " + weather);
+            }
+        }
+        return true;
     }
 
     @Override
@@ -84,11 +148,6 @@ public class AltarEntity extends BlockEntity {
             return inventoryCap.cast();
         }
         return super.getCapability(cap, side);
-    }
-
-    public void tick() {
-        // TODO
-        if (level == null || level.isClientSide) return;
     }
 
     public void sendUpdate() {

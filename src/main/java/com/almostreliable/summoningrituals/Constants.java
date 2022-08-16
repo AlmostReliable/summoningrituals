@@ -4,6 +4,7 @@ public final class Constants {
 
     private Constants() {}
 
+    public static final String PROGRESS = "progress";
     public static final String BLOCK_BELOW = "block_below";
     public static final String CATALYST = "catalyst";
     public static final String COUNT = "count";

@@ -1,4 +1,11 @@
 {
   "itemGroup.summoningrituals": "Summoning Rituals",
-  "block.summoningrituals.altar": "Summoning Altar"
+
+  "block.summoningrituals.altar": "Summoning Altar",
+
+  "message.summoningrituals.no_inputs": "You need to place at least one input.",
+  "message.summoningrituals.in_progress": "The ritual is already in progress.",
+  "message.summoningrituals.no_rain": "You need to be in the rain to start the ritual.",
+  "message.summoningrituals.no_thunder": "You need to be in the thunder to start the ritual.",
+  "message.summoningrituals.no_sun": "You need to be in the sun to start the ritual."
 }

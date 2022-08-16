@@ -59,17 +59,4 @@ public class AltarBlock extends Block implements EntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new AltarEntity(pos, state);
     }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
-        Level level, BlockState state, BlockEntityType<T> type
-    ) {
-        if (level.isClientSide) return null;
-        return (entityLevel, entityState, entityType, entity) -> {
-            if (entity instanceof AltarEntity altar) {
-                altar.tick();
-            }
-        };
-    }
 }

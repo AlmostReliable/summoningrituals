@@ -23,8 +23,9 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     public AltarInventory(AltarEntity parent) {
         this.parent = parent;
-        inputs = NonNullList.create();
         vanillaInv = new AltarInvWrapper(this);
+        inputs = NonNullList.create();
+        catalyst = ItemStack.EMPTY;
     }
 
     @Override
@@ -179,6 +180,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     public void setCatalyst(ItemStack catalyst) {
         this.catalyst = catalyst;
+        onContentsChanged();
     }
 
     public AltarEntity getParent() {
