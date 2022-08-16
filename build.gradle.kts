@@ -60,7 +60,7 @@ dependencies {
 
     modCompileOnlyApi("mezz.jei:jei-$mcVersion-common-api:$jeiVersion")
     modCompileOnlyApi("mezz.jei:jei-$mcVersion-forge-api:$jeiVersion")
-    modLocalRuntime("mezz.jei:jei-$mcVersion-forge:$jeiVersion")
+//    modLocalRuntime("mezz.jei:jei-$mcVersion-forge:$jeiVersion")
 
     fileTree("extra-mods-$mcVersion") { include("**/*.jar") }
         .forEach { f ->
