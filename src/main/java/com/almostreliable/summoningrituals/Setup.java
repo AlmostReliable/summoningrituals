@@ -35,7 +35,7 @@ public final class Setup {
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
     public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register("altar", AltarBlock::new);
-    private static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
+    public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         "altar",
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))
     );

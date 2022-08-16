@@ -1,11 +1,14 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.Setup;
+import com.almostreliable.summoningrituals.Utils;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -81,6 +84,19 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
             return ItemStack.EMPTY;
         }
         return remaining;
+    }
+
+    public void dropContents() {
+        var level = parent.getLevel();
+        assert level != null && !level.isClientSide;
+        var pos = parent.getBlockPos();
+        for (var stack : inputs) {
+            if (stack.isEmpty()) continue;
+            Utils.dropItem(level, pos, stack, false);
+        }
+        if (!catalyst.isEmpty()) {
+            Utils.dropItem(level, pos, catalyst, false);
+        }
     }
 
     private void onContentsChanged() {
