@@ -34,6 +34,8 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         }
 
         var catalyst = Ingredient.fromJson(json.getAsJsonObject(Constants.CATALYST));
+        AltarRecipe.CATALYST_CACHE.add(catalyst);
+
         var recipeTime = GsonHelper.getAsInt(json, Constants.RECIPE_TIME, 100);
         var dayTime = GsonHelper.getAsInt(json, Constants.DAY_TIME, -1);
 

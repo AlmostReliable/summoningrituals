@@ -27,7 +27,8 @@ public class SummoningRituals {
     }
 
     private static void onRightClick(RightClickBlock event) {
-        if (event.getWorld().getBlockState(event.getPos()).getBlock().equals(Setup.ALTAR_BLOCK.get())) {
+        if (!event.getPlayer().isShiftKeyDown() &&
+            event.getWorld().getBlockState(event.getPos()).getBlock().equals(Setup.ALTAR_BLOCK.get())) {
             event.setUseBlock(Result.ALLOW);
             event.setUseItem(Result.DENY);
             event.setCanceled(false);

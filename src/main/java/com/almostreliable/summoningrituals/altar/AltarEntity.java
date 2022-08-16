@@ -29,7 +29,6 @@ import javax.annotation.Nullable;
 public class AltarEntity extends BlockEntity {
 
     public final AltarInventory inventory;
-    // TODO: decide if the cap is needed | if automation is required the catalyst logic needs to be replaced
     private final LazyOptional<AltarInventory> inventoryCap;
 
     @Nullable private AltarRecipe recipeCache;
@@ -68,21 +67,24 @@ public class AltarEntity extends BlockEntity {
     }
 
     public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
-        if (player.getItemInHand(hand).isEmpty()) return InteractionResult.PASS;
+        var stack = player.getItemInHand(hand);
+        if (stack.isEmpty()) return InteractionResult.PASS;
         if (progress > 0) {
             Utils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
             return InteractionResult.PASS;
         }
 
-        if (player.isShiftKeyDown()) {
-            if (inventory.getInputs().isEmpty()) {
-                Utils.sendPlayerMessage(player, "no_inputs", ChatFormatting.RED);
-                return InteractionResult.PASS;
-            }
+        if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
             inventory.setCatalyst(player.getItemInHand(hand));
-            player.setItemInHand(hand, ItemStack.EMPTY);
-            handleSummoning(player);
-            return InteractionResult.SUCCESS;
+            var recipe = findRecipe();
+            if (recipe == null) {
+                inventory.setCatalyst(ItemStack.EMPTY);
+            } else {
+                player.setItemInHand(hand, ItemStack.EMPTY);
+                recipeCache = recipe;
+                handleSummoning(recipe, player);
+                return InteractionResult.SUCCESS;
+            }
         }
 
         var remaining = inventory.insertItem(player.getItemInHand(hand));
@@ -110,11 +112,8 @@ public class AltarEntity extends BlockEntity {
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
-    private void handleSummoning(ServerPlayer player) {
+    private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
         assert level != null && !level.isClientSide;
-
-        var recipe = findRecipe();
-        if (recipe == null) return;
 
         // TODO: check weather, daytime, block below, sacrifices
         if (!checkWeather(recipe.getWeather(), player)) return;

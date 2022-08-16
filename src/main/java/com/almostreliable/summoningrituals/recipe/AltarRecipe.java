@@ -14,7 +14,9 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
@@ -22,6 +24,8 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     // - add effects that are performed after recipe crafting (lighting, weather change)
     // - add a range for the daytime
     // - add presets for the crafting animation
+
+    public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
     private final ResourceLocation recipeId;
     private final RecipeOutput<?> output;

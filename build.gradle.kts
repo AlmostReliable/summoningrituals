@@ -39,6 +39,10 @@ base {
 loom {
     silentMojangMappingsLicense()
     // launchConfigs.getByName("client").property("fabric.log.level", "debug")
+
+    forge {
+        mixinConfig("$modId.mixins.json")
+    }
 }
 
 repositories {

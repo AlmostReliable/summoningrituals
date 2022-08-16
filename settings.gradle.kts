@@ -6,13 +6,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "net.minecraftforge.gradle") {
-                useModule("${requested.id}:ForgeGradle:${requested.version}")
-            }
-        }
-    }
 }
 
 rootProject.name = "Summoning-Rituals"
