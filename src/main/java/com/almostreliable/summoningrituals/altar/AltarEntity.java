@@ -15,6 +15,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -77,6 +78,17 @@ public class AltarEntity extends BlockEntity {
 
         // TODO: check weather, daytime, block below, sacrifices
         if (!checkWeather(recipe.getWeather(), player)) return;
+
+        // TODO: actually implement recipe processing, this is only for testing
+        inventory.getInputs().clear();
+        inventory.setCatalyst(ItemStack.EMPTY);
+        level.addFreshEntity(new ItemEntity(
+            level,
+            worldPosition.getX(),
+            worldPosition.getY() + 2.0,
+            worldPosition.getZ(),
+            (ItemStack) recipe.getOutput().getEntry()
+        ));
     }
 
     @Nullable
