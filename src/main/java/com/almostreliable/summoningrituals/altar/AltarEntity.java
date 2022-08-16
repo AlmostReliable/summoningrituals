@@ -82,11 +82,12 @@ public class AltarEntity extends BlockEntity {
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
-            inventory.setCatalyst(player.getItemInHand(hand));
+            inventory.setCatalyst(stack);
             var recipe = findRecipe();
             if (recipe == null) {
                 inventory.setCatalyst(ItemStack.EMPTY);
             } else {
+                // TODO: make sure only one catalyst is accepted and consumed
                 player.setItemInHand(hand, ItemStack.EMPTY);
                 recipeCache = recipe;
                 handleSummoning(recipe, player);
@@ -128,13 +129,7 @@ public class AltarEntity extends BlockEntity {
         // TODO: actually implement recipe processing, this is only for testing
         inventory.getInputs().clear();
         inventory.setCatalyst(ItemStack.EMPTY);
-        level.addFreshEntity(new ItemEntity(
-            level,
-            worldPosition.getX(),
-            worldPosition.getY() + 2.0,
-            worldPosition.getZ(),
-            (ItemStack) recipe.getOutput().getEntry()
-        ));
+        Utils.dropItem(level, worldPosition, (ItemStack) recipe.getOutput().getEntry(), true);
     }
 
     @Nullable
