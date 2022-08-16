@@ -106,6 +106,16 @@ public final class Utils {
         return Minecraft.getInstance().level.getRecipeManager();
     }
 
+    public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
+        level.addFreshEntity(new ItemEntity(
+            level,
+            pos.getX() + (offset ? 0.5 : 0),
+            pos.getY() + (offset ? 0.5 : 0),
+            pos.getZ() + (offset ? 0.5 : 0),
+            stack
+        ));
+    }
+
     /**
      * Colors a given String with the given color.
      *
@@ -126,15 +136,5 @@ public final class Utils {
      */
     private static String getTranslationKey(String type, String key) {
         return String.format("%s.%s.%s", type.toLowerCase(), BuildConfig.MOD_ID, key);
-    }
-
-    public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
-        level.addFreshEntity(new ItemEntity(
-            level,
-            pos.getX() + (offset ? 0.5 : 0),
-            pos.getY() + (offset ? 0.5 : 0),
-            pos.getZ() + (offset ? 0.5 : 0),
-            stack
-        ));
     }
 }

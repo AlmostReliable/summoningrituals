@@ -40,7 +40,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
         if (!entity.inventory.getCatalyst().isEmpty()) {
             mc.getItemRenderer()
-                .renderStatic(entity.inventory.getCatalyst(),
+                .renderStatic(
+                    entity.inventory.getCatalyst(),
                     TransformType.FIXED,
                     lightAbove,
                     overlay,

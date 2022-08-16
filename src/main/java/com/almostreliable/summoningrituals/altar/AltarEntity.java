@@ -47,13 +47,6 @@ public class AltarEntity extends BlockEntity {
         if (tag.contains(Constants.PROGRESS)) progress = tag.getInt(Constants.PROGRESS);
     }
 
-    public void playerDestroy(boolean creative) {
-        assert level != null && !level.isClientSide;
-        inventory.dropContents();
-        if (creative) return;
-        Utils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
-    }
-
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
@@ -71,6 +64,13 @@ public class AltarEntity extends BlockEntity {
         var tag = super.getUpdateTag();
         saveAdditional(tag);
         return tag;
+    }
+
+    public void playerDestroy(boolean creative) {
+        assert level != null && !level.isClientSide;
+        inventory.dropContents();
+        if (creative) return;
+        Utils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
     }
 
     public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {

@@ -37,6 +37,14 @@ public class AltarBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
+            altar.playerDestroy(player.isCreative());
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ACTIVE);
@@ -51,14 +59,6 @@ public class AltarBlock extends Block implements EntityBlock {
             return altar.handleInteraction(serverPlayer, hand);
         }
         return super.use(state, level, pos, player, hand, hit);
-    }
-
-    @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            altar.playerDestroy(player.isCreative());
-        }
-        super.playerWillDestroy(level, pos, state, player);
     }
 
     @Nullable
