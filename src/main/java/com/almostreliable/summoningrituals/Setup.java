@@ -34,7 +34,7 @@ public final class Setup {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = createRegistry(ForgeRegistries.RECIPE_SERIALIZERS);
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
-    private static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register("altar", AltarBlock::new);
+    public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register("altar", AltarBlock::new);
     private static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         "altar",
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))

@@ -17,10 +17,10 @@ public class AltarRecipeBuilder {
     private final RecipeOutput<?> output;
     private final NonNullList<IngredientStack> inputs;
     @Nullable private Ingredient catalyst;
-    private int recipeTime = 100;
-    private int dayTime = -1;
     @Nullable private RecipeSacrifices sacrifices;
+    private int recipeTime = 100;
     @Nullable private BlockState blockBelow;
+    private int dayTime = -1;
     private String weather = "any";
 
     private AltarRecipeBuilder(RecipeOutput<?> output) {
@@ -79,6 +79,9 @@ public class AltarRecipeBuilder {
     }
 
     public AltarRecipeBuilder catalyst(Ingredient catalyst) {
+        if (this.catalyst != null) {
+            throw new IllegalArgumentException("Catalyst has already been set");
+        }
         this.catalyst = catalyst;
         return this;
     }
@@ -89,6 +92,9 @@ public class AltarRecipeBuilder {
     }
 
     public AltarRecipeBuilder dayTime(int dayTime) {
+        if (this.dayTime != -1) {
+            throw new IllegalArgumentException("dayTime has already been set");
+        }
         this.dayTime = dayTime;
         return this;
     }
@@ -99,17 +105,27 @@ public class AltarRecipeBuilder {
     }
 
     public AltarRecipeBuilder blockBelow(BlockState blockBelow) {
+        if (this.blockBelow != null) {
+            throw new IllegalArgumentException("blockBelow has already been set");
+        }
         this.blockBelow = blockBelow;
         return this;
     }
 
     public AltarRecipeBuilder weather(String weather) {
+        if (!this.weather.equals("any")) {
+            throw new IllegalArgumentException("weather has already been set");
+        }
         this.weather = weather;
         return this;
     }
 
     public AltarRecipe build(ResourceLocation id) {
         // TODO: handle nullables and default values
-        return new AltarRecipe(id, output, inputs, catalyst, recipeTime, dayTime, sacrifices, blockBelow, weather);
+        if (catalyst == null) {
+            throw new IllegalArgumentException("Catalyst cannot be null");
+        }
+
+        return new AltarRecipe(id, output, inputs, catalyst, sacrifices, recipeTime, blockBelow, dayTime, weather);
     }
 }

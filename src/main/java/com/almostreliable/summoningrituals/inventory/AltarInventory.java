@@ -18,58 +18,62 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private final AltarEntity parent;
     private final AltarInvWrapper vanillaInv;
-    private NonNullList<ItemStack> stacks;
+    private NonNullList<ItemStack> inputs;
+    private ItemStack catalyst;
 
     public AltarInventory(AltarEntity parent) {
         this.parent = parent;
-        stacks = NonNullList.create();
-        vanillaInv = new AltarInvWrapper(this, parent);
+        inputs = NonNullList.create();
+        vanillaInv = new AltarInvWrapper(this);
     }
 
     @Override
     public CompoundTag serializeNBT() {
         var tagList = new ListTag();
-        for (var slot = 0; slot < stacks.size(); slot++) {
-            if (!stacks.get(slot).isEmpty()) {
+        for (var slot = 0; slot < inputs.size(); slot++) {
+            if (!inputs.get(slot).isEmpty()) {
                 var itemTag = new CompoundTag();
                 itemTag.putInt(Constants.SLOT, slot);
-                stacks.get(slot).save(itemTag);
+                inputs.get(slot).save(itemTag);
                 tagList.add(itemTag);
             }
         }
         var tag = new CompoundTag();
-        tag.putInt(Constants.SIZE, stacks.size());
+        tag.putInt(Constants.SIZE, inputs.size());
         tag.put(Constants.ITEMS, tagList);
+        tag.put(Constants.CATALYST, catalyst.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        setSize(tag.contains(Constants.SIZE) ? tag.getInt(Constants.SIZE) : stacks.size());
+        setSize(tag.contains(Constants.SIZE) ? tag.getInt(Constants.SIZE) : inputs.size());
         var tagList = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
         for (var i = 0; i < tagList.size(); i++) {
             var itemTags = tagList.getCompound(i);
             var slot = itemTags.getInt(Constants.SLOT);
-            if (slot >= 0 && slot < stacks.size()) {
-                stacks.set(slot, ItemStack.of(itemTags));
+            if (slot >= 0 && slot < inputs.size()) {
+                inputs.set(slot, ItemStack.of(itemTags));
             }
         }
+        catalyst = ItemStack.of(tag.getCompound(Constants.CATALYST));
     }
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
         validateSlot(slot);
-        stacks.set(slot, stack);
+        inputs.set(slot, stack);
         onContentsChanged();
     }
 
     private void onContentsChanged() {
         parent.setChanged();
+        parent.sendUpdate();
     }
 
     private void validateSlot(int slot) {
-        if (slot < 0 || slot >= stacks.size()) {
-            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, stacks.size()));
+        if (slot < 0 || slot >= inputs.size()) {
+            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, inputs.size()));
         }
     }
 
@@ -79,14 +83,29 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     @Override
     public int getSlots() {
-        return stacks.size();
+        return inputs.size();
     }
 
     @NotNull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
-        return stacks.get(slot);
+        return inputs.get(slot);
+    }
+
+    public ItemStack insertItem(ItemStack stack) {
+        var remaining = stack;
+        for (var i = 0; i < inputs.size(); i++) {
+            remaining = insertItem(i, remaining, false);
+            if (remaining.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+        }
+        if (inputs.add(remaining)) {
+            onContentsChanged();
+            return ItemStack.EMPTY;
+        }
+        return remaining;
     }
 
     @NotNull
@@ -96,7 +115,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (!isItemValid(slot, stack)) return stack;
         validateSlot(slot);
 
-        var current = stacks.get(slot);
+        var current = inputs.get(slot);
         var limit = getStackLimit(slot, stack);
         if (!current.isEmpty()) {
             if (!ItemHandlerHelper.canItemStacksStack(stack, current)) return stack;
@@ -107,7 +126,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         var reachedLimit = stack.getCount() > limit;
         if (!simulate) {
             if (current.isEmpty()) {
-                stacks.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
+                inputs.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
             } else {
                 current.grow(reachedLimit ? limit : stack.getCount());
             }
@@ -123,20 +142,20 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (amount == 0) return ItemStack.EMPTY;
         validateSlot(slot);
 
-        var current = stacks.get(slot);
+        var current = inputs.get(slot);
         if (current.isEmpty()) return ItemStack.EMPTY;
         var toExtract = Math.min(amount, current.getMaxStackSize());
 
         if (current.getCount() <= toExtract) {
             if (!simulate) {
-                stacks.set(slot, ItemStack.EMPTY);
+                inputs.set(slot, ItemStack.EMPTY);
                 onContentsChanged();
                 return current;
             }
             return current.copy();
         }
         if (!simulate) {
-            stacks.set(slot, ItemHandlerHelper.copyStackWithSize(current, current.getCount() - toExtract));
+            inputs.set(slot, ItemHandlerHelper.copyStackWithSize(current, current.getCount() - toExtract));
             onContentsChanged();
         }
 
@@ -155,6 +174,26 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     private void setSize(int size) {
-        stacks = NonNullList.withSize(size, ItemStack.EMPTY);
+        inputs = NonNullList.withSize(size, ItemStack.EMPTY);
+    }
+
+    public void setCatalyst(ItemStack catalyst) {
+        this.catalyst = catalyst;
+    }
+
+    public AltarEntity getParent() {
+        return parent;
+    }
+
+    public AltarInvWrapper getVanillaInv() {
+        return vanillaInv;
+    }
+
+    public NonNullList<ItemStack> getInputs() {
+        return inputs;
+    }
+
+    public ItemStack getCatalyst() {
+        return catalyst;
     }
 }

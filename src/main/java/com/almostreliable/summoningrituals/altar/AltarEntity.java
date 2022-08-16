@@ -6,6 +6,13 @@ import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -16,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class AltarEntity extends BlockEntity {
 
-    private final AltarInventory inventory;
+    public final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
     public AltarEntity(BlockPos pos, BlockState state) {
@@ -31,10 +38,37 @@ public class AltarEntity extends BlockEntity {
         if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(tag.getCompound(Constants.INVENTORY));
     }
 
+    public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
+        if (player.getItemInHand(hand).isEmpty()) return InteractionResult.PASS;
+
+        if (player.isShiftKeyDown()) {
+            inventory.setCatalyst(player.getItemInHand(hand));
+            player.setItemInHand(hand, ItemStack.EMPTY);
+            return InteractionResult.SUCCESS;
+        }
+
+        var remaining = inventory.insertItem(player.getItemInHand(hand));
+        player.setItemInHand(hand, remaining);
+        return InteractionResult.SUCCESS;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put(Constants.INVENTORY, inventory.serializeNBT());
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        var tag = super.getUpdateTag();
+        saveAdditional(tag);
+        return tag;
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
@@ -55,6 +89,11 @@ public class AltarEntity extends BlockEntity {
     public void tick() {
         // TODO
         if (level == null || level.isClientSide) return;
+    }
+
+    public void sendUpdate() {
+        if (level == null || level.isClientSide) return;
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
     private void changeActivityState(boolean state) {

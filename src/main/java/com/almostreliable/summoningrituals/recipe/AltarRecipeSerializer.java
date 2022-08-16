@@ -55,10 +55,10 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             output,
             inputs,
             catalyst,
-            recipeTime,
-            dayTime,
             sacrifices,
+            recipeTime,
             blockBelow,
+            dayTime,
             weather
         );
     }
@@ -96,10 +96,10 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             output,
             inputs,
             catalyst,
-            recipeTime,
-            dayTime,
             sacrifices,
+            recipeTime,
             blockBelow,
+            dayTime,
             weather
         );
     }

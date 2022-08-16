@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
@@ -25,32 +27,51 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final RecipeOutput<?> output;
     private final NonNullList<IngredientStack> inputs;
     private final Ingredient catalyst;
-    private final int recipeTime;
-    private final int dayTime;
     @Nullable private final RecipeSacrifices sacrifices;
+    private final int recipeTime;
     @Nullable private final BlockState blockBelow;
+    private final int dayTime;
     private final String weather;
 
     public AltarRecipe(
-        ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs,
-        Ingredient catalyst, int recipeTime, int dayTime, @Nullable RecipeSacrifices sacrifices,
-        @Nullable BlockState blockBelow,
+        ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs, Ingredient catalyst,
+        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockState blockBelow, int dayTime,
         String weather
     ) {
         this.recipeId = recipeId;
         this.output = output;
         this.inputs = inputs;
         this.catalyst = catalyst;
-        this.recipeTime = recipeTime;
-        this.dayTime = dayTime;
         this.sacrifices = sacrifices;
+        this.recipeTime = recipeTime;
         this.blockBelow = blockBelow;
+        this.dayTime = dayTime;
         this.weather = weather;
     }
 
     @Override
     public boolean matches(AltarInvWrapper inv, Level level) {
-        return false;
+        if (inv.getCatalyst().isEmpty() || inv.getInputs().isEmpty() || !catalyst.test(inv.getCatalyst())) {
+            return false;
+        }
+
+        var matchedItems = new Ingredient[inv.getContainerSize()];
+        List<Ingredient> matchedIngredients = new ArrayList<>();
+
+        for (var slot = 0; slot < inv.getInputs().size(); slot++) {
+            var stack = inv.getInputs().get(slot);
+            if (!stack.isEmpty() && matchedItems[slot] == null) {
+                for (var input : inputs) {
+                    if (!matchedIngredients.contains(input.ingredient()) && input.ingredient()
+                        .test(stack) && stack.getCount() >= input.count()) {
+                        matchedItems[slot] = input.ingredient();
+                        matchedIngredients.add(input.ingredient());
+                    }
+                }
+            }
+        }
+
+        return matchedIngredients.size() == inputs.size();
     }
 
     @Override
@@ -100,22 +121,22 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return catalyst;
     }
 
-    public int getRecipeTime() {
-        return recipeTime;
-    }
-
-    public int getDayTime() {
-        return dayTime;
-    }
-
     @Nullable
     public RecipeSacrifices getSacrifices() {
         return sacrifices;
     }
 
+    public int getRecipeTime() {
+        return recipeTime;
+    }
+
     @Nullable
     public BlockState getBlockBelow() {
         return blockBelow;
+    }
+
+    public int getDayTime() {
+        return dayTime;
     }
 
     public String getWeather() {
