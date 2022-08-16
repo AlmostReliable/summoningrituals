@@ -67,6 +67,21 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         onContentsChanged();
     }
 
+    public ItemStack insertItem(ItemStack stack) {
+        var remaining = stack;
+        for (var i = 0; i < inputs.size(); i++) {
+            remaining = insertItem(i, remaining, false);
+            if (remaining.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+        }
+        if (inputs.add(remaining)) {
+            onContentsChanged();
+            return ItemStack.EMPTY;
+        }
+        return remaining;
+    }
+
     private void onContentsChanged() {
         parent.setChanged();
         parent.sendUpdate();
@@ -92,21 +107,6 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
         return inputs.get(slot);
-    }
-
-    public ItemStack insertItem(ItemStack stack) {
-        var remaining = stack;
-        for (var i = 0; i < inputs.size(); i++) {
-            remaining = insertItem(i, remaining, false);
-            if (remaining.isEmpty()) {
-                return ItemStack.EMPTY;
-            }
-        }
-        if (inputs.add(remaining)) {
-            onContentsChanged();
-            return ItemStack.EMPTY;
-        }
-        return remaining;
     }
 
     @NotNull
@@ -174,15 +174,6 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return true;
     }
 
-    private void setSize(int size) {
-        inputs = NonNullList.withSize(size, ItemStack.EMPTY);
-    }
-
-    public void setCatalyst(ItemStack catalyst) {
-        this.catalyst = catalyst;
-        onContentsChanged();
-    }
-
     public AltarEntity getParent() {
         return parent;
     }
@@ -197,5 +188,14 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     public ItemStack getCatalyst() {
         return catalyst;
+    }
+
+    public void setCatalyst(ItemStack catalyst) {
+        this.catalyst = catalyst;
+        onContentsChanged();
+    }
+
+    private void setSize(int size) {
+        inputs = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 }

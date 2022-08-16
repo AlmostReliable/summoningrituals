@@ -2,8 +2,6 @@ package com.almostreliable.summoningrituals;
 
 public final class Constants {
 
-    private Constants() {}
-
     public static final String PROGRESS = "progress";
     public static final String BLOCK_BELOW = "block_below";
     public static final String CATALYST = "catalyst";
@@ -23,4 +21,6 @@ public final class Constants {
     public static final String SLOT = "slot";
     public static final String WEATHER = "weather";
     public static final String WIDTH = "width";
+
+    private Constants() {}
 }

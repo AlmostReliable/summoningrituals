@@ -49,11 +49,6 @@ public class AltarRecipeBuilder {
         return new AltarRecipeBuilder(RecipeOutput.of(item));
     }
 
-    private AltarRecipeBuilder input(IngredientStack... input) {
-        Collections.addAll(inputs, input);
-        return this;
-    }
-
     public AltarRecipeBuilder input(Ingredient item, int count) {
         return input(new IngredientStack(item, count));
     }
@@ -127,5 +122,10 @@ public class AltarRecipeBuilder {
         }
 
         return new AltarRecipe(id, output, inputs, catalyst, sacrifices, recipeTime, blockBelow, dayTime, weather);
+    }
+
+    private AltarRecipeBuilder input(IngredientStack... input) {
+        Collections.addAll(inputs, input);
+        return this;
     }
 }

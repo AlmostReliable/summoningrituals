@@ -11,10 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -91,6 +87,22 @@ public final class Utils {
         return (TranslatableComponent) output.withStyle(color);
     }
 
+    public static void sendPlayerMessage(Player player, String translationKey, ChatFormatting color, Object... args) {
+        player.sendMessage(
+            translateWithArgs("message", translationKey, color, args),
+            MOD_UUID
+        );
+    }
+
+    public static RecipeManager getRecipeManager(@Nullable Level level) {
+        if (level != null && level.getServer() != null) return level.getServer().getRecipeManager();
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            return ServerLifecycleHooks.getCurrentServer().getRecipeManager();
+        }
+        assert Minecraft.getInstance().level != null;
+        return Minecraft.getInstance().level.getRecipeManager();
+    }
+
     /**
      * Colors a given String with the given color.
      *
@@ -111,21 +123,5 @@ public final class Utils {
      */
     private static String getTranslationKey(String type, String key) {
         return String.format("%s.%s.%s", type.toLowerCase(), BuildConfig.MOD_ID, key);
-    }
-
-    public static void sendPlayerMessage(Player player, String translationKey, ChatFormatting color, Object... args) {
-        player.sendMessage(
-            translateWithArgs("message", translationKey, color, args),
-            MOD_UUID
-        );
-    }
-
-    public static RecipeManager getRecipeManager(@Nullable Level level) {
-        if (level != null && level.getServer() != null) return level.getServer().getRecipeManager();
-        if (ServerLifecycleHooks.getCurrentServer() != null) {
-            return ServerLifecycleHooks.getCurrentServer().getRecipeManager();
-        }
-        assert Minecraft.getInstance().level != null;
-        return Minecraft.getInstance().level.getRecipeManager();
     }
 }

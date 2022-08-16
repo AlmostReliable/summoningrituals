@@ -47,6 +47,25 @@ public class AltarEntity extends BlockEntity {
         if (tag.contains(Constants.PROGRESS)) progress = tag.getInt(Constants.PROGRESS);
     }
 
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put(Constants.INVENTORY, inventory.serializeNBT());
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        var tag = super.getUpdateTag();
+        saveAdditional(tag);
+        return tag;
+    }
+
     public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
         if (player.getItemInHand(hand).isEmpty()) return InteractionResult.PASS;
         if (progress > 0) {
@@ -68,6 +87,26 @@ public class AltarEntity extends BlockEntity {
         var remaining = inventory.insertItem(player.getItemInHand(hand));
         player.setItemInHand(hand, remaining);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        inventoryCap.invalidate();
+    }
+
+    @NotNull
+    @Override
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (!remove && cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)) {
+            return inventoryCap.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    public void sendUpdate() {
+        if (level == null || level.isClientSide) return;
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
     private void handleSummoning(ServerPlayer player) {
@@ -126,45 +165,6 @@ public class AltarEntity extends BlockEntity {
             }
         }
         return true;
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put(Constants.INVENTORY, inventory.serializeNBT());
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        var tag = super.getUpdateTag();
-        saveAdditional(tag);
-        return tag;
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        inventoryCap.invalidate();
-    }
-
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (!remove && cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)) {
-            return inventoryCap.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    public void sendUpdate() {
-        if (level == null || level.isClientSide) return;
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
     private void changeActivityState(boolean state) {

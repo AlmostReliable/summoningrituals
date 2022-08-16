@@ -1,16 +1,13 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import com.sun.jna.platform.win32.OpenGL32Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
-import net.minecraft.core.Vec3i;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
@@ -42,7 +39,15 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
         stack.mulPose(axis.rotation(entity.getLevel().getGameTime() / 50f));
 
         if (!entity.inventory.getCatalyst().isEmpty()) {
-            mc.getItemRenderer().renderStatic(entity.inventory.getCatalyst(), TransformType.FIXED, lightAbove, overlay, stack, buffer, 1);
+            mc.getItemRenderer()
+                .renderStatic(entity.inventory.getCatalyst(),
+                    TransformType.FIXED,
+                    lightAbove,
+                    overlay,
+                    stack,
+                    buffer,
+                    1
+                );
         }
 
         var inputs = entity.inventory.getInputs();
