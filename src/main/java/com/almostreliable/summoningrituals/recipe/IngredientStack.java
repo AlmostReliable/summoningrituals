@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
@@ -24,11 +23,5 @@ public record IngredientStack(Ingredient ingredient, int count) {
     public void toNetwork(FriendlyByteBuf buffer) {
         ingredient.toNetwork(buffer);
         buffer.writeVarInt(count);
-    }
-
-    public JsonElement toJson(JsonObject json) {
-        var ingred = ingredient.toJson();
-        if (count > 1) ingred.getAsJsonObject().addProperty(Constants.COUNT, count);
-        return ingred;
     }
 }
