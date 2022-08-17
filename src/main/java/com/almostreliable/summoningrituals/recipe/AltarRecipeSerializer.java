@@ -1,6 +1,8 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -36,13 +38,12 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         var catalyst = Ingredient.fromJson(json.getAsJsonObject(Constants.CATALYST));
         AltarRecipe.CATALYST_CACHE.add(catalyst);
 
-        var recipeTime = GsonHelper.getAsInt(json, Constants.RECIPE_TIME, 100);
-        var dayTime = GsonHelper.getAsInt(json, Constants.DAY_TIME, -1);
-
         RecipeSacrifices sacrifices = null;
         if (json.has(Constants.SACRIFICES)) {
             sacrifices = RecipeSacrifices.fromJson(json.getAsJsonObject(Constants.SACRIFICES));
         }
+
+        var recipeTime = GsonHelper.getAsInt(json, Constants.RECIPE_TIME, 100);
 
         BlockState blockBelow = null;
         if (json.has(Constants.BLOCK_BELOW)) {
@@ -50,7 +51,13 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             blockBelow = readBlockFromString(blockString);
         }
 
-        var weather = GsonHelper.getAsString(json, Constants.WEATHER, "any");
+        var dayTime = DAY_TIME.valueOf(
+            GsonHelper.getAsString(json, Constants.DAY_TIME, DAY_TIME.ANY.name()).toUpperCase()
+        );
+
+        var weather = WEATHER.valueOf(
+            GsonHelper.getAsString(json, Constants.WEATHER, WEATHER.ANY.name()).toUpperCase()
+        );
 
         return new AltarRecipe(
             recipeId,
@@ -77,13 +84,13 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         }
 
         var catalyst = Ingredient.fromNetwork(buffer);
-        var recipeTime = buffer.readVarInt();
-        var dayTime = buffer.readVarInt();
 
         RecipeSacrifices sacrifices = null;
         if (buffer.readBoolean()) {
             sacrifices = RecipeSacrifices.fromNetwork(buffer);
         }
+
+        var recipeTime = buffer.readVarInt();
 
         BlockState blockBelow = null;
         if (buffer.readBoolean()) {
@@ -91,7 +98,8 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             blockBelow = readBlockFromString(blockString);
         }
 
-        var weather = buffer.readUtf();
+        var dayTime = DAY_TIME.values()[buffer.readVarInt()];
+        var weather = WEATHER.values()[buffer.readVarInt()];
 
         return new AltarRecipe(
             recipeId,
@@ -116,8 +124,6 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         }
 
         recipe.getCatalyst().toNetwork(buffer);
-        buffer.writeVarInt(recipe.getRecipeTime());
-        buffer.writeVarInt(recipe.getDayTime());
 
         if (recipe.getSacrifices() != null) {
             buffer.writeBoolean(true);
@@ -126,6 +132,8 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             buffer.writeBoolean(false);
         }
 
+        buffer.writeVarInt(recipe.getRecipeTime());
+
         if (recipe.getBlockBelow() != null) {
             buffer.writeBoolean(true);
             buffer.writeUtf(BlockStateParser.serialize(recipe.getBlockBelow()));
@@ -133,7 +141,8 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             buffer.writeBoolean(false);
         }
 
-        buffer.writeUtf(recipe.getWeather());
+        buffer.writeVarInt(recipe.getDayTime().ordinal());
+        buffer.writeVarInt(recipe.getWeather().ordinal());
     }
 
     private BlockState readBlockFromString(String blockString) {

@@ -34,13 +34,13 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     @Nullable private final RecipeSacrifices sacrifices;
     private final int recipeTime;
     @Nullable private final BlockState blockBelow;
-    private final int dayTime;
-    private final String weather;
+    private final DAY_TIME dayTime;
+    private final WEATHER weather;
 
     public AltarRecipe(
         ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs, Ingredient catalyst,
-        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockState blockBelow, int dayTime,
-        String weather
+        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockState blockBelow, DAY_TIME dayTime,
+        WEATHER weather
     ) {
         this.recipeId = recipeId;
         this.output = output;
@@ -139,11 +139,24 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return blockBelow;
     }
 
-    public int getDayTime() {
+    public DAY_TIME getDayTime() {
         return dayTime;
     }
 
-    public String getWeather() {
+    public WEATHER getWeather() {
         return weather;
+    }
+
+    public enum WEATHER {
+        ANY,
+        SUN,
+        RAIN,
+        THUNDER
+    }
+
+    public enum DAY_TIME {
+        ANY,
+        DAY,
+        NIGHT
     }
 }

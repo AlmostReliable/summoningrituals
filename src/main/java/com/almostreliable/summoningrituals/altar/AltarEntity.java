@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.Utils;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -147,28 +148,29 @@ public class AltarEntity extends BlockEntity {
             .orElse(null);
     }
 
-    private boolean checkWeather(String weather, ServerPlayer player) {
+    private boolean checkWeather(WEATHER weather, ServerPlayer player) {
         assert level != null && !level.isClientSide;
-        if (!weather.equals("any")) {
-            switch (weather) {
-                case "rain":
-                    if (!level.isRaining()) {
-                        Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.GOLD);
-                        return false;
-                    }
-                case "thunder":
-                    if (!level.isThundering()) {
-                        Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.GOLD);
-                        return false;
-                    }
-                case "sun":
-                    if (level.isRaining() || level.isThundering()) {
-                        Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.GOLD);
-                        return false;
-                    }
-                default:
-                    throw new IllegalArgumentException("Unknown weather: " + weather);
-            }
+        switch (weather) {
+            case RAIN:
+                if (!level.isRaining()) {
+                    Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.GOLD);
+                    return false;
+                }
+                break;
+            case THUNDER:
+                if (!level.isThundering()) {
+                    Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.GOLD);
+                    return false;
+                }
+                break;
+            case SUN:
+                if (level.isRaining() || level.isThundering()) {
+                    Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.GOLD);
+                    return false;
+                }
+                break;
+            case ANY:
+                break;
         }
         return true;
     }
