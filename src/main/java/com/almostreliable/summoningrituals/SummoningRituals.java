@@ -1,6 +1,8 @@
 package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
@@ -22,6 +24,7 @@ public class SummoningRituals {
 
     private static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(Setup.ALTAR_BLOCK.get(), RenderType.cutout());
             BlockEntityRenderers.register(Setup.ALTAR_ENTITY.get(), AltarRenderer::new);
         });
     }

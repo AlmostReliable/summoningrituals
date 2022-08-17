@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "summoningrituals:block/altar",
   "textures": {
-    "all": "summoningrituals:block/altar_active"
+    "0": "summoningrituals:block/altar_active",
+    "particle": "summoningrituals:block/altar_active"
   }
 }
