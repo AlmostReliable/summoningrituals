@@ -3,16 +3,20 @@ package com.almostreliable.summoningrituals.inventory;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Utils;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 import static com.almostreliable.summoningrituals.Utils.f;
 
@@ -20,43 +24,63 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private final AltarEntity parent;
     private final AltarInvWrapper vanillaInv;
-    private NonNullList<ItemStack> inputs;
+    // TODO: serialize insertOrder, clear insertOrder when crafted
+    private final Deque<Tuple<ItemStack, Integer>> insertOrder;
+    // TODO: drop all inputs when crafted
+    private List<ItemStack> items;
     private ItemStack catalyst;
 
     public AltarInventory(AltarEntity parent) {
         this.parent = parent;
         vanillaInv = new AltarInvWrapper(this);
-        inputs = NonNullList.create();
+        items = new ArrayList<>();
         catalyst = ItemStack.EMPTY;
+        insertOrder = new ArrayDeque<>();
     }
 
     @Override
     public CompoundTag serializeNBT() {
-        var tagList = new ListTag();
-        for (var slot = 0; slot < inputs.size(); slot++) {
-            if (!inputs.get(slot).isEmpty()) {
+        var insertList = new ListTag();
+        for (var insert : insertOrder) {
+            var insertTag = new CompoundTag();
+            insert.getA().save(insertTag);
+            insertTag.putInt(Constants.SLOT, insert.getB());
+            insertList.add(insertTag);
+        }
+        var itemList = new ListTag();
+        for (var slot = 0; slot < items.size(); slot++) {
+            if (!items.get(slot).isEmpty()) {
                 var itemTag = new CompoundTag();
                 itemTag.putInt(Constants.SLOT, slot);
-                inputs.get(slot).save(itemTag);
-                tagList.add(itemTag);
+                items.get(slot).save(itemTag);
+                itemList.add(itemTag);
             }
         }
         var tag = new CompoundTag();
-        tag.putInt(Constants.SIZE, inputs.size());
-        tag.put(Constants.ITEMS, tagList);
+        tag.put(Constants.INSERT_ORDER, insertList);
+        tag.putInt(Constants.SIZE, items.size());
+        tag.put(Constants.ITEMS, itemList);
         tag.put(Constants.CATALYST, catalyst.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        setSize(tag.contains(Constants.SIZE) ? tag.getInt(Constants.SIZE) : inputs.size());
-        var tagList = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
-        for (var i = 0; i < tagList.size(); i++) {
-            var itemTags = tagList.getCompound(i);
-            var slot = itemTags.getInt(Constants.SLOT);
-            if (slot >= 0 && slot < inputs.size()) {
-                inputs.set(slot, ItemStack.of(itemTags));
+        var insertList = tag.getList(Constants.INSERT_ORDER, Tag.TAG_COMPOUND);
+        insertOrder.clear();
+        for (var insertTag : insertList) {
+            var stack = ItemStack.of((CompoundTag) insertTag);
+            insertOrder.add(new Tuple<>(stack, ((CompoundTag) insertTag).getInt(Constants.SLOT)));
+        }
+        items = new ArrayList<>();
+        for (var i = 0; i < tag.getInt(Constants.SIZE); i++) {
+            items.add(ItemStack.EMPTY);
+        }
+        var itemList = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
+        for (var itemTag : itemList) {
+            var slot = ((CompoundTag) itemTag).getInt(Constants.SLOT);
+            if (slot >= 0 && slot < items.size()) {
+                items.set(slot, ItemStack.of((CompoundTag) itemTag));
             }
         }
         catalyst = ItemStack.of(tag.getCompound(Constants.CATALYST));
@@ -65,34 +89,77 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         validateSlot(slot);
-        inputs.set(slot, stack);
+        items.set(slot, stack);
         onContentsChanged();
     }
 
     public ItemStack insertItem(ItemStack stack) {
-        for (var i = 0; i < inputs.size(); i++) {
-            stack = insertItem(i, stack, false);
-            if (stack.isEmpty()) {
+        if (stack.isEmpty()) return ItemStack.EMPTY;
+
+        var remaining = stack;
+        for (var i = 0; i < items.size(); i++) {
+            remaining = insertItem(i, remaining, false);
+            if (remaining.isEmpty()) {
+                insertOrder.push(new Tuple<>(stack, i));
                 return ItemStack.EMPTY;
             }
+            if (remaining.getCount() == stack.getCount()) {
+                continue;
+            }
+            stack.shrink(remaining.getCount());
+            insertOrder.push(new Tuple<>(stack.copy(), i));
+            return remaining;
         }
-        if (inputs.add(stack)) {
+
+        if (items.add(stack)) {
+            insertOrder.push(new Tuple<>(stack.copy(), items.size() - 1));
             onContentsChanged();
             return ItemStack.EMPTY;
         }
         return stack;
     }
 
+    public void popLastInserted() {
+        assert parent.getLevel() != null && !parent.getLevel().isClientSide;
+
+        if (!catalyst.isEmpty()) {
+            Utils.dropItem(parent.getLevel(), parent.getBlockPos(), catalyst, true);
+            catalyst = ItemStack.EMPTY;
+            return;
+        }
+
+        if (insertOrder.isEmpty()) return;
+        var last = insertOrder.pop();
+        var stack = last.getA();
+        int slot = last.getB();
+        items.get(slot).shrink(stack.getCount());
+        if (items.get(slot).isEmpty()) {
+            trimInputs();
+        }
+        onContentsChanged();
+        Utils.dropItem(parent.getLevel(), parent.getBlockPos(), stack, true);
+    }
+
     public void dropContents() {
         var level = parent.getLevel();
         assert level != null && !level.isClientSide;
         var pos = parent.getBlockPos();
-        for (var stack : inputs) {
+        for (var stack : items) {
             if (stack.isEmpty()) continue;
             Utils.dropItem(level, pos, stack, false);
         }
         if (!catalyst.isEmpty()) {
             Utils.dropItem(level, pos, catalyst, false);
+        }
+    }
+
+    private void trimInputs() {
+        for (var i = items.size() - 1; i >= 0; i--) {
+            if (items.get(i).isEmpty()) {
+                items.remove(i);
+            } else {
+                break;
+            }
         }
     }
 
@@ -102,8 +169,8 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     private void validateSlot(int slot) {
-        if (slot < 0 || slot >= inputs.size()) {
-            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, inputs.size()));
+        if (slot < 0 || slot >= items.size()) {
+            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, items.size()));
         }
     }
 
@@ -113,14 +180,14 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     @Override
     public int getSlots() {
-        return inputs.size();
+        return items.size();
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
-        return inputs.get(slot);
+        return items.get(slot);
     }
 
     @Nonnull
@@ -130,7 +197,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (!isItemValid(slot, stack)) return stack;
         validateSlot(slot);
 
-        var current = inputs.get(slot);
+        var current = items.get(slot);
         var limit = getStackLimit(slot, stack);
         if (!current.isEmpty()) {
             if (!ItemHandlerHelper.canItemStacksStack(stack, current)) return stack;
@@ -141,7 +208,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         var reachedLimit = stack.getCount() > limit;
         if (!simulate) {
             if (current.isEmpty()) {
-                inputs.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
+                items.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
             } else {
                 current.grow(reachedLimit ? limit : stack.getCount());
             }
@@ -157,20 +224,20 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (amount == 0) return ItemStack.EMPTY;
         validateSlot(slot);
 
-        var current = inputs.get(slot);
+        var current = items.get(slot);
         if (current.isEmpty()) return ItemStack.EMPTY;
         var toExtract = Math.min(amount, current.getMaxStackSize());
 
         if (current.getCount() <= toExtract) {
             if (!simulate) {
-                inputs.set(slot, ItemStack.EMPTY);
+                items.set(slot, ItemStack.EMPTY);
                 onContentsChanged();
                 return current;
             }
             return current.copy();
         }
         if (!simulate) {
-            inputs.set(slot, ItemHandlerHelper.copyStackWithSize(current, current.getCount() - toExtract));
+            items.set(slot, ItemHandlerHelper.copyStackWithSize(current, current.getCount() - toExtract));
             onContentsChanged();
         }
 
@@ -196,8 +263,8 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return vanillaInv;
     }
 
-    public NonNullList<ItemStack> getInputs() {
-        return inputs;
+    public List<ItemStack> getItems() {
+        return items;
     }
 
     public ItemStack getCatalyst() {
@@ -207,9 +274,5 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     public void setCatalyst(ItemStack catalyst) {
         this.catalyst = catalyst;
         onContentsChanged();
-    }
-
-    private void setSize(int size) {
-        inputs = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 }

@@ -2,7 +2,6 @@ package com.almostreliable.summoningrituals;
 
 public final class Constants {
 
-    public static final String PROGRESS = "progress";
     public static final String BLOCK_BELOW = "block_below";
     public static final String CATALYST = "catalyst";
     public static final String COUNT = "count";
@@ -11,10 +10,12 @@ public final class Constants {
     public static final String ENTITY = "entity";
     public static final String HEIGHT = "height";
     public static final String INPUT = "input";
+    public static final String INSERT_ORDER = "insert_order";
     public static final String INVENTORY = "inventory";
     public static final String ITEM = "item";
     public static final String ITEMS = "items";
     public static final String OUTPUT = "output";
+    public static final String PROGRESS = "progress";
     public static final String RECIPE_TIME = "recipe_time";
     public static final String SACRIFICES = "sacrifices";
     public static final String SIZE = "size";

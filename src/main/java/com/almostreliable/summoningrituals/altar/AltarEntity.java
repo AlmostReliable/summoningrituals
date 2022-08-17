@@ -72,13 +72,17 @@ public class AltarEntity extends BlockEntity {
         Utils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
     }
 
-    public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
-        // TODO: queue the inserted items and give them back when shift right clicking
-        var stack = player.getItemInHand(hand);
-        if (stack.isEmpty()) return InteractionResult.PASS;
+    public InteractionResult handleInteraction(ServerPlayer player, ItemStack stack) {
         if (progress > 0) {
             Utils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
             return InteractionResult.PASS;
+        }
+
+        if (stack.isEmpty()) {
+            if (player.isShiftKeyDown()) {
+                inventory.popLastInserted();
+            }
+            return InteractionResult.SUCCESS;
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
@@ -89,14 +93,14 @@ public class AltarEntity extends BlockEntity {
             } else {
                 recipeCache = recipe;
                 stack.shrink(1);
-                player.setItemInHand(hand, stack.isEmpty() ? ItemStack.EMPTY : stack);
+                player.setItemInHand(InteractionHand.MAIN_HAND, stack.isEmpty() ? ItemStack.EMPTY : stack);
                 handleSummoning(recipe, player);
                 return InteractionResult.SUCCESS;
             }
         }
 
-        var remaining = inventory.insertItem(player.getItemInHand(hand));
-        player.setItemInHand(hand, remaining);
+        var remaining = inventory.insertItem(stack);
+        player.setItemInHand(InteractionHand.MAIN_HAND, remaining);
         return InteractionResult.SUCCESS;
     }
 
@@ -127,7 +131,7 @@ public class AltarEntity extends BlockEntity {
         if (!checkWeather(recipe.getWeather(), player)) return;
 
         // TODO: actually implement recipe processing, this is only for testing
-        inventory.getInputs().clear();
+        inventory.getItems().clear();
         inventory.setCatalyst(ItemStack.EMPTY);
         Utils.dropItem(level, worldPosition, (ItemStack) recipe.getOutput().getEntry(), true);
     }

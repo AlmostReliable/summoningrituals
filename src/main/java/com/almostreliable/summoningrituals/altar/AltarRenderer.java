@@ -51,7 +51,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
                 );
         }
 
-        var inputs = entity.inventory.getInputs();
+        var inputs = entity.inventory.getItems();
         for (var i = 0; i < inputs.size(); i++) {
             stack.pushPose();
             stack.mulPose(axis.rotation(i * 360f / inputs.size()));

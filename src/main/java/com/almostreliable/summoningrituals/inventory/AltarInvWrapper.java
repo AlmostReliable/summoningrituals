@@ -1,9 +1,10 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.altar.AltarEntity;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
+
+import java.util.List;
 
 public class AltarInvWrapper extends RecipeWrapper {
 
@@ -18,8 +19,8 @@ public class AltarInvWrapper extends RecipeWrapper {
         return delegate.getParent();
     }
 
-    public NonNullList<ItemStack> getInputs() {
-        return delegate.getInputs();
+    public List<ItemStack> getInputs() {
+        return delegate.getItems();
     }
 
     public ItemStack getCatalyst() {

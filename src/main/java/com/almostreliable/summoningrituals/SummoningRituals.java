@@ -4,6 +4,7 @@ import com.almostreliable.summoningrituals.altar.AltarRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -30,7 +31,11 @@ public class SummoningRituals {
     }
 
     private static void onRightClick(RightClickBlock event) {
-        if (!event.getPlayer().isShiftKeyDown() &&
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
+        var player = event.getPlayer();
+        var item = player.getItemInHand(InteractionHand.MAIN_HAND);
+
+        if (((player.isShiftKeyDown() && item.isEmpty()) || (!player.isShiftKeyDown() && !item.isEmpty())) &&
             event.getWorld().getBlockState(event.getPos()).getBlock().equals(Setup.ALTAR_BLOCK.get())) {
             event.setUseBlock(Result.ALLOW);
             event.setUseItem(Result.DENY);

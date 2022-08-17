@@ -70,8 +70,9 @@ public class AltarBlock extends Block implements EntityBlock {
     public InteractionResult use(
         BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit
     ) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            return altar.handleInteraction(serverPlayer, hand);
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && hand == InteractionHand.MAIN_HAND &&
+            level.getBlockEntity(pos) instanceof AltarEntity altar) {
+            return altar.handleInteraction(serverPlayer, player.getItemInHand(InteractionHand.MAIN_HAND));
         }
         return super.use(state, level, pos, player, hand, hit);
     }
