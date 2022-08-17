@@ -125,6 +125,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (!catalyst.isEmpty()) {
             Utils.dropItem(parent.getLevel(), parent.getBlockPos(), catalyst, true);
             catalyst = ItemStack.EMPTY;
+            onContentsChanged();
             return;
         }
 
