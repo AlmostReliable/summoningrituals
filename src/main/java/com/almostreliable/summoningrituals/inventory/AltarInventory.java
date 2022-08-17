@@ -70,18 +70,17 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     public ItemStack insertItem(ItemStack stack) {
-        var remaining = stack;
         for (var i = 0; i < inputs.size(); i++) {
-            remaining = insertItem(i, remaining, false);
-            if (remaining.isEmpty()) {
+            stack = insertItem(i, stack, false);
+            if (stack.isEmpty()) {
                 return ItemStack.EMPTY;
             }
         }
-        if (inputs.add(remaining)) {
+        if (inputs.add(stack)) {
             onContentsChanged();
             return ItemStack.EMPTY;
         }
-        return remaining;
+        return stack;
     }
 
     public void dropContents() {

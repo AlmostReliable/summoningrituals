@@ -15,7 +15,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -74,6 +73,7 @@ public class AltarEntity extends BlockEntity {
     }
 
     public InteractionResult handleInteraction(ServerPlayer player, InteractionHand hand) {
+        // TODO: queue the inserted items and give them back when shift right clicking
         var stack = player.getItemInHand(hand);
         if (stack.isEmpty()) return InteractionResult.PASS;
         if (progress > 0) {
@@ -82,14 +82,14 @@ public class AltarEntity extends BlockEntity {
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
-            inventory.setCatalyst(stack);
+            inventory.setCatalyst(new ItemStack(stack.getItem(), 1));
             var recipe = findRecipe();
             if (recipe == null) {
                 inventory.setCatalyst(ItemStack.EMPTY);
             } else {
-                // TODO: make sure only one catalyst is accepted and consumed
-                player.setItemInHand(hand, ItemStack.EMPTY);
                 recipeCache = recipe;
+                stack.shrink(1);
+                player.setItemInHand(hand, stack.isEmpty() ? ItemStack.EMPTY : stack);
                 handleSummoning(recipe, player);
                 return InteractionResult.SUCCESS;
             }
