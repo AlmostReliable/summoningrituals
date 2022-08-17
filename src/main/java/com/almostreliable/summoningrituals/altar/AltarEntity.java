@@ -5,8 +5,10 @@ import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.Utils;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -128,8 +130,13 @@ public class AltarEntity extends BlockEntity {
     private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
-        // TODO: check weather, daytime, block below, sacrifices
-        if (!checkWeather(recipe.getWeather(), player)) return;
+        // TODO: check sacrifices
+        if (!checkBlockBelow(recipe.getBlockBelow(), player) ||
+            !checkDayTime(recipe.getDayTime(), player) ||
+            !checkWeather(recipe.getWeather(), player)) {
+            inventory.popLastInserted();
+            return;
+        }
 
         // TODO: actually implement recipe processing, this is only for testing
         inventory.getItems().clear();
@@ -148,24 +155,55 @@ public class AltarEntity extends BlockEntity {
             .orElse(null);
     }
 
+    private boolean checkBlockBelow(@Nullable BlockState blockBelow, ServerPlayer player) {
+        assert level != null && !level.isClientSide;
+        if (blockBelow == null) return true;
+        if (level.getBlockState(worldPosition.below()).equals(blockBelow)) {
+            return true;
+        }
+        Utils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);
+        return false;
+    }
+
+    private boolean checkDayTime(DAY_TIME dayTime, ServerPlayer player) {
+        assert level != null && !level.isClientSide;
+        switch (dayTime) {
+            case DAY:
+                if (!level.isDay()) {
+                    Utils.sendPlayerMessage(player, "no_day", ChatFormatting.YELLOW);
+                    return false;
+                }
+                break;
+            case NIGHT:
+                if (!level.isNight()) {
+                    Utils.sendPlayerMessage(player, "no_night", ChatFormatting.YELLOW);
+                    return false;
+                }
+                break;
+            case ANY:
+                break;
+        }
+        return true;
+    }
+
     private boolean checkWeather(WEATHER weather, ServerPlayer player) {
         assert level != null && !level.isClientSide;
         switch (weather) {
             case RAIN:
                 if (!level.isRaining()) {
-                    Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.GOLD);
+                    Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
             case THUNDER:
                 if (!level.isThundering()) {
-                    Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.GOLD);
+                    Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
             case SUN:
                 if (level.isRaining() || level.isThundering()) {
-                    Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.GOLD);
+                    Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;

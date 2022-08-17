@@ -16,5 +16,6 @@
   ],
   "catalyst": {
     "item": "minecraft:diamond"
-  }
+  },
+  "block_below": "minecraft:stone"
 }

@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -20,8 +22,8 @@ public class AltarRecipeBuilder {
     @Nullable private RecipeSacrifices sacrifices;
     private int recipeTime = 100;
     @Nullable private BlockState blockBelow;
-    private int dayTime = -1;
-    private String weather = "any";
+    private DAY_TIME dayTime = DAY_TIME.ANY;
+    private WEATHER weather = WEATHER.ANY;
 
     private AltarRecipeBuilder(RecipeOutput<?> output) {
         this.output = output;
@@ -86,11 +88,12 @@ public class AltarRecipeBuilder {
         return this;
     }
 
-    public AltarRecipeBuilder dayTime(int dayTime) {
-        if (this.dayTime != -1) {
+    public AltarRecipeBuilder dayTime(String dayTime) {
+        var dayTimeEnum = DAY_TIME.valueOf(dayTime.toUpperCase());
+        if (dayTimeEnum != DAY_TIME.ANY) {
             throw new IllegalArgumentException("dayTime has already been set");
         }
-        this.dayTime = dayTime;
+        this.dayTime = dayTimeEnum;
         return this;
     }
 
@@ -108,10 +111,11 @@ public class AltarRecipeBuilder {
     }
 
     public AltarRecipeBuilder weather(String weather) {
-        if (!this.weather.equals("any")) {
+        var weatherEnum = WEATHER.valueOf(weather.toUpperCase());
+        if (weatherEnum != WEATHER.ANY) {
             throw new IllegalArgumentException("weather has already been set");
         }
-        this.weather = weather;
+        this.weather = weatherEnum;
         return this;
     }
 
