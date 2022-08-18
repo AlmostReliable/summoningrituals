@@ -22,6 +22,7 @@ import java.util.Objects;
 public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AltarRecipe> {
 
     // TODO: check if varInt is the correct thing for serialization
+    // TODO: add proper serialization for the block below | split the block state properties to a json object
 
     @Override
     public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {

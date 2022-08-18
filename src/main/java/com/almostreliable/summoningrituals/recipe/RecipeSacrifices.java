@@ -2,10 +2,15 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.google.gson.JsonObject;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+
+import java.util.function.Predicate;
 
 public class RecipeSacrifices {
 
@@ -14,8 +19,8 @@ public class RecipeSacrifices {
     private final NonNullList<Sacrifice> sacrifices;
 
     public RecipeSacrifices() {
-        width = 1;
-        height = 1;
+        width = 2;
+        height = 2;
         sacrifices = NonNullList.create();
     }
 
@@ -26,8 +31,8 @@ public class RecipeSacrifices {
     }
 
     public static RecipeSacrifices fromJson(JsonObject json) {
-        var width = GsonHelper.getAsInt(json, Constants.WIDTH, 1);
-        var height = GsonHelper.getAsInt(json, Constants.HEIGHT, 1);
+        var width = GsonHelper.getAsInt(json, Constants.WIDTH, 2);
+        var height = GsonHelper.getAsInt(json, Constants.HEIGHT, 2);
         var entities = json.getAsJsonArray(Constants.ENTITIES);
         NonNullList<Sacrifice> sacrifices = NonNullList.create();
         for (var entity : entities) {
@@ -60,7 +65,18 @@ public class RecipeSacrifices {
         sacrifices.add(new Sacrifice(id, count));
     }
 
-    private record Sacrifice(ResourceLocation entity, int count) {
+    public AABB getRegion(BlockPos pos) {
+        return new AABB(pos.offset(-width, -height, -width), pos.offset(width, height, width));
+    }
+
+    public boolean test(Predicate<? super Sacrifice> predicate) {
+        for (var sacrifice : sacrifices) {
+            if (!predicate.test(sacrifice)) return false;
+        }
+        return true;
+    }
+
+    public record Sacrifice(ResourceLocation entity, int count) {
 
         private static Sacrifice fromJson(JsonObject json) {
             var entity = new ResourceLocation(GsonHelper.getAsString(json, Constants.ENTITY));
@@ -77,6 +93,10 @@ public class RecipeSacrifices {
         private void toNetwork(FriendlyByteBuf buffer) {
             buffer.writeUtf(entity.toString());
             buffer.writeVarInt(count);
+        }
+
+        public boolean matches(Entity toCheck) {
+            return entity.equals(toCheck.getType().getRegistryName());
         }
     }
 }

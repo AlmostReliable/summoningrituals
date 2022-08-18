@@ -10,5 +10,6 @@
   "message.summoningrituals.no_sun": "You need to be in the sun to start the ritual.",
   "message.summoningrituals.no_night": "You need to be in the night to start the ritual.",
   "message.summoningrituals.no_day": "You need to be in the day to start the ritual.",
-  "message.summoningrituals.no_block_below": "You need to have the correct block below to start the ritual."
+  "message.summoningrituals.no_block_below": "You need to have the correct block below to start the ritual.",
+  "message.summoningrituals.sacrifice_missing": "You have missing sacrifices."
 }

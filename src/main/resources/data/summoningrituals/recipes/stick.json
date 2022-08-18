@@ -17,5 +17,15 @@
   "catalyst": {
     "item": "minecraft:diamond"
   },
+  "sacrifices": {
+    "width": 3,
+    "height": 3,
+    "entities": [
+      {
+        "entity": "minecraft:zombie",
+        "count": 3
+      }
+    ]
+  },
   "block_below": "minecraft:stone"
 }
