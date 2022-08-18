@@ -27,5 +27,10 @@
       }
     ]
   },
-  "block_below": "minecraft:stone"
+  "block_below": {
+    "block": "minecraft:furnace",
+    "states": {
+      "lit": true
+    }
+  }
 }

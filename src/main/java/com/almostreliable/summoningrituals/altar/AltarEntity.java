@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
+import com.almostreliable.summoningrituals.recipe.BlockReference;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -182,11 +183,10 @@ public class AltarEntity extends BlockEntity {
         return success ? toKill : null;
     }
 
-    private boolean checkBlockBelow(@Nullable BlockState blockBelow, ServerPlayer player) {
+    private boolean checkBlockBelow(@Nullable BlockReference blockBelow, ServerPlayer player) {
         // TODO: when the serialization for the block is done, check if properties even exist, if not, only match the block
         assert level != null && !level.isClientSide;
-        if (blockBelow == null) return true;
-        if (level.getBlockState(worldPosition.below()).equals(blockBelow)) {
+        if (blockBelow == null || blockBelow.test(level.getBlockState(worldPosition.below()))) {
             return true;
         }
         TextUtils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);

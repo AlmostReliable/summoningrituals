@@ -4,20 +4,14 @@ import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AltarRecipe> {
 
@@ -45,10 +39,9 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
         var recipeTime = GsonHelper.getAsInt(json, Constants.RECIPE_TIME, 100);
 
-        BlockState blockBelow = null;
+        BlockReference blockBelow = null;
         if (json.has(Constants.BLOCK_BELOW)) {
-            var blockString = GsonHelper.getAsString(json, Constants.BLOCK_BELOW);
-            blockBelow = readBlockFromString(blockString);
+            blockBelow = BlockReference.fromJson(json.getAsJsonObject(Constants.BLOCK_BELOW));
         }
 
         var dayTime = DAY_TIME.valueOf(
@@ -92,10 +85,9 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
         var recipeTime = buffer.readInt();
 
-        BlockState blockBelow = null;
+        BlockReference blockBelow = null;
         if (buffer.readBoolean()) {
-            var blockString = buffer.readUtf();
-            blockBelow = readBlockFromString(blockString);
+            blockBelow = BlockReference.fromNetwork(buffer);
         }
 
         var dayTime = DAY_TIME.values()[buffer.readVarInt()];
@@ -136,23 +128,12 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
         if (recipe.getBlockBelow() != null) {
             buffer.writeBoolean(true);
-            buffer.writeUtf(BlockStateParser.serialize(recipe.getBlockBelow()));
+            recipe.getBlockBelow().toNetwork(buffer);
         } else {
             buffer.writeBoolean(false);
         }
 
         buffer.writeVarInt(recipe.getDayTime().ordinal());
         buffer.writeVarInt(recipe.getWeather().ordinal());
-    }
-
-    private BlockState readBlockFromString(String blockString) {
-        var reader = new StringReader(blockString);
-        var parser = new BlockStateParser(reader, false);
-        try {
-            parser.parse(false);
-        } catch (CommandSyntaxException e) {
-            throw new IllegalArgumentException("Invalid block state: " + blockString);
-        }
-        return Objects.requireNonNull(parser.getState());
     }
 }

@@ -33,13 +33,13 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final Ingredient catalyst;
     @Nullable private final RecipeSacrifices sacrifices;
     private final int recipeTime;
-    @Nullable private final BlockState blockBelow;
+    @Nullable private final BlockReference blockBelow;
     private final DAY_TIME dayTime;
     private final WEATHER weather;
 
     public AltarRecipe(
         ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs, Ingredient catalyst,
-        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockState blockBelow, DAY_TIME dayTime,
+        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
         WEATHER weather
     ) {
         this.recipeId = recipeId;
@@ -135,7 +135,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     }
 
     @Nullable
-    public BlockState getBlockBelow() {
+    public BlockReference getBlockBelow() {
         return blockBelow;
     }
 

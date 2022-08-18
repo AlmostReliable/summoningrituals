@@ -18,6 +18,8 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 @Mod(BuildConfig.MOD_ID)
 public class SummoningRituals {
 
+    // TODO: dispatch kube event on successful summoning
+
     public SummoningRituals() {
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(SummoningRituals::onClientSetup);

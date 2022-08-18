@@ -22,6 +22,8 @@ public final class Constants {
     public static final String SLOT = "slot";
     public static final String WEATHER = "weather";
     public static final String WIDTH = "width";
+    public static final String BLOCK = "block";
+    public static final String STATES = "states";
 
     private Constants() {}
 }

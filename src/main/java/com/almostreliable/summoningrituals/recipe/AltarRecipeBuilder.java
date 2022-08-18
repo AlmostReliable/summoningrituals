@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class AltarRecipeBuilder {
 
@@ -21,7 +22,7 @@ public class AltarRecipeBuilder {
     @Nullable private Ingredient catalyst;
     @Nullable private RecipeSacrifices sacrifices;
     private int recipeTime = 100;
-    @Nullable private BlockState blockBelow;
+    @Nullable private BlockReference blockBelow;
     private DAY_TIME dayTime = DAY_TIME.ANY;
     private WEATHER weather = WEATHER.ANY;
 
@@ -106,7 +107,7 @@ public class AltarRecipeBuilder {
         if (this.blockBelow != null) {
             throw new IllegalArgumentException("blockBelow has already been set");
         }
-        this.blockBelow = blockBelow;
+        this.blockBelow = BlockReference.fromState(blockBelow);
         return this;
     }
 
