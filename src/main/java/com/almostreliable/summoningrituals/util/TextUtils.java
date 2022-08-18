@@ -1,28 +1,21 @@
-package com.almostreliable.summoningrituals;
+package com.almostreliable.summoningrituals.util;
 
+import com.almostreliable.summoningrituals.BuildConfig;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public final class Utils {
+public final class TextUtils {
 
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{}");
     private static final UUID MOD_UUID = UUID.nameUUIDFromBytes(BuildConfig.MOD_ID.getBytes());
 
-    private Utils() {}
+    private TextUtils() {}
 
     /**
      * A helper method to format a string with simple bracket placeholders.
@@ -95,25 +88,6 @@ public final class Utils {
             translateWithArgs("message", translationKey, color, args),
             MOD_UUID
         );
-    }
-
-    public static RecipeManager getRecipeManager(@Nullable Level level) {
-        if (level != null && level.getServer() != null) return level.getServer().getRecipeManager();
-        if (ServerLifecycleHooks.getCurrentServer() != null) {
-            return ServerLifecycleHooks.getCurrentServer().getRecipeManager();
-        }
-        assert Minecraft.getInstance().level != null;
-        return Minecraft.getInstance().level.getRecipeManager();
-    }
-
-    public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
-        level.addFreshEntity(new ItemEntity(
-            level,
-            pos.getX() + (offset ? 0.5 : 0),
-            pos.getY() + (offset ? 0.5 : 0),
-            pos.getZ() + (offset ? 0.5 : 0),
-            stack
-        ));
     }
 
     /**

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import static com.almostreliable.summoningrituals.Utils.f;
+import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 @Mod(BuildConfig.MOD_ID)
 public class SummoningRituals {

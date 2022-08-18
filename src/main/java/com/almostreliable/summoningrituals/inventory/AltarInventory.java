@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Utils;
+import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static com.almostreliable.summoningrituals.Utils.f;
+import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
 
@@ -123,7 +123,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         assert parent.getLevel() != null && !parent.getLevel().isClientSide;
 
         if (!catalyst.isEmpty()) {
-            Utils.dropItem(parent.getLevel(), parent.getBlockPos(), catalyst, true);
+            GameUtils.dropItem(parent.getLevel(), parent.getBlockPos(), catalyst, true);
             catalyst = ItemStack.EMPTY;
             onContentsChanged();
             return;
@@ -138,7 +138,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
             trimInputs();
         }
         onContentsChanged();
-        Utils.dropItem(parent.getLevel(), parent.getBlockPos(), stack, true);
+        GameUtils.dropItem(parent.getLevel(), parent.getBlockPos(), stack, true);
     }
 
     public void dropContents() {
@@ -147,10 +147,10 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         var pos = parent.getBlockPos();
         for (var stack : items) {
             if (stack.isEmpty()) continue;
-            Utils.dropItem(level, pos, stack, false);
+            GameUtils.dropItem(level, pos, stack, false);
         }
         if (!catalyst.isEmpty()) {
-            Utils.dropItem(level, pos, catalyst, false);
+            GameUtils.dropItem(level, pos, catalyst, false);
         }
     }
 

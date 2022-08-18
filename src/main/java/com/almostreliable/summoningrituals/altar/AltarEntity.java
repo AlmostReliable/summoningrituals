@@ -1,14 +1,13 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.almostreliable.summoningrituals.BuildConfig;
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.Utils;
+import com.almostreliable.summoningrituals.*;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
+import com.almostreliable.summoningrituals.util.GameUtils;
+import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,11 +16,9 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,9 +30,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.almostreliable.summoningrituals.Utils.f;
+import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarEntity extends BlockEntity {
 
@@ -81,12 +77,12 @@ public class AltarEntity extends BlockEntity {
         assert level != null && !level.isClientSide;
         inventory.dropContents();
         if (creative) return;
-        Utils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
+        GameUtils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
     }
 
     public InteractionResult handleInteraction(ServerPlayer player, ItemStack stack) {
         if (progress > 0) {
-            Utils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
+            TextUtils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
             return InteractionResult.PASS;
         }
 
@@ -152,7 +148,7 @@ public class AltarEntity extends BlockEntity {
         // TODO: actually implement recipe processing, this is only for testing
         inventory.getItems().clear();
         inventory.setCatalyst(ItemStack.EMPTY);
-        Utils.dropItem(level, worldPosition, (ItemStack) recipe.getOutput().getEntry(), true);
+        GameUtils.dropItem(level, worldPosition, (ItemStack) recipe.getOutput().getEntry(), true);
         sacrifices.forEach(EntitySacrifice::kill);
     }
 
@@ -162,7 +158,7 @@ public class AltarEntity extends BlockEntity {
         if (recipeCache != null && recipeCache.matches(inventory.getVanillaInv(), level)) {
             return recipeCache;
         }
-        var recipeManager = Utils.getRecipeManager(level);
+        var recipeManager = GameUtils.getRecipeManager(level);
         return recipeManager.getRecipeFor(Setup.ALTAR_RECIPE.type().get(), inventory.getVanillaInv(), level)
             .orElse(null);
     }
@@ -177,7 +173,7 @@ public class AltarEntity extends BlockEntity {
         var success = sacrifices.test(sacrifice -> {
             var found = entities.stream().filter(sacrifice::matches).toList();
             if (found.size() < sacrifice.count()) {
-                Utils.sendPlayerMessage(player, "sacrifice_missing", ChatFormatting.YELLOW);
+                TextUtils.sendPlayerMessage(player, "sacrifice_missing", ChatFormatting.YELLOW);
                 return false;
             }
             toKill.add(new EntitySacrifice(found, sacrifice.count()));
@@ -193,7 +189,7 @@ public class AltarEntity extends BlockEntity {
         if (level.getBlockState(worldPosition.below()).equals(blockBelow)) {
             return true;
         }
-        Utils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);
+        TextUtils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);
         return false;
     }
 
@@ -202,13 +198,13 @@ public class AltarEntity extends BlockEntity {
         switch (dayTime) {
             case DAY:
                 if (!level.isDay()) {
-                    Utils.sendPlayerMessage(player, "no_day", ChatFormatting.YELLOW);
+                    TextUtils.sendPlayerMessage(player, "no_day", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
             case NIGHT:
                 if (!level.isNight()) {
-                    Utils.sendPlayerMessage(player, "no_night", ChatFormatting.YELLOW);
+                    TextUtils.sendPlayerMessage(player, "no_night", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
@@ -223,19 +219,19 @@ public class AltarEntity extends BlockEntity {
         switch (weather) {
             case RAIN:
                 if (!level.isRaining()) {
-                    Utils.sendPlayerMessage(player, "no_rain", ChatFormatting.YELLOW);
+                    TextUtils.sendPlayerMessage(player, "no_rain", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
             case THUNDER:
                 if (!level.isThundering()) {
-                    Utils.sendPlayerMessage(player, "no_thunder", ChatFormatting.YELLOW);
+                    TextUtils.sendPlayerMessage(player, "no_thunder", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
             case SUN:
                 if (level.isRaining() || level.isThundering()) {
-                    Utils.sendPlayerMessage(player, "no_sun", ChatFormatting.YELLOW);
+                    TextUtils.sendPlayerMessage(player, "no_sun", ChatFormatting.YELLOW);
                     return false;
                 }
                 break;
