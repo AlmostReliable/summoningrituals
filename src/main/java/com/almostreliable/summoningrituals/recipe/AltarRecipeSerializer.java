@@ -21,7 +21,6 @@ import java.util.Objects;
 
 public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AltarRecipe> {
 
-    // TODO: check if varInt is the correct thing for serialization
     // TODO: add proper serialization for the block below | split the block state properties to a json object
 
     @Override
@@ -91,7 +90,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             sacrifices = RecipeSacrifices.fromNetwork(buffer);
         }
 
-        var recipeTime = buffer.readVarInt();
+        var recipeTime = buffer.readInt();
 
         BlockState blockBelow = null;
         if (buffer.readBoolean()) {
@@ -133,7 +132,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             buffer.writeBoolean(false);
         }
 
-        buffer.writeVarInt(recipe.getRecipeTime());
+        buffer.writeInt(recipe.getRecipeTime());
 
         if (recipe.getBlockBelow() != null) {
             buffer.writeBoolean(true);
