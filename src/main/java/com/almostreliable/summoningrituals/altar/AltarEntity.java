@@ -125,7 +125,7 @@ public class AltarEntity extends BlockEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (!remove && cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)) {
+        if (!remove && cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) && progress == 0) {
             return inventoryCap.cast();
         }
         return super.getCapability(cap, side);
