@@ -45,15 +45,6 @@ public class BlockReference implements Predicate<BlockState> {
         return new BlockReference(new ResourceLocation(blockId), properties);
     }
 
-    public void toNetwork(FriendlyByteBuf buffer) {
-        buffer.writeResourceLocation(block);
-        buffer.writeVarInt(properties.size());
-        for (var entry : properties.entrySet()) {
-            buffer.writeUtf(entry.getKey());
-            buffer.writeUtf(entry.getValue());
-        }
-    }
-
     public static BlockReference fromNetwork(FriendlyByteBuf buffer) {
         var block = buffer.readResourceLocation();
         var size = buffer.readVarInt();
@@ -62,6 +53,15 @@ public class BlockReference implements Predicate<BlockState> {
             properties.put(buffer.readUtf(), buffer.readUtf());
         }
         return new BlockReference(block, properties);
+    }
+
+    public void toNetwork(FriendlyByteBuf buffer) {
+        buffer.writeResourceLocation(block);
+        buffer.writeVarInt(properties.size());
+        for (var entry : properties.entrySet()) {
+            buffer.writeUtf(entry.getKey());
+            buffer.writeUtf(entry.getValue());
+        }
     }
 
     @Override

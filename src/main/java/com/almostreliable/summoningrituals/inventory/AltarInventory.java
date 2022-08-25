@@ -1,8 +1,9 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.util.GameUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -24,9 +25,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private final AltarEntity parent;
     private final AltarInvWrapper vanillaInv;
-    // TODO: serialize insertOrder, clear insertOrder when crafted
     private final Deque<Tuple<ItemStack, Integer>> insertOrder;
-    // TODO: drop all inputs when crafted
     private List<ItemStack> items;
     private ItemStack catalyst;
 
@@ -111,12 +110,10 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
             return remaining;
         }
 
-        if (items.add(stack)) {
-            insertOrder.push(new Tuple<>(stack.copy(), items.size() - 1));
-            onContentsChanged();
-            return ItemStack.EMPTY;
-        }
-        return stack;
+        items.add(stack);
+        insertOrder.push(new Tuple<>(stack.copy(), items.size() - 1));
+        onContentsChanged();
+        return ItemStack.EMPTY;
     }
 
     public void popLastInserted() {
@@ -135,7 +132,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         int slot = last.getB();
         items.get(slot).shrink(stack.getCount());
         if (items.get(slot).isEmpty()) {
-            trimInputs();
+            trimInventory();
         }
         onContentsChanged();
         GameUtils.dropItem(parent.getLevel(), parent.getBlockPos(), stack, true);
@@ -154,7 +151,35 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         }
     }
 
-    private void trimInputs() {
+    public boolean handleRecipe(AltarRecipe recipe) {
+        var oldItems = new ArrayList<>(items);
+        var toRemove = 0;
+        var removed = 0;
+        for (var input : recipe.getInputs()) {
+            toRemove += input.count();
+            var inputRemoved = 0;
+            for (var stack : items) {
+                if (stack.isEmpty() || !input.ingredient().test(stack)) continue;
+                var shrinkCount = Math.min(input.count() - inputRemoved, stack.getCount());
+                stack.shrink(shrinkCount);
+                inputRemoved += shrinkCount;
+                if (inputRemoved >= input.count()) break;
+            }
+            removed += inputRemoved;
+        }
+        if (removed < toRemove) {
+            items = oldItems;
+            return false;
+        }
+        catalyst = ItemStack.EMPTY;
+        insertOrder.clear();
+        dropContents();
+        items.clear();
+        onContentsChanged();
+        return true;
+    }
+
+    private void trimInventory() {
         for (var i = items.size() - 1; i >= 0; i--) {
             if (items.get(i).isEmpty()) {
                 items.remove(i);

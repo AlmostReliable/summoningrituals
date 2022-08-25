@@ -90,13 +90,13 @@ public class RecipeSacrifices {
             return new Sacrifice(entity, count);
         }
 
+        public boolean matches(Entity toCheck) {
+            return entity.equals(toCheck.getType().getRegistryName());
+        }
+
         private void toNetwork(FriendlyByteBuf buffer) {
             buffer.writeUtf(entity.toString());
             buffer.writeVarInt(count);
-        }
-
-        public boolean matches(Entity toCheck) {
-            return entity.equals(toCheck.getType().getRegistryName());
         }
     }
 }

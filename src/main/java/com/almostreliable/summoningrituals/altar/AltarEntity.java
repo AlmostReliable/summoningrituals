@@ -1,9 +1,10 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.almostreliable.summoningrituals.*;
+import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.BlockReference;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
@@ -39,6 +40,9 @@ public class AltarEntity extends BlockEntity {
     private final LazyOptional<AltarInventory> inventoryCap;
 
     @Nullable private AltarRecipe recipeCache;
+    @Nullable private AltarRecipe currentRecipe;
+    @Nullable private List<EntitySacrifice> sacrifices;
+    @Nullable private ServerPlayer invokingPlayer;
     private int progress;
 
     public AltarEntity(BlockPos pos, BlockState state) {
@@ -132,11 +136,40 @@ public class AltarEntity extends BlockEntity {
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
+    public void tick() {
+        if (level == null || currentRecipe == null) return;
+
+        if (progress >= currentRecipe.getRecipeTime()) {
+            if (inventory.handleRecipe(currentRecipe)) {
+                // TODO: implement proper result handling, not only item stack output
+                GameUtils.dropItem(level, worldPosition, (ItemStack) currentRecipe.getOutput().getEntry(), true);
+            } else {
+                inventory.popLastInserted();
+                if (invokingPlayer != null) {
+                    TextUtils.sendPlayerMessage(invokingPlayer, "no_output", ChatFormatting.RED);
+                }
+            }
+            currentRecipe = null;
+            sacrifices = null;
+            invokingPlayer = null;
+            progress = 0;
+            changeActivityState(false);
+            return;
+        }
+
+        if (progress == 0) {
+            changeActivityState(true);
+            if (sacrifices != null && !sacrifices.isEmpty()) {
+                sacrifices.forEach(EntitySacrifice::kill);
+            }
+        }
+        progress++;
+    }
+
     private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
-        var sacrifices = checkSacrifices(recipe.getSacrifices(), player);
-
+        sacrifices = checkSacrifices(recipe.getSacrifices(), player);
         if (sacrifices == null ||
             !checkBlockBelow(recipe.getBlockBelow(), player) ||
             !recipe.getDayTime().check(level, player) ||
@@ -145,11 +178,8 @@ public class AltarEntity extends BlockEntity {
             return;
         }
 
-        // TODO: actually implement recipe processing, this is only for testing
-        inventory.getItems().clear();
-        inventory.setCatalyst(ItemStack.EMPTY);
-        GameUtils.dropItem(level, worldPosition, (ItemStack) recipe.getOutput().getEntry(), true);
-        sacrifices.forEach(EntitySacrifice::kill);
+        currentRecipe = recipe;
+        invokingPlayer = player;
     }
 
     @Nullable
