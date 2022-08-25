@@ -24,7 +24,6 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     // TODO:
     // - add effects that are performed after recipe crafting (lighting, weather change)
-    // - add a range for the daytime
     // - add presets for the crafting animation
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();

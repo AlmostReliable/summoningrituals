@@ -15,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<AltarRecipe> {
 
-    // TODO: add proper serialization for the block below | split the block state properties to a json object
-
     @Override
     public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
         var output = RecipeOutput.fromJson(json.getAsJsonObject(Constants.OUTPUT));
