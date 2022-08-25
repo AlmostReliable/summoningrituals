@@ -2,15 +2,17 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInvWrapper;
+import com.almostreliable.summoningrituals.util.TextUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -151,12 +153,45 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         ANY,
         SUN,
         RAIN,
-        THUNDER
+        THUNDER;
+
+        public boolean check(Level level, ServerPlayer player) {
+            var check = switch (this) {
+                case RAIN -> level.isRaining();
+                case THUNDER -> level.isThundering();
+                case SUN -> !level.isRaining() && !level.isThundering();
+                case ANY -> true;
+            };
+            if (!check) {
+                TextUtils.sendPlayerMessage(
+                    player,
+                    TextUtils.f("no_{}", toString().toLowerCase()),
+                    ChatFormatting.YELLOW
+                );
+            }
+            return check;
+        }
     }
 
     public enum DAY_TIME {
         ANY,
         DAY,
-        NIGHT
+        NIGHT;
+
+        public boolean check(Level level, ServerPlayer player) {
+            var check = switch (this) {
+                case DAY -> level.isDay();
+                case NIGHT -> level.isNight();
+                case ANY -> true;
+            };
+            if (!check) {
+                TextUtils.sendPlayerMessage(
+                    player,
+                    TextUtils.f("no_{}", toString().toLowerCase()),
+                    ChatFormatting.YELLOW
+                );
+            }
+            return check;
+        }
     }
 }

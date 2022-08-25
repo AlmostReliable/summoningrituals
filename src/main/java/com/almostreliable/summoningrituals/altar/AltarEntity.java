@@ -4,7 +4,6 @@ import com.almostreliable.summoningrituals.*;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
-import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.almostreliable.summoningrituals.recipe.BlockReference;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
@@ -140,8 +139,8 @@ public class AltarEntity extends BlockEntity {
 
         if (sacrifices == null ||
             !checkBlockBelow(recipe.getBlockBelow(), player) ||
-            !checkDayTime(recipe.getDayTime(), player) ||
-            !checkWeather(recipe.getWeather(), player)) {
+            !recipe.getDayTime().check(level, player) ||
+            !recipe.getWeather().check(level, player)) {
             inventory.popLastInserted();
             return;
         }
@@ -184,61 +183,12 @@ public class AltarEntity extends BlockEntity {
     }
 
     private boolean checkBlockBelow(@Nullable BlockReference blockBelow, ServerPlayer player) {
-        // TODO: when the serialization for the block is done, check if properties even exist, if not, only match the block
         assert level != null && !level.isClientSide;
         if (blockBelow == null || blockBelow.test(level.getBlockState(worldPosition.below()))) {
             return true;
         }
         TextUtils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);
         return false;
-    }
-
-    private boolean checkDayTime(DAY_TIME dayTime, ServerPlayer player) {
-        assert level != null && !level.isClientSide;
-        switch (dayTime) {
-            case DAY:
-                if (!level.isDay()) {
-                    TextUtils.sendPlayerMessage(player, "no_day", ChatFormatting.YELLOW);
-                    return false;
-                }
-                break;
-            case NIGHT:
-                if (!level.isNight()) {
-                    TextUtils.sendPlayerMessage(player, "no_night", ChatFormatting.YELLOW);
-                    return false;
-                }
-                break;
-            case ANY:
-                break;
-        }
-        return true;
-    }
-
-    private boolean checkWeather(WEATHER weather, ServerPlayer player) {
-        assert level != null && !level.isClientSide;
-        switch (weather) {
-            case RAIN:
-                if (!level.isRaining()) {
-                    TextUtils.sendPlayerMessage(player, "no_rain", ChatFormatting.YELLOW);
-                    return false;
-                }
-                break;
-            case THUNDER:
-                if (!level.isThundering()) {
-                    TextUtils.sendPlayerMessage(player, "no_thunder", ChatFormatting.YELLOW);
-                    return false;
-                }
-                break;
-            case SUN:
-                if (level.isRaining() || level.isThundering()) {
-                    TextUtils.sendPlayerMessage(player, "no_sun", ChatFormatting.YELLOW);
-                    return false;
-                }
-                break;
-            case ANY:
-                break;
-        }
-        return true;
     }
 
     private void changeActivityState(boolean state) {
