@@ -69,9 +69,7 @@ public final class TextUtils {
      * @param color an optional color
      * @return the translated phrase
      */
-    public static TranslatableComponent translate(
-        String type, String key, ChatFormatting... color
-    ) {
+    public static TranslatableComponent translate(String type, String key, ChatFormatting... color) {
         var output = new TranslatableComponent(getTranslationKey(type, key));
         return color.length == 0 ? output : (TranslatableComponent) output.withStyle(color[0]);
     }

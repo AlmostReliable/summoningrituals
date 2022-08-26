@@ -16,7 +16,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
     private final Minecraft mc;
 
-    public AltarRenderer(Context context) {
+    public AltarRenderer(Context ignoredContext) {
         mc = Minecraft.getInstance();
     }
 
