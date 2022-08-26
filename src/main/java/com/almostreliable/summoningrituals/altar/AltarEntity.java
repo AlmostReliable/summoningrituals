@@ -141,8 +141,7 @@ public class AltarEntity extends BlockEntity {
 
         if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
-                // TODO: implement proper result handling, not only item stack output
-                GameUtils.dropItem(level, worldPosition, (ItemStack) currentRecipe.getOutput().getEntry(), true);
+                currentRecipe.getOutputs().handleRecipe(level, worldPosition);
             } else {
                 inventory.popLastInserted();
                 if (invokingPlayer != null) {
@@ -194,9 +193,9 @@ public class AltarEntity extends BlockEntity {
     }
 
     @Nullable
-    private List<EntitySacrifice> checkSacrifices(@Nullable RecipeSacrifices sacrifices, ServerPlayer player) {
+    private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, ServerPlayer player) {
         assert level != null && !level.isClientSide;
-        if (sacrifices == null) return null;
+        if (sacrifices.isEmpty()) return null;
         var region = sacrifices.getRegion(worldPosition);
         var entities = level.getEntities(player, region);
         List<EntitySacrifice> toKill = new ArrayList<>();

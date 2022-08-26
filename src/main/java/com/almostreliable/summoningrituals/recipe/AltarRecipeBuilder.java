@@ -2,57 +2,63 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
+import com.almostreliable.summoningrituals.recipe.RecipeOutputs.EntityOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
+import java.util.function.Consumer;
 
-public class AltarRecipeBuilder {
+public final class AltarRecipeBuilder {
 
-    private final RecipeOutput<?> output;
+    private final RecipeOutputs outputs;
     private final NonNullList<IngredientStack> inputs;
-    @Nullable private Ingredient catalyst;
-    @Nullable private RecipeSacrifices sacrifices;
-    private int recipeTime = 100;
+    private final Ingredient catalyst;
+    private final int recipeTime;
+    private RecipeSacrifices sacrifices;
     @Nullable private BlockReference blockBelow;
     private DAY_TIME dayTime = DAY_TIME.ANY;
     private WEATHER weather = WEATHER.ANY;
 
-    private AltarRecipeBuilder(RecipeOutput<?> output) {
-        this.output = output;
+    private AltarRecipeBuilder(Ingredient catalyst, int recipeTime) {
+        outputs = new RecipeOutputs();
         inputs = NonNullList.create();
+        this.catalyst = catalyst;
+        this.recipeTime = recipeTime;
         sacrifices = new RecipeSacrifices();
     }
 
-    public static AltarRecipeBuilder entity(ResourceLocation entity, int count) {
-        return new AltarRecipeBuilder(RecipeOutput.of(entity, count));
+    public static AltarRecipeBuilder builder(Ingredient catalyst, int recipeTime) {
+        return new AltarRecipeBuilder(catalyst, recipeTime);
     }
 
-    public static AltarRecipeBuilder entity(ResourceLocation entity) {
-        return new AltarRecipeBuilder(RecipeOutput.of(entity));
+    public static AltarRecipeBuilder builder(Ingredient catalyst) {
+        return builder(catalyst, 100);
     }
 
-    public static AltarRecipeBuilder item(ItemLike item, int count) {
-        return new AltarRecipeBuilder(RecipeOutput.of(item, count));
+    public AltarRecipeBuilder itemOutput(Consumer<ItemOutputBuilder> outputBuilder) {
+        var builder = new ItemOutputBuilder();
+        outputBuilder.accept(builder);
+        outputs.add(builder.build());
+        return this;
     }
 
-    public static AltarRecipeBuilder item(ItemLike item) {
-        return new AltarRecipeBuilder(RecipeOutput.of(item));
-    }
-
-    public static AltarRecipeBuilder item(ItemStack item) {
-        return new AltarRecipeBuilder(RecipeOutput.of(item));
+    public AltarRecipeBuilder mobOutput(Consumer<EntityOutputBuilder> outputBuilder) {
+        var builder = new EntityOutputBuilder();
+        outputBuilder.accept(builder);
+        outputs.add(builder.build());
+        return this;
     }
 
     public AltarRecipeBuilder input(Ingredient item, int count) {
-        return input(new IngredientStack(item, count));
+        inputs.add(new IngredientStack(item, count));
+        return this;
     }
 
     public AltarRecipeBuilder input(Ingredient item) {
@@ -73,19 +79,6 @@ public class AltarRecipeBuilder {
 
     public AltarRecipeBuilder input(TagKey<Item> item) {
         return input(item, 1);
-    }
-
-    public AltarRecipeBuilder catalyst(Ingredient catalyst) {
-        if (this.catalyst != null) {
-            throw new IllegalArgumentException("Catalyst has already been set");
-        }
-        this.catalyst = catalyst;
-        return this;
-    }
-
-    public AltarRecipeBuilder recipeTime(int recipeTime) {
-        this.recipeTime = recipeTime;
-        return this;
     }
 
     public AltarRecipeBuilder dayTime(String dayTime) {
@@ -121,15 +114,7 @@ public class AltarRecipeBuilder {
 
     public AltarRecipe build(ResourceLocation id) {
         // TODO: handle nullables and default values
-        if (catalyst == null) {
-            throw new IllegalArgumentException("Catalyst cannot be null");
-        }
 
-        return new AltarRecipe(id, output, inputs, catalyst, sacrifices, recipeTime, blockBelow, dayTime, weather);
-    }
-
-    private AltarRecipeBuilder input(IngredientStack... input) {
-        Collections.addAll(inputs, input);
-        return this;
+        return new AltarRecipe(id, outputs, inputs, catalyst, sacrifices, recipeTime, blockBelow, dayTime, weather);
     }
 }

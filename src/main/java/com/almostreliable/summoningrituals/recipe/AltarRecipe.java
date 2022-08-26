@@ -23,28 +23,28 @@ import java.util.Set;
 public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     // TODO:
-    // - add effects that are performed after recipe crafting (lighting, weather change)
+    // - maybe let the users do that with the kube event | add effects that are performed after recipe crafting (lighting, weather change)
     // - add presets for the crafting animation
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
     private final ResourceLocation recipeId;
-    private final RecipeOutput<?> output;
+    private final RecipeOutputs outputs;
     private final NonNullList<IngredientStack> inputs;
     private final Ingredient catalyst;
-    @Nullable private final RecipeSacrifices sacrifices;
+    private final RecipeSacrifices sacrifices;
     private final int recipeTime;
     @Nullable private final BlockReference blockBelow;
     private final DAY_TIME dayTime;
     private final WEATHER weather;
 
     public AltarRecipe(
-        ResourceLocation recipeId, RecipeOutput<?> output, NonNullList<IngredientStack> inputs, Ingredient catalyst,
-        @Nullable RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
+        ResourceLocation recipeId, RecipeOutputs outputs, NonNullList<IngredientStack> inputs, Ingredient catalyst,
+        RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
         WEATHER weather
     ) {
         this.recipeId = recipeId;
-        this.output = output;
+        this.outputs = outputs;
         this.inputs = inputs;
         this.catalyst = catalyst;
         this.sacrifices = sacrifices;
@@ -114,8 +114,8 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return Setup.ALTAR_RECIPE.type().get();
     }
 
-    public RecipeOutput<?> getOutput() {
-        return output;
+    public RecipeOutputs getOutputs() {
+        return outputs;
     }
 
     public NonNullList<IngredientStack> getInputs() {
@@ -126,7 +126,6 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return catalyst;
     }
 
-    @Nullable
     public RecipeSacrifices getSacrifices() {
         return sacrifices;
     }

@@ -17,7 +17,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
     @Override
     public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-        var output = RecipeOutput.fromJson(json.getAsJsonObject(Constants.OUTPUT));
+        var outputs = RecipeOutputs.fromJson(json.getAsJsonArray(Constants.OUTPUTS));
 
         NonNullList<IngredientStack> inputs = NonNullList.create();
         if (json.has(Constants.INPUT)) {
@@ -52,7 +52,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
         return new AltarRecipe(
             recipeId,
-            output,
+            outputs,
             inputs,
             catalyst,
             sacrifices,
@@ -66,7 +66,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
     @Nullable
     @Override
     public AltarRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-        var output = RecipeOutput.fromNetwork(buffer);
+        var outputs = RecipeOutputs.fromNetwork(buffer);
 
         NonNullList<IngredientStack> inputs = NonNullList.create();
         var inputCount = buffer.readVarInt();
@@ -93,7 +93,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
         return new AltarRecipe(
             recipeId,
-            output,
+            outputs,
             inputs,
             catalyst,
             sacrifices,
@@ -106,7 +106,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, AltarRecipe recipe) {
-        recipe.getOutput().toNetwork(buffer);
+        recipe.getOutputs().toNetwork(buffer);
 
         buffer.writeVarInt(recipe.getInputs().size());
         for (var input : recipe.getInputs()) {

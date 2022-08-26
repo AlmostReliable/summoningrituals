@@ -76,6 +76,10 @@ public class RecipeSacrifices {
         return true;
     }
 
+    public boolean isEmpty() {
+        return sacrifices.isEmpty();
+    }
+
     public record Sacrifice(ResourceLocation entity, int count) {
 
         private static Sacrifice fromJson(JsonObject json) {
