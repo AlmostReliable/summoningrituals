@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.recipe.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
+import com.almostreliable.summoningrituals.util.Bruhtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
@@ -20,13 +21,12 @@ import java.util.List;
 
 public class AltarRecipeJS extends RecipeJS {
 
-    private boolean serialize;
-
-    private IngredientJS catalyst;
     private final RecipeOutputs outputs = new RecipeOutputs();
     private final List<IngredientJS> inputs = new ArrayList<>();
     private final RecipeSacrifices sacrifices = new RecipeSacrifices();
-    private int recipeTime = 100;
+    private boolean serialize;
+    private IngredientJS catalyst;
+    private final int recipeTime = 100;
     @Nullable private BlockReference blockBelow;
     private AltarRecipe.DAY_TIME dayTime = AltarRecipe.DAY_TIME.ANY;
     private AltarRecipe.WEATHER weather = AltarRecipe.WEATHER.ANY;
@@ -81,11 +81,8 @@ public class AltarRecipeJS extends RecipeJS {
     }
 
     public AltarRecipeJS blockBelow(Block block, JsonObject properties) {
-        if (block.getRegistryName() == null) {
-            throw new IllegalArgumentException("block is missing registry name");
-        }
         var blockJson = new JsonObject();
-        blockJson.addProperty(Constants.BLOCK, block.getRegistryName().toString());
+        blockJson.addProperty(Constants.BLOCK, Bruhtils.getId(block).toString());
         blockJson.add(Constants.PROPERTIES, properties);
         blockBelow = BlockReference.fromJson(blockJson);
         return this;

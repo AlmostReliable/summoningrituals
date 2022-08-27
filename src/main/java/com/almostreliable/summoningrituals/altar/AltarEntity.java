@@ -16,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -39,7 +40,6 @@ public class AltarEntity extends BlockEntity {
     public final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
-    @Nullable private AltarRecipe recipeCache;
     @Nullable private AltarRecipe currentRecipe;
     @Nullable private List<EntitySacrifice> sacrifices;
     @Nullable private ServerPlayer invokingPlayer;
@@ -103,7 +103,6 @@ public class AltarEntity extends BlockEntity {
             if (recipe == null) {
                 inventory.setCatalyst(ItemStack.EMPTY);
             } else {
-                recipeCache = recipe;
                 stack.shrink(1);
                 player.setItemInHand(InteractionHand.MAIN_HAND, stack.isEmpty() ? ItemStack.EMPTY : stack);
                 handleSummoning(recipe, player);
@@ -141,7 +140,7 @@ public class AltarEntity extends BlockEntity {
 
         if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
-                currentRecipe.getOutputs().handleRecipe(level, worldPosition);
+                currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
             } else {
                 inventory.popLastInserted();
                 if (invokingPlayer != null) {
@@ -184,9 +183,6 @@ public class AltarEntity extends BlockEntity {
     @Nullable
     private AltarRecipe findRecipe() {
         assert level != null && !level.isClientSide;
-        if (recipeCache != null && recipeCache.matches(inventory.getVanillaInv(), level)) {
-            return recipeCache;
-        }
         var recipeManager = GameUtils.getRecipeManager(level);
         return recipeManager.getRecipeFor(Setup.ALTAR_RECIPE.type().get(), inventory.getVanillaInv(), level)
             .orElse(null);

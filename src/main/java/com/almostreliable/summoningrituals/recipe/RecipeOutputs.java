@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.util.Bruhtils;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
@@ -8,17 +9,21 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 
-public final class RecipeOutputs {
+import java.util.Objects;
 
-    // TODO: add data support (nbt which are called tag)
+public final class RecipeOutputs {
 
     private static final Vec3i DEFAULT_OFFSET = new Vec3i(0, 2, 0);
     private static final Vec3i DEFAULT_SPREAD = new Vec3i(1, 0, 1);
@@ -41,14 +46,6 @@ public final class RecipeOutputs {
         return new RecipeOutputs(recipeOutputs);
     }
 
-    public JsonArray toJson() {
-        JsonArray json = new JsonArray();
-        for (var output : outputs) {
-            json.add(output.toJson());
-        }
-        return json;
-    }
-
     public static RecipeOutputs fromNetwork(FriendlyByteBuf buffer) {
         var length = buffer.readVarInt();
         NonNullList<RecipeOutput<?>> outputs = NonNullList.create();
@@ -56,6 +53,14 @@ public final class RecipeOutputs {
             outputs.add(RecipeOutput.fromNetwork(buffer));
         }
         return new RecipeOutputs(outputs);
+    }
+
+    public JsonArray toJson() {
+        JsonArray json = new JsonArray();
+        for (var output : outputs) {
+            json.add(output.toJson());
+        }
+        return json;
     }
 
     public void toNetwork(FriendlyByteBuf buffer) {
@@ -69,7 +74,7 @@ public final class RecipeOutputs {
         outputs.add(output);
     }
 
-    public void handleRecipe(Level level, BlockPos origin) {
+    public void handleRecipe(ServerLevel level, BlockPos origin) {
         for (var output : outputs) {
             output.handleRecipe(level, origin);
         }
@@ -78,11 +83,13 @@ public final class RecipeOutputs {
     private abstract static class RecipeOutput<T> {
 
         final T output;
+        CompoundTag data;
         Vec3i offset = DEFAULT_OFFSET;
         Vec3i spread = DEFAULT_SPREAD;
 
         private RecipeOutput(T output) {
             this.output = output;
+            data = new CompoundTag();
         }
 
         private static RecipeOutput<?> fromJson(JsonObject json) {
@@ -94,7 +101,9 @@ public final class RecipeOutputs {
             } else {
                 throw new IllegalArgumentException("Invalid recipe output");
             }
-
+            if (json.has(Constants.DATA)) {
+                output.data = SerializeUtils.nbtFromString(GsonHelper.getAsString(json, Constants.DATA));
+            }
             if (json.has(Constants.OFFSET)) {
                 output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
             }
@@ -105,8 +114,7 @@ public final class RecipeOutputs {
             return output;
         }
 
-        abstract JsonObject toJson();
-
+        // TODO: should nbt be sent to the client?
         private static RecipeOutput<?> fromNetwork(FriendlyByteBuf buffer) {
             RecipeOutput<?> output;
             var i = buffer.readVarInt();
@@ -124,12 +132,35 @@ public final class RecipeOutputs {
             return output;
         }
 
+        abstract JsonObject toJson();
+
+        void writeJsonDefaults(JsonObject json) {
+            if (!data.isEmpty()) {
+                json.addProperty(Constants.DATA, data.toString());
+            }
+            if (!offset.equals(DEFAULT_OFFSET)) {
+                json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
+            }
+            if (!spread.equals(DEFAULT_SPREAD)) {
+                json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
+            }
+        }
+
         void toNetwork(FriendlyByteBuf buffer) {
             SerializeUtils.vec3ToNetwork(buffer, offset);
             SerializeUtils.vec3ToNetwork(buffer, spread);
         }
 
-        abstract void handleRecipe(Level level, BlockPos origin);
+        void handleData(Entity entity) {
+            if (data.isEmpty()) return;
+            var entityData = entity.serializeNBT();
+            for (var prop : data.getAllKeys()) {
+                entityData.put(prop, Objects.requireNonNull(data.get(prop)));
+            }
+            entity.load(entityData);
+        }
+
+        abstract void handleRecipe(ServerLevel level, BlockPos origin);
 
         abstract int getCount();
     }
@@ -145,16 +176,15 @@ public final class RecipeOutputs {
             return new ItemOutput(stack);
         }
 
+        private static ItemOutput fromNetwork(FriendlyByteBuf buffer) {
+            return new ItemOutput(buffer.readItem());
+        }
+
         @Override
         JsonObject toJson() {
             var json = SerializeUtils.stackToJson(output);
-            json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
-            json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
+            writeJsonDefaults(json);
             return json;
-        }
-
-        private static ItemOutput fromNetwork(FriendlyByteBuf buffer) {
-            return new ItemOutput(buffer.readItem());
         }
 
         @Override
@@ -165,9 +195,17 @@ public final class RecipeOutputs {
         }
 
         @Override
-        void handleRecipe(Level level, BlockPos origin) {
+        void handleRecipe(ServerLevel level, BlockPos origin) {
             // TODO: add offset and spread to the position of the item
-            GameUtils.dropItem(level, origin, output, true);
+            var itemEntity = new ItemEntity(
+                level,
+                origin.getX() + offset.getX(),
+                origin.getY() + offset.getY(),
+                origin.getZ() + offset.getZ(),
+                output
+            );
+            handleData(itemEntity);
+            GameUtils.spawnEntity(level, itemEntity);
         }
 
         @Override
@@ -191,25 +229,21 @@ public final class RecipeOutputs {
             return new MobOutput(mob, count);
         }
 
-        @Override
-        JsonObject toJson() {
-            if (output.getRegistryName() == null) {
-                throw new IllegalArgumentException("Invalid mob type");
-            }
-            var json = new JsonObject();
-            json.addProperty(Constants.MOB, output.getRegistryName().toString());
-            if (getCount() > 1) {
-                json.addProperty(Constants.COUNT, getCount());
-            }
-            json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
-            json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
-            return json;
-        }
-
         private static MobOutput fromNetwork(FriendlyByteBuf buffer) {
             var mob = SerializeUtils.mobFromNetwork(buffer);
             var count = buffer.readVarInt();
             return new MobOutput(mob, count);
+        }
+
+        @Override
+        JsonObject toJson() {
+            var json = new JsonObject();
+            json.addProperty(Constants.MOB, Bruhtils.getId(output).toString());
+            if (getCount() > 1) {
+                json.addProperty(Constants.COUNT, getCount());
+            }
+            writeJsonDefaults(json);
+            return json;
         }
 
         @Override
@@ -221,13 +255,17 @@ public final class RecipeOutputs {
         }
 
         @Override
-        void handleRecipe(Level level, BlockPos origin) {
+        void handleRecipe(ServerLevel level, BlockPos origin) {
             // TODO: use spread and offset
-            // TODO: switch back to resource location, build CompoundTag and spawn the entity with custom data
-            var entity = output.create(level);
-            if (entity == null) return;
-            entity.setPos(origin.getX() + 0.5, origin.getY() + 1, origin.getZ() + 0.5);
-            level.addFreshEntity(entity);
+            var mobEntity = output.create(level);
+            if (mobEntity == null) return;
+            handleData(mobEntity);
+            mobEntity.setPos(
+                origin.getX() + offset.getX(),
+                origin.getY() + offset.getY(),
+                origin.getZ() + offset.getZ()
+            );
+            GameUtils.spawnEntity(level, mobEntity);
         }
 
         @Override
@@ -236,17 +274,25 @@ public final class RecipeOutputs {
         }
     }
 
+    @SuppressWarnings("unused") // remapped by Rhino for Kube
     private abstract static class RecipeOutputBuilder {
 
+        CompoundTag data;
         Vec3i offset;
         Vec3i spread;
 
         private RecipeOutputBuilder() {
+            data = new CompoundTag();
             offset = new Vec3i(0, 2, 0);
             spread = new Vec3i(1, 0, 1);
         }
 
         public abstract RecipeOutput<?> build();
+
+        public RecipeOutputBuilder data(CompoundTag data) {
+            this.data = data;
+            return this;
+        }
 
         public RecipeOutputBuilder offset(int x, int y, int z) {
             this.offset = new Vec3i(x, y, z);
@@ -259,6 +305,7 @@ public final class RecipeOutputs {
         }
     }
 
+    @SuppressWarnings("unused") // remapped by Rhino for Kube
     public static class ItemOutputBuilder extends RecipeOutputBuilder {
 
         private ItemStack stack;
@@ -275,12 +322,14 @@ public final class RecipeOutputs {
         @Override
         public ItemOutput build() {
             var output = new ItemOutput(stack);
+            output.data = data;
             output.offset = offset;
             output.spread = spread;
             return output;
         }
     }
 
+    @SuppressWarnings("unused") // remapped by Rhino for Kube
     public static class MobOutputBuilder extends RecipeOutputBuilder {
 
         private EntityType<?> mob;
@@ -304,6 +353,7 @@ public final class RecipeOutputs {
         @Override
         public MobOutput build() {
             var output = new MobOutput(mob, count);
+            output.data = data;
             output.offset = offset;
             output.spread = spread;
             return output;

@@ -7,6 +7,7 @@ public final class Constants {
     public static final String BLOCK_BELOW = "block_below";
     public static final String CATALYST = "catalyst";
     public static final String COUNT = "count";
+    public static final String DATA = "data";
     public static final String DAY_TIME = "day_time";
     public static final String HEIGHT = "height";
     public static final String INGREDIENT = "ingredient";

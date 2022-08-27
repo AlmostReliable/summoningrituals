@@ -2,7 +2,10 @@ package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -11,6 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class SerializeUtils {
 
@@ -49,11 +55,7 @@ public final class SerializeUtils {
             throw new IllegalArgumentException("stack is empty");
         }
         var json = new JsonObject();
-        var id = stack.getItem().getRegistryName();
-        if (id == null) {
-            throw new IllegalArgumentException("ItemStack has no registry name");
-        }
-        json.addProperty(Constants.ITEM, id.toString());
+        json.addProperty(Constants.ITEM, Bruhtils.getId(stack.getItem()).toString());
         json.addProperty(Constants.COUNT, stack.getCount());
         if (stack.hasTag()) {
             assert stack.getTag() != null;
@@ -81,5 +83,46 @@ public final class SerializeUtils {
     public static EntityType<?> mobFromNetwork(FriendlyByteBuf buffer) {
         var id = new ResourceLocation(buffer.readUtf());
         return mobFromId(id);
+    }
+
+    public static Map<String, String> mapFromJson(JsonObject json) {
+        return json.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().getAsString()
+            ));
+    }
+
+    public static JsonObject mapToJson(Map<String, String> map) {
+        var json = new JsonObject();
+        for (var entry : map.entrySet()) {
+            json.addProperty(entry.getKey(), entry.getValue());
+        }
+        return json;
+    }
+
+    public static Map<String, String> mapFromNetwork(FriendlyByteBuf buffer) {
+        var map = new HashMap<String, String>();
+        var size = buffer.readVarInt();
+        for (var i = 0; i < size; i++) {
+            map.put(buffer.readUtf(), buffer.readUtf());
+        }
+        return map;
+    }
+
+    public static void mapToNetwork(FriendlyByteBuf buffer, Map<String, String> map) {
+        buffer.writeVarInt(map.size());
+        for (var entry : map.entrySet()) {
+            buffer.writeUtf(entry.getKey());
+            buffer.writeUtf(entry.getValue());
+        }
+    }
+
+    public static CompoundTag nbtFromString(String nbtString) {
+        try {
+            return TagParser.parseTag(nbtString);
+        } catch (CommandSyntaxException e) {
+            throw new IllegalArgumentException("Invalid NBT string: " + nbtString, e);
+        }
     }
 }

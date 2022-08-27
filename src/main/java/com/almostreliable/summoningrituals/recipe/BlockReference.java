@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
@@ -8,11 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class BlockReference implements Predicate<BlockState> {
 
@@ -26,42 +24,26 @@ public class BlockReference implements Predicate<BlockState> {
 
     public static BlockReference fromJson(JsonObject json) {
         var blockId = GsonHelper.getAsString(json, Constants.BLOCK);
-        var properties = json.getAsJsonObject(Constants.PROPERTIES).entrySet().stream()
-            .collect(Collectors.toMap(
-                Entry::getKey,
-                entry -> entry.getValue().getAsString()
-            ));
+        var properties = SerializeUtils.mapFromJson(json.getAsJsonObject(Constants.PROPERTIES));
         return new BlockReference(new ResourceLocation(blockId), properties);
+    }
+
+    public static BlockReference fromNetwork(FriendlyByteBuf buffer) {
+        var block = buffer.readResourceLocation();
+        var properties = SerializeUtils.mapFromNetwork(buffer);
+        return new BlockReference(block, properties);
     }
 
     public JsonElement toJson() {
         var json = new JsonObject();
         json.addProperty(Constants.BLOCK, block.toString());
-        var states = new JsonObject();
-        for (var entry : properties.entrySet()) {
-            states.addProperty(entry.getKey(), entry.getValue());
-        }
-        json.add(Constants.PROPERTIES, states);
+        json.add(Constants.PROPERTIES, SerializeUtils.mapToJson(properties));
         return json;
-    }
-
-    public static BlockReference fromNetwork(FriendlyByteBuf buffer) {
-        var block = buffer.readResourceLocation();
-        var size = buffer.readVarInt();
-        var properties = new HashMap<String, String>();
-        for (var i = 0; i < size; i++) {
-            properties.put(buffer.readUtf(), buffer.readUtf());
-        }
-        return new BlockReference(block, properties);
     }
 
     public void toNetwork(FriendlyByteBuf buffer) {
         buffer.writeResourceLocation(block);
-        buffer.writeVarInt(properties.size());
-        for (var entry : properties.entrySet()) {
-            buffer.writeUtf(entry.getKey());
-            buffer.writeUtf(entry.getValue());
-        }
+        SerializeUtils.mapToNetwork(buffer, properties);
     }
 
     @Override
