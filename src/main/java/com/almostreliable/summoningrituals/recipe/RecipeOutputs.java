@@ -114,7 +114,6 @@ public final class RecipeOutputs {
             return output;
         }
 
-        // TODO: should nbt be sent to the client?
         private static RecipeOutput<?> fromNetwork(FriendlyByteBuf buffer) {
             RecipeOutput<?> output;
             var i = buffer.readVarInt();
@@ -126,6 +125,9 @@ public final class RecipeOutputs {
                 throw new IllegalArgumentException("Invalid recipe output");
             }
 
+            if (buffer.readBoolean()) {
+                output.data = SerializeUtils.nbtFromString(buffer.readUtf());
+            }
             output.offset = SerializeUtils.vec3FromNetwork(buffer);
             output.spread = SerializeUtils.vec3FromNetwork(buffer);
 
@@ -147,6 +149,12 @@ public final class RecipeOutputs {
         }
 
         void toNetwork(FriendlyByteBuf buffer) {
+            if (data.isEmpty()) {
+                buffer.writeBoolean(false);
+            } else {
+                buffer.writeBoolean(true);
+                buffer.writeUtf(data.toString());
+            }
             SerializeUtils.vec3ToNetwork(buffer, offset);
             SerializeUtils.vec3ToNetwork(buffer, spread);
         }
