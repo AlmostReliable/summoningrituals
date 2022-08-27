@@ -29,9 +29,9 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
     private final ResourceLocation recipeId;
+    private final Ingredient catalyst;
     private final RecipeOutputs outputs;
     private final NonNullList<IngredientStack> inputs;
-    private final Ingredient catalyst;
     private final RecipeSacrifices sacrifices;
     private final int recipeTime;
     @Nullable private final BlockReference blockBelow;
@@ -39,7 +39,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final WEATHER weather;
 
     public AltarRecipe(
-        ResourceLocation recipeId, RecipeOutputs outputs, NonNullList<IngredientStack> inputs, Ingredient catalyst,
+        ResourceLocation recipeId, Ingredient catalyst, RecipeOutputs outputs, NonNullList<IngredientStack> inputs,
         RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
         WEATHER weather
     ) {
@@ -114,16 +114,16 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         return Setup.ALTAR_RECIPE.type().get();
     }
 
+    public Ingredient getCatalyst() {
+        return catalyst;
+    }
+
     public RecipeOutputs getOutputs() {
         return outputs;
     }
 
     public NonNullList<IngredientStack> getInputs() {
         return inputs;
-    }
-
-    public Ingredient getCatalyst() {
-        return catalyst;
     }
 
     public RecipeSacrifices getSacrifices() {

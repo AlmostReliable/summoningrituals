@@ -195,7 +195,7 @@ public class AltarEntity extends BlockEntity {
     @Nullable
     private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, ServerPlayer player) {
         assert level != null && !level.isClientSide;
-        if (sacrifices.isEmpty()) return null;
+        if (sacrifices.isEmpty()) return List.of();
         var region = sacrifices.getRegion(worldPosition);
         var entities = level.getEntities(player, region);
         List<EntitySacrifice> toKill = new ArrayList<>();

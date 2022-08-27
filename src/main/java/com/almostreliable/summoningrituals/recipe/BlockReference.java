@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -23,26 +24,25 @@ public class BlockReference implements Predicate<BlockState> {
         this.properties = properties;
     }
 
-    public static BlockReference fromState(BlockState state) {
-        var block = state.getBlock().getRegistryName();
-        if (block == null) {
-            throw new IllegalArgumentException("Block state block has no registry name");
-        }
-        var properties = new HashMap<String, String>();
-        for (var entry : state.getValues().entrySet()) {
-            properties.put(entry.getKey().getName().toLowerCase(), entry.getValue().toString().toLowerCase());
-        }
-        return new BlockReference(block, properties);
-    }
-
     public static BlockReference fromJson(JsonObject json) {
         var blockId = GsonHelper.getAsString(json, Constants.BLOCK);
-        var properties = json.getAsJsonObject(Constants.STATES).entrySet().stream()
+        var properties = json.getAsJsonObject(Constants.PROPERTIES).entrySet().stream()
             .collect(Collectors.toMap(
                 Entry::getKey,
                 entry -> entry.getValue().getAsString()
             ));
         return new BlockReference(new ResourceLocation(blockId), properties);
+    }
+
+    public JsonElement toJson() {
+        var json = new JsonObject();
+        json.addProperty(Constants.BLOCK, block.toString());
+        var states = new JsonObject();
+        for (var entry : properties.entrySet()) {
+            states.addProperty(entry.getKey(), entry.getValue());
+        }
+        json.add(Constants.PROPERTIES, states);
+        return json;
     }
 
     public static BlockReference fromNetwork(FriendlyByteBuf buffer) {

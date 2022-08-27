@@ -21,6 +21,8 @@ val githubUser: String by project
 val githubRepo: String by project
 val jeiVersion: String by project
 val jeiVersionRange: String by project
+val kubeVersion: String by project
+val kubeVersionRange: String by project
 
 plugins {
     id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
@@ -48,6 +50,7 @@ loom {
 repositories {
     maven("https://maven.parchmentmc.org/")
     maven("https://dvs1.progwml6.com/files/maven/")
+    maven("https://maven.saps.dev/minecraft")
     flatDir {
         name = "extra-mods"
         dir(file("extra-mods-$mcVersion"))
@@ -62,9 +65,10 @@ dependencies {
     })
     forge("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
-    modCompileOnlyApi("mezz.jei:jei-$mcVersion-common-api:$jeiVersion")
-    modCompileOnlyApi("mezz.jei:jei-$mcVersion-forge-api:$jeiVersion")
-//    modLocalRuntime("mezz.jei:jei-$mcVersion-forge:$jeiVersion")
+    modCompileOnlyApi("mezz.jei:jei-$mcVersion:$jeiVersion:api")
+    modLocalRuntime("mezz.jei:jei-$mcVersion:$jeiVersion")
+
+    modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")!!)
 
     fileTree("extra-mods-$mcVersion") { include("**/*.jar") }
         .forEach { f ->
@@ -112,15 +116,13 @@ tasks {
             "modAuthor" to modAuthor,
             "modDescription" to modDescription,
             "modCredits" to modCredits,
-            "mcVersion" to mcVersion,
             "mcVersionRange" to mcVersionRange,
-            "forgeVersion" to forgeVersion,
             "forgeVersionRange" to forgeVersionRange,
             "license" to license,
             "githubUser" to githubUser,
             "githubRepo" to githubRepo,
-            "jeiVersion" to jeiVersion,
-            "jeiVersionRange" to jeiVersionRange
+            "jeiVersionRange" to jeiVersionRange,
+            "kubeVersionRange" to kubeVersionRange
         )
 
         inputs.properties(replaceProperties)

@@ -31,3 +31,10 @@ mandatory = false
 versionRange = "${jeiVersionRange}"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.${modId}]]
+modId = "kubejs"
+mandatory = false
+versionRange = "${kubeVersionRange}"
+ordering = "AFTER"
+side = "BOTH"

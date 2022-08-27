@@ -1,8 +1,10 @@
 {
   "type": "summoningrituals:altar",
-  "output": {
-    "item": "minecraft:stick"
-  },
+  "outputs": [
+    {
+      "item": "minecraft:stick"
+    }
+  ],
   "input": [
     {
       "item": "minecraft:stone"
@@ -20,16 +22,16 @@
   "sacrifices": {
     "width": 3,
     "height": 3,
-    "entities": [
+    "mobs": [
       {
-        "entity": "minecraft:zombie",
+        "mob": "minecraft:zombie",
         "count": 3
       }
     ]
   },
   "block_below": {
     "block": "minecraft:furnace",
-    "states": {
+    "properties": {
       "lit": true
     }
   }

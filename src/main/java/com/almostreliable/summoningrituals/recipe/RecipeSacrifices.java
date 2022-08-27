@@ -1,6 +1,8 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -33,9 +35,9 @@ public class RecipeSacrifices {
     public static RecipeSacrifices fromJson(JsonObject json) {
         var width = GsonHelper.getAsInt(json, Constants.WIDTH, 2);
         var height = GsonHelper.getAsInt(json, Constants.HEIGHT, 2);
-        var entities = json.getAsJsonArray(Constants.ENTITIES);
+        var mobs = json.getAsJsonArray(Constants.MOBS);
         NonNullList<Sacrifice> sacrifices = NonNullList.create();
-        for (var entity : entities) {
+        for (var entity : mobs) {
             sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
         }
         return new RecipeSacrifices(width, height, sacrifices);
@@ -50,6 +52,18 @@ public class RecipeSacrifices {
             sacrifices.add(Sacrifice.fromNetwork(buffer));
         }
         return new RecipeSacrifices(width, height, sacrifices);
+    }
+
+    public JsonElement toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty(Constants.WIDTH, width);
+        json.addProperty(Constants.HEIGHT, height);
+        var mobs = new JsonArray();
+        for (var sacrifice : sacrifices) {
+            mobs.add(sacrifice.toJson());
+        }
+        json.add(Constants.MOBS, mobs);
+        return json;
     }
 
     public void toNetwork(FriendlyByteBuf buffer) {
@@ -80,26 +94,33 @@ public class RecipeSacrifices {
         return sacrifices.isEmpty();
     }
 
-    public record Sacrifice(ResourceLocation entity, int count) {
+    public record Sacrifice(ResourceLocation mob, int count) {
 
         private static Sacrifice fromJson(JsonObject json) {
-            var entity = new ResourceLocation(GsonHelper.getAsString(json, Constants.ENTITY));
+            var mob = new ResourceLocation(GsonHelper.getAsString(json, Constants.MOB));
             var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
-            return new Sacrifice(entity, count);
+            return new Sacrifice(mob, count);
         }
 
         private static Sacrifice fromNetwork(FriendlyByteBuf buffer) {
-            var entity = new ResourceLocation(buffer.readUtf());
+            var mob = new ResourceLocation(buffer.readUtf());
             var count = buffer.readVarInt();
-            return new Sacrifice(entity, count);
+            return new Sacrifice(mob, count);
+        }
+
+        public JsonElement toJson() {
+            JsonObject json = new JsonObject();
+            json.addProperty(Constants.MOB, mob.toString());
+            json.addProperty(Constants.COUNT, count);
+            return json;
         }
 
         public boolean matches(Entity toCheck) {
-            return entity.equals(toCheck.getType().getRegistryName());
+            return mob.equals(toCheck.getType().getRegistryName());
         }
 
         private void toNetwork(FriendlyByteBuf buffer) {
-            buffer.writeUtf(entity.toString());
+            buffer.writeUtf(mob.toString());
             buffer.writeVarInt(count);
         }
     }
