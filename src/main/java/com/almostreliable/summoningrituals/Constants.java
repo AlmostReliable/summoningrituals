@@ -9,7 +9,6 @@ public final class Constants {
     public static final String COUNT = "count";
     public static final String DATA = "data";
     public static final String DAY_TIME = "day_time";
-    public static final String HEIGHT = "height";
     public static final String INGREDIENT = "ingredient";
     public static final String INPUT = "input";
     public static final String INSERT_ORDER = "insert_order";
@@ -29,7 +28,7 @@ public final class Constants {
     public static final String SLOT = "slot";
     public static final String SPREAD = "spread";
     public static final String WEATHER = "weather";
-    public static final String WIDTH = "width";
+    public static final String ZONE = "zone";
 
     private Constants() {}
 }

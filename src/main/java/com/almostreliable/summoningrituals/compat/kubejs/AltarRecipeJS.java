@@ -14,12 +14,15 @@ import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.kubejs.util.ListJS;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class AltarRecipeJS extends RecipeJS {
 
     private final RecipeOutputs outputs = new RecipeOutputs();
@@ -55,7 +58,11 @@ public class AltarRecipeJS extends RecipeJS {
         JsonArray inputsArray = new JsonArray();
         inputs.forEach(i -> inputsArray.add(i.toJson()));
         if (!inputsArray.isEmpty()) {
-            json.add(Constants.INPUT, inputsArray);
+            if (inputsArray.size() == 1) {
+                json.add(Constants.INPUT, inputsArray.get(0));
+            } else {
+                json.add(Constants.INPUT, inputsArray);
+            }
         }
         if (!sacrifices.isEmpty()) {
             json.add(Constants.SACRIFICES, sacrifices.toJson());
@@ -92,6 +99,20 @@ public class AltarRecipeJS extends RecipeJS {
         }
         inputs.add(ingredient);
         return this;
+    }
+
+    public AltarRecipeJS sacrificeRegion(int width, int height) {
+        sacrifices.setRegion(new Vec3i(width, height, width));
+        return this;
+    }
+
+    public AltarRecipeJS sacrifice(ResourceLocation id, int count) {
+        sacrifices.add(id, count);
+        return this;
+    }
+
+    public AltarRecipeJS sacrifice(ResourceLocation id) {
+        return sacrifice(id, 1);
     }
 
     public AltarRecipeJS recipeTime(int recipeTime) {
