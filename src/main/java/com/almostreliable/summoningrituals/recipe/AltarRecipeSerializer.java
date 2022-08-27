@@ -76,7 +76,7 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
             inputs.add(IngredientStack.fromNetwork(buffer));
         }
 
-        RecipeSacrifices sacrifices = null;
+        RecipeSacrifices sacrifices = new RecipeSacrifices();
         if (buffer.readBoolean()) {
             sacrifices = RecipeSacrifices.fromNetwork(buffer);
         }

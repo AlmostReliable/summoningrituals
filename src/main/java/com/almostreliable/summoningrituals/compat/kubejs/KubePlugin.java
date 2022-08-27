@@ -1,10 +1,10 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
+import com.almostreliable.summoningrituals.util.TextUtils;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.item.ItemStackJS;
 import dev.latvian.mods.kubejs.recipe.RegisterRecipeHandlersEvent;
@@ -34,7 +34,7 @@ public class KubePlugin extends KubeJSPlugin {
 
     @Override
     public void addRecipes(RegisterRecipeHandlersEvent event) {
-        event.register(new ResourceLocation(BuildConfig.MOD_ID, Constants.ALTAR), AltarRecipeJS::new);
+        event.register(TextUtils.getRL(Constants.ALTAR), AltarRecipeJS::new);
     }
 
     public static final class OutputWrapper {

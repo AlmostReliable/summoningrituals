@@ -12,6 +12,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.kubejs.util.ListJS;
 import net.minecraft.world.level.block.Block;
 
@@ -24,17 +25,18 @@ public class AltarRecipeJS extends RecipeJS {
     private final RecipeOutputs outputs = new RecipeOutputs();
     private final List<IngredientJS> inputs = new ArrayList<>();
     private final RecipeSacrifices sacrifices = new RecipeSacrifices();
-    private boolean serialize;
     private IngredientJS catalyst;
-    private final int recipeTime = 100;
+    private int recipeTime = 100;
     @Nullable private BlockReference blockBelow;
     private AltarRecipe.DAY_TIME dayTime = AltarRecipe.DAY_TIME.ANY;
     private AltarRecipe.WEATHER weather = AltarRecipe.WEATHER.ANY;
 
+    private boolean serialize;
+
     @Override
     public void create(ListJS listJS) {
         if (listJS.size() != 1) {
-            throw new IllegalArgumentException("missing catalyst for AltarRecipeJS");
+            throw new IllegalArgumentException("missing catalyst");
         }
         this.catalyst = IngredientJS.of(listJS.get(0));
         serialize = true;
@@ -52,14 +54,26 @@ public class AltarRecipeJS extends RecipeJS {
         json.add(Constants.OUTPUTS, outputs.toJson());
         JsonArray inputsArray = new JsonArray();
         inputs.forEach(i -> inputsArray.add(i.toJson()));
-        json.add(Constants.INPUT, inputsArray);
-        json.add(Constants.SACRIFICES, sacrifices.toJson());
-        json.addProperty(Constants.RECIPE_TIME, recipeTime);
+        if (!inputsArray.isEmpty()) {
+            json.add(Constants.INPUT, inputsArray);
+        }
+        if (!sacrifices.isEmpty()) {
+            json.add(Constants.SACRIFICES, sacrifices.toJson());
+        }
+        if (recipeTime != 100) {
+            json.addProperty(Constants.RECIPE_TIME, recipeTime);
+        }
         if (blockBelow != null) {
             json.add(Constants.BLOCK_BELOW, blockBelow.toJson());
         }
-        json.addProperty(Constants.DAY_TIME, dayTime.name());
-        json.addProperty(Constants.WEATHER, weather.name());
+        if (dayTime != AltarRecipe.DAY_TIME.ANY) {
+            json.addProperty(Constants.DAY_TIME, dayTime.name());
+        }
+        if (weather != AltarRecipe.WEATHER.ANY) {
+            json.addProperty(Constants.WEATHER, weather.name());
+        }
+        // TODO: remove
+        ConsoleJS.SERVER.info("Altar Recipe: " + json.toString());
     }
 
     public AltarRecipeJS itemOutput(ItemOutputBuilder itemOutput) {
@@ -77,6 +91,11 @@ public class AltarRecipeJS extends RecipeJS {
             throw new IllegalArgumentException("ingredient is empty");
         }
         inputs.add(ingredient);
+        return this;
+    }
+
+    public AltarRecipeJS recipeTime(int recipeTime) {
+        this.recipeTime = recipeTime;
         return this;
     }
 

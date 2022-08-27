@@ -288,10 +288,6 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return true;
     }
 
-    public AltarEntity getParent() {
-        return parent;
-    }
-
     public AltarInvWrapper getVanillaInv() {
         return vanillaInv;
     }

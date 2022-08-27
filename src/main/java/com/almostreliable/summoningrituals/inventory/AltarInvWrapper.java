@@ -1,6 +1,5 @@
 package com.almostreliable.summoningrituals.inventory;
 
-import com.almostreliable.summoningrituals.altar.AltarEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 
@@ -13,10 +12,6 @@ public class AltarInvWrapper extends RecipeWrapper {
     AltarInvWrapper(AltarInventory inv) {
         super(inv);
         delegate = inv;
-    }
-
-    public AltarEntity getParent() {
-        return delegate.getParent();
     }
 
     public List<ItemStack> getInputs() {

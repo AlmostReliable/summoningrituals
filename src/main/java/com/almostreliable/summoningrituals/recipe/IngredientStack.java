@@ -24,16 +24,6 @@ public record IngredientStack(Ingredient ingredient, int count) {
         return new IngredientStack(ingred, count);
     }
 
-    public JsonElement toJson() {
-        if (count > 1) {
-            var json = new JsonObject();
-            json.add(Constants.INGREDIENT, ingredient.toJson());
-            json.addProperty(Constants.COUNT, count);
-            return json;
-        }
-        return ingredient.toJson();
-    }
-
     public void toNetwork(FriendlyByteBuf buffer) {
         ingredient.toNetwork(buffer);
         buffer.writeVarInt(count);

@@ -16,8 +16,6 @@ import java.util.function.Predicate;
 
 public class RecipeSacrifices {
 
-    // TODO: ignore when empty (don't write to json and stuff like that)
-
     private final int width;
     private final int height;
     private final NonNullList<Sacrifice> sacrifices;

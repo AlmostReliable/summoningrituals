@@ -37,6 +37,10 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarEntity extends BlockEntity {
 
+    // TODO:
+    // - in load(), if the progress is > 0, reset the recipe and try to restart it
+    // - make sure the automatic insertion via hoppers through caps can start the recipe
+
     public final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
@@ -62,6 +66,7 @@ public class AltarEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put(Constants.INVENTORY, inventory.serializeNBT());
+        if (progress > 0) tag.putInt(Constants.PROGRESS, progress);
     }
 
     @Nullable
@@ -162,6 +167,7 @@ public class AltarEntity extends BlockEntity {
             }
         }
         progress++;
+        sendUpdate();
     }
 
     private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
