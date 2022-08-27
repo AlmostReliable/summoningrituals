@@ -1,7 +1,6 @@
 {
   "parent": "summoningrituals:block/altar",
   "textures": {
-    "0": "summoningrituals:block/altar_active",
-    "particle": "summoningrituals:block/altar_active"
+    "texture": "summoningrituals:block/altar_active"
   }
 }
