@@ -203,6 +203,7 @@ public final class RecipeOutputs {
         @Override
         void handleRecipe(ServerLevel level, BlockPos origin) {
             // TODO: add offset and spread to the position of the item
+            // use the count to throw the items in a circle, stack some of them if they are too many
             var itemEntity = new ItemEntity(
                 level,
                 origin.getX() + offset.getX(),
@@ -262,16 +263,18 @@ public final class RecipeOutputs {
 
         @Override
         void handleRecipe(ServerLevel level, BlockPos origin) {
-            // TODO: use spread and offset
-            var mobEntity = output.create(level);
-            if (mobEntity == null) return;
-            handleData(mobEntity);
-            mobEntity.setPos(
-                origin.getX() + offset.getX(),
-                origin.getY() + offset.getY(),
-                origin.getZ() + offset.getZ()
-            );
-            GameUtils.spawnEntity(level, mobEntity);
+            // TODO: use spread
+            for (var i = 0; i < count; i++) {
+                var mobEntity = output.create(level);
+                if (mobEntity == null) return;
+                handleData(mobEntity);
+                mobEntity.setPos(
+                    origin.getX() + offset.getX(),
+                    origin.getY() + offset.getY(),
+                    origin.getZ() + offset.getZ()
+                );
+                GameUtils.spawnEntity(level, mobEntity);
+            }
         }
 
         @Override
