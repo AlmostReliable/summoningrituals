@@ -41,18 +41,26 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             stack.scale(HALF, HALF, HALF);
 
             var lightAbove = LevelRenderer.getLightColor(entity.getLevel(), entity.getBlockPos().above());
-            if (!entity.inventory.getCatalyst().isEmpty()) {
-                itemRenderer
-                    .renderStatic(
-                        entity.inventory.getCatalyst(),
-                        TransformType.FIXED,
-                        lightAbove,
-                        overlay,
-                        stack,
-                        buffer,
-                        1
-                    );
+
+            stack.pushPose();
+            {
+                stack.translate(0, 1, 0);
+                // stack.scale(0.7f, 0.7f, 0.7f);
+                stack.mulPose(Vector3f.YN.rotationDegrees(mc.player.getYHeadRot()));
+                if (!entity.inventory.getCatalyst().isEmpty()) {
+                    itemRenderer
+                        .renderStatic(
+                            entity.inventory.getCatalyst(),
+                            TransformType.FIXED,
+                            lightAbove,
+                            overlay,
+                            stack,
+                            buffer,
+                            (int) entity.getBlockPos().asLong()
+                        );
+                }
             }
+            stack.popPose();
 
             var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromBlockPos(entity.getBlockPos()));
             var playerPos = mc.player.position();
