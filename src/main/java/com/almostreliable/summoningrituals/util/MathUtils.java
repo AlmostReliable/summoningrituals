@@ -1,13 +1,13 @@
 package com.almostreliable.summoningrituals.util;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 
 public final class MathUtils {
 
     private MathUtils() {}
 
-    public static Vec3 vectorFromBlockPos(BlockPos pos) {
+    public static Vec3 vectorFromBlockPos(Vec3i pos) {
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 

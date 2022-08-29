@@ -9,17 +9,21 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
     private static final int MAX_DISTANCE = 32;
     private static final int HEIGHT_SHIFT = 2;
     private static final float HALF = .5f;
+    private static final float ITEM_OFFSET = 1.5f;
 
     private final Minecraft mc;
+    private final ItemRenderer itemRenderer;
 
     public AltarRenderer(Context ignoredContext) {
         mc = Minecraft.getInstance();
+        itemRenderer = mc.getItemRenderer();
     }
 
     @Override
@@ -31,15 +35,14 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             return;
         }
 
-        var lightAbove = LevelRenderer.getLightColor(entity.getLevel(), entity.getBlockPos().above());
-
         stack.pushPose();
         {
-            stack.translate(HALF, HALF, HALF);
+            stack.translate(HALF, 0.8f, HALF);
             stack.scale(HALF, HALF, HALF);
 
+            var lightAbove = LevelRenderer.getLightColor(entity.getLevel(), entity.getBlockPos().above());
             if (!entity.inventory.getCatalyst().isEmpty()) {
-                mc.getItemRenderer()
+                itemRenderer
                     .renderStatic(
                         entity.inventory.getCatalyst(),
                         TransformType.FIXED,
@@ -53,22 +56,25 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
             var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromBlockPos(entity.getBlockPos()));
             var playerPos = mc.player.position();
-            var theta = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
-
-            var axisRotation = entity.getLevel().getGameTime() % 360;
+            var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
+            var axisRotation = MathUtils.ensureDegree(entity.getLevel().getGameTime());
 
             var inputs = entity.inventory.getItems();
             for (var i = 0; i < inputs.size(); i++) {
                 stack.pushPose();
                 {
-                    var rotation = 360 - (i * 360f / inputs.size());
+                    var itemRotation = 360 - (i * 360f / inputs.size());
 
-                    var diff = Math.abs(MathUtils.ensureDegree(axisRotation + rotation) - theta);
-                    if (diff > 180) diff = 360 - diff;
-                    var newHeight = (diff / 180) * HEIGHT_SHIFT;
+                    var rotationDiff = Math.abs(MathUtils.ensureDegree(axisRotation + itemRotation) - playerAngle);
+                    if (rotationDiff > 180) rotationDiff = 360 - rotationDiff;
+                    var newHeight = (rotationDiff / 180) * HEIGHT_SHIFT;
 
-                    stack.mulPose(Vector3f.YN.rotationDegrees(MathUtils.ensureDegree(rotation + axisRotation)));
-                    stack.translate(0, newHeight, -1.5f);
+                    var playerOffset = Math.max(1 - altarPos.distanceTo(playerPos) / 8, 0);
+                    newHeight *= playerOffset;
+
+                    stack.mulPose(Vector3f.YN.rotationDegrees(MathUtils.ensureDegree(itemRotation + axisRotation)));
+                    stack.translate(0, newHeight, -ITEM_OFFSET);
+
                     var item = inputs.get(i);
                     if (!item.isEmpty()) {
                         mc.getItemRenderer()
