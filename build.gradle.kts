@@ -40,7 +40,19 @@ base {
 
 loom {
     silentMojangMappingsLicense()
-    // launchConfigs.getByName("client").property("fabric.log.level", "debug")
+
+    runs {
+        named("client") {
+            client()
+            // property("fabric.log.level", "debug")
+            vmArgs("-XX:+AllowEnhancedClassRedefinition -XX:+IgnoreUnrecognizedVMOptions")
+        }
+        named("server") {
+            server()
+            // property("fabric.log.level", "debug")
+            vmArgs("-XX:+AllowEnhancedClassRedefinition -XX:+IgnoreUnrecognizedVMOptions")
+        }
+    }
 
     forge {
         mixinConfig("$modId.mixins.json")
