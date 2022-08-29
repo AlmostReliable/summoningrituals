@@ -124,7 +124,7 @@ public final class RecipeOutputs {
             }
 
             if (buffer.readBoolean()) {
-                output.data = SerializeUtils.nbtFromString(buffer.readUtf());
+                output.data = buffer.readNbt();
             }
             output.offset = SerializeUtils.vec3FromNetwork(buffer);
             output.spread = SerializeUtils.vec3FromNetwork(buffer);
@@ -151,7 +151,7 @@ public final class RecipeOutputs {
                 buffer.writeBoolean(false);
             } else {
                 buffer.writeBoolean(true);
-                buffer.writeUtf(data.toString());
+                buffer.writeNbt(data);
             }
             SerializeUtils.vec3ToNetwork(buffer, offset);
             SerializeUtils.vec3ToNetwork(buffer, spread);
