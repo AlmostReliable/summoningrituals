@@ -4,6 +4,9 @@ import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -44,6 +47,25 @@ public class BlockReference implements Predicate<BlockState> {
     public void toNetwork(FriendlyByteBuf buffer) {
         buffer.writeResourceLocation(block);
         SerializeUtils.mapToNetwork(buffer, properties);
+    }
+
+    // TODO: oh my, please get rid of this
+    public BlockState asBlockState() {
+        var blockString = block + "[" + properties.entrySet().stream()
+            .map(e -> e.getKey() + "=" + e.getValue())
+            .reduce((a, b) -> a + "," + b)
+            .orElse("") + "]";
+
+        var blockStateParser = new BlockStateParser(new StringReader(blockString), false);
+        try {
+            blockStateParser.parse(false);
+        } catch (CommandSyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        if (blockStateParser.getState() == null) {
+            throw new IllegalArgumentException();
+        }
+        return blockStateParser.getState();
     }
 
     @Override
