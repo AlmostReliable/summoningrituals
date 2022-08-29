@@ -1,1 +1,1 @@
-com.almostreliable.summoningrituals.compat.kubejs.KubePlugin
+com.almostreliable.summoningrituals.compat.kubejs.AlmostKube

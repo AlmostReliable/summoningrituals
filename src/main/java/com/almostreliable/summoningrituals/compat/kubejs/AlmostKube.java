@@ -17,7 +17,8 @@ import net.minecraft.world.entity.EntityType;
 
 import javax.annotation.Nullable;
 
-public class KubePlugin extends KubeJSPlugin {
+@SuppressWarnings("unused")
+public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void addBindings(BindingsEvent event) {
