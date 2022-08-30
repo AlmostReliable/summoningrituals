@@ -7,7 +7,8 @@ import com.almostreliable.summoningrituals.recipe.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
-import com.almostreliable.summoningrituals.util.Bruhtils;
+import com.almostreliable.summoningrituals.util.SerializeUtils;
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
@@ -16,7 +17,6 @@ import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.kubejs.util.ListJS;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -107,11 +107,13 @@ public class AltarRecipeJS extends RecipeJS {
     }
 
     public AltarRecipeJS sacrifice(ResourceLocation id, int count) {
-        sacrifices.add(id, count);
+        Preconditions.checkNotNull(id);
+        sacrifices.add(SerializeUtils.mobFromId(id), count);
         return this;
     }
 
     public AltarRecipeJS sacrifice(ResourceLocation id) {
+        Preconditions.checkNotNull(id);
         return sacrifice(id, 1);
     }
 
@@ -120,16 +122,17 @@ public class AltarRecipeJS extends RecipeJS {
         return this;
     }
 
-    public AltarRecipeJS blockBelow(Block block, JsonObject properties) {
+    public AltarRecipeJS blockBelow(ResourceLocation id, JsonObject properties) {
+        Preconditions.checkNotNull(id);
         var blockJson = new JsonObject();
-        blockJson.addProperty(Constants.BLOCK, Bruhtils.getId(block).toString());
+        blockJson.addProperty(Constants.BLOCK, id.toString());
         blockJson.add(Constants.PROPERTIES, properties);
         blockBelow = BlockReference.fromJson(blockJson);
         return this;
     }
 
-    public AltarRecipeJS blockBelow(Block block) {
-        return blockBelow(block, new JsonObject());
+    public AltarRecipeJS blockBelow(ResourceLocation id) {
+        return blockBelow(id, new JsonObject());
     }
 
     public AltarRecipeJS dayTime(AltarRecipe.DAY_TIME dayTime) {

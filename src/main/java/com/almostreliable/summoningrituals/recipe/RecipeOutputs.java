@@ -256,7 +256,7 @@ public final class RecipeOutputs {
         @Override
         void toNetwork(FriendlyByteBuf buffer) {
             buffer.writeVarInt(1);
-            buffer.writeUtf(output.toString());
+            buffer.writeUtf(Bruhtils.getId(output).toString());
             buffer.writeVarInt(getCount());
             super.toNetwork(buffer);
         }

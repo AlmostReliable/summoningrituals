@@ -90,9 +90,8 @@ public class BlockReference implements Predicate<BlockState> {
             try {
                 newState.set(newState.get().setValue(property, Bruhtils.cast(newValue)));
             } catch (Exception ignored) {
-                property.getValue(newValue.toString()).ifPresent(v -> {
-                    newState.set(newState.get().setValue(property, Bruhtils.cast(v)));
-                });
+                property.getValue(newValue.toString())
+                    .ifPresent(v -> newState.set(newState.get().setValue(property, Bruhtils.cast(v))));
             }
         }
         displayState = newState.get();

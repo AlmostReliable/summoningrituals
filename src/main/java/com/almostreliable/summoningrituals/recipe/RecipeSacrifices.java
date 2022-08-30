@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.util.Bruhtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -9,9 +10,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 
 import java.util.function.Predicate;
@@ -72,8 +73,8 @@ public class RecipeSacrifices {
         SerializeUtils.vec3ToNetwork(buffer, region);
     }
 
-    public void add(ResourceLocation id, int count) {
-        sacrifices.add(new Sacrifice(id, count));
+    public void add(EntityType<?> mob, int count) {
+        sacrifices.add(new Sacrifice(mob, count));
     }
 
     public AABB getRegion(BlockPos pos) {
@@ -95,36 +96,37 @@ public class RecipeSacrifices {
         this.region = region;
     }
 
-    public record Sacrifice(ResourceLocation mob, int count) {
+    public record Sacrifice(EntityType<?> mob, int count) implements Predicate<Entity> {
 
         private static Sacrifice fromJson(JsonObject json) {
-            var mob = new ResourceLocation(GsonHelper.getAsString(json, Constants.MOB));
+            var mob = SerializeUtils.mobFromJson(json);
             var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
             return new Sacrifice(mob, count);
         }
 
         private static Sacrifice fromNetwork(FriendlyByteBuf buffer) {
-            var mob = new ResourceLocation(buffer.readUtf());
+            var mob = SerializeUtils.mobFromNetwork(buffer);
             var count = buffer.readVarInt();
             return new Sacrifice(mob, count);
         }
 
         public JsonElement toJson() {
             JsonObject json = new JsonObject();
-            json.addProperty(Constants.MOB, mob.toString());
+            json.addProperty(Constants.MOB, Bruhtils.getId(mob).toString());
             if (count > 1) {
                 json.addProperty(Constants.COUNT, count);
             }
             return json;
         }
 
-        public boolean matches(Entity toCheck) {
-            return mob.equals(toCheck.getType().getRegistryName());
+        private void toNetwork(FriendlyByteBuf buffer) {
+            buffer.writeUtf(Bruhtils.getId(mob).toString());
+            buffer.writeVarInt(count);
         }
 
-        private void toNetwork(FriendlyByteBuf buffer) {
-            buffer.writeUtf(mob.toString());
-            buffer.writeVarInt(count);
+        @Override
+        public boolean test(Entity entity) {
+            return mob.equals(entity.getType());
         }
     }
 }

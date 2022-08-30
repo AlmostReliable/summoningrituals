@@ -202,7 +202,7 @@ public class AltarEntity extends BlockEntity {
         var entities = level.getEntities(player, region);
         List<EntitySacrifice> toKill = new ArrayList<>();
         var success = sacrifices.test(sacrifice -> {
-            var found = entities.stream().filter(sacrifice::matches).toList();
+            var found = entities.stream().filter(sacrifice).toList();
             if (found.size() < sacrifice.count()) {
                 TextUtils.sendPlayerMessage(player, "sacrifice_missing", ChatFormatting.YELLOW);
                 return false;
