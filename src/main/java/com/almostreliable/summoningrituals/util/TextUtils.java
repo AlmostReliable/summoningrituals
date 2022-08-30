@@ -17,17 +17,6 @@ public final class TextUtils {
 
     private TextUtils() {}
 
-    /**
-     * A helper method to format a string with simple bracket placeholders.
-     * <p>
-     * The bracket pairs will be replaced with the given values in the same order.
-     * <p>
-     * Brackets with index values will be replaced with the corresponding value.
-     *
-     * @param input the input string
-     * @param args  the values to replace the brackets with
-     * @return the formatted string
-     */
     public static String f(String input, Object... args) {
         for (var arg : args) {
             input = PLACEHOLDER.matcher(input).replaceFirst(arg.toString());
@@ -38,37 +27,10 @@ public final class TextUtils {
         return input;
     }
 
-    /**
-     * Gets a resource location with the given key
-     * and the namespace of the mod.
-     *
-     * @param key the key to generate the resource location with
-     * @return the generated resource location
-     */
     public static ResourceLocation getRL(String key) {
         return new ResourceLocation(BuildConfig.MOD_ID, key);
     }
 
-    /**
-     * Gets a translated phrase within the mod's namespace.
-     *
-     * @param type the translation type to get the translation from
-     * @param key  the translation key
-     * @return the translated phrase
-     */
-    public static String translateAsString(String type, String key) {
-        return translate(type, key).getString();
-    }
-
-    /**
-     * Generates a Translation Text Component within the mod's namespace
-     * with a custom type, key and optional color.
-     *
-     * @param type  the type of the translation
-     * @param key   the unique key of the translation
-     * @param color an optional color
-     * @return the translated phrase
-     */
     public static TranslatableComponent translate(String type, String key, ChatFormatting... color) {
         var output = new TranslatableComponent(getTranslationKey(type, key));
         return color.length == 0 ? output : (TranslatableComponent) output.withStyle(color[0]);
@@ -88,24 +50,10 @@ public final class TextUtils {
         );
     }
 
-    /**
-     * Colors a given String with the given color.
-     *
-     * @param input the string to color
-     * @param color an optional color
-     * @return the colorized string
-     */
-    static TextComponent colorize(String input, ChatFormatting color) {
+    public static TextComponent colorize(String input, ChatFormatting color) {
         return (TextComponent) new TextComponent(input).withStyle(color);
     }
 
-    /**
-     * Gets the translation key from the provided type and key.
-     *
-     * @param type the type of the translation
-     * @param key  the unique key of the translation
-     * @return the translation key
-     */
     private static String getTranslationKey(String type, String key) {
         return String.format("%s.%s.%s", type.toLowerCase(), BuildConfig.MOD_ID, key);
     }

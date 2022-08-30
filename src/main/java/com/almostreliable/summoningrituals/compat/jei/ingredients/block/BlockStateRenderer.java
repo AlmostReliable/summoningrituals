@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
 
 import com.almostreliable.summoningrituals.util.TextUtils;
-import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -68,33 +67,39 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
         var stack = new ItemStack(blockState.getBlock());
         try {
             var tooltip = stack.getTooltipLines(player, tooltipFlag);
+
             var stateId = Block.getId(blockState);
             if (propertyTooltipCache.containsKey(stateId)) {
                 return propertyTooltipCache.get(stateId);
             }
 
-            var defaultState = blockState.getBlock().defaultBlockState();
-            List<String> modifiedProps = new ArrayList<>();
-            for (var property : blockState.getProperties()) {
-                if (!blockState.getValue(property).equals(defaultState.getValue(property))) {
-                    modifiedProps.add("» " + property.getName() + ": " + blockState.getValue(property));
-                }
-            }
-
-            if (modifiedProps.isEmpty()) {
-                propertyTooltipCache.put(stateId, null);
-            } else {
-                tooltip.add(TextComponent.EMPTY);
-                tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA));
-                for (var prop : modifiedProps) {
-                    tooltip.add(new TextComponent(prop));
-                }
-                propertyTooltipCache.put(stateId, tooltip);
-            }
+            cacheTooltip(blockState, tooltip, stateId);
             return tooltip;
         } catch (RuntimeException | LinkageError e) {
             return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
                 .withStyle(ChatFormatting.DARK_RED));
+        }
+    }
+
+    private void cacheTooltip(BlockState blockState, List<Component> tooltip, int stateId) {
+        var defaultState = blockState.getBlock().defaultBlockState();
+        List<String> modifiedProps = new ArrayList<>();
+        for (var property : blockState.getProperties()) {
+            if (!blockState.getValue(property).equals(defaultState.getValue(property))) {
+                modifiedProps.add(property.getName() + ": " + blockState.getValue(property));
+            }
+        }
+
+        if (modifiedProps.isEmpty()) {
+            propertyTooltipCache.put(stateId, null);
+        } else {
+            tooltip.add(TextComponent.EMPTY);
+            tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA)
+                .append(TextUtils.colorize(":", ChatFormatting.AQUA)));
+            for (var prop : modifiedProps) {
+                tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY).append(new TextComponent(prop)));
+            }
+            propertyTooltipCache.put(stateId, tooltip);
         }
     }
 
