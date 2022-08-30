@@ -44,8 +44,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
             stack.pushPose();
             {
-                stack.translate(0, 1, 0);
-                // stack.scale(0.7f, 0.7f, 0.7f);
+                stack.translate(0, Math.sin(entity.getLevel().getGameTime() / 5f) / 10 + 1, 0);
+                stack.scale(0.8f, 0.8f, 0.8f);
                 stack.mulPose(Vector3f.YN.rotationDegrees(mc.player.getYHeadRot()));
                 if (!entity.inventory.getCatalyst().isEmpty()) {
                     itemRenderer
