@@ -43,9 +43,9 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     public void render(PoseStack stack, BlockState blockState) {
         stack.pushPose();
         {
-            stack.translate(size * 4f / 5f, size * 4f / 5f, 0);
+            stack.translate(0.95f * size, 0.75f * size, 0);
+            stack.scale(0.625f * size, 0.625f * size, 0.625f * size);
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
-            stack.scale(size * 3f / 5f, size * 3f / 5f, 1);
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
             var bufferSource = mc.renderBuffers().bufferSource();
@@ -97,7 +97,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
             tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA)
                 .append(TextUtils.colorize(":", ChatFormatting.AQUA)));
             for (var prop : modifiedProps) {
-                tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY).append(new TextComponent(prop)));
+                tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY).append(TextUtils.colorize(prop, ChatFormatting.WHITE)));
             }
             propertyTooltipCache.put(stateId, tooltip);
         }
