@@ -1,7 +1,9 @@
 package com.almostreliable.summoningrituals.compat.jei;
 
 import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.compat.jei.blockingredient.BlockRenderer;
+import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.item.SizedItemRenderer;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -14,8 +16,6 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -30,22 +30,20 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     private static final int TEXTURE_WIDTH = 150;
     private static final int TEXTURE_HEIGHT = 157;
 
-    private final Minecraft mc;
-    private final BlockRenderDispatcher blockRenderer;
     private final IDrawable background;
     private final IDrawable icon;
     // private final IDrawable row;
-    private final AltarRenderer altarRenderer;
+    private final BlockStateRenderer blockStateRenderer;
+    private final SizedItemRenderer sizedItemRenderer;
 
     public AltarCategory(IGuiHelper guiHelper) {
-        mc = Minecraft.getInstance();
-        blockRenderer = mc.getBlockRenderer();
         background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Setup.ALTAR_ITEM.get()));
         // row = guiHelper.drawableBuilder(TEXTURE, 0, 0, 146, 18).setTextureSize(146, 38).build();
-        altarRenderer = new AltarRenderer(mc);
+        blockStateRenderer = new BlockStateRenderer(32);
+        sizedItemRenderer = new SizedItemRenderer(32);
     }
 
     @Override
@@ -70,14 +68,14 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
-        // TODO: shift upwards if there is a block below
+        // TODO: shift altar upwards if there is a block below
         if (recipe.getBlockBelow() != null) {
-            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - altarRenderer.getWidth()) / 2, 55)
-                .setCustomRenderer(AlmostJEI.AlmostTypes.BLOCK, new BlockRenderer(32))
-                .addIngredient(AlmostJEI.AlmostTypes.BLOCK, recipe.getBlockBelow().getDisplayState());
+            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - sizedItemRenderer.getWidth()) / 2, 55)
+                .setCustomRenderer(AlmostTypes.BLOCK_STATE, blockStateRenderer)
+                .addIngredient(AlmostTypes.BLOCK_STATE, recipe.getBlockBelow().getDisplayState());
         }
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - altarRenderer.getWidth()) / 2, 35)
-            .setCustomRenderer(VanillaTypes.ITEM_STACK, altarRenderer)
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - sizedItemRenderer.getWidth()) / 2, 35)
+            .setCustomRenderer(VanillaTypes.ITEM_STACK, sizedItemRenderer)
             .addItemStack(new ItemStack(Setup.ALTAR_ITEM.get()));
     }
 

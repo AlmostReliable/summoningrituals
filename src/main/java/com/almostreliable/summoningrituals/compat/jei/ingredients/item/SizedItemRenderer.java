@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei;
+package com.almostreliable.summoningrituals.compat.jei.ingredients.item;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,19 +15,19 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
-/**
- * Adapted from the JEI ItemStackRenderer to render a bigger slot for the altar.
- */
-public class AltarRenderer implements IIngredientRenderer<ItemStack> {
+public class SizedItemRenderer implements IIngredientRenderer<ItemStack> {
 
     private final Font font;
     private final ItemRenderer itemRenderer;
     private final Player player;
+    private final int size;
 
-    public AltarRenderer(Minecraft mc) {
+    public SizedItemRenderer(int size) {
+        var mc = Minecraft.getInstance();
         this.font = mc.font;
         this.itemRenderer = mc.getItemRenderer();
         this.player = mc.player;
+        this.size = size;
     }
 
     @Override
@@ -36,7 +36,8 @@ public class AltarRenderer implements IIngredientRenderer<ItemStack> {
         modelViewStack.pushPose();
         {
             modelViewStack.mulPoseMatrix(stack.last().pose());
-            modelViewStack.scale(2, 2, 1);
+            var scale = size / 16f;
+            modelViewStack.scale(scale, scale, scale);
             RenderSystem.enableDepthTest();
             itemRenderer.renderAndDecorateFakeItem(altar, 0, 0);
             itemRenderer.renderGuiItemDecorations(font, altar, 0, 0);
@@ -58,11 +59,11 @@ public class AltarRenderer implements IIngredientRenderer<ItemStack> {
 
     @Override
     public int getWidth() {
-        return 32;
+        return size;
     }
 
     @Override
     public int getHeight() {
-        return 32;
+        return size;
     }
 }

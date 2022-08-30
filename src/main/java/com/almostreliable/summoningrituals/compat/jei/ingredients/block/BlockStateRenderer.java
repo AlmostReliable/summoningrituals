@@ -1,29 +1,34 @@
-package com.almostreliable.summoningrituals.compat.jei.blockingredient;
+package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import mezz.jei.api.ingredients.IIngredientRenderer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.List;
 
-public class BlockRenderer implements IIngredientRenderer<BlockState> {
+public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
 
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
+    private final Player player;
     private final int size;
 
-    public BlockRenderer(int size) {
+    public BlockStateRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
+        this.player = mc.player;
         this.size = size;
     }
 
@@ -52,7 +57,13 @@ public class BlockRenderer implements IIngredientRenderer<BlockState> {
 
     @Override
     public List<Component> getTooltip(BlockState blockState, TooltipFlag tooltipFlag) {
-        return List.of(new TextComponent("todo, some block lol"));
+        var stack = new ItemStack(blockState.getBlock());
+        try {
+            return stack.getTooltipLines(player, tooltipFlag);
+        } catch (RuntimeException | LinkageError e) {
+            return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
+                .withStyle(ChatFormatting.DARK_RED));
+        }
     }
 
     @Override

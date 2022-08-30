@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.blockingredient;
+package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
 
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI;
 import com.almostreliable.summoningrituals.util.Bruhtils;
@@ -9,11 +9,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockHelper implements IIngredientHelper<BlockState> {
+public class BlockStateHelper implements IIngredientHelper<BlockState> {
 
     @Override
     public IIngredientType<BlockState> getIngredientType() {
-        return AlmostJEI.AlmostTypes.BLOCK;
+        return AlmostJEI.AlmostTypes.BLOCK_STATE;
     }
 
     @Override
