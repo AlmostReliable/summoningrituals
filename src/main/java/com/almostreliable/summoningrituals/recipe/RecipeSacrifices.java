@@ -76,10 +76,6 @@ public class RecipeSacrifices {
         sacrifices.add(new Sacrifice(id, count));
     }
 
-    public void setRegion(Vec3i region) {
-        this.region = region;
-    }
-
     public AABB getRegion(BlockPos pos) {
         return new AABB(pos.offset(region.multiply(-1)), pos.offset(region));
     }
@@ -93,6 +89,10 @@ public class RecipeSacrifices {
 
     public boolean isEmpty() {
         return sacrifices.isEmpty();
+    }
+
+    public void setRegion(Vec3i region) {
+        this.region = region;
     }
 
     public record Sacrifice(ResourceLocation mob, int count) {

@@ -13,4 +13,9 @@ public final class Bruhtils {
         }
         return entry.getRegistryName();
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T cast(Object o) {
+        return (T) o;
+    }
 }

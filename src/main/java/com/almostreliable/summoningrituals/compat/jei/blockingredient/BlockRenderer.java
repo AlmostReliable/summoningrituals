@@ -1,9 +1,7 @@
 package com.almostreliable.summoningrituals.compat.jei.blockingredient;
 
-import com.almostreliable.summoningrituals.compat.jei.AltarRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;

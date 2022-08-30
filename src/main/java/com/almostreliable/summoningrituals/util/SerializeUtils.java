@@ -11,7 +11,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -64,15 +67,12 @@ public final class SerializeUtils {
         return json;
     }
 
+    public static Block blockFromId(@Nullable ResourceLocation id) {
+        return getFromRegistry(ForgeRegistries.BLOCKS, id);
+    }
+
     public static EntityType<?> mobFromId(@Nullable ResourceLocation id) {
-        if (id == null) {
-            throw new IllegalArgumentException("id is null");
-        }
-        var entity = ForgeRegistries.ENTITIES.getValue(id);
-        if (entity == null) {
-            throw new IllegalArgumentException("Entity " + id + " is not registered");
-        }
-        return entity;
+        return getFromRegistry(ForgeRegistries.ENTITIES, id);
     }
 
     public static EntityType<?> mobFromJson(JsonObject json) {
@@ -124,5 +124,18 @@ public final class SerializeUtils {
         } catch (CommandSyntaxException e) {
             throw new IllegalArgumentException("Invalid NBT string: " + nbtString, e);
         }
+    }
+
+    private static <T extends IForgeRegistryEntry<T>> T getFromRegistry(
+        IForgeRegistry<T> registry, @Nullable ResourceLocation id
+    ) {
+        if (id == null) {
+            throw new IllegalArgumentException("id is null");
+        }
+        var entry = registry.getValue(id);
+        if (entry == null) {
+            throw new IllegalArgumentException(id + " is not registered");
+        }
+        return entry;
     }
 }

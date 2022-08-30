@@ -27,6 +27,11 @@ public class AlmostJEI implements IModPlugin {
     }
 
     @Override
+    public void registerIngredients(IModIngredientRegistration r) {
+        r.register(AlmostTypes.BLOCK, List.of(), new BlockHelper(), new BlockRenderer(16));
+    }
+
+    @Override
     public void registerCategories(IRecipeCategoryRegistration r) {
         var guiHelper = r.getJeiHelpers().getGuiHelper();
         r.addRecipeCategories(new AltarCategory(guiHelper));
@@ -41,11 +46,6 @@ public class AlmostJEI implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration r) {
         r.addRecipeCatalyst(new ItemStack(Setup.ALTAR_ITEM.get()), AltarCategory.TYPE);
-    }
-
-    @Override
-    public void registerIngredients(IModIngredientRegistration r) {
-        r.register(AlmostTypes.BLOCK, List.of(), new BlockHelper(), new BlockRenderer(16));
     }
 
     public static final class AlmostTypes {

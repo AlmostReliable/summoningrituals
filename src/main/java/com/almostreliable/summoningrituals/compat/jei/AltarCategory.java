@@ -3,13 +3,10 @@ package com.almostreliable.summoningrituals.compat.jei;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.blockingredient.BlockRenderer;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.BlockReference;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -18,13 +15,10 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.model.data.EmptyModelData;
 
 import static com.almostreliable.summoningrituals.Constants.ALTAR;
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
@@ -55,12 +49,32 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     }
 
     @Override
+    public RecipeType<AltarRecipe> getRecipeType() {
+        return TYPE;
+    }
+
+    @Override
+    public Component getTitle() {
+        return TextUtils.translate("block", ALTAR);
+    }
+
+    @Override
+    public IDrawable getBackground() {
+        return background;
+    }
+
+    @Override
+    public IDrawable getIcon() {
+        return icon;
+    }
+
+    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
         // TODO: shift upwards if there is a block below
         if (recipe.getBlockBelow() != null) {
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - altarRenderer.getWidth()) / 2, 55)
                 .setCustomRenderer(AlmostJEI.AlmostTypes.BLOCK, new BlockRenderer(32))
-                .addIngredient(AlmostJEI.AlmostTypes.BLOCK, recipe.getBlockBelow().asBlockState());
+                .addIngredient(AlmostJEI.AlmostTypes.BLOCK, recipe.getBlockBelow().getDisplayState());
         }
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, (TEXTURE_WIDTH - altarRenderer.getWidth()) / 2, 35)
             .setCustomRenderer(VanillaTypes.ITEM_STACK, altarRenderer)
@@ -87,26 +101,6 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         // );
         // bufferSource.endBatch();
         // stack.popPose();
-    }
-
-    @Override
-    public Component getTitle() {
-        return TextUtils.translate("block", ALTAR);
-    }
-
-    @Override
-    public IDrawable getBackground() {
-        return background;
-    }
-
-    @Override
-    public IDrawable getIcon() {
-        return icon;
-    }
-
-    @Override
-    public RecipeType<AltarRecipe> getRecipeType() {
-        return TYPE;
     }
 
     @SuppressWarnings("removal")
