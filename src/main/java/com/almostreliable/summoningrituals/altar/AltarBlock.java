@@ -1,7 +1,10 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.util.MathUtils;
+import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,6 +31,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 import java.util.stream.Stream;
 
 public class AltarBlock extends Block implements EntityBlock {
@@ -102,5 +106,44 @@ public class AltarBlock extends Block implements EntityBlock {
                 altar.tick();
             }
         };
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+        Vector3f[][] particlePos = MathUtils.getHorizontalVectors(
+            new Vector3f(3.5f, 1.5f, 9.5f),
+            new Vector3f(9.5f, 3.5f, 12.5f),
+            new Vector3f(11.5f, 4.5f, 10.5f)
+        );
+
+        var x = pos.getX();
+        var y = pos.getY() + 1;
+        var z = pos.getZ();
+        var vec = particlePos[state.getValue(FACING).ordinal() - 2];
+        var active = state.getValue(ACTIVE);
+
+        for (var i = 0; i < 3; i++) {
+            if (active) {
+                renderCandleActive(level, x, y, z, vec[i]);
+            } else {
+                renderCandleInactive(level, x, y, z, vec[i]);
+            }
+        }
+    }
+
+    private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
+        level.addParticle(
+            ParticleTypes.SOUL,
+            x + vec.x() / 16f,
+            y + (vec.y() + 2) / 16f,
+            z + vec.z() / 16f,
+            0,
+            0,
+            0
+        );
+    }
+
+    private void renderCandleInactive(Level level, int x, int y, int z, Vector3f vec) {
+        level.addParticle(ParticleTypes.SMALL_FLAME, x + vec.x() / 16f, y + vec.y() / 16f, z + vec.z() / 16f, 0, 0, 0);
     }
 }
