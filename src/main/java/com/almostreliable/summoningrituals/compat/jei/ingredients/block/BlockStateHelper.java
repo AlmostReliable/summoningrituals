@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
 
-import com.almostreliable.summoningrituals.compat.jei.AlmostJEI;
+import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
 import com.almostreliable.summoningrituals.util.Bruhtils;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -13,7 +13,7 @@ public class BlockStateHelper implements IIngredientHelper<BlockState> {
 
     @Override
     public IIngredientType<BlockState> getIngredientType() {
-        return AlmostJEI.AlmostTypes.BLOCK_STATE;
+        return AlmostTypes.BLOCK_STATE;
     }
 
     @Override

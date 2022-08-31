@@ -86,6 +86,16 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
         }
     }
 
+    @Override
+    public int getWidth() {
+        return size;
+    }
+
+    @Override
+    public int getHeight() {
+        return size;
+    }
+
     private void constructTooltip(BlockState blockState, List<Component> tooltip) {
         var defaultState = blockState.getBlock().defaultBlockState();
         List<String> modifiedProps = new ArrayList<>();
@@ -102,15 +112,5 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
             tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY)
                 .append(TextUtils.colorize(prop, ChatFormatting.WHITE)));
         }
-    }
-
-    @Override
-    public int getWidth() {
-        return size;
-    }
-
-    @Override
-    public int getHeight() {
-        return size;
     }
 }

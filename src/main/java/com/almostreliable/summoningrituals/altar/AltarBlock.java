@@ -49,28 +49,6 @@ public class AltarBlock extends Block implements EntityBlock {
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false));
     }
 
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        var superState = super.getStateForPlacement(context);
-        var state = superState == null ? defaultBlockState() : superState;
-        return state.setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(ACTIVE, false);
-    }
-
-    @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            altar.playerDestroy(player.isCreative());
-        }
-        super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(FACING).add(ACTIVE);
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public InteractionResult use(
@@ -129,6 +107,28 @@ public class AltarBlock extends Block implements EntityBlock {
                 renderCandleInactive(level, x, y, z, vec[i]);
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        var superState = super.getStateForPlacement(context);
+        var state = superState == null ? defaultBlockState() : superState;
+        return state.setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(ACTIVE, false);
+    }
+
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
+            altar.playerDestroy(player.isCreative());
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(FACING).add(ACTIVE);
     }
 
     private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
