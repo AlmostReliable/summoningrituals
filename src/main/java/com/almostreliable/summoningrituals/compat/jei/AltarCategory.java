@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.jei;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
 import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.jei.ingredients.item.SizedItemRenderer;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -30,13 +31,13 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     public static final RecipeType<AltarRecipe> TYPE = new RecipeType<>(TextUtils.getRL(ALTAR), AltarRecipe.class);
     private static final ResourceLocation TEXTURE = TextUtils.getRL(f("textures/jei/{}.png", ALTAR));
-    private static final int TEXTURE_WIDTH = 150;
-    private static final int TEXTURE_HEIGHT = 157;
+    private static final int TEXTURE_WIDTH = 160;
+    private static final int TEXTURE_HEIGHT = 160;
     private static final int CENTER_X = TEXTURE_WIDTH / 2;
-    private static final int RENDER_Y = 50;
+    private static final int RENDER_Y = 60;
     private static final int RENDER_SIZE = 24;
     private static final int ITEM_RADIUS = 45;
-    private static final int MOB_RADIUS = 65;
+    private static final int MOB_RADIUS = 70;
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -79,12 +80,20 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
         var yOffset = blockStateRenderer.getHeight() / 2;
         if (recipe.getBlockBelow() != null) {
-            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - blockStateRenderer.getWidth() / 2, RENDER_Y + blockStateRenderer.getHeight())
+            builder.addSlot(
+                    RecipeIngredientRole.RENDER_ONLY,
+                    CENTER_X - blockStateRenderer.getWidth() / 2,
+                    RENDER_Y + blockStateRenderer.getHeight()
+                )
                 .setCustomRenderer(AlmostTypes.BLOCK_STATE, blockStateRenderer)
                 .addIngredient(AlmostTypes.BLOCK_STATE, recipe.getBlockBelow().getDisplayState());
             yOffset = 0;
         }
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - sizedItemRenderer.getWidth() / 2, RENDER_Y + yOffset)
+        builder.addSlot(
+                RecipeIngredientRole.RENDER_ONLY,
+                CENTER_X - sizedItemRenderer.getWidth() / 2,
+                RENDER_Y + yOffset
+            )
             .setCustomRenderer(VanillaTypes.ITEM_STACK, sizedItemRenderer)
             .addItemStack(new ItemStack(Setup.ALTAR_ITEM.get()));
         builder.addSlot(RecipeIngredientRole.INPUT, CENTER_X - 8, RENDER_Y - 16 + yOffset)
@@ -104,6 +113,14 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
             builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStacks(inputStacks);
         }
+
+        var sacrificeSize = recipe.getSacrifices().getSize();
+        recipe.getSacrifices().forEach((sacrifice, i) -> {
+            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / sacrificeSize) * MOB_RADIUS) - 8;
+            var y = RENDER_Y + (int) (Math.sin(i * 2 * Math.PI / sacrificeSize) * MOB_RADIUS) + 8;
+            builder.addSlot(RecipeIngredientRole.INPUT, x, y)
+                .addIngredient(AlmostTypes.ENTITY, new EntityIngredient(sacrifice.mob(), sacrifice.count()));
+        });
     }
 
     @Override

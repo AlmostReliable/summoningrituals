@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class RecipeSacrifices {
@@ -81,11 +82,18 @@ public class RecipeSacrifices {
         return new AABB(pos.offset(region.multiply(-1)), pos.offset(region));
     }
 
-    public boolean test(Predicate<? super Sacrifice> predicate) {
-        for (var sacrifice : sacrifices) {
-            if (!predicate.test(sacrifice)) return false;
+    public void forEach(BiConsumer<? super Sacrifice, Integer> consumer) {
+        for (var i = 0; i < sacrifices.size(); i++) {
+            consumer.accept(sacrifices.get(i), i);
         }
-        return true;
+    }
+
+    public boolean test(Predicate<? super Sacrifice> predicate) {
+        return sacrifices.stream().allMatch(predicate);
+    }
+
+    public int getSize() {
+        return sacrifices.size();
     }
 
     public boolean isEmpty() {
@@ -119,14 +127,14 @@ public class RecipeSacrifices {
             return json;
         }
 
-        private void toNetwork(FriendlyByteBuf buffer) {
-            buffer.writeUtf(Bruhtils.getId(mob).toString());
-            buffer.writeVarInt(count);
-        }
-
         @Override
         public boolean test(Entity entity) {
             return mob.equals(entity.getType());
+        }
+
+        private void toNetwork(FriendlyByteBuf buffer) {
+            buffer.writeUtf(Bruhtils.getId(mob).toString());
+            buffer.writeVarInt(count);
         }
     }
 }

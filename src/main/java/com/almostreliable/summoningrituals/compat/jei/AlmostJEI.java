@@ -3,6 +3,9 @@ package com.almostreliable.summoningrituals.compat.jei;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateHelper;
 import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityRenderer;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import mezz.jei.api.IModPlugin;
@@ -29,6 +32,7 @@ public class AlmostJEI implements IModPlugin {
     @Override
     public void registerIngredients(IModIngredientRegistration r) {
         r.register(AlmostTypes.BLOCK_STATE, List.of(), new BlockStateHelper(), new BlockStateRenderer(16));
+        r.register(AlmostTypes.ENTITY, List.of(), new EntityHelper(), new EntityRenderer(16));
     }
 
     @Override
@@ -50,6 +54,7 @@ public class AlmostJEI implements IModPlugin {
 
     public static final class AlmostTypes {
         public static final IIngredientType<BlockState> BLOCK_STATE = () -> BlockState.class;
+        public static final IIngredientType<EntityIngredient> ENTITY = () -> EntityIngredient.class;
 
         private AlmostTypes() {}
     }

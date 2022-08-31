@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.util;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -36,5 +37,45 @@ public final class GameUtils {
 
     public static void spawnEntity(Level level, Entity entity) {
         level.addFreshEntity(entity);
+    }
+
+    public static void renderCount(PoseStack stack, String text, int x, int y) {
+        renderText(stack, text, ANCHOR.BOTTOM_RIGHT, x + 2, y + 2, 1, 0xFF_FFFF);
+    }
+
+    public static void renderText(PoseStack stack, String text, ANCHOR anchor, int x, int y, float scale, int color) {
+        stack.pushPose();
+        {
+            stack.translate(x, y, 200);
+            stack.scale(scale, scale, 1);
+
+            var xOffset = 0;
+            var yOffset = 0;
+            var font = Minecraft.getInstance().font;
+            var width = font.width(text);
+            var height = font.lineHeight;
+            switch (anchor) {
+                case TOP_LEFT:
+                    // do nothing
+                    break;
+                case TOP_RIGHT:
+                    xOffset -= width;
+                    break;
+                case BOTTOM_LEFT:
+                    yOffset -= height;
+                    break;
+                case BOTTOM_RIGHT:
+                    xOffset -= width;
+                    yOffset -= height;
+                    break;
+            }
+
+            font.drawShadow(stack, text, xOffset, yOffset, color);
+        }
+        stack.popPose();
+    }
+
+    public enum ANCHOR {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }
 }
