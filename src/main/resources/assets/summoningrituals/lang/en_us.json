@@ -13,5 +13,6 @@
   "message.summoningrituals.no_block_below": "You need to have the correct block below to start the ritual.",
   "message.summoningrituals.sacrifice_missing": "You have missing sacrifices.",
 
+  "tooltip.summoningrituals.block_below": "Block below",
   "tooltip.summoningrituals.relevant_properties": "Relevant Properties"
 }

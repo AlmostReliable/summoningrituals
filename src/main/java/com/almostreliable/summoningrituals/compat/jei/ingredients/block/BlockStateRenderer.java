@@ -28,14 +28,14 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
     private final Player player;
-    private final Map<Integer, List<Component>> propertyTooltipCache;
+    private final Map<Integer, List<Component>> tooltipCache;
     private final int size;
 
     public BlockStateRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
         this.player = mc.player;
-        propertyTooltipCache = new HashMap<>();
+        tooltipCache = new HashMap<>();
         this.size = size;
     }
 
@@ -66,22 +66,27 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     public List<Component> getTooltip(BlockState blockState, TooltipFlag tooltipFlag) {
         var stack = new ItemStack(blockState.getBlock());
         try {
-            var tooltip = stack.getTooltipLines(player, tooltipFlag);
-
             var stateId = Block.getId(blockState);
-            if (propertyTooltipCache.containsKey(stateId)) {
-                return propertyTooltipCache.get(stateId);
-            }
+            var tooltip = tooltipCache.get(stateId);
+            if (tooltip != null) return tooltip;
 
-            cacheTooltip(blockState, tooltip, stateId);
+            tooltip = stack.getTooltipLines(player, tooltipFlag);
+            tooltip.set(
+                0,
+                TextUtils.translate("tooltip", "block_below", ChatFormatting.GOLD)
+                    .append(": ")
+                    .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
+            );
+            constructTooltip(blockState, tooltip);
+            tooltipCache.put(stateId, tooltip);
             return tooltip;
-        } catch (RuntimeException | LinkageError e) {
+        } catch (Exception e) {
             return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
                 .withStyle(ChatFormatting.DARK_RED));
         }
     }
 
-    private void cacheTooltip(BlockState blockState, List<Component> tooltip, int stateId) {
+    private void constructTooltip(BlockState blockState, List<Component> tooltip) {
         var defaultState = blockState.getBlock().defaultBlockState();
         List<String> modifiedProps = new ArrayList<>();
         for (var property : blockState.getProperties()) {
@@ -89,17 +94,13 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
                 modifiedProps.add(property.getName() + ": " + blockState.getValue(property));
             }
         }
+        if (modifiedProps.isEmpty()) return;
 
-        if (modifiedProps.isEmpty()) {
-            propertyTooltipCache.put(stateId, null);
-        } else {
-            tooltip.add(TextComponent.EMPTY);
-            tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA)
-                .append(TextUtils.colorize(":", ChatFormatting.AQUA)));
-            for (var prop : modifiedProps) {
-                tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY).append(TextUtils.colorize(prop, ChatFormatting.WHITE)));
-            }
-            propertyTooltipCache.put(stateId, tooltip);
+        tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA)
+            .append(TextUtils.colorize(":", ChatFormatting.AQUA)));
+        for (var prop : modifiedProps) {
+            tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY)
+                .append(TextUtils.colorize(prop, ChatFormatting.WHITE)));
         }
     }
 
