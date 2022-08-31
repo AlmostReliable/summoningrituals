@@ -43,7 +43,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     public void render(PoseStack stack, BlockState blockState) {
         stack.pushPose();
         {
-            stack.translate(0.95f * size, 0.75f * size, 0);
+            stack.translate(0.93f * size, 0.77f * size, 0);
             stack.scale(0.625f * size, 0.625f * size, 0.625f * size);
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
