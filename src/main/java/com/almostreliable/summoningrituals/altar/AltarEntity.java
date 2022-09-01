@@ -4,6 +4,10 @@ import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
+import com.almostreliable.summoningrituals.network.IPacket;
+import com.almostreliable.summoningrituals.network.PacketHandler;
+import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
+import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.BlockReference;
 import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
@@ -27,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -163,11 +168,22 @@ public class AltarEntity extends BlockEntity {
         if (progress == 0) {
             changeActivityState(true);
             if (sacrifices != null && !sacrifices.isEmpty()) {
-                sacrifices.forEach(EntitySacrifice::kill);
+                sacrifices.stream()
+                    .map(EntitySacrifice::kill)
+                    .filter(positions -> !positions.isEmpty())
+                    .forEach(positions -> trackingChunkPacket(new SacrificeParticlePacket(positions)));
             }
         }
         progress++;
-        sendUpdate();
+        trackingChunkPacket(new ProgressUpdatePacket(worldPosition, progress));
+    }
+
+    private void trackingChunkPacket(IPacket<?> packet) {
+        if (level == null || level.isClientSide) return;
+        PacketHandler.CHANNEL.send(
+            PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(worldPosition)),
+            packet
+        );
     }
 
     private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
@@ -230,13 +246,21 @@ public class AltarEntity extends BlockEntity {
         }
     }
 
+    public void setProgress(int progress) {
+        this.progress = progress;
+        setChanged();
+    }
+
     private record EntitySacrifice(List<Entity> entities, int count) {
-        private void kill() {
+        private List<BlockPos> kill() {
+            List<BlockPos> positions = new ArrayList<>();
             for (var i = 0; i < count; i++) {
                 var entity = entities.get(i);
                 entity.addTag(f("{}_sacrificed", BuildConfig.MOD_ID));
                 entity.kill();
+                positions.add(entity.blockPosition());
             }
+            return positions;
         }
     }
 }
