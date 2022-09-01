@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.block;
 
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
 import com.almostreliable.summoningrituals.util.Bruhtils;

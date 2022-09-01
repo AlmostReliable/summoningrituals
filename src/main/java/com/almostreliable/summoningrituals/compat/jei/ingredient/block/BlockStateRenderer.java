@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.block;
 
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;

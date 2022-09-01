@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredients.entity;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;

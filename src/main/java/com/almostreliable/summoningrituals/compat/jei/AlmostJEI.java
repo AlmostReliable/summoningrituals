@@ -1,11 +1,11 @@
 package com.almostreliable.summoningrituals.compat.jei;
 
 import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateHelper;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateRenderer;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityHelper;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityRenderer;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import mezz.jei.api.IModPlugin;

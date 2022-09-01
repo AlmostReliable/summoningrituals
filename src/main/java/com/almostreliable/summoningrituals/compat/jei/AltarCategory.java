@@ -2,9 +2,9 @@ package com.almostreliable.summoningrituals.compat.jei;
 
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.block.BlockStateRenderer;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.entity.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.jei.ingredients.item.SizedItemRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.item.SizedItemRenderer;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;

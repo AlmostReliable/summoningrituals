@@ -1,5 +1,5 @@
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
-package com.almostreliable.summoningrituals.compat.jei.ingredients.block;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.entity;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredients.entity;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.entity;
 
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
 import com.almostreliable.summoningrituals.util.Bruhtils;
