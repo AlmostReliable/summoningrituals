@@ -10,12 +10,16 @@ public final class MathUtils {
 
     private MathUtils() {}
 
-    public static Vec3 vectorFromBlockPos(Vec3i pos) {
+    public static Vec3 vectorFromPos(Vec3i pos) {
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 
     public static Vec3 shiftToCenter(Vec3 pos) {
         return new Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
+    }
+
+    public static Vec3 shiftToCenter(Vec3i pos) {
+        return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     public static int ensureDegree(Number degree) {

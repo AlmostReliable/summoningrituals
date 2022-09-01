@@ -62,7 +62,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             }
             stack.popPose();
 
-            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromBlockPos(entity.getBlockPos()));
+            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.getBlockPos()));
             var playerPos = mc.player.position();
             var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
             var axisRotation = MathUtils.ensureDegree(entity.getLevel().getGameTime());

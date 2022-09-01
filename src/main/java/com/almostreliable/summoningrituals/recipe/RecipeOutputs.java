@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.recipe;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.Bruhtils;
 import com.almostreliable.summoningrituals.util.GameUtils;
+import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,13 +19,17 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 public final class RecipeOutputs {
 
     private static final Vec3i DEFAULT_OFFSET = new Vec3i(0, 2, 0);
     private static final Vec3i DEFAULT_SPREAD = new Vec3i(1, 0, 1);
+    private static final Random RANDOM = new Random();
 
     private final NonNullList<RecipeOutput<?>> outputs;
 
@@ -74,7 +79,7 @@ public final class RecipeOutputs {
 
     public void handleRecipe(ServerLevel level, BlockPos origin) {
         for (var output : outputs) {
-            output.handleRecipe(level, origin);
+            output.spawn(level, origin);
         }
     }
 
@@ -102,11 +107,13 @@ public final class RecipeOutputs {
             if (json.has(Constants.DATA)) {
                 output.data = SerializeUtils.nbtFromString(GsonHelper.getAsString(json, Constants.DATA));
             }
-            if (json.has(Constants.OFFSET)) {
-                output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
-            }
-            if (json.has(Constants.SPREAD)) {
-                output.spread = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.SPREAD));
+            if (output.getCount() > 1) {
+                if (json.has(Constants.OFFSET)) {
+                    output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
+                }
+                if (json.has(Constants.SPREAD)) {
+                    output.spread = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.SPREAD));
+                }
             }
 
             return output;
@@ -126,8 +133,10 @@ public final class RecipeOutputs {
             if (buffer.readBoolean()) {
                 output.data = buffer.readNbt();
             }
-            output.offset = SerializeUtils.vec3FromNetwork(buffer);
-            output.spread = SerializeUtils.vec3FromNetwork(buffer);
+            if (output.getCount() > 1) {
+                output.offset = SerializeUtils.vec3FromNetwork(buffer);
+                output.spread = SerializeUtils.vec3FromNetwork(buffer);
+            }
 
             return output;
         }
@@ -138,11 +147,13 @@ public final class RecipeOutputs {
             if (!data.isEmpty()) {
                 json.addProperty(Constants.DATA, data.toString());
             }
-            if (!offset.equals(DEFAULT_OFFSET)) {
-                json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
-            }
-            if (!spread.equals(DEFAULT_SPREAD)) {
-                json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
+            if (getCount() > 1) {
+                if (!offset.equals(DEFAULT_OFFSET)) {
+                    json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
+                }
+                if (!spread.equals(DEFAULT_SPREAD)) {
+                    json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
+                }
             }
         }
 
@@ -153,11 +164,13 @@ public final class RecipeOutputs {
                 buffer.writeBoolean(true);
                 buffer.writeNbt(data);
             }
-            SerializeUtils.vec3ToNetwork(buffer, offset);
-            SerializeUtils.vec3ToNetwork(buffer, spread);
+            if (getCount() > 1) {
+                SerializeUtils.vec3ToNetwork(buffer, offset);
+                SerializeUtils.vec3ToNetwork(buffer, spread);
+            }
         }
 
-        void handleData(Entity entity) {
+        void writeDataToEntity(Entity entity) {
             if (data.isEmpty()) return;
             var entityData = entity.serializeNBT();
             for (var prop : data.getAllKeys()) {
@@ -166,7 +179,14 @@ public final class RecipeOutputs {
             entity.load(entityData);
         }
 
-        abstract void handleRecipe(ServerLevel level, BlockPos origin);
+        Vec3 getRandomPos(BlockPos origin) {
+            var x = spread.getX() > 0 ? RANDOM.nextDouble(-spread.getX(), spread.getX()) / 2.0 : 0;
+            var y = spread.getY() > 0 ? RANDOM.nextDouble(-spread.getY(), spread.getY()) / 2.0 : 0;
+            var z = spread.getZ() > 0 ? RANDOM.nextDouble(-spread.getZ(), spread.getZ()) / 2.0 : 0;
+            return MathUtils.shiftToCenter(origin).add(MathUtils.vectorFromPos(offset)).add(x, y, z);
+        }
+
+        abstract void spawn(ServerLevel level, BlockPos origin);
 
         abstract int getCount();
     }
@@ -201,18 +221,22 @@ public final class RecipeOutputs {
         }
 
         @Override
-        void handleRecipe(ServerLevel level, BlockPos origin) {
-            // TODO: add offset and spread to the position of the item
-            // use the count to throw the items in a circle, stack some of them if they are too many
-            var itemEntity = new ItemEntity(
-                level,
-                origin.getX() + offset.getX(),
-                origin.getY() + offset.getY(),
-                origin.getZ() + offset.getZ(),
-                output
-            );
-            handleData(itemEntity);
-            GameUtils.spawnEntity(level, itemEntity);
+        void spawn(ServerLevel level, BlockPos origin) {
+            var count = getCount();
+            var stacks = new ArrayList<ItemStack>();
+            while (count > 0) {
+                var stack = output.copy();
+                stack.setCount(Math.min(count, 4));
+                stacks.add(stack);
+                count -= stack.getCount();
+            }
+
+            for (var stack : stacks) {
+                var pos = getRandomPos(origin);
+                var itemEntity = new ItemEntity(level, pos.x, pos.y, pos.z, stack);
+                writeDataToEntity(itemEntity);
+                GameUtils.spawnEntity(level, itemEntity);
+            }
         }
 
         @Override
@@ -262,17 +286,12 @@ public final class RecipeOutputs {
         }
 
         @Override
-        void handleRecipe(ServerLevel level, BlockPos origin) {
-            // TODO: use spread
+        void spawn(ServerLevel level, BlockPos origin) {
             for (var i = 0; i < count; i++) {
                 var mobEntity = output.create(level);
                 if (mobEntity == null) return;
-                handleData(mobEntity);
-                mobEntity.setPos(
-                    origin.getX() + offset.getX(),
-                    origin.getY() + offset.getY(),
-                    origin.getZ() + offset.getZ()
-                );
+                writeDataToEntity(mobEntity);
+                mobEntity.setPos(getRandomPos(origin));
                 GameUtils.spawnEntity(level, mobEntity);
             }
         }
