@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarRenderer;
+import com.almostreliable.summoningrituals.network.PacketHandler;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -11,6 +12,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBloc
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
@@ -22,11 +24,16 @@ public class SummoningRituals {
 
     public SummoningRituals() {
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(SummoningRituals::onCommonSetup);
         modEventBus.addListener(SummoningRituals::onClientSetup);
         var forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(SummoningRituals::onRightClick);
         forgeEventBus.addListener(SummoningRituals::onLivingDrops);
         Setup.init(modEventBus);
+    }
+
+    private static void onCommonSetup(FMLCommonSetupEvent event) {
+        PacketHandler.init();
     }
 
     private static void onClientSetup(FMLClientSetupEvent event) {
