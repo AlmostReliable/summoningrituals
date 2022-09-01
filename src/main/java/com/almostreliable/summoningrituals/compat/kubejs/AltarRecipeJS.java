@@ -93,11 +93,13 @@ public class AltarRecipeJS extends RecipeJS {
         return this;
     }
 
-    public AltarRecipeJS input(IngredientJS ingredient) {
-        if (ingredient.isEmpty()) {
-            throw new IllegalArgumentException("ingredient is empty");
+    public AltarRecipeJS input(IngredientJS... ingredients) {
+        for (var ingredient : ingredients) {
+            if (ingredient.isEmpty()) {
+                throw new IllegalArgumentException("ingredient is empty");
+            }
+            inputs.add(ingredient);
         }
-        inputs.add(ingredient);
         return this;
     }
 
