@@ -141,6 +141,12 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         sizedItemRenderer = new SizedItemRenderer(BIG_SLOT_SIZE - 2);
     }
 
+    private Component requirementTooltip(String translationKey, String value) {
+        return TextUtils.translate("tooltip", translationKey, ChatFormatting.AQUA)
+            .append(": ")
+            .append(TextUtils.translate(translationKey, value.toLowerCase(), ChatFormatting.WHITE));
+    }
+
     @Override
     public RecipeType<AltarRecipe> getRecipeType() {
         return TYPE;
@@ -330,12 +336,6 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             }
         }
         return tooltip;
-    }
-
-    private Component requirementTooltip(String translationKey, String value) {
-        return TextUtils.translate("tooltip", translationKey, ChatFormatting.AQUA)
-            .append(": ")
-            .append(TextUtils.translate(translationKey, value.toLowerCase(), ChatFormatting.WHITE));
     }
 
     @SuppressWarnings("removal")

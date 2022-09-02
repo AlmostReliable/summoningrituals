@@ -15,7 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class RecipeSacrifices {
@@ -82,10 +81,6 @@ public class RecipeSacrifices {
         return new AABB(pos.offset(region.multiply(-1)), pos.offset(region));
     }
 
-    public String getDisplayRegion() {
-        return String.format("%dx%dx%d", region.getX(), region.getY(), region.getZ());
-    }
-
     public boolean test(Predicate<? super Sacrifice> predicate) {
         return sacrifices.stream().allMatch(predicate);
     }
@@ -96,6 +91,10 @@ public class RecipeSacrifices {
 
     public Sacrifice get(int index) {
         return sacrifices.get(index);
+    }
+
+    public String getDisplayRegion() {
+        return String.format("%dx%dx%d", region.getX(), region.getY(), region.getZ());
     }
 
     public boolean isEmpty() {

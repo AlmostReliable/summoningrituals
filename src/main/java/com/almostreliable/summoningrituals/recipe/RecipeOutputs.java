@@ -25,7 +25,6 @@ import org.apache.logging.log4j.util.TriConsumer;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
-import java.util.function.BiConsumer;
 
 public final class RecipeOutputs {
 
@@ -96,10 +95,14 @@ public final class RecipeOutputs {
         }
     }
 
+    public enum OutputType {
+        ITEM, MOB
+    }
+
     public abstract static class RecipeOutput<T> {
 
-        private final OutputType type;
         final T output;
+        private final OutputType type;
         CompoundTag data;
         Vec3i offset = DEFAULT_OFFSET;
         Vec3i spread = DEFAULT_SPREAD;
@@ -201,6 +204,8 @@ public final class RecipeOutputs {
             return MathUtils.shiftToCenter(origin).add(MathUtils.vectorFromPos(offset)).add(x, y, z);
         }
 
+        abstract void spawn(ServerLevel level, BlockPos origin);
+
         private OutputType getType() {
             return type;
         }
@@ -208,8 +213,6 @@ public final class RecipeOutputs {
         public T getOutput() {
             return output;
         }
-
-        abstract void spawn(ServerLevel level, BlockPos origin);
 
         public abstract int getCount();
     }
@@ -409,9 +412,5 @@ public final class RecipeOutputs {
             output.spread = spread;
             return output;
         }
-    }
-
-    public enum OutputType {
-        ITEM, MOB
     }
 }
