@@ -43,6 +43,10 @@ public final class GameUtils {
         renderText(stack, text, ANCHOR.BOTTOM_RIGHT, x + 2, y + 2, 1, 0xFF_FFFF);
     }
 
+    public static boolean isWithinBounds(double mX, double mY, int x, int y, int width, int height) {
+        return mX >= x && mX <= x + width && mY >= y && mY <= y + height;
+    }
+
     public static void renderText(PoseStack stack, String text, ANCHOR anchor, int x, int y, float scale, int color) {
         stack.pushPose();
         {

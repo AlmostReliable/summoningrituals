@@ -31,6 +31,10 @@ public final class TextUtils {
         return new ResourceLocation(BuildConfig.MOD_ID, key);
     }
 
+    public static String translateAsString(String type, String key) {
+        return translate(type, key).getString();
+    }
+
     public static TranslatableComponent translate(String type, String key, ChatFormatting... color) {
         var output = new TranslatableComponent(getTranslationKey(type, key));
         return color.length == 0 ? output : (TranslatableComponent) output.withStyle(color[0]);

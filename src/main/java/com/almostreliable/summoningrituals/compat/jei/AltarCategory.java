@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStat
 import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.item.SizedItemRenderer;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.almostreliable.summoningrituals.recipe.RecipeOutputs.OutputType;
 import com.almostreliable.summoningrituals.util.GameUtils;
@@ -20,6 +21,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -39,8 +41,8 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     private static final int TEXTURE_HEIGHT = 148;
     private static final int BIG_SLOT_SIZE = 22;
     private static final int SMALL_SLOT_SIZE = 18;
-    private static final int WEATHER_SLOT_SIZE = 16;
-    private static final int WEATHER_ICON_SIZE = 12;
+    private static final int SPRITE_SLOT_SIZE = 16;
+    private static final int SPRITE_SIZE = 14;
     private static final int CENTER_X = (TEXTURE_WIDTH - BIG_SLOT_SIZE) / 2;
     private static final int RENDER_Y = 62;
     private static final int SLOT_RADIUS = 48;
@@ -49,10 +51,12 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     private final IDrawable icon;
     private final IDrawable blockBelowSlot;
     private final IDrawable catalystSlot;
-    private final IDrawable weatherSlot;
-    private final IDrawable sunIcon;
-    private final IDrawable rainIcon;
-    private final IDrawable thunderIcon;
+    private final IDrawable spriteSlot;
+    private final IDrawable daySprite;
+    private final IDrawable nightSprite;
+    private final IDrawable sunSprite;
+    private final IDrawable rainSprite;
+    private final IDrawable thunderSprite;
     private final BlockStateRenderer blockStateRenderer;
     private final SizedItemRenderer sizedItemRenderer;
 
@@ -79,39 +83,57 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             )
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        weatherSlot = guiHelper.drawableBuilder(
+        spriteSlot = guiHelper.drawableBuilder(
                 TEXTURE,
                 TEXTURE_WIDTH - BIG_SLOT_SIZE,
                 BIG_SLOT_SIZE + SMALL_SLOT_SIZE,
-                WEATHER_SLOT_SIZE,
-                WEATHER_SLOT_SIZE
+                SPRITE_SLOT_SIZE,
+                SPRITE_SLOT_SIZE
             )
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        sunIcon = guiHelper.drawableBuilder(
+        daySprite = guiHelper.drawableBuilder(
                 TEXTURE,
                 TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + WEATHER_SLOT_SIZE,
-                WEATHER_ICON_SIZE,
-                WEATHER_ICON_SIZE
+                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE,
+                SPRITE_SIZE,
+                SPRITE_SIZE
             )
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        rainIcon = guiHelper.drawableBuilder(
+        nightSprite = guiHelper.drawableBuilder(
                 TEXTURE,
                 TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + 2 * WEATHER_SLOT_SIZE - 2,
-                WEATHER_ICON_SIZE,
-                WEATHER_ICON_SIZE
+                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + SPRITE_SIZE,
+                SPRITE_SIZE,
+                SPRITE_SIZE
             )
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        thunderIcon = guiHelper.drawableBuilder(
+        sunSprite = guiHelper.drawableBuilder(
                 TEXTURE,
                 TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + 3 * WEATHER_SLOT_SIZE - 4,
-                WEATHER_ICON_SIZE,
-                WEATHER_ICON_SIZE
+                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 2 * SPRITE_SIZE,
+                SPRITE_SIZE,
+                SPRITE_SIZE
+            )
+            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
+            .build();
+        rainSprite = guiHelper.drawableBuilder(
+                TEXTURE,
+                TEXTURE_WIDTH - BIG_SLOT_SIZE,
+                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 3 * SPRITE_SIZE,
+                SPRITE_SIZE,
+                SPRITE_SIZE
+            )
+            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
+            .build();
+        thunderSprite = guiHelper.drawableBuilder(
+                TEXTURE,
+                TEXTURE_WIDTH - BIG_SLOT_SIZE,
+                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 4 * SPRITE_SIZE,
+                SPRITE_SIZE,
+                SPRITE_SIZE
             )
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
@@ -222,10 +244,25 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             CENTER_X - SMALL_SLOT_SIZE / 2,
             RENDER_Y - BIG_SLOT_SIZE / 2 - SMALL_SLOT_SIZE + yOffset
         );
-        // TODO: make translation keys
-        GameUtils.renderText(stack, "Output:", GameUtils.ANCHOR.BOTTOM_LEFT, 2, 128, 1, 0x36_A400);
+        GameUtils.renderText(
+            stack,
+            f("{}:", TextUtils.translateAsString("label", "output")),
+            GameUtils.ANCHOR.BOTTOM_LEFT,
+            2,
+            128,
+            1,
+            0x36_A400
+        );
         if (!recipe.getSacrifices().isEmpty()) {
-            GameUtils.renderText(stack, "Range:", GameUtils.ANCHOR.TOP_LEFT, 1, 1, 1, 0x00_A2FF);
+            GameUtils.renderText(
+                stack,
+                f("{}:", TextUtils.translateAsString("label", "range")),
+                GameUtils.ANCHOR.TOP_LEFT,
+                1,
+                1,
+                1,
+                0x00_A2FF
+            );
             GameUtils.renderText(
                 stack,
                 recipe.getSacrifices().getDisplayRegion(),
@@ -236,15 +273,69 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
                 0xFF_FFFF
             );
         }
+        var spriteOffset = 1;
+        if (recipe.getDayTime() != DAY_TIME.ANY) {
+            spriteSlot.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1, spriteOffset);
+            if (recipe.getDayTime() == DAY_TIME.DAY) {
+                daySprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+            } else if (recipe.getDayTime() == DAY_TIME.NIGHT) {
+                nightSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+            }
+            spriteOffset += SPRITE_SLOT_SIZE + 1;
+        }
         if (recipe.getWeather() != WEATHER.ANY) {
-            weatherSlot.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - WEATHER_SLOT_SIZE - 1, 1);
+            spriteSlot.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1, spriteOffset);
             switch (recipe.getWeather()) {
-                case SUN -> sunIcon.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - WEATHER_SLOT_SIZE + 1, 3);
-                case RAIN -> rainIcon.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - WEATHER_SLOT_SIZE + 1, 3);
-                case THUNDER -> thunderIcon.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - WEATHER_SLOT_SIZE + 1, 3);
+                case CLEAR -> sunSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+                case RAIN -> rainSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+                case THUNDER ->
+                    thunderSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
                 default -> throw new IllegalStateException("Unexpected value: " + recipe.getWeather());
             }
         }
+    }
+
+    @Override
+    public List<Component> getTooltipStrings(
+        AltarRecipe recipe, IRecipeSlotsView recipeSlotsView, double mX, double mY
+    ) {
+        List<Component> tooltip = new ArrayList<>();
+        if (!recipe.getSacrifices().isEmpty() && GameUtils.isWithinBounds(mX, mY, 1, 1, 30, 20)) {
+            tooltip.add(TextUtils.translate("tooltip", "sacrifice_range", ChatFormatting.WHITE));
+        }
+        if (GameUtils.isWithinBounds(
+            mX,
+            mY,
+            TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1,
+            1,
+            SPRITE_SLOT_SIZE,
+            SPRITE_SLOT_SIZE
+        )) {
+            if (recipe.getDayTime() != DAY_TIME.ANY) {
+                tooltip.add(requirementTooltip("day_time", recipe.getDayTime().name()));
+            } else if (recipe.getWeather() != WEATHER.ANY) {
+                tooltip.add(requirementTooltip("weather", recipe.getWeather().name()));
+            }
+        }
+        if (GameUtils.isWithinBounds(
+            mX,
+            mY,
+            TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1,
+            SPRITE_SLOT_SIZE + 2,
+            SPRITE_SLOT_SIZE,
+            SPRITE_SLOT_SIZE
+        )) {
+            if (recipe.getWeather() != WEATHER.ANY) {
+                tooltip.add(requirementTooltip("weather", recipe.getWeather().name()));
+            }
+        }
+        return tooltip;
+    }
+
+    private Component requirementTooltip(String translationKey, String value) {
+        return TextUtils.translate("tooltip", translationKey, ChatFormatting.AQUA)
+            .append(": ")
+            .append(TextUtils.translate(translationKey, value.toLowerCase(), ChatFormatting.WHITE));
     }
 
     @SuppressWarnings("removal")
