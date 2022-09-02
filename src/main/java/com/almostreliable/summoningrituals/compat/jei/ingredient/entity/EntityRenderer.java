@@ -34,8 +34,9 @@ public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
         {
             var entity = ingredient.getEntity();
             entity.tickCount = player.tickCount;
+            var entityHeight = entity.getBbHeight();
             stack.translate(0.5f * size, 0.85f * size, 0);
-            stack.scale(0.5f * size, 0.5f * size, 0.5f * size);
+            stack.scale(0.48f * size / entityHeight, 0.48f * size / entityHeight, 0.48f * size / entityHeight);
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
             stack.mulPose(Vector3f.XP.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));

@@ -20,10 +20,12 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.BiConsumer;
 
 public final class RecipeOutputs {
 
@@ -83,14 +85,27 @@ public final class RecipeOutputs {
         }
     }
 
-    private abstract static class RecipeOutput<T> {
+    public int size() {
+        return outputs.size();
+    }
 
+    public void forEach(TriConsumer<OutputType, RecipeOutput<?>, Integer> consumer) {
+        for (var i = 0; i < outputs.size(); i++) {
+            var output = outputs.get(i);
+            consumer.accept(output.getType(), output, i);
+        }
+    }
+
+    public abstract static class RecipeOutput<T> {
+
+        private final OutputType type;
         final T output;
         CompoundTag data;
         Vec3i offset = DEFAULT_OFFSET;
         Vec3i spread = DEFAULT_SPREAD;
 
-        private RecipeOutput(T output) {
+        private RecipeOutput(OutputType type, T output) {
+            this.type = type;
             this.output = output;
             data = new CompoundTag();
         }
@@ -186,15 +201,23 @@ public final class RecipeOutputs {
             return MathUtils.shiftToCenter(origin).add(MathUtils.vectorFromPos(offset)).add(x, y, z);
         }
 
+        private OutputType getType() {
+            return type;
+        }
+
+        public T getOutput() {
+            return output;
+        }
+
         abstract void spawn(ServerLevel level, BlockPos origin);
 
-        abstract int getCount();
+        public abstract int getCount();
     }
 
     private static final class ItemOutput extends RecipeOutput<ItemStack> {
 
         private ItemOutput(ItemStack stack) {
-            super(stack);
+            super(OutputType.ITEM, stack);
         }
 
         private static ItemOutput fromJson(JsonObject json) {
@@ -240,7 +263,7 @@ public final class RecipeOutputs {
         }
 
         @Override
-        int getCount() {
+        public int getCount() {
             return output.getCount();
         }
     }
@@ -250,7 +273,7 @@ public final class RecipeOutputs {
         private final int count;
 
         private MobOutput(EntityType<?> mob, int count) {
-            super(mob);
+            super(OutputType.MOB, mob);
             this.count = count;
         }
 
@@ -297,7 +320,7 @@ public final class RecipeOutputs {
         }
 
         @Override
-        int getCount() {
+        public int getCount() {
             return count;
         }
     }
@@ -386,5 +409,9 @@ public final class RecipeOutputs {
             output.spread = spread;
             return output;
         }
+    }
+
+    public enum OutputType {
+        ITEM, MOB
     }
 }

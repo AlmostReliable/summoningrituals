@@ -82,18 +82,20 @@ public class RecipeSacrifices {
         return new AABB(pos.offset(region.multiply(-1)), pos.offset(region));
     }
 
-    public void forEach(BiConsumer<? super Sacrifice, Integer> consumer) {
-        for (var i = 0; i < sacrifices.size(); i++) {
-            consumer.accept(sacrifices.get(i), i);
-        }
+    public String getDisplayRegion() {
+        return String.format("%dx%dx%d", region.getX(), region.getY(), region.getZ());
     }
 
     public boolean test(Predicate<? super Sacrifice> predicate) {
         return sacrifices.stream().allMatch(predicate);
     }
 
-    public int getSize() {
+    public int size() {
         return sacrifices.size();
+    }
+
+    public Sacrifice get(int index) {
+        return sacrifices.get(index);
     }
 
     public boolean isEmpty() {
