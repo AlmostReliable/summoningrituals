@@ -65,22 +65,22 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.getBlockPos()));
             var playerPos = mc.player.position();
             var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
-            var axisRotation = MathUtils.ensureDegree(entity.getLevel().getGameTime());
+            var axisRotation = MathUtils.singleRotation(entity.getLevel().getGameTime());
 
             var inputs = entity.inventory.getItems();
             for (var i = 0; i < inputs.size(); i++) {
                 stack.pushPose();
                 {
-                    var itemRotation = 360 - (i * 360f / inputs.size());
+                    var itemRotation = MathUtils.flipCircle(i * 360f / inputs.size());
 
-                    var rotationDiff = Math.abs(MathUtils.ensureDegree(axisRotation + itemRotation) - playerAngle);
+                    var rotationDiff = Math.abs(MathUtils.singleRotation(axisRotation + itemRotation) - playerAngle);
                     if (rotationDiff > 180) rotationDiff = 360 - rotationDiff;
                     var newHeight = (rotationDiff / 180) * HEIGHT_SHIFT;
 
                     var playerOffset = Math.max(1 - altarPos.distanceTo(playerPos) / 8, 0);
                     newHeight *= playerOffset;
 
-                    stack.mulPose(Vector3f.YN.rotationDegrees(MathUtils.ensureDegree(itemRotation + axisRotation)));
+                    stack.mulPose(Vector3f.YN.rotationDegrees(MathUtils.singleRotation(itemRotation + axisRotation)));
                     stack.translate(0, newHeight, -ITEM_OFFSET);
 
                     var item = inputs.get(i);

@@ -22,7 +22,11 @@ public final class MathUtils {
         return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
-    public static int ensureDegree(Number degree) {
+    public static int flipCircle(Number degree) {
+        return 360 - degree.intValue();
+    }
+
+    public static int singleRotation(Number degree) {
         return Math.abs(degree.intValue()) % 360;
     }
 
