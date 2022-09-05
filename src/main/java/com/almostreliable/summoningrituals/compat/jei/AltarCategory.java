@@ -226,7 +226,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
                 builder.addSlot(RecipeIngredientRole.INPUT, x, y)
                     .addIngredient(
                         AlmostTypes.ENTITY,
-                        new EntityIngredient((EntityType<?>) output.getOutput(), output.getCount())
+                        new EntityIngredient((EntityType<?>) output.getOutput(), output.getCount(), output.getData())
                     );
             }
         });

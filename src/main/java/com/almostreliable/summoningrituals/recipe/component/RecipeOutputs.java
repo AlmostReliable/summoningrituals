@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.Bruhtils;
@@ -212,6 +212,10 @@ public final class RecipeOutputs {
 
         public T getOutput() {
             return output;
+        }
+
+        public CompoundTag getData() {
+            return data;
         }
 
         public abstract int getCount();
