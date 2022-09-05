@@ -15,6 +15,9 @@ import java.util.List;
 
 public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
 
+    private static final float CREEPER_HEIGHT = 1.7f;
+    private static final float CREEPER_SCALE = 0.5f;
+
     private final Minecraft mc;
     private final EntityRenderDispatcher entityRenderer;
     private final Player player;
@@ -34,9 +37,11 @@ public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
         {
             var entity = ingredient.getEntity();
             entity.tickCount = player.tickCount;
-            var entityHeight = entity.getBbHeight();
             stack.translate(0.5f * size, 0.85f * size, 0);
-            stack.scale(0.48f * size / entityHeight, 0.48f * size / entityHeight, 0.48f * size / entityHeight);
+            var entityHeight = entity.getBbHeight();
+            var entityScale = Math.min(CREEPER_HEIGHT / entityHeight, 1f);
+            var scaleFactor = CREEPER_SCALE * size * entityScale;
+            stack.scale(scaleFactor, scaleFactor, scaleFactor);
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
             stack.mulPose(Vector3f.XP.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
