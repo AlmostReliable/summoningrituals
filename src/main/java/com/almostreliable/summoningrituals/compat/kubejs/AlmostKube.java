@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.altar.AltarEntity;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
@@ -19,6 +20,22 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
 public class AlmostKube extends KubeJSPlugin {
+
+    @Override
+    public void init() {
+        AltarEntity.SUMMONING_START.register((level, pos, recipe, player) -> {
+            var event = new SummoningEventJS(true, level, pos, recipe, player);
+            event.post(ScriptType.SERVER, "summoningrituals.start");
+            return !event.isCancelled();
+        });
+        AltarEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) -> {
+            new SummoningEventJS(false, level, pos, recipe, player).post(
+                ScriptType.SERVER,
+                "summoningrituals.complete"
+            );
+            return true;
+        });
+    }
 
     @Override
     public void addBindings(BindingsEvent event) {

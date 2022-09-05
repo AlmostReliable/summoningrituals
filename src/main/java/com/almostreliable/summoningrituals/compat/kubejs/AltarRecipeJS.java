@@ -79,9 +79,7 @@ public class AltarRecipeJS extends RecipeJS {
         if (weather != AltarRecipe.WEATHER.ANY) {
             json.addProperty(Constants.WEATHER, weather.name());
         }
-        // TODO: remove
-        // debug
-        ConsoleJS.SERVER.info("Altar Recipe: " + json.toString());
+        ConsoleJS.SERVER.debug("Altar Recipe: " + json.toString());
     }
 
     public AltarRecipeJS itemOutput(ItemOutputBuilder itemOutput) {

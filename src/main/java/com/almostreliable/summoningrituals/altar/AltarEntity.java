@@ -3,7 +3,6 @@ package com.almostreliable.summoningrituals.altar;
 import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.compat.kubejs.event.ISummoningObserver;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.network.IPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
@@ -13,6 +12,7 @@ import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
+import com.almostreliable.summoningrituals.util.Observable;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -42,9 +42,11 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarEntity extends BlockEntity {
 
+    public static final Observable SUMMONING_START = new Observable();
+    public static final Observable SUMMONING_COMPLETE = new Observable();
+
     final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
-    @Nullable private final ISummoningObserver observer;
 
     @Nullable private AltarRecipe currentRecipe;
     @Nullable private List<EntitySacrifice> sacrifices;
@@ -55,7 +57,6 @@ public class AltarEntity extends BlockEntity {
         super(Setup.ALTAR_ENTITY.get(), pos, state);
         inventory = new AltarInventory(this);
         inventoryCap = LazyOptional.of(() -> inventory);
-        observer = ISummoningObserver.create();
     }
 
     @Override
@@ -83,15 +84,6 @@ public class AltarEntity extends BlockEntity {
         var tag = super.getUpdateTag();
         saveAdditional(tag);
         return tag;
-    }
-
-    public void resetSummoning(boolean popLastInserted) {
-        currentRecipe = null;
-        sacrifices = null;
-        invokingPlayer = null;
-        progress = 0;
-        changeActivityState(false);
-        if (popLastInserted) inventory.popLastInserted();
     }
 
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
@@ -167,7 +159,7 @@ public class AltarEntity extends BlockEntity {
         if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
                 currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
-                if (observer != null) observer.onSummoningComplete(level, worldPosition, currentRecipe, invokingPlayer);
+                SUMMONING_COMPLETE.invoke(level, worldPosition, currentRecipe, invokingPlayer);
                 resetSummoning(false);
             } else {
                 TextUtils.sendPlayerMessage(invokingPlayer, "no_output", ChatFormatting.RED);
@@ -187,6 +179,15 @@ public class AltarEntity extends BlockEntity {
         }
         progress++;
         trackingChunkPacket(new ProgressUpdatePacket(worldPosition, progress));
+    }
+
+    private void resetSummoning(boolean popLastInserted) {
+        currentRecipe = null;
+        sacrifices = null;
+        invokingPlayer = null;
+        progress = 0;
+        changeActivityState(false);
+        if (popLastInserted) inventory.popLastInserted();
     }
 
     private void trackingChunkPacket(IPacket<?> packet) {
@@ -209,9 +210,12 @@ public class AltarEntity extends BlockEntity {
             return;
         }
 
+        if (!SUMMONING_START.invoke(level, worldPosition, recipe, player)) {
+            resetSummoning(true);
+            return;
+        }
         currentRecipe = recipe;
         invokingPlayer = player;
-        if (observer != null) observer.onSummoningStart(level, worldPosition, recipe, player);
     }
 
     @Nullable
