@@ -153,7 +153,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         RAIN,
         THUNDER;
 
-        public boolean check(Level level, ServerPlayer player) {
+        public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
                 case ANY -> true;
                 case CLEAR -> !level.isRaining() && !level.isThundering();
@@ -176,7 +176,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         DAY,
         NIGHT;
 
-        public boolean check(Level level, ServerPlayer player) {
+        public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
                 case ANY -> true;
                 case DAY -> level.isDay();

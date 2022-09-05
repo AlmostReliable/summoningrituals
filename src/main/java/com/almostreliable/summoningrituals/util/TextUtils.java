@@ -7,6 +7,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,10 @@ public final class TextUtils {
         return (TranslatableComponent) output.withStyle(color);
     }
 
-    public static void sendPlayerMessage(Player player, String translationKey, ChatFormatting color, Object... args) {
+    public static void sendPlayerMessage(
+        @Nullable Player player, String translationKey, ChatFormatting color, Object... args
+    ) {
+        if (player == null) return;
         player.sendMessage(
             translateWithArgs("message", translationKey, color, args),
             MOD_UUID

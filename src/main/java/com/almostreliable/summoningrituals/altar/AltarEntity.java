@@ -23,7 +23,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +43,6 @@ public class AltarEntity extends BlockEntity {
 
     // TODO:
     // - in load(), if the progress is > 0, reset the recipe and try to restart it
-    // - make sure the automatic insertion via hoppers through caps can start the recipe
 
     public final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
@@ -94,17 +92,17 @@ public class AltarEntity extends BlockEntity {
         GameUtils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
     }
 
-    public InteractionResult handleInteraction(ServerPlayer player, ItemStack stack) {
+    public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
         if (progress > 0) {
             TextUtils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
-            return InteractionResult.PASS;
+            return stack;
         }
 
         if (stack.isEmpty()) {
-            if (player.isShiftKeyDown()) {
+            if (player != null && player.isShiftKeyDown()) {
                 inventory.popLastInserted();
             }
-            return InteractionResult.SUCCESS;
+            return ItemStack.EMPTY;
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
@@ -114,15 +112,16 @@ public class AltarEntity extends BlockEntity {
                 inventory.setCatalyst(ItemStack.EMPTY);
             } else {
                 stack.shrink(1);
-                player.setItemInHand(InteractionHand.MAIN_HAND, stack.isEmpty() ? ItemStack.EMPTY : stack);
+                var result = stack.isEmpty() ? ItemStack.EMPTY : stack;
+                if (player != null) player.setItemInHand(InteractionHand.MAIN_HAND, result);
                 handleSummoning(recipe, player);
-                return InteractionResult.SUCCESS;
+                return result;
             }
         }
 
-        var remaining = inventory.insertItem(stack);
-        player.setItemInHand(InteractionHand.MAIN_HAND, remaining);
-        return InteractionResult.SUCCESS;
+        var remaining = inventory.handleInsertion(stack);
+        if (player != null) player.setItemInHand(InteractionHand.MAIN_HAND, remaining);
+        return remaining;
     }
 
     @Override
@@ -186,7 +185,7 @@ public class AltarEntity extends BlockEntity {
         );
     }
 
-    private void handleSummoning(AltarRecipe recipe, ServerPlayer player) {
+    private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
         sacrifices = checkSacrifices(recipe.getSacrifices(), player);
@@ -211,7 +210,7 @@ public class AltarEntity extends BlockEntity {
     }
 
     @Nullable
-    private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, ServerPlayer player) {
+    private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
         if (sacrifices.isEmpty()) return List.of();
         var region = sacrifices.getRegion(worldPosition);
@@ -229,7 +228,7 @@ public class AltarEntity extends BlockEntity {
         return success ? toKill : null;
     }
 
-    private boolean checkBlockBelow(@Nullable BlockReference blockBelow, ServerPlayer player) {
+    private boolean checkBlockBelow(@Nullable BlockReference blockBelow, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
         if (blockBelow == null || blockBelow.test(level.getBlockState(worldPosition.below()))) {
             return true;

@@ -88,16 +88,20 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         validateSlot(slot);
+        if (slot == items.size()) {
+            setCatalyst(stack);
+            return;
+        }
         items.set(slot, stack);
         onContentsChanged();
     }
 
-    public ItemStack insertItem(ItemStack stack) {
+    public ItemStack handleInsertion(ItemStack stack) {
         if (stack.isEmpty()) return ItemStack.EMPTY;
 
         var remaining = stack;
         for (var i = 0; i < items.size(); i++) {
-            remaining = insertItem(i, remaining, false);
+            remaining = insertItem(i, remaining);
             if (remaining.isEmpty()) {
                 insertOrder.push(new Tuple<>(stack, i));
                 return ItemStack.EMPTY;
@@ -177,6 +181,30 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         return true;
     }
 
+    private ItemStack insertItem(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return ItemStack.EMPTY;
+        if (!isItemValid(slot, stack)) return stack;
+        validateSlot(slot);
+
+        var current = items.get(slot);
+        var limit = getStackLimit(slot, stack);
+        if (!current.isEmpty()) {
+            if (!ItemHandlerHelper.canItemStacksStack(stack, current)) return stack;
+            limit -= current.getCount();
+        }
+        if (limit <= 0) return stack;
+
+        var reachedLimit = stack.getCount() > limit;
+        if (current.isEmpty()) {
+            items.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
+        } else {
+            current.grow(reachedLimit ? limit : stack.getCount());
+        }
+        onContentsChanged();
+
+        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
+    }
+
     private void rebuildInsertOrder() {
         insertOrder.clear();
         for (var i = items.size() - 1; i >= 0; i--) {
@@ -202,7 +230,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     private void validateSlot(int slot) {
-        if (slot < 0 || slot >= items.size()) {
+        if (slot < 0 || slot >= items.size() + 1) {
             throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, items.size()));
         }
     }
@@ -213,42 +241,24 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     @Override
     public int getSlots() {
-        return items.size();
+        return items.size() + 1;
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
+        if (slot == items.size()) {
+            return catalyst;
+        }
         return items.get(slot);
     }
 
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (stack.isEmpty()) return ItemStack.EMPTY;
-        if (!isItemValid(slot, stack)) return stack;
-        validateSlot(slot);
-
-        var current = items.get(slot);
-        var limit = getStackLimit(slot, stack);
-        if (!current.isEmpty()) {
-            if (!ItemHandlerHelper.canItemStacksStack(stack, current)) return stack;
-            limit -= current.getCount();
-        }
-        if (limit <= 0) return stack;
-
-        var reachedLimit = stack.getCount() > limit;
-        if (!simulate) {
-            if (current.isEmpty()) {
-                items.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
-            } else {
-                current.grow(reachedLimit ? limit : stack.getCount());
-            }
-            onContentsChanged();
-        }
-
-        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
+        if (simulate) return ItemStack.EMPTY;
+        return parent.handleInteraction(null, stack);
     }
 
     @Nonnull
@@ -257,6 +267,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
         if (amount == 0) return ItemStack.EMPTY;
         validateSlot(slot);
 
+        if (slot == items.size()) return ItemStack.EMPTY;
         var current = items.get(slot);
         if (current.isEmpty()) return ItemStack.EMPTY;
         var toExtract = Math.min(amount, current.getMaxStackSize());

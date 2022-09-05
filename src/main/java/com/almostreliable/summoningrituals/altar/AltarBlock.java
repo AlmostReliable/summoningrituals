@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -56,7 +57,9 @@ public class AltarBlock extends Block implements EntityBlock {
     ) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && hand == InteractionHand.MAIN_HAND &&
             level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            return altar.handleInteraction(serverPlayer, player.getItemInHand(InteractionHand.MAIN_HAND));
+            var result = altar.handleInteraction(serverPlayer, player.getItemInHand(InteractionHand.MAIN_HAND));
+            return ItemStack.matches(result, player.getItemInHand(InteractionHand.MAIN_HAND)) ?
+                InteractionResult.PASS : InteractionResult.SUCCESS;
         }
         return super.use(state, level, pos, player, hand, hit);
     }
