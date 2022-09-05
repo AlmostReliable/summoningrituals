@@ -41,9 +41,6 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarEntity extends BlockEntity {
 
-    // TODO:
-    // - in load(), if the progress is > 0, reset the recipe and try to restart it
-
     final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
@@ -145,16 +142,22 @@ public class AltarEntity extends BlockEntity {
     }
 
     void tick() {
-        if (level == null || currentRecipe == null) return;
+        if (level == null) return;
+
+        if (progress > 0 && currentRecipe == null) {
+            progress = 0;
+            var recipe = findRecipe();
+            if (recipe == null) return;
+            handleSummoning(recipe, null);
+        }
+        if (currentRecipe == null) return;
 
         if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
                 currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
             } else {
                 inventory.popLastInserted();
-                if (invokingPlayer != null) {
-                    TextUtils.sendPlayerMessage(invokingPlayer, "no_output", ChatFormatting.RED);
-                }
+                TextUtils.sendPlayerMessage(invokingPlayer, "no_output", ChatFormatting.RED);
             }
             currentRecipe = null;
             sacrifices = null;
