@@ -31,12 +31,12 @@ public class EntityIngredient {
         this(entityType, count, new CompoundTag());
     }
 
-    public Component getDisplayName() {
+    Component getDisplayName() {
         if (entity == null) return new TextComponent("Unknown Entity");
         return entity.getDisplayName();
     }
 
-    public EntityType<?> getEntityType() {
+    EntityType<?> getEntityType() {
         return entityType;
     }
 

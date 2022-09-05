@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.Bruhtils;
@@ -119,18 +119,18 @@ public class RecipeSacrifices {
             return new Sacrifice(mob, count);
         }
 
-        public JsonElement toJson() {
+        @Override
+        public boolean test(Entity entity) {
+            return mob.equals(entity.getType());
+        }
+
+        private JsonElement toJson() {
             JsonObject json = new JsonObject();
             json.addProperty(Constants.MOB, Bruhtils.getId(mob).toString());
             if (count > 1) {
                 json.addProperty(Constants.COUNT, count);
             }
             return json;
-        }
-
-        @Override
-        public boolean test(Entity entity) {
-            return mob.equals(entity.getType());
         }
 
         private void toNetwork(FriendlyByteBuf buffer) {

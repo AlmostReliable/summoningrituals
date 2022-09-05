@@ -8,7 +8,7 @@ import com.almostreliable.summoningrituals.compat.jei.ingredient.item.SizedItemR
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs.OutputType;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.OutputType;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -35,7 +35,7 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
-    public static final RecipeType<AltarRecipe> TYPE = new RecipeType<>(TextUtils.getRL(ALTAR), AltarRecipe.class);
+    static final RecipeType<AltarRecipe> TYPE = new RecipeType<>(TextUtils.getRL(ALTAR), AltarRecipe.class);
     private static final ResourceLocation TEXTURE = TextUtils.getRL(f("textures/jei/{}.png", ALTAR));
     private static final int TEXTURE_WIDTH = 194;
     private static final int TEXTURE_HEIGHT = 148;
@@ -60,7 +60,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     private final BlockStateRenderer blockStateRenderer;
     private final SizedItemRenderer sizedItemRenderer;
 
-    public AltarCategory(IGuiHelper guiHelper) {
+    AltarCategory(IGuiHelper guiHelper) {
         background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - BIG_SLOT_SIZE, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();

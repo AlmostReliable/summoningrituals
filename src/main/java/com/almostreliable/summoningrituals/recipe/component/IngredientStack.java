@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.google.gson.JsonElement;

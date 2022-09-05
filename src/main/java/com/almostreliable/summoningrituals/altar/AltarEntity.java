@@ -9,8 +9,8 @@ import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.BlockReference;
-import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
+import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
@@ -44,7 +44,7 @@ public class AltarEntity extends BlockEntity {
     // TODO:
     // - in load(), if the progress is > 0, reset the recipe and try to restart it
 
-    public final AltarInventory inventory;
+    final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
 
     @Nullable private AltarRecipe currentRecipe;
@@ -83,13 +83,6 @@ public class AltarEntity extends BlockEntity {
         var tag = super.getUpdateTag();
         saveAdditional(tag);
         return tag;
-    }
-
-    public void playerDestroy(boolean creative) {
-        assert level != null && !level.isClientSide;
-        inventory.dropContents();
-        if (creative) return;
-        GameUtils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
     }
 
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
@@ -144,7 +137,14 @@ public class AltarEntity extends BlockEntity {
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
     }
 
-    public void tick() {
+    void playerDestroy(boolean creative) {
+        assert level != null && !level.isClientSide;
+        inventory.dropContents();
+        if (creative) return;
+        GameUtils.dropItem(level, worldPosition, new ItemStack(Setup.ALTAR_ITEM.get()), true);
+    }
+
+    void tick() {
         if (level == null || currentRecipe == null) return;
 
         if (progress >= currentRecipe.getRecipeTime()) {

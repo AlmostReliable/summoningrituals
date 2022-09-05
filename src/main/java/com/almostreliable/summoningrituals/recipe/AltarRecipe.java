@@ -2,6 +2,10 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInvWrapper;
+import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+import com.almostreliable.summoningrituals.recipe.component.IngredientStack;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
+import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
@@ -24,7 +28,6 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     // TODO:
     // - maybe let the users do that with the kube event | add effects that are performed after recipe crafting (lighting, weather change)
-    // - add presets for the crafting animation
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
@@ -38,7 +41,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     private final DAY_TIME dayTime;
     private final WEATHER weather;
 
-    public AltarRecipe(
+    AltarRecipe(
         ResourceLocation recipeId, Ingredient catalyst, RecipeOutputs outputs, NonNullList<IngredientStack> inputs,
         RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
         WEATHER weather

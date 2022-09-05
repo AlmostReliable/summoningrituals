@@ -2,11 +2,11 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.BlockReference;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs.MobOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.RecipeSacrifices;
+import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class AltarRecipeJS extends RecipeJS {
 
     private final RecipeOutputs outputs = new RecipeOutputs();

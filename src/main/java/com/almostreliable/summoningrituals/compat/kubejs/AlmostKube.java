@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs.ItemOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.RecipeOutputs.MobOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
@@ -38,6 +38,7 @@ public class AlmostKube extends KubeJSPlugin {
         event.register(TextUtils.getRL(Constants.ALTAR), AltarRecipeJS::new);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static final class OutputWrapper {
 
         private OutputWrapper() {}

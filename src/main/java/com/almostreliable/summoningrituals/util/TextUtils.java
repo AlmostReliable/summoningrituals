@@ -41,19 +41,12 @@ public final class TextUtils {
         return color.length == 0 ? output : (TranslatableComponent) output.withStyle(color[0]);
     }
 
-    public static TranslatableComponent translateWithArgs(
-        String type, String key, ChatFormatting color, Object... args
-    ) {
-        var output = new TranslatableComponent(getTranslationKey(type, key), args);
-        return (TranslatableComponent) output.withStyle(color);
-    }
-
     public static void sendPlayerMessage(
         @Nullable Player player, String translationKey, ChatFormatting color, Object... args
     ) {
         if (player == null) return;
         player.sendMessage(
-            translateWithArgs("message", translationKey, color, args),
+            new TranslatableComponent(getTranslationKey("message", translationKey), args).withStyle(color),
             MOD_UUID
         );
     }

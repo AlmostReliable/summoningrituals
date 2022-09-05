@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.Bruhtils;
@@ -18,14 +18,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-public class BlockReference implements Predicate<BlockState> {
+public final class BlockReference implements Predicate<BlockState> {
 
     private final Block block;
     private final Map<String, String> properties;
     private final Map<Integer, Boolean> testCache;
     @Nullable private BlockState displayState;
 
-    public BlockReference(Block block, Map<String, String> properties) {
+    private BlockReference(Block block, Map<String, String> properties) {
         this.block = block;
         this.properties = properties;
         this.testCache = new HashMap<>();
