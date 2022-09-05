@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.jei.ingredient.block;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
@@ -73,7 +74,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
             tooltip = stack.getTooltipLines(player, tooltipFlag);
             tooltip.set(
                 0,
-                TextUtils.translate("tooltip", "block_below", ChatFormatting.GOLD)
+                TextUtils.translate(Constants.TOOLTIP, Constants.BLOCK_BELOW, ChatFormatting.GOLD)
                     .append(": ")
                     .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
             );
@@ -106,7 +107,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
         }
         if (modifiedProps.isEmpty()) return;
 
-        tooltip.add(TextUtils.translate("tooltip", "relevant_properties", ChatFormatting.AQUA)
+        tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.PROPERTIES, ChatFormatting.AQUA)
             .append(TextUtils.colorize(":", ChatFormatting.AQUA)));
         for (var prop : modifiedProps) {
             tooltip.add(TextUtils.colorize("» ", ChatFormatting.GRAY)

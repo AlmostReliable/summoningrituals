@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.jei;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateRenderer;
@@ -31,12 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.almostreliable.summoningrituals.Constants.ALTAR;
+import static com.almostreliable.summoningrituals.Constants.JEI;
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     static final RecipeType<AltarRecipe> TYPE = new RecipeType<>(TextUtils.getRL(ALTAR), AltarRecipe.class);
-    private static final ResourceLocation TEXTURE = TextUtils.getRL(f("textures/jei/{}.png", ALTAR));
+    private static final ResourceLocation TEXTURE = TextUtils.getRL(f("textures/{}/{}.png", JEI, ALTAR));
     private static final int TEXTURE_WIDTH = 194;
     private static final int TEXTURE_HEIGHT = 148;
     private static final int BIG_SLOT_SIZE = 22;
@@ -142,7 +144,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     }
 
     private Component requirementTooltip(String translationKey, String value) {
-        return TextUtils.translate("tooltip", translationKey, ChatFormatting.AQUA)
+        return TextUtils.translate(Constants.TOOLTIP, translationKey, ChatFormatting.AQUA)
             .append(": ")
             .append(TextUtils.translate(translationKey, value.toLowerCase(), ChatFormatting.WHITE));
     }
@@ -154,7 +156,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     @Override
     public Component getTitle() {
-        return TextUtils.translate("block", ALTAR);
+        return TextUtils.translate(Constants.BLOCK, ALTAR);
     }
 
     @Override
@@ -252,7 +254,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         );
         GameUtils.renderText(
             stack,
-            f("{}:", TextUtils.translateAsString("label", "output")),
+            f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.OUTPUTS)),
             GameUtils.ANCHOR.BOTTOM_LEFT,
             2,
             128,
@@ -262,7 +264,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         if (!recipe.getSacrifices().isEmpty()) {
             GameUtils.renderText(
                 stack,
-                f("{}:", TextUtils.translateAsString("label", "range")),
+                f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.REGION)),
                 GameUtils.ANCHOR.TOP_LEFT,
                 1,
                 1,
@@ -307,7 +309,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     ) {
         List<Component> tooltip = new ArrayList<>();
         if (!recipe.getSacrifices().isEmpty() && GameUtils.isWithinBounds(mX, mY, 1, 1, 30, 20)) {
-            tooltip.add(TextUtils.translate("tooltip", "sacrifice_range", ChatFormatting.WHITE));
+            tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.REGION, ChatFormatting.WHITE));
         }
         if (GameUtils.isWithinBounds(
             mX,
@@ -318,9 +320,9 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             SPRITE_SLOT_SIZE
         )) {
             if (recipe.getDayTime() != DAY_TIME.ANY) {
-                tooltip.add(requirementTooltip("day_time", recipe.getDayTime().name()));
+                tooltip.add(requirementTooltip(Constants.DAY_TIME, recipe.getDayTime().name()));
             } else if (recipe.getWeather() != WEATHER.ANY) {
-                tooltip.add(requirementTooltip("weather", recipe.getWeather().name()));
+                tooltip.add(requirementTooltip(Constants.WEATHER, recipe.getWeather().name()));
             }
         }
         if (GameUtils.isWithinBounds(
@@ -332,7 +334,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             SPRITE_SLOT_SIZE
         )) {
             if (recipe.getWeather() != WEATHER.ANY) {
-                tooltip.add(requirementTooltip("weather", recipe.getWeather().name()));
+                tooltip.add(requirementTooltip(Constants.WEATHER, recipe.getWeather().name()));
             }
         }
         return tooltip;

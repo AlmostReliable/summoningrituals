@@ -59,9 +59,9 @@ public class AltarRecipeJS extends RecipeJS {
         inputs.forEach(i -> inputsArray.add(i.toJson()));
         if (!inputsArray.isEmpty()) {
             if (inputsArray.size() == 1) {
-                json.add(Constants.INPUT, inputsArray.get(0));
+                json.add(Constants.INPUTS, inputsArray.get(0));
             } else {
-                json.add(Constants.INPUT, inputsArray);
+                json.add(Constants.INPUTS, inputsArray);
             }
         }
         if (!sacrifices.isEmpty()) {

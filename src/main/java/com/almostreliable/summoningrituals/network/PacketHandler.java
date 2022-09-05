@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.network;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -9,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PacketHandler {
 
-    private static final ResourceLocation ID = TextUtils.getRL("network");
+    private static final ResourceLocation ID = TextUtils.getRL(Constants.NETWORK);
     private static final String PROTOCOL = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(ID)
         .networkProtocolVersion(() -> PROTOCOL)

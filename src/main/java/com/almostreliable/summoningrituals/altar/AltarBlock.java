@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
@@ -37,7 +38,7 @@ import java.util.stream.Stream;
 
 public class AltarBlock extends Block implements EntityBlock {
 
-    static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
     private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape SHAPE = Stream.of(
         Block.box(3, 0, 3, 13, 2, 13),

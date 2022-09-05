@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
+import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
@@ -18,6 +19,8 @@ import net.minecraft.world.entity.EntityType;
 
 import javax.annotation.Nullable;
 
+import static com.almostreliable.summoningrituals.util.TextUtils.f;
+
 @SuppressWarnings("unused")
 public class AlmostKube extends KubeJSPlugin {
 
@@ -25,13 +28,13 @@ public class AlmostKube extends KubeJSPlugin {
     public void init() {
         AltarEntity.SUMMONING_START.register((level, pos, recipe, player) -> {
             var event = new SummoningEventJS(true, level, pos, recipe, player);
-            event.post(ScriptType.SERVER, "summoningrituals.start");
+            event.post(ScriptType.SERVER, f("{}.start", BuildConfig.MOD_ID));
             return !event.isCancelled();
         });
         AltarEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) -> {
             new SummoningEventJS(false, level, pos, recipe, player).post(
                 ScriptType.SERVER,
-                "summoningrituals.complete"
+                f("{}.complete", BuildConfig.MOD_ID)
             );
             return true;
         });

@@ -27,8 +27,8 @@ public class AltarRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?
         var outputs = RecipeOutputs.fromJson(json.getAsJsonArray(Constants.OUTPUTS));
 
         NonNullList<IngredientStack> inputs = NonNullList.create();
-        if (json.has(Constants.INPUT)) {
-            var inputJson = json.get(Constants.INPUT);
+        if (json.has(Constants.INPUTS)) {
+            var inputJson = json.get(Constants.INPUTS);
             if (inputJson.isJsonObject()) {
                 inputs.add(IngredientStack.fromJson(inputJson));
             } else {

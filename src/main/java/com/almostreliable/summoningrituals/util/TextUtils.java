@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -46,7 +47,7 @@ public final class TextUtils {
     ) {
         if (player == null) return;
         player.sendMessage(
-            new TranslatableComponent(getTranslationKey("message", translationKey), args).withStyle(color),
+            new TranslatableComponent(getTranslationKey(Constants.MESSAGE, translationKey), args).withStyle(color),
             MOD_UUID
         );
     }

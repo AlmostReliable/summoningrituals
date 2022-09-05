@@ -34,17 +34,17 @@ public final class Setup {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = createRegistry(ForgeRegistries.RECIPE_SERIALIZERS);
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
-    static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register("altar", AltarBlock::new);
+    static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(Constants.ALTAR, AltarBlock::new);
     public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
-        "altar",
+        Constants.ALTAR,
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))
     );
     public static final RegistryObject<BlockEntityType<AltarEntity>> ALTAR_ENTITY = BLOCK_ENTITIES.register(
-        "altar",
+        Constants.ALTAR,
         () -> Builder.of(AltarEntity::new, ALTAR_BLOCK.get()).build(null)
     );
     public static final RecipeEntry<AltarRecipe> ALTAR_RECIPE = RecipeEntry.register(
-        "altar",
+        Constants.ALTAR,
         AltarRecipeSerializer::new
     );
 

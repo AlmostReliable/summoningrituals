@@ -21,12 +21,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
+import static com.almostreliable.summoningrituals.Constants.JEI;
+
 @JeiPlugin
 public class AlmostJEI implements IModPlugin {
 
     @Override
     public ResourceLocation getPluginUid() {
-        return TextUtils.getRL("jei");
+        return TextUtils.getRL(JEI);
     }
 
     @Override
