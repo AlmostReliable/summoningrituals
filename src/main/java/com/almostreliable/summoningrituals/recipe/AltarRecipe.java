@@ -163,7 +163,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
             if (!check) {
                 TextUtils.sendPlayerMessage(
                     player,
-                    TextUtils.f("no_{}", toString().toLowerCase()),
+                    toString().toLowerCase(),
                     ChatFormatting.YELLOW
                 );
             }
@@ -185,7 +185,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
             if (!check) {
                 TextUtils.sendPlayerMessage(
                     player,
-                    TextUtils.f("no_{}", toString().toLowerCase()),
+                    toString().toLowerCase(),
                     ChatFormatting.YELLOW
                 );
             }

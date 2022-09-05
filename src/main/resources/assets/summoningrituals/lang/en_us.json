@@ -3,15 +3,14 @@
 
   "block.summoningrituals.altar": "Summoning Altar",
 
-  "message.summoningrituals.no_inputs": "You need to place at least one input.",
-  "message.summoningrituals.in_progress": "The ritual is already in progress.",
-  "message.summoningrituals.no_clear": "You need to be in the sun to start the ritual.",
-  "message.summoningrituals.no_rain": "You need to be in the rain to start the ritual.",
-  "message.summoningrituals.no_thunder": "You need to be in the thunder to start the ritual.",
-  "message.summoningrituals.no_day": "You need to be in the day to start the ritual.",
-  "message.summoningrituals.no_night": "You need to be in the night to start the ritual.",
-  "message.summoningrituals.no_block_below": "You need to have the correct block below to start the ritual.",
-  "message.summoningrituals.sacrifice_missing": "You have missing sacrifices.",
+  "message.summoningrituals.progress": "The summoning ritual is already in progress.",
+  "message.summoningrituals.clear": "The weather needs to be clear in order to start the ritual.",
+  "message.summoningrituals.rain": "It needs to be raining in order to start the ritual.",
+  "message.summoningrituals.thunder": "It needs to be thundering in order to start the ritual.",
+  "message.summoningrituals.day": "It needs to be daytime in order to start the ritual.",
+  "message.summoningrituals.night": "It needs to be nighttime in order to start the ritual.",
+  "message.summoningrituals.block_below": "The Altar does not have the correct block below it.",
+  "message.summoningrituals.sacrifices": "There are not enough sacrifices around the Altar.",
 
   "label.summoningrituals.range": "Range",
   "label.summoningrituals.output": "Output",

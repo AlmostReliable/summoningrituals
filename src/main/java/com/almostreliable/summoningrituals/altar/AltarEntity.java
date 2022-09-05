@@ -88,7 +88,7 @@ public class AltarEntity extends BlockEntity {
 
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
         if (progress > 0) {
-            TextUtils.sendPlayerMessage(player, "in_progress", ChatFormatting.RED);
+            TextUtils.sendPlayerMessage(player, "progress", ChatFormatting.RED);
             return stack;
         }
 
@@ -236,7 +236,7 @@ public class AltarEntity extends BlockEntity {
         var success = sacrifices.test(sacrifice -> {
             var found = entities.stream().filter(sacrifice).toList();
             if (found.size() < sacrifice.count()) {
-                TextUtils.sendPlayerMessage(player, "sacrifice_missing", ChatFormatting.YELLOW);
+                TextUtils.sendPlayerMessage(player, "sacrifices", ChatFormatting.YELLOW);
                 return false;
             }
             toKill.add(new EntitySacrifice(found, sacrifice.count()));
@@ -250,7 +250,7 @@ public class AltarEntity extends BlockEntity {
         if (blockBelow == null || blockBelow.test(level.getBlockState(worldPosition.below()))) {
             return true;
         }
-        TextUtils.sendPlayerMessage(player, "no_block_below", ChatFormatting.YELLOW);
+        TextUtils.sendPlayerMessage(player, "block_below", ChatFormatting.YELLOW);
         return false;
     }
 
