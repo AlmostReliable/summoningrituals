@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.altar;
 import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
+import com.almostreliable.summoningrituals.compat.kubejs.event.ISummoningObserver;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.network.IPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
@@ -43,6 +44,7 @@ public class AltarEntity extends BlockEntity {
 
     final AltarInventory inventory;
     private final LazyOptional<AltarInventory> inventoryCap;
+    @Nullable private final ISummoningObserver observer;
 
     @Nullable private AltarRecipe currentRecipe;
     @Nullable private List<EntitySacrifice> sacrifices;
@@ -53,6 +55,7 @@ public class AltarEntity extends BlockEntity {
         super(Setup.ALTAR_ENTITY.get(), pos, state);
         inventory = new AltarInventory(this);
         inventoryCap = LazyOptional.of(() -> inventory);
+        observer = ISummoningObserver.create();
     }
 
     @Override
@@ -80,6 +83,15 @@ public class AltarEntity extends BlockEntity {
         var tag = super.getUpdateTag();
         saveAdditional(tag);
         return tag;
+    }
+
+    public void resetSummoning(boolean popLastInserted) {
+        currentRecipe = null;
+        sacrifices = null;
+        invokingPlayer = null;
+        progress = 0;
+        changeActivityState(false);
+        if (popLastInserted) inventory.popLastInserted();
     }
 
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
@@ -155,15 +167,12 @@ public class AltarEntity extends BlockEntity {
         if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
                 currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
+                if (observer != null) observer.onSummoningComplete(level, worldPosition, currentRecipe, invokingPlayer);
+                resetSummoning(false);
             } else {
-                inventory.popLastInserted();
                 TextUtils.sendPlayerMessage(invokingPlayer, "no_output", ChatFormatting.RED);
+                resetSummoning(true);
             }
-            currentRecipe = null;
-            sacrifices = null;
-            invokingPlayer = null;
-            progress = 0;
-            changeActivityState(false);
             return;
         }
 
@@ -202,6 +211,7 @@ public class AltarEntity extends BlockEntity {
 
         currentRecipe = recipe;
         invokingPlayer = player;
+        if (observer != null) observer.onSummoningStart(level, worldPosition, recipe, player);
     }
 
     @Nullable

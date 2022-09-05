@@ -26,9 +26,6 @@ import java.util.Set;
 
 public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
-    // TODO:
-    // - maybe let the users do that with the kube event | add effects that are performed after recipe crafting (lighting, weather change)
-
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
     private final ResourceLocation recipeId;

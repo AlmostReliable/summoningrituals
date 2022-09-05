@@ -80,6 +80,7 @@ public class AltarRecipeJS extends RecipeJS {
             json.addProperty(Constants.WEATHER, weather.name());
         }
         // TODO: remove
+        // debug
         ConsoleJS.SERVER.info("Altar Recipe: " + json.toString());
     }
 
