@@ -226,7 +226,8 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private void onContentsChanged() {
         parent.setChanged();
-        parent.sendUpdate();
+        if (parent.getLevel() == null || parent.getLevel().isClientSide) return;
+        parent.getLevel().sendBlockUpdated(parent.getBlockPos(), parent.getBlockState(), parent.getBlockState(), 1 | 2);
     }
 
     private void validateSlot(int slot) {

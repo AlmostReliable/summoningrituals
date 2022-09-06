@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.network.packet.ProcessTimeUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -25,6 +26,7 @@ public final class PacketHandler {
         var packetId = -1;
         // server to client
         register(++packetId, ProgressUpdatePacket.class, new ProgressUpdatePacket());
+        register(++packetId, ProcessTimeUpdatePacket.class, new ProcessTimeUpdatePacket());
         register(++packetId, SacrificeParticlePacket.class, new SacrificeParticlePacket());
     }
 

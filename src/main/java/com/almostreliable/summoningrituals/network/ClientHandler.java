@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.altar.AltarEntity;
+import com.almostreliable.summoningrituals.network.packet.ProcessTimeUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -32,5 +33,10 @@ public final class ClientHandler {
                 );
             }
         }
+    }
+
+    public static void handleProcessTimeUpdate(ProcessTimeUpdatePacket packet, ClientLevel level) {
+        if (!(level.getBlockEntity(packet.getPos()) instanceof AltarEntity altar)) return;
+        altar.setProcessTime(packet.getProcessTime());
     }
 }

@@ -21,6 +21,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
     private final Minecraft mc;
     private final ItemRenderer itemRenderer;
 
+    private double oldCircleOffset;
+
     public AltarRenderer(Context ignoredContext) {
         mc = Minecraft.getInstance();
         itemRenderer = mc.getItemRenderer();
@@ -41,13 +43,22 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             stack.scale(HALF, HALF, HALF);
 
             var lightAbove = LevelRenderer.getLightColor(entity.getLevel(), entity.getBlockPos().above());
+            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.getBlockPos()));
+            var playerPos = mc.player.position();
+            var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
 
-            stack.pushPose();
-            {
-                stack.translate(0, Math.sin(entity.getLevel().getGameTime() / 5f) / 10 + 1, 0);
-                stack.scale(0.8f, 0.8f, 0.8f);
-                stack.mulPose(Vector3f.YN.rotationDegrees(mc.player.getYHeadRot()));
-                if (!entity.inventory.getCatalyst().isEmpty()) {
+            var progress = entity.getProgress();
+            var processTime = entity.getProcessTime();
+            var progressHeightShift = 2.5f;
+
+            stack.translate(0, processTime == 0 ? 0 : progressHeightShift * (progress / (float) processTime), 0);
+
+            if (!entity.inventory.getCatalyst().isEmpty()) {
+                stack.pushPose();
+                {
+                    stack.translate(0, 1, 0);
+                    stack.scale(0.75f, 0.75f, 0.75f);
+                    stack.mulPose(Vector3f.YN.rotationDegrees((float) playerAngle));
                     itemRenderer
                         .renderStatic(
                             entity.inventory.getCatalyst(),
@@ -59,21 +70,27 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
                             (int) entity.getBlockPos().asLong()
                         );
                 }
+                stack.popPose();
             }
-            stack.popPose();
 
-            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.getBlockPos()));
-            var playerPos = mc.player.position();
-            var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
             var axisRotation = MathUtils.singleRotation(entity.getLevel().getGameTime());
+            var scale = progress > 0 ? (1 - (progress / (float) processTime)) : 1;
+            stack.scale(scale, scale, scale);
 
             var inputs = entity.inventory.getItems();
             for (var i = 0; i < inputs.size(); i++) {
                 stack.pushPose();
                 {
                     var itemRotation = MathUtils.flipCircle(i * 360f / inputs.size());
+                    var circleOffset = 0.0;
+                    if (progress > 0) {
+                        circleOffset = (progress / (double) processTime) * 360 * 3 + oldCircleOffset;
+                    } else {
+                        circleOffset = playerAngle;
+                        oldCircleOffset = circleOffset;
+                    }
 
-                    var rotationDiff = Math.abs(MathUtils.singleRotation(axisRotation + itemRotation) - playerAngle);
+                    var rotationDiff = MathUtils.singleRotation(axisRotation + itemRotation - circleOffset);
                     if (rotationDiff > 180) rotationDiff = 360 - rotationDiff;
                     var newHeight = (rotationDiff / 180) * HEIGHT_SHIFT;
 

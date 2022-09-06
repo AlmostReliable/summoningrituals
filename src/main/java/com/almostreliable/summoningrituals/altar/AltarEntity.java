@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.network.IPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
+import com.almostreliable.summoningrituals.network.packet.ProcessTimeUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
 import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -52,6 +53,7 @@ public class AltarEntity extends BlockEntity {
     @Nullable private List<EntitySacrifice> sacrifices;
     @Nullable private ServerPlayer invokingPlayer;
     private int progress;
+    private int processTime;
 
     public AltarEntity(BlockPos pos, BlockState state) {
         super(Setup.ALTAR_ENTITY.get(), pos, state);
@@ -133,11 +135,6 @@ public class AltarEntity extends BlockEntity {
         return super.getCapability(cap, side);
     }
 
-    public void sendUpdate() {
-        if (level == null || level.isClientSide) return;
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 1 | 2);
-    }
-
     void playerDestroy(boolean creative) {
         assert level != null && !level.isClientSide;
         inventory.dropContents();
@@ -186,6 +183,9 @@ public class AltarEntity extends BlockEntity {
         sacrifices = null;
         invokingPlayer = null;
         progress = 0;
+        trackingChunkPacket(new ProgressUpdatePacket(worldPosition, progress));
+        processTime = 0;
+        trackingChunkPacket(new ProcessTimeUpdatePacket(worldPosition, processTime));
         changeActivityState(false);
         if (popLastInserted) inventory.popLastInserted();
     }
@@ -216,6 +216,8 @@ public class AltarEntity extends BlockEntity {
         }
         currentRecipe = recipe;
         invokingPlayer = player;
+        processTime = recipe.getRecipeTime();
+        trackingChunkPacket(new ProcessTimeUpdatePacket(worldPosition, processTime));
     }
 
     @Nullable
@@ -262,9 +264,20 @@ public class AltarEntity extends BlockEntity {
         }
     }
 
+    int getProcessTime() {
+        return processTime;
+    }
+
+    public void setProcessTime(int processTime) {
+        this.processTime = processTime;
+    }
+
+    int getProgress() {
+        return progress;
+    }
+
     public void setProgress(int progress) {
         this.progress = progress;
-        setChanged();
     }
 
     private record EntitySacrifice(List<Entity> entities, int count) {

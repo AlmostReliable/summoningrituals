@@ -26,8 +26,8 @@ public final class MathUtils {
         return 360 - degree.intValue();
     }
 
-    public static int singleRotation(Number degree) {
-        return Math.abs(degree.intValue()) % 360;
+    public static float singleRotation(Number degree) {
+        return Math.abs(degree.floatValue()) % 360f;
     }
 
     public static Vector3f[][] getHorizontalVectors(Vector3f... north) {
