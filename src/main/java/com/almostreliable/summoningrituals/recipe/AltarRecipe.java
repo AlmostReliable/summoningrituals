@@ -81,7 +81,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     @Override
     public ItemStack assemble(AltarInvWrapper inv) {
-        throw new UnsupportedOperationException();
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     @Override
     public ItemStack getResultItem() {
-        throw new UnsupportedOperationException();
+        return ItemStack.EMPTY;
     }
 
     @Override
