@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
@@ -20,23 +19,21 @@ public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
 
     private final Minecraft mc;
     private final EntityRenderDispatcher entityRenderer;
-    private final Player player;
     private final int size;
 
     public EntityRenderer(int size) {
         mc = Minecraft.getInstance();
         entityRenderer = mc.getEntityRenderDispatcher();
-        this.player = mc.player;
         this.size = size;
     }
 
     @Override
     public void render(PoseStack stack, EntityIngredient ingredient) {
-        if (mc.level == null || ingredient.getEntity() == null) return;
+        if (mc.level == null || mc.player == null || ingredient.getEntity() == null) return;
         stack.pushPose();
         {
             var entity = ingredient.getEntity();
-            entity.tickCount = player.tickCount;
+            entity.tickCount = mc.player.tickCount;
             stack.translate(0.5f * size, 0.85f * size, 0);
             var entityHeight = entity.getBbHeight();
             var entityScale = Math.min(CREEPER_HEIGHT / entityHeight, 1f);

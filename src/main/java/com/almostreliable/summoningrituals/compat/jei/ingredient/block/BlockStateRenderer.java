@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
@@ -28,14 +27,12 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
 
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
-    private final Player player;
     private final Map<Integer, List<Component>> tooltipCache;
     private final int size;
 
     public BlockStateRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
-        this.player = mc.player;
         tooltipCache = new HashMap<>();
         this.size = size;
     }
@@ -71,7 +68,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
             var tooltip = tooltipCache.get(stateId);
             if (tooltip != null) return tooltip;
 
-            tooltip = stack.getTooltipLines(player, tooltipFlag);
+            tooltip = stack.getTooltipLines(mc.player, tooltipFlag);
             tooltip.set(
                 0,
                 TextUtils.translate(Constants.TOOLTIP, Constants.BLOCK_BELOW, ChatFormatting.GOLD)
