@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredient.entity;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.mob;
 
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,7 +12,7 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
-public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
+public class MobRenderer implements IIngredientRenderer<MobIngredient> {
 
     private static final float CREEPER_HEIGHT = 1.7f;
     private static final float CREEPER_SCALE = 0.5f;
@@ -21,18 +21,18 @@ public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
     private final EntityRenderDispatcher entityRenderer;
     private final int size;
 
-    public EntityRenderer(int size) {
+    public MobRenderer(int size) {
         mc = Minecraft.getInstance();
         entityRenderer = mc.getEntityRenderDispatcher();
         this.size = size;
     }
 
     @Override
-    public void render(PoseStack stack, EntityIngredient ingredient) {
-        if (mc.level == null || mc.player == null || ingredient.getEntity() == null) return;
+    public void render(PoseStack stack, MobIngredient mob) {
+        if (mc.level == null || mc.player == null || mob.getEntity() == null) return;
         stack.pushPose();
         {
-            var entity = ingredient.getEntity();
+            var entity = mob.getEntity();
             entity.tickCount = mc.player.tickCount;
             stack.translate(0.5f * size, 0.85f * size, 0);
             var entityHeight = entity.getBbHeight();
@@ -47,15 +47,15 @@ public class EntityRenderer implements IIngredientRenderer<EntityIngredient> {
             bufferSource.endBatch();
         }
         stack.popPose();
-        if (ingredient.getCount() > 1) {
-            var count = String.valueOf(ingredient.getCount());
+        if (mob.getCount() > 1) {
+            var count = String.valueOf(mob.getCount());
             GameUtils.renderCount(stack, count, size, size);
         }
     }
 
     @Override
-    public List<Component> getTooltip(EntityIngredient ingredient, TooltipFlag tooltipFlag) {
-        return List.of(ingredient.getDisplayName());
+    public List<Component> getTooltip(MobIngredient mob, TooltipFlag tooltipFlag) {
+        return List.of(mob.getDisplayName());
     }
 
     @Override

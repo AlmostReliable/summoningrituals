@@ -16,6 +16,8 @@
   "label.summoningrituals.region": "Region",
   "label.summoningrituals.outputs": "Outputs",
 
+  "tooltip.summoningrituals.catalyst": "Catalyst",
+  "tooltip.summoningrituals.catalyst_desc": "Insert last to start the ritual.",
   "tooltip.summoningrituals.block_below": "Block below",
   "tooltip.summoningrituals.properties": "Relevant properties",
   "tooltip.summoningrituals.region": "The region around the altar where mobs are considered for sacrifice.",

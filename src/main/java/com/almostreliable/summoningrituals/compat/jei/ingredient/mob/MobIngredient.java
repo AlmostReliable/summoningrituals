@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.jei.ingredient.entity;
+package com.almostreliable.summoningrituals.compat.jei.ingredient.mob;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -10,26 +10,26 @@ import net.minecraft.world.item.SpawnEggItem;
 
 import javax.annotation.Nullable;
 
-public class EntityIngredient {
+public class MobIngredient {
 
-    private final EntityType<?> entityType;
+    private final EntityType<?> mob;
     private final int count;
     @Nullable private Entity entity;
 
-    public EntityIngredient(EntityType<?> entityType, int count, CompoundTag tag) {
-        this.entityType = entityType;
+    public MobIngredient(EntityType<?> mob, int count, CompoundTag tag) {
+        this.mob = mob;
         this.count = count;
         var level = Minecraft.getInstance().level;
         if (level != null) {
-            entity = entityType.create(level);
+            entity = mob.create(level);
             if (entity != null && !tag.isEmpty()) {
                 entity.load(tag);
             }
         }
     }
 
-    public EntityIngredient(EntityType<?> entityType, int count) {
-        this(entityType, count, new CompoundTag());
+    public MobIngredient(EntityType<?> mob, int count) {
+        this(mob, count, new CompoundTag());
     }
 
     Component getDisplayName() {
@@ -38,7 +38,7 @@ public class EntityIngredient {
     }
 
     EntityType<?> getEntityType() {
-        return entityType;
+        return mob;
     }
 
     public int getCount() {
@@ -53,6 +53,6 @@ public class EntityIngredient {
     @Nullable
     @SuppressWarnings("deprecation")
     public SpawnEggItem getEgg() {
-        return SpawnEggItem.byId(entityType);
+        return SpawnEggItem.byId(mob);
     }
 }

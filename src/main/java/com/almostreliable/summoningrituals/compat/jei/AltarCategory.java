@@ -3,9 +3,10 @@ package com.almostreliable.summoningrituals.compat.jei;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateRenderer;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.item.SizedItemRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.item.AltarRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.item.CatalystRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobIngredient;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
@@ -39,114 +40,71 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     static final RecipeType<AltarRecipe> TYPE = new RecipeType<>(TextUtils.getRL(ALTAR), AltarRecipe.class);
     private static final ResourceLocation TEXTURE = TextUtils.getRL(f("textures/{}/{}.png", JEI, ALTAR));
-    private static final int TEXTURE_WIDTH = 194;
+    private static final int TEXTURE_WIDTH = 188;
     private static final int TEXTURE_HEIGHT = 148;
-    private static final int BIG_SLOT_SIZE = 22;
-    private static final int SMALL_SLOT_SIZE = 18;
+
+    private static final int ITEM_SLOT_SIZE = 18;
+    private static final int BLOCK_SLOT_SIZE = 22;
     private static final int SPRITE_SLOT_SIZE = 16;
-    private static final int SPRITE_SIZE = 14;
-    private static final int CENTER_X = (TEXTURE_WIDTH - BIG_SLOT_SIZE) / 2;
-    private static final int RENDER_Y = 62;
-    private static final int SLOT_RADIUS = 48;
+    private static final int SPRITE_SIZE = SPRITE_SLOT_SIZE - 2;
+
+    private static final int CENTER_X = (TEXTURE_WIDTH - SPRITE_SLOT_SIZE) / 2 + 1;
+    private static final int RENDER_Y = 64;
+    private static final int INPUT_RADIUS = 47;
+
+    private final AltarRenderer altarRenderer;
+    private final CatalystRenderer catalystRenderer;
+    private final BlockBelowRenderer blockBelowRenderer;
 
     private final IDrawable background;
     private final IDrawable icon;
-    private final IDrawable blockBelowSlot;
-    private final IDrawable catalystSlot;
+
     private final IDrawable spriteSlot;
     private final IDrawable daySprite;
     private final IDrawable nightSprite;
     private final IDrawable sunSprite;
     private final IDrawable rainSprite;
     private final IDrawable thunderSprite;
-    private final BlockStateRenderer blockStateRenderer;
-    private final SizedItemRenderer sizedItemRenderer;
 
     AltarCategory(IGuiHelper guiHelper) {
-        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - BIG_SLOT_SIZE, TEXTURE_HEIGHT)
+        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - SPRITE_SLOT_SIZE, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Setup.ALTAR_ITEM.get()));
-        blockBelowSlot = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                0,
-                BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE
-            )
+
+        altarRenderer = new AltarRenderer(BLOCK_SLOT_SIZE - 2);
+        catalystRenderer = new CatalystRenderer(ITEM_SLOT_SIZE - 2);
+        blockBelowRenderer = new BlockBelowRenderer(BLOCK_SLOT_SIZE - 2);
+
+        spriteSlot = spriteTexture(guiHelper, 0, SPRITE_SLOT_SIZE, SPRITE_SLOT_SIZE);
+        daySprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+        nightSprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE + SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+        sunSprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE + 2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+        rainSprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE + 3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+        thunderSprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE + 4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+    }
+
+    private IDrawable spriteTexture(IGuiHelper guiHelper, int v, int width, int height) {
+        return guiHelper.drawableBuilder(TEXTURE, TEXTURE_WIDTH - SPRITE_SLOT_SIZE, v, width, height)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        catalystSlot = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE,
-                SMALL_SLOT_SIZE,
-                SMALL_SLOT_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        spriteSlot = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE,
-                SPRITE_SLOT_SIZE,
-                SPRITE_SLOT_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        daySprite = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE,
-                SPRITE_SIZE,
-                SPRITE_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        nightSprite = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + SPRITE_SIZE,
-                SPRITE_SIZE,
-                SPRITE_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        sunSprite = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 2 * SPRITE_SIZE,
-                SPRITE_SIZE,
-                SPRITE_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        rainSprite = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 3 * SPRITE_SIZE,
-                SPRITE_SIZE,
-                SPRITE_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        thunderSprite = guiHelper.drawableBuilder(
-                TEXTURE,
-                TEXTURE_WIDTH - BIG_SLOT_SIZE,
-                BIG_SLOT_SIZE + SMALL_SLOT_SIZE + SPRITE_SLOT_SIZE + 4 * SPRITE_SIZE,
-                SPRITE_SIZE,
-                SPRITE_SIZE
-            )
-            .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
-            .build();
-        blockStateRenderer = new BlockStateRenderer(BIG_SLOT_SIZE - 2);
-        sizedItemRenderer = new SizedItemRenderer(BIG_SLOT_SIZE - 2);
     }
 
     private Component requirementTooltip(String translationKey, String value) {
         return TextUtils.translate(Constants.TOOLTIP, translationKey, ChatFormatting.AQUA)
             .append(": ")
             .append(TextUtils.translate(translationKey, value.toLowerCase(), ChatFormatting.WHITE));
+    }
+
+    private boolean isWithinRequirement(double mX, double mY, int y) {
+        return GameUtils.isWithinBounds(
+            mX,
+            mY,
+            TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE - 1,
+            y,
+            SPRITE_SLOT_SIZE,
+            SPRITE_SLOT_SIZE
+        );
     }
 
     @Override
@@ -171,68 +129,61 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
-        var yOffset = BIG_SLOT_SIZE / 2 + 1;
         if (recipe.getBlockBelow() != null) {
             builder.addSlot(
                     RecipeIngredientRole.RENDER_ONLY,
-                    CENTER_X - BIG_SLOT_SIZE / 2 + 1,
-                    RENDER_Y + yOffset
+                    CENTER_X - BLOCK_SLOT_SIZE / 2,
+                    RENDER_Y - 3
                 )
-                .setCustomRenderer(AlmostTypes.BLOCK_STATE, blockStateRenderer)
-                .addIngredient(AlmostTypes.BLOCK_STATE, recipe.getBlockBelow().getDisplayState());
-            yOffset = 1;
+                .setCustomRenderer(AlmostTypes.BLOCK_BELOW, blockBelowRenderer)
+                .addIngredient(AlmostTypes.BLOCK_BELOW, recipe.getBlockBelow().getDisplayState());
         }
-        builder.addSlot(
-                RecipeIngredientRole.RENDER_ONLY,
-                CENTER_X - BIG_SLOT_SIZE / 2 + 1,
-                RENDER_Y - BIG_SLOT_SIZE / 2 + yOffset
-            )
-            .setCustomRenderer(VanillaTypes.ITEM_STACK, sizedItemRenderer)
-            .addItemStack(new ItemStack(Setup.ALTAR_ITEM.get()));
+
         builder.addSlot(
                 RecipeIngredientRole.INPUT,
-                CENTER_X - SMALL_SLOT_SIZE / 2 + 1,
-                RENDER_Y - BIG_SLOT_SIZE / 2 - SMALL_SLOT_SIZE + yOffset
+                CENTER_X - ITEM_SLOT_SIZE / 2,
+                RENDER_Y - 32
             )
+            .setCustomRenderer(VanillaTypes.ITEM_STACK, catalystRenderer)
             .addIngredients(recipe.getCatalyst());
 
-        var inputs = recipe.getInputs();
-        var sacrifices = recipe.getSacrifices();
-        var ringSlots = inputs.size() + sacrifices.size();
+        var itemInputs = recipe.getInputs();
+        var mobInputs = recipe.getSacrifices();
+        var inputSlots = itemInputs.size() + mobInputs.size();
 
-        for (var i = 0; i < ringSlots; i++) {
-            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / ringSlots) * SLOT_RADIUS) - SMALL_SLOT_SIZE / 2;
-            var y = RENDER_Y + (int) (Math.sin(i * 2 * Math.PI / ringSlots) * SLOT_RADIUS) - SMALL_SLOT_SIZE / 2;
+        for (var i = 0; i < inputSlots; i++) {
+            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
+            var y = RENDER_Y + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
 
-            if (i < inputs.size()) {
+            if (i < itemInputs.size()) {
                 List<ItemStack> inputStacks = new ArrayList<>();
-                for (var stack : inputs.get(i).ingredient().getItems()) {
-                    stack.setCount(inputs.get(i).count());
+                for (var stack : itemInputs.get(i).ingredient().getItems()) {
+                    stack.setCount(itemInputs.get(i).count());
                     inputStacks.add(stack);
                 }
                 builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStacks(inputStacks);
             } else {
-                var sacrifice = sacrifices.get(i - inputs.size());
+                var mobInput = mobInputs.get(i - itemInputs.size());
                 builder.addSlot(RecipeIngredientRole.INPUT, x, y)
-                    .addIngredient(AlmostTypes.ENTITY, new EntityIngredient(sacrifice.mob(), sacrifice.count()));
+                    .addIngredient(AlmostTypes.MOB, new MobIngredient(mobInput.mob(), mobInput.count()));
             }
         }
 
         recipe.getOutputs().forEach((type, output, i) -> {
-            var x = 2 + i * (SMALL_SLOT_SIZE - 1);
+            var x = 2 + i * (ITEM_SLOT_SIZE - 1);
             var y = 130;
 
             if (type == OutputType.ITEM) {
                 builder.addSlot(RecipeIngredientRole.OUTPUT, x, y).addItemStack((ItemStack) output.getOutput());
             } else if (type == OutputType.MOB) {
-                var entityIngredient = new EntityIngredient(
+                var entityIngredient = new MobIngredient(
                     (EntityType<?>) output.getOutput(),
                     output.getCount(),
                     output.getData()
                 );
                 builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                     .addIngredient(
-                        AlmostTypes.ENTITY,
+                        AlmostTypes.MOB,
                         entityIngredient
                     );
                 var egg = entityIngredient.getEgg();
@@ -247,20 +198,14 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
     public void draw(
         AltarRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY
     ) {
-        var yOffset = BIG_SLOT_SIZE / 2;
-        if (recipe.getBlockBelow() != null) {
-            blockBelowSlot.draw(
-                stack,
-                CENTER_X - BIG_SLOT_SIZE / 2,
-                RENDER_Y + BIG_SLOT_SIZE / 2
-            );
-            yOffset = 0;
+        stack.pushPose();
+        {
+            var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.getBlockBelow() == null ? 0 : 4);
+            stack.translate(CENTER_X - BLOCK_SLOT_SIZE / 2f, altarY, 0);
+            altarRenderer.render(stack);
         }
-        catalystSlot.draw(
-            stack,
-            CENTER_X - SMALL_SLOT_SIZE / 2,
-            RENDER_Y - BIG_SLOT_SIZE / 2 - SMALL_SLOT_SIZE + yOffset
-        );
+        stack.popPose();
+
         GameUtils.renderText(
             stack,
             f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.OUTPUTS)),
@@ -290,23 +235,23 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
                 0xFF_FFFF
             );
         }
+
         var spriteOffset = 1;
         if (recipe.getDayTime() != DAY_TIME.ANY) {
-            spriteSlot.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1, spriteOffset);
+            spriteSlot.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE - 1, spriteOffset);
             if (recipe.getDayTime() == DAY_TIME.DAY) {
-                daySprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+                daySprite.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE, spriteOffset + 1);
             } else if (recipe.getDayTime() == DAY_TIME.NIGHT) {
-                nightSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+                nightSprite.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE, spriteOffset + 1);
             }
             spriteOffset += SPRITE_SLOT_SIZE + 1;
         }
         if (recipe.getWeather() != WEATHER.ANY) {
-            spriteSlot.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1, spriteOffset);
+            spriteSlot.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE - 1, spriteOffset);
             switch (recipe.getWeather()) {
-                case CLEAR -> sunSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
-                case RAIN -> rainSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
-                case THUNDER ->
-                    thunderSprite.draw(stack, TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE, spriteOffset + 1);
+                case CLEAR -> sunSprite.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE, spriteOffset + 1);
+                case RAIN -> rainSprite.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE, spriteOffset + 1);
+                case THUNDER -> thunderSprite.draw(stack, TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE, spriteOffset + 1);
                 default -> throw new IllegalStateException("Unexpected value: " + recipe.getWeather());
             }
         }
@@ -320,28 +265,14 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         if (!recipe.getSacrifices().isEmpty() && GameUtils.isWithinBounds(mX, mY, 1, 1, 30, 20)) {
             tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.REGION, ChatFormatting.WHITE));
         }
-        if (GameUtils.isWithinBounds(
-            mX,
-            mY,
-            TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1,
-            1,
-            SPRITE_SLOT_SIZE,
-            SPRITE_SLOT_SIZE
-        )) {
+        if (isWithinRequirement(mX, mY, 1)) {
             if (recipe.getDayTime() != DAY_TIME.ANY) {
                 tooltip.add(requirementTooltip(Constants.DAY_TIME, recipe.getDayTime().name()));
             } else if (recipe.getWeather() != WEATHER.ANY) {
                 tooltip.add(requirementTooltip(Constants.WEATHER, recipe.getWeather().name()));
             }
         }
-        if (GameUtils.isWithinBounds(
-            mX,
-            mY,
-            TEXTURE_WIDTH - BIG_SLOT_SIZE - SPRITE_SLOT_SIZE - 1,
-            SPRITE_SLOT_SIZE + 2,
-            SPRITE_SLOT_SIZE,
-            SPRITE_SLOT_SIZE
-        )) {
+        if (isWithinRequirement(mX, mY, SPRITE_SLOT_SIZE + 2)) {
             if (recipe.getWeather() != WEATHER.ANY) {
                 tooltip.add(requirementTooltip(Constants.WEATHER, recipe.getWeather().name()));
             }

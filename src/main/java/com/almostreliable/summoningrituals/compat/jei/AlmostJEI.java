@@ -1,11 +1,11 @@
 package com.almostreliable.summoningrituals.compat.jei;
 
 import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateHelper;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockStateRenderer;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityHelper;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.entity.EntityRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobIngredient;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobRenderer;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import mezz.jei.api.IModPlugin;
@@ -33,8 +33,8 @@ public class AlmostJEI implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration r) {
-        r.register(AlmostTypes.BLOCK_STATE, List.of(), new BlockStateHelper(), new BlockStateRenderer(16));
-        r.register(AlmostTypes.ENTITY, List.of(), new EntityHelper(), new EntityRenderer(16));
+        r.register(AlmostTypes.BLOCK_BELOW, List.of(), new BlockBelowHelper(), new BlockBelowRenderer(16));
+        r.register(AlmostTypes.MOB, List.of(), new MobHelper(), new MobRenderer(16));
     }
 
     @Override
@@ -55,8 +55,8 @@ public class AlmostJEI implements IModPlugin {
     }
 
     public static final class AlmostTypes {
-        public static final IIngredientType<BlockState> BLOCK_STATE = () -> BlockState.class;
-        public static final IIngredientType<EntityIngredient> ENTITY = () -> EntityIngredient.class;
+        public static final IIngredientType<BlockState> BLOCK_BELOW = () -> BlockState.class;
+        public static final IIngredientType<MobIngredient> MOB = () -> MobIngredient.class;
 
         private AlmostTypes() {}
     }

@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.jei.ingredient.block;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.TextUtils;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -23,14 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
+public class BlockBelowRenderer implements IIngredientRenderer<BlockState> {
 
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
     private final Map<Integer, List<Component>> tooltipCache;
     private final int size;
 
-    public BlockStateRenderer(int size) {
+    public BlockBelowRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
         tooltipCache = new HashMap<>();
@@ -38,7 +39,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     }
 
     @Override
-    public void render(PoseStack stack, BlockState blockState) {
+    public void render(PoseStack stack, BlockState blockBelow) {
         stack.pushPose();
         {
             stack.translate(0.93f * size, 0.77f * size, 0);
@@ -46,9 +47,10 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
+            RenderSystem.disableDepthTest();
             var bufferSource = mc.renderBuffers().bufferSource();
             blockRenderer.renderSingleBlock(
-                blockState,
+                blockBelow,
                 stack,
                 bufferSource,
                 LightTexture.FULL_BRIGHT,
@@ -61,10 +63,10 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
     }
 
     @Override
-    public List<Component> getTooltip(BlockState blockState, TooltipFlag tooltipFlag) {
-        var stack = new ItemStack(blockState.getBlock());
+    public List<Component> getTooltip(BlockState blockBelow, TooltipFlag tooltipFlag) {
+        var stack = new ItemStack(blockBelow.getBlock());
         try {
-            var stateId = Block.getId(blockState);
+            var stateId = Block.getId(blockBelow);
             var tooltip = tooltipCache.get(stateId);
             if (tooltip != null) return tooltip;
 
@@ -75,7 +77,7 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
                     .append(": ")
                     .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
             );
-            constructTooltip(blockState, tooltip);
+            constructTooltip(blockBelow, tooltip);
             tooltipCache.put(stateId, tooltip);
             return tooltip;
         } catch (Exception e) {
@@ -94,12 +96,12 @@ public class BlockStateRenderer implements IIngredientRenderer<BlockState> {
         return size;
     }
 
-    private void constructTooltip(BlockState blockState, List<Component> tooltip) {
-        var defaultState = blockState.getBlock().defaultBlockState();
+    private void constructTooltip(BlockState blockBelow, List<Component> tooltip) {
+        var defaultState = blockBelow.getBlock().defaultBlockState();
         List<String> modifiedProps = new ArrayList<>();
-        for (var property : blockState.getProperties()) {
-            if (!blockState.getValue(property).equals(defaultState.getValue(property))) {
-                modifiedProps.add(property.getName() + ": " + blockState.getValue(property));
+        for (var property : blockBelow.getProperties()) {
+            if (!blockBelow.getValue(property).equals(defaultState.getValue(property))) {
+                modifiedProps.add(property.getName() + ": " + blockBelow.getValue(property));
             }
         }
         if (modifiedProps.isEmpty()) return;
