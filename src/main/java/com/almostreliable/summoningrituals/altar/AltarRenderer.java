@@ -13,14 +13,17 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
-    private static final int MAX_DISTANCE = 32;
-    private static final int HEIGHT_SHIFT = 2;
+    private static final int MAX_RENDER_DISTANCE = 32;
+    private static final int MAX_ITEM_HEIGHT = 2;
+    private static final int MAX_RESET = 60;
+    private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float HALF = .5f;
     private static final float ITEM_OFFSET = 1.5f;
 
     private final Minecraft mc;
     private final ItemRenderer itemRenderer;
 
+    private float resetTimer;
     private double oldCircleOffset;
 
     public AltarRenderer(Context ignoredContext) {
@@ -33,7 +36,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
         AltarEntity entity, float partial, PoseStack stack, MultiBufferSource buffer, int light, int overlay
     ) {
         if (mc.player == null || entity.getLevel() == null ||
-            entity.getBlockPos().distSqr(mc.player.blockPosition()) > Math.pow(MAX_DISTANCE, 2)) {
+            entity.getBlockPos().distSqr(mc.player.blockPosition()) > Math.pow(MAX_RENDER_DISTANCE, 2)) {
             return;
         }
 
@@ -49,14 +52,13 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
             var progress = entity.getProgress();
             var processTime = entity.getProcessTime();
-            var progressHeightShift = 2.5f;
 
-            stack.translate(0, processTime == 0 ? 0 : progressHeightShift * (progress / (float) processTime), 0);
+            stack.translate(0, MAX_PROGRESS_HEIGHT * MathUtils.modifier(progress, processTime, 0), 0);
 
             if (!entity.inventory.getCatalyst().isEmpty()) {
                 stack.pushPose();
                 {
-                    stack.translate(0, 1, 0);
+                    stack.translate(0, 1 - 0.75f * MathUtils.modifier(progress, processTime, 0), 0);
                     stack.scale(0.75f, 0.75f, 0.75f);
                     stack.mulPose(Vector3f.YN.rotationDegrees((float) playerAngle));
                     itemRenderer
@@ -74,7 +76,13 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
             }
 
             var axisRotation = MathUtils.singleRotation(entity.getLevel().getGameTime());
-            var scale = progress > 0 ? (1 - (progress / (float) processTime)) : 1;
+            var scale = 1 - MathUtils.modifier(progress, processTime, 0);
+
+            if (progress == 0 && resetTimer > 0) {
+                scale = 1 - MathUtils.modifier(resetTimer, MAX_RESET, 0);
+                resetTimer = Math.max(0, resetTimer - partial);
+            }
+
             stack.scale(scale, scale, scale);
 
             var inputs = entity.inventory.getItems();
@@ -84,7 +92,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
                     var itemRotation = MathUtils.flipCircle(i * 360f / inputs.size());
                     var circleOffset = 0.0;
                     if (progress > 0) {
-                        circleOffset = (progress / (double) processTime) * 360 * 3 + oldCircleOffset;
+                        circleOffset = MathUtils.modifier(progress, processTime, 1) * 360 * 3 + oldCircleOffset;
                     } else {
                         circleOffset = playerAngle;
                         oldCircleOffset = circleOffset;
@@ -92,7 +100,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
 
                     var rotationDiff = MathUtils.singleRotation(axisRotation + itemRotation - circleOffset);
                     if (rotationDiff > 180) rotationDiff = 360 - rotationDiff;
-                    var newHeight = (rotationDiff / 180) * HEIGHT_SHIFT;
+                    var newHeight = (rotationDiff / 180) * MAX_ITEM_HEIGHT;
 
                     var playerOffset = Math.max(1 - altarPos.distanceTo(playerPos) / 8, 0);
                     newHeight *= playerOffset;
@@ -115,6 +123,10 @@ public class AltarRenderer implements BlockEntityRenderer<AltarEntity> {
                     }
                 }
                 stack.popPose();
+            }
+
+            if (processTime > 0 && progress >= processTime) {
+                resetTimer = MAX_RESET;
             }
         }
         stack.popPose();

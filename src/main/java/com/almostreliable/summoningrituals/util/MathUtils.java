@@ -45,4 +45,8 @@ public final class MathUtils {
         var vector2 = getOppositeVector(vector1);
         return new Vector3f(vector2.z(), vector1.y(), vector1.x());
     }
+
+    public static float modifier(float current, float max, float fallback) {
+        return max == 0 ? fallback : current / max;
+    }
 }
