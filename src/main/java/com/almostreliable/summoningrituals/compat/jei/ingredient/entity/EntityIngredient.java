@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.SpawnEggItem;
 
 import javax.annotation.Nullable;
 
@@ -47,5 +48,11 @@ public class EntityIngredient {
     @Nullable
     public Entity getEntity() {
         return entity;
+    }
+
+    @Nullable
+    @SuppressWarnings("deprecation")
+    public SpawnEggItem getEgg() {
+        return SpawnEggItem.byId(entityType);
     }
 }

@@ -223,13 +223,22 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
             var y = 130;
 
             if (type == OutputType.ITEM) {
-                builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack((ItemStack) output.getOutput());
+                builder.addSlot(RecipeIngredientRole.OUTPUT, x, y).addItemStack((ItemStack) output.getOutput());
             } else if (type == OutputType.MOB) {
-                builder.addSlot(RecipeIngredientRole.INPUT, x, y)
+                var entityIngredient = new EntityIngredient(
+                    (EntityType<?>) output.getOutput(),
+                    output.getCount(),
+                    output.getData()
+                );
+                builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                     .addIngredient(
                         AlmostTypes.ENTITY,
-                        new EntityIngredient((EntityType<?>) output.getOutput(), output.getCount(), output.getData())
+                        entityIngredient
                     );
+                var egg = entityIngredient.getEgg();
+                if (egg != null) {
+                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(egg.getDefaultInstance());
+                }
             }
         });
     }
