@@ -207,20 +207,15 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
 
     private void rebuildInsertOrder() {
         insertOrder.clear();
+        trimInventory();
         for (var i = items.size() - 1; i >= 0; i--) {
-            if (!items.get(i).isEmpty()) {
-                insertOrder.add(new Tuple<>(items.get(i).copy(), i));
-            }
+            insertOrder.add(new Tuple<>(items.get(i).copy(), i));
         }
     }
 
     private void trimInventory() {
         for (var i = items.size() - 1; i >= 0; i--) {
-            if (items.get(i).isEmpty()) {
-                items.remove(i);
-            } else {
-                break;
-            }
+            if (items.get(i).isEmpty()) items.remove(i);
         }
     }
 
