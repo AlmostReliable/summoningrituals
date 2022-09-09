@@ -3,6 +3,8 @@ package com.almostreliable.summoningrituals.util;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +39,11 @@ public final class GameUtils {
 
     public static void spawnEntity(Level level, Entity entity) {
         level.addFreshEntity(entity);
+    }
+
+    public static void playSound(@Nullable Level level, BlockPos pos, SoundEvent sound) {
+        if (level == null) return;
+        level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.5f, 1f);
     }
 
     public static void renderCount(PoseStack stack, String text, int x, int y) {

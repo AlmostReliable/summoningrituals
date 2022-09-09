@@ -37,6 +37,10 @@ public final class MathUtils {
         return new Vector3f[][]{north, south, west, east};
     }
 
+    public static float modifier(float current, float max, float fallback) {
+        return max == 0 ? fallback : current / max;
+    }
+
     private static Vector3f getOppositeVector(Vector3f vector) {
         return new Vector3f(16 - vector.x(), vector.y(), 16 - vector.z());
     }
@@ -44,9 +48,5 @@ public final class MathUtils {
     private static Vector3f getNeighborVector(Vector3f vector1) {
         var vector2 = getOppositeVector(vector1);
         return new Vector3f(vector2.z(), vector1.y(), vector1.x());
-    }
-
-    public static float modifier(float current, float max, float fallback) {
-        return max == 0 ? fallback : current / max;
     }
 }

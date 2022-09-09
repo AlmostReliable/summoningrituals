@@ -24,6 +24,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -116,6 +117,7 @@ public class AltarEntity extends BlockEntity {
         }
 
         var remaining = inventory.handleInsertion(stack);
+        GameUtils.playSound(level, worldPosition, SoundEvents.ITEM_PICKUP);
         if (player != null) player.setItemInHand(InteractionHand.MAIN_HAND, remaining);
         return remaining;
     }
@@ -157,6 +159,7 @@ public class AltarEntity extends BlockEntity {
             if (inventory.handleRecipe(currentRecipe)) {
                 currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
                 SUMMONING_COMPLETE.invoke(level, worldPosition, currentRecipe, invokingPlayer);
+                GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
                 resetSummoning(false);
             } else {
                 TextUtils.sendPlayerMessage(invokingPlayer, Constants.INVALID, ChatFormatting.RED);
@@ -207,6 +210,7 @@ public class AltarEntity extends BlockEntity {
             !recipe.getDayTime().check(level, player) ||
             !recipe.getWeather().check(level, player)) {
             inventory.popLastInserted();
+            GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
             return;
         }
 
@@ -217,6 +221,7 @@ public class AltarEntity extends BlockEntity {
         currentRecipe = recipe;
         invokingPlayer = player;
         processTime = recipe.getRecipeTime();
+        GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
         trackingChunkPacket(new ProcessTimeUpdatePacket(worldPosition, processTime));
     }
 
