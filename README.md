@@ -21,6 +21,50 @@ This mod does not add any recipes by default.
 
 Summoning Rituals has a native [KubeJS] integration and also supports datapacks.
 
+<details>
+  <summary>Preview</summary>
+
+  https://user-images.githubusercontent.com/16513358/189552459-67e2dd38-528a-471a-9325-36b6fe7e83ff.mp4
+
+  ```js
+onEvent('recipes', event => {
+    event.recipes.summoningrituals
+        .altar('iron_ingot')
+        .itemOutput('3x gold_ingot')
+        .itemOutput('diamond')
+        .mobOutput('wolf')
+        .mobOutput(
+            SummoningOutput.mob('blaze')
+                .count(5)
+                .offset(0, 3, 0)
+                .spread(4, 0, 4)
+                .data({ Health: 50, Attributes: [{ Name: 'generic.max_health', Base: 50 }] })
+        )
+        .input('64x minecraft:stone')
+        .input('5x prismarine_shard')
+        .input('10x amethyst_shard')
+        .input(Ingredient.of('#forge:glass'))
+        .sacrifice('pig', 3)
+        .sacrifice('sheep')
+        .sacrifice('cow')
+        .sacrificeRegion(3, 3)
+        .recipeTime(200)
+        .blockBelow('minecraft:furnace', { lit: true })
+        .weather('clear')
+        .dayTime('day');
+});
+
+onEvent('summoningrituals.start', event => {
+    event.level.spawnLightning(event.pos.x, event.pos.y, event.pos.z, true);
+});
+
+onEvent('summoningrituals.complete', event => {
+    event.player.addXPLevels(10);
+});
+  ```
+
+</details>
+
 ## **🔧 Manual Installation**
 1. Download the latest **mod jar** from the [releases], from [CurseForge] or from [Modrinth].
 2. Install Minecraft [Forge].
