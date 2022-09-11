@@ -66,14 +66,12 @@ public class AltarEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(tag.getCompound(Constants.INVENTORY));
-        if (tag.contains(Constants.PROGRESS)) progress = tag.getInt(Constants.PROGRESS);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put(Constants.INVENTORY, inventory.serializeNBT());
-        if (progress > 0) tag.putInt(Constants.PROGRESS, progress);
     }
 
     @Nullable
@@ -147,10 +145,12 @@ public class AltarEntity extends BlockEntity {
     void tick() {
         if (level == null) return;
 
-        if (progress > 0 && currentRecipe == null) {
-            progress = 0;
+        if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
             var recipe = findRecipe();
-            if (recipe == null) return;
+            if (recipe == null) {
+                resetSummoning(true);
+                return;
+            }
             handleSummoning(recipe, null);
         }
         if (currentRecipe == null) return;
