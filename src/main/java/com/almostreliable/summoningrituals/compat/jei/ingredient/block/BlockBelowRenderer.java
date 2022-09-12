@@ -29,12 +29,14 @@ public class BlockBelowRenderer implements IIngredientRenderer<BlockState> {
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
     private final Map<Integer, List<Component>> tooltipCache;
+    private final Map<Integer, List<Component>> tooltipCacheAdvanced;
     private final int size;
 
     public BlockBelowRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
         tooltipCache = new HashMap<>();
+        tooltipCacheAdvanced = new HashMap<>();
         this.size = size;
     }
 
@@ -67,7 +69,7 @@ public class BlockBelowRenderer implements IIngredientRenderer<BlockState> {
         var stack = new ItemStack(blockBelow.getBlock());
         try {
             var stateId = Block.getId(blockBelow);
-            var tooltip = tooltipCache.get(stateId);
+            var tooltip = getTooltipCache(tooltipFlag).get(stateId);
             if (tooltip != null) return tooltip;
 
             tooltip = stack.getTooltipLines(mc.player, tooltipFlag);
@@ -78,7 +80,7 @@ public class BlockBelowRenderer implements IIngredientRenderer<BlockState> {
                     .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
             );
             constructTooltip(blockBelow, tooltip);
-            tooltipCache.put(stateId, tooltip);
+            getTooltipCache(tooltipFlag).put(stateId, tooltip);
             return tooltip;
         } catch (Exception e) {
             return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
@@ -94,6 +96,10 @@ public class BlockBelowRenderer implements IIngredientRenderer<BlockState> {
     @Override
     public int getHeight() {
         return size;
+    }
+
+    private Map<Integer, List<Component>> getTooltipCache(TooltipFlag flag) {
+        return flag.isAdvanced() ? tooltipCacheAdvanced : tooltipCache;
     }
 
     private void constructTooltip(BlockState blockBelow, List<Component> tooltip) {
