@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## [1.0.0] - 2022-09-XX
+## [1.0.0] - 2022-09-12
 
 Initial release!
 
@@ -14,4 +14,4 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-3.0.0-beta
+[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.0.0
