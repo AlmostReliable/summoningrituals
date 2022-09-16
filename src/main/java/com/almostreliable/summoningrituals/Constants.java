@@ -26,6 +26,7 @@ public final class Constants {
     public static final String NETWORK = "network";
     public static final String OFFSET = "offset";
     public static final String OUTPUTS = "outputs";
+    public static final String INDESTRUCTIBLE_ALTAR = "indestructible_altar";
     public static final String PROGRESS = "progress";
     public static final String PROPERTIES = "properties";
     public static final String RECIPE_TIME = "recipe_time";

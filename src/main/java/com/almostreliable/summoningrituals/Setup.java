@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
+import com.almostreliable.summoningrituals.altar.IndestructibleAltarBlock;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import net.minecraft.core.Registry;
@@ -35,13 +36,18 @@ public final class Setup {
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
     public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(Constants.ALTAR, AltarBlock::new);
+    public static final RegistryObject<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = BLOCKS.register(Constants.INDESTRUCTIBLE_ALTAR, IndestructibleAltarBlock::new);
     public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         Constants.ALTAR,
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))
     );
+    public static final RegistryObject<Item> INDESTRUCTIBLE_ALTAR_ITEM = ITEMS.register(
+        Constants.INDESTRUCTIBLE_ALTAR,
+        () -> new BlockItem(INDESTRUCTIBLE_ALTAR_BLOCK.get(), new Properties().tab(TAB))
+    );
     public static final RegistryObject<BlockEntityType<AltarEntity>> ALTAR_ENTITY = BLOCK_ENTITIES.register(
         Constants.ALTAR,
-        () -> Builder.of(AltarEntity::new, ALTAR_BLOCK.get()).build(null)
+        () -> Builder.of(AltarEntity::new, ALTAR_BLOCK.get(), INDESTRUCTIBLE_ALTAR_BLOCK.get()).build(null)
     );
     public static final RecipeEntry<AltarRecipe> ALTAR_RECIPE = RecipeEntry.register(
         Constants.ALTAR,

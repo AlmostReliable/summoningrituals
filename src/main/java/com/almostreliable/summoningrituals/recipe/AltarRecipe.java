@@ -56,7 +56,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
 
     @Override
     public boolean matches(AltarInvWrapper inv, Level level) {
-        if (inv.getCatalyst().isEmpty() || inv.getInputs().isEmpty() || !catalyst.test(inv.getCatalyst())) {
+        if (inv.getCatalyst().isEmpty() || inv.getInputs().size() != this.inputs.size() || !catalyst.test(inv.getCatalyst())) {
             return false;
         }
 

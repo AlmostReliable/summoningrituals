@@ -52,6 +52,7 @@ public class AlmostJEI implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration r) {
         r.addRecipeCatalyst(new ItemStack(Setup.ALTAR_ITEM.get()), AltarCategory.TYPE);
+        r.addRecipeCatalyst(new ItemStack(Setup.INDESTRUCTIBLE_ALTAR_ITEM.get()), AltarCategory.TYPE);
     }
 
     public static final class AlmostTypes {

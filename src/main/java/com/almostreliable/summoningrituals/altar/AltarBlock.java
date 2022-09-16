@@ -38,13 +38,18 @@ import java.util.stream.Stream;
 
 public class AltarBlock extends Block implements EntityBlock {
 
-    static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
-    private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    private static final VoxelShape SHAPE = Stream.of(
+    public static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final VoxelShape SHAPE = Stream.of(
         Block.box(3, 0, 3, 13, 2, 13),
         Block.box(5, 2, 5, 11, 9, 11),
         Block.box(2, 9, 2, 14, 13, 14)
     ).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
+
+    public AltarBlock(Properties properties) {
+        super(properties);
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false));
+    }
 
     public AltarBlock() {
         super(Properties.of(Material.STONE).strength(2.5f).sound(SoundType.STONE));
@@ -135,7 +140,7 @@ public class AltarBlock extends Block implements EntityBlock {
         builder.add(FACING).add(ACTIVE);
     }
 
-    private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
+    protected void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
         level.addParticle(
             ParticleTypes.SOUL,
             x + vec.x() / 16f,
@@ -147,7 +152,7 @@ public class AltarBlock extends Block implements EntityBlock {
         );
     }
 
-    private void renderCandleInactive(Level level, int x, int y, int z, Vector3f vec) {
+    protected void renderCandleInactive(Level level, int x, int y, int z, Vector3f vec) {
         level.addParticle(ParticleTypes.SMALL_FLAME, x + vec.x() / 16f, y + vec.y() / 16f, z + vec.z() / 16f, 0, 0, 0);
     }
 }
