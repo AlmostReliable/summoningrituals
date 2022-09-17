@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## Unreleased
+
+### Added
+- an Indestructible Altar ([#1] by [wchen1990])
+  - can be used for structures or central places where players have to go for rituals without being able to break it
+
+### Changed
+- altar recipes no longer require at least one input item ([#1] by [wchen1990])
+  - this allows recipes with only sacrifices
+- recipe sacrifices now use the default region if none is specified in the recipe ([#1] by [wchen1990])
+- the active texture animation of the altar is now more seamless ([#1] by [wchen1990])
+
+<!-- Links -->
+[wchen1990]: https://github.com/wchen1990
+[#1]: https://github.com/AlmostReliable/summoningrituals-forge/pull/1
+
 ## [1.0.0] - 2022-09-12
 
 Initial release!
