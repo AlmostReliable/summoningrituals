@@ -43,7 +43,9 @@ public final class Setup {
     );
     public static final RegistryObject<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = BLOCKS.register(
         Constants.INDESTRUCTIBLE_ALTAR,
-        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE).strength(-1.0F, 3600000.0F).sound(SoundType.STONE))
+        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE)
+            .strength(-1.0f, 3_600_000.0f)
+            .sound(SoundType.STONE))
     );
     public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         Constants.ALTAR,
