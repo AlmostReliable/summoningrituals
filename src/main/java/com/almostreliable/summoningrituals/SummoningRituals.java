@@ -37,6 +37,7 @@ public class SummoningRituals {
     private static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(Setup.ALTAR_BLOCK.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(Setup.INDESTRUCTIBLE_ALTAR_BLOCK.get(), RenderType.cutout());
             BlockEntityRenderers.register(Setup.ALTAR_ENTITY.get(), AltarRenderer::new);
         });
     }
