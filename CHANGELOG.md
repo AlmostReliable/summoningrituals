@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning].
 - recipe sacrifices now use the default region if none is specified in the recipe ([#1] by [wchen1990])
 - the active texture animation of the altar is now more seamless ([#1] by [wchen1990])
 
+### Fixed
+- incompatibility with Chisels and Bits
+
 <!-- Links -->
 [wchen1990]: https://github.com/wchen1990
 [#1]: https://github.com/AlmostReliable/summoningrituals-forge/pull/1

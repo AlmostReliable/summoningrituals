@@ -10,6 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -25,7 +26,7 @@ public class SummoningRituals {
         modEventBus.addListener(SummoningRituals::onCommonSetup);
         modEventBus.addListener(SummoningRituals::onClientSetup);
         var forgeEventBus = MinecraftForge.EVENT_BUS;
-        forgeEventBus.addListener(SummoningRituals::onRightClick);
+        forgeEventBus.addListener(EventPriority.LOWEST, SummoningRituals::onRightClick);
         forgeEventBus.addListener(SummoningRituals::onLivingDrops);
         Setup.init(modEventBus);
     }
