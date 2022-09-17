@@ -40,7 +40,7 @@ public class RecipeSacrifices {
         for (var entity : mobs) {
             sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
         }
-        var zone = (json.has(Constants.REGION)) ?
+        var zone = json.has(Constants.REGION) ?
             SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.REGION))
             : DEFAULT_ZONE;
         return new RecipeSacrifices(sacrifices, zone);

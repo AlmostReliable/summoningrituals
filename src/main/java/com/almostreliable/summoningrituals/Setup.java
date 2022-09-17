@@ -2,7 +2,6 @@ package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.altar.AltarEntity;
-import com.almostreliable.summoningrituals.altar.IndestructibleAltarBlock;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import net.minecraft.core.Registry;
@@ -15,8 +14,11 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.*;
 
@@ -35,8 +37,14 @@ public final class Setup {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = createRegistry(ForgeRegistries.RECIPE_SERIALIZERS);
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
-    public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(Constants.ALTAR, AltarBlock::new);
-    public static final RegistryObject<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = BLOCKS.register(Constants.INDESTRUCTIBLE_ALTAR, IndestructibleAltarBlock::new);
+    public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(
+        Constants.ALTAR,
+        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.5f).sound(SoundType.STONE))
+    );
+    public static final RegistryObject<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = BLOCKS.register(
+        Constants.INDESTRUCTIBLE_ALTAR,
+        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE).strength(-1.0F, 3600000.0F).sound(SoundType.STONE))
+    );
     public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         Constants.ALTAR,
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))
