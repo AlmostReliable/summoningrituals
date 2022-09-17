@@ -45,9 +45,10 @@ public class SummoningRituals {
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
         var player = event.getPlayer();
         var item = player.getItemInHand(InteractionHand.MAIN_HAND);
+        var block = event.getWorld().getBlockState(event.getPos()).getBlock();
 
         if (((player.isShiftKeyDown() && item.isEmpty()) || (!player.isShiftKeyDown() && !item.isEmpty())) &&
-            event.getWorld().getBlockState(event.getPos()).getBlock().equals(Setup.ALTAR_BLOCK.get())) {
+            (block.equals(Setup.ALTAR_BLOCK.get()) || block.equals(Setup.INDESTRUCTIBLE_ALTAR_BLOCK.get()))) {
             event.setUseBlock(Result.ALLOW);
             event.setUseItem(Result.DENY);
             event.setCanceled(false);
