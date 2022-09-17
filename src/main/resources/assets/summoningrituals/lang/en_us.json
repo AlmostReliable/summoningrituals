@@ -2,6 +2,7 @@
   "itemGroup.summoningrituals": "Summoning Rituals",
 
   "block.summoningrituals.altar": "Summoning Altar",
+  "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
 
   "message.summoningrituals.progress": "The summoning ritual is already in progress.",
   "message.summoningrituals.day": "It needs to be daytime in order to start the ritual.",

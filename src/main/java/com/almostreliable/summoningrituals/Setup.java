@@ -14,8 +14,11 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.*;
 
@@ -34,14 +37,27 @@ public final class Setup {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = createRegistry(ForgeRegistries.RECIPE_SERIALIZERS);
 
     private static final Tab TAB = new Tab(BuildConfig.MOD_ID);
-    public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(Constants.ALTAR, AltarBlock::new);
+    public static final RegistryObject<AltarBlock> ALTAR_BLOCK = BLOCKS.register(
+        Constants.ALTAR,
+        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE).strength(2.5f).sound(SoundType.STONE))
+    );
+    public static final RegistryObject<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = BLOCKS.register(
+        Constants.INDESTRUCTIBLE_ALTAR,
+        () -> new AltarBlock(BlockBehaviour.Properties.of(Material.STONE)
+            .strength(-1.0f, 3_600_000.0f)
+            .sound(SoundType.STONE))
+    );
     public static final RegistryObject<Item> ALTAR_ITEM = ITEMS.register(
         Constants.ALTAR,
         () -> new BlockItem(ALTAR_BLOCK.get(), new Properties().tab(TAB))
     );
+    public static final RegistryObject<Item> INDESTRUCTIBLE_ALTAR_ITEM = ITEMS.register(
+        Constants.INDESTRUCTIBLE_ALTAR,
+        () -> new BlockItem(INDESTRUCTIBLE_ALTAR_BLOCK.get(), new Properties().tab(TAB))
+    );
     public static final RegistryObject<BlockEntityType<AltarEntity>> ALTAR_ENTITY = BLOCK_ENTITIES.register(
         Constants.ALTAR,
-        () -> Builder.of(AltarEntity::new, ALTAR_BLOCK.get()).build(null)
+        () -> Builder.of(AltarEntity::new, ALTAR_BLOCK.get(), INDESTRUCTIBLE_ALTAR_BLOCK.get()).build(null)
     );
     public static final RecipeEntry<AltarRecipe> ALTAR_RECIPE = RecipeEntry.register(
         Constants.ALTAR,
