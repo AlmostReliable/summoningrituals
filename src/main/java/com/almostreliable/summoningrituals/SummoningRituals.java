@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals;
 
+import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.altar.AltarRenderer;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -49,8 +50,7 @@ public class SummoningRituals {
         var item = player.getItemInHand(InteractionHand.MAIN_HAND);
         var block = event.getWorld().getBlockState(event.getPos()).getBlock();
 
-        if (((player.isShiftKeyDown() && item.isEmpty()) || (!player.isShiftKeyDown() && !item.isEmpty())) &&
-            (block.equals(Setup.ALTAR_BLOCK.get()) || block.equals(Setup.INDESTRUCTIBLE_ALTAR_BLOCK.get()))) {
+        if (player.isShiftKeyDown() == item.isEmpty() && block instanceof AltarBlock) {
             event.setUseBlock(Result.ALLOW);
             event.setUseItem(Result.DENY);
             event.setCanceled(false);
