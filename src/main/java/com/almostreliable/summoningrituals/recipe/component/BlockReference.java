@@ -34,7 +34,10 @@ public final class BlockReference implements Predicate<BlockState> {
     public static BlockReference fromJson(JsonObject json) {
         var blockId = new ResourceLocation(GsonHelper.getAsString(json, Constants.BLOCK));
         var block = SerializeUtils.blockFromId(blockId);
-        var properties = SerializeUtils.mapFromJson(json.getAsJsonObject(Constants.PROPERTIES));
+        Map<String, String> properties = new HashMap<>();
+        if (json.has(Constants.PROPERTIES)) {
+            properties = SerializeUtils.mapFromJson(json.getAsJsonObject(Constants.PROPERTIES));
+        }
         return new BlockReference(block, properties);
     }
 
@@ -48,7 +51,9 @@ public final class BlockReference implements Predicate<BlockState> {
     public JsonElement toJson() {
         var json = new JsonObject();
         json.addProperty(Constants.BLOCK, Bruhtils.getId(block).toString());
-        json.add(Constants.PROPERTIES, SerializeUtils.mapToJson(properties));
+        if (!properties.isEmpty()) {
+            json.add(Constants.PROPERTIES, SerializeUtils.mapToJson(properties));
+        }
         return json;
     }
 
