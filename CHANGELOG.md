@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [1.1.1] - 2022-09-25
+
+### Changed
+- improved the check for the block right-click event
+- block properties are now only read and written when necessary
+
 ## [1.1.0] - 2022-09-17
 
 ### Added
@@ -33,5 +39,6 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.1]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.1
 [1.1.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.0
 [1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.0.0
