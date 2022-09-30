@@ -1,0 +1,34 @@
+{
+  "itemGroup.summoningrituals": "召唤仪式",
+
+  "block.summoningrituals.altar": "召唤祭坛",
+  "block.summoningrituals.indestructible_altar": "坚固的召唤祭坛",
+
+  "message.summoningrituals.progress": "召唤仪式已在进行中。",
+  "message.summoningrituals.day": "非白天不得进行仪式。",
+  "message.summoningrituals.night": "非夜晚不得进行仪式。",
+  "message.summoningrituals.clear": "非晴天不得进行仪式。",
+  "message.summoningrituals.rain": "非雨天不得进行仪式。",
+  "message.summoningrituals.thunder": "非雷暴天不得进行仪式。",
+  "message.summoningrituals.block_below": "祭坛下的方块未满足要求。",
+  "message.summoningrituals.sacrifices": "祭坛周围没有足够的祭品。",
+  "message.summoningrituals.invalid": "祭坛上没有包含所有必需的试剂。",
+
+  "label.summoningrituals.region": "区域",
+  "label.summoningrituals.outputs": "输出",
+
+  "tooltip.summoningrituals.catalyst": "催化剂",
+  "tooltip.summoningrituals.catalyst_desc": "在最后放入，激活仪式。",
+  "tooltip.summoningrituals.block_below": "下方的方块",
+  "tooltip.summoningrituals.properties": "相关属性",
+  "tooltip.summoningrituals.region": "祭坛周边生物作为祭品存在的有效范围",
+  "tooltip.summoningrituals.day_time": "所需时间",
+  "tooltip.summoningrituals.weather": "所需天气",
+
+  "day_time.summoningrituals.day": "白天",
+  "day_time.summoningrituals.night": "夜晚",
+
+  "weather.summoningrituals.clear": "晴天",
+  "weather.summoningrituals.rain": "雨天",
+  "weather.summoningrituals.thunder": "雷暴天"
+}
