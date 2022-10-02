@@ -4,12 +4,15 @@ import com.almostreliable.summoningrituals.util.GameUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import mezz.jei.api.ingredients.IIngredientRenderer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.TooltipFlag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MobRenderer implements IIngredientRenderer<MobIngredient> {
@@ -55,7 +58,12 @@ public class MobRenderer implements IIngredientRenderer<MobIngredient> {
 
     @Override
     public List<Component> getTooltip(MobIngredient mob, TooltipFlag tooltipFlag) {
-        return List.of(mob.getDisplayName());
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(mob.getDisplayName());
+        if (tooltipFlag.isAdvanced()) {
+            tooltip.add(mob.getRegistryName().withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return tooltip;
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.almostreliable.summoningrituals.compat.jei.ingredient.mob;
 
+import com.almostreliable.summoningrituals.util.Bruhtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -35,6 +37,10 @@ public class MobIngredient {
     Component getDisplayName() {
         if (entity == null) return new TextComponent("Unknown Entity");
         return entity.getDisplayName();
+    }
+
+    MutableComponent getRegistryName() {
+        return new TextComponent(Bruhtils.getId(mob).toString());
     }
 
     EntityType<?> getEntityType() {
