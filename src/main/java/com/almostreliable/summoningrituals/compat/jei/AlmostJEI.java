@@ -1,11 +1,12 @@
 package com.almostreliable.summoningrituals.compat.jei;
 
 import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowHelper;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockReferenceHelper;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockReferenceRenderer;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobHelper;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobIngredient;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobRenderer;
+import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import mezz.jei.api.IModPlugin;
@@ -17,7 +18,6 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class AlmostJEI implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration r) {
-        r.register(AlmostTypes.BLOCK_BELOW, List.of(), new BlockBelowHelper(), new BlockBelowRenderer(16));
+        r.register(AlmostTypes.BLOCK_REFERENCE, List.of(), new BlockReferenceHelper(), new BlockReferenceRenderer(16));
         r.register(AlmostTypes.MOB, List.of(), new MobHelper(), new MobRenderer(16));
     }
 
@@ -56,7 +56,7 @@ public class AlmostJEI implements IModPlugin {
     }
 
     public static final class AlmostTypes {
-        public static final IIngredientType<BlockState> BLOCK_BELOW = () -> BlockState.class;
+        public static final IIngredientType<BlockReference> BLOCK_REFERENCE = () -> BlockReference.class;
         public static final IIngredientType<MobIngredient> MOB = () -> MobIngredient.class;
 
         private AlmostTypes() {}

@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.jei;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Setup;
 import com.almostreliable.summoningrituals.compat.jei.AlmostJEI.AlmostTypes;
-import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockBelowRenderer;
+import com.almostreliable.summoningrituals.compat.jei.ingredient.block.BlockReferenceRenderer;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.item.AltarRenderer;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.item.CatalystRenderer;
 import com.almostreliable.summoningrituals.compat.jei.ingredient.mob.MobIngredient;
@@ -54,7 +54,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
     private final AltarRenderer altarRenderer;
     private final CatalystRenderer catalystRenderer;
-    private final BlockBelowRenderer blockBelowRenderer;
+    private final BlockReferenceRenderer blockReferenceRenderer;
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -74,7 +74,7 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
 
         altarRenderer = new AltarRenderer(BLOCK_SLOT_SIZE - 2);
         catalystRenderer = new CatalystRenderer(ITEM_SLOT_SIZE - 2);
-        blockBelowRenderer = new BlockBelowRenderer(BLOCK_SLOT_SIZE - 2);
+        blockReferenceRenderer = new BlockReferenceRenderer(BLOCK_SLOT_SIZE - 2);
 
         spriteSlot = spriteTexture(guiHelper, 0, SPRITE_SLOT_SIZE, SPRITE_SLOT_SIZE);
         daySprite = spriteTexture(guiHelper, SPRITE_SLOT_SIZE, SPRITE_SIZE, SPRITE_SIZE);
@@ -135,8 +135,8 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
                     CENTER_X - BLOCK_SLOT_SIZE / 2,
                     RENDER_Y - 3
                 )
-                .setCustomRenderer(AlmostTypes.BLOCK_BELOW, blockBelowRenderer)
-                .addIngredient(AlmostTypes.BLOCK_BELOW, recipe.getBlockBelow().getDisplayState());
+                .setCustomRenderer(AlmostTypes.BLOCK_REFERENCE, blockReferenceRenderer)
+                .addIngredient(AlmostTypes.BLOCK_REFERENCE, recipe.getBlockBelow());
         }
 
         builder.addSlot(
