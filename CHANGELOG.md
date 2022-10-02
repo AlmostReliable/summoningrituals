@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [1.1.2] - 2022-10-02
+
+### Added
+- simplified Chinese translation ([#4])
+
+### Fixed
+- crash with Blue Skies ([#5], [#6])
+
+<!-- Links -->
+[#4]: https://github.com/AlmostReliable/summoningrituals-forge/pull/4
+[#5]: https://github.com/AlmostReliable/summoningrituals-forge/issues/5
+[#6]: https://github.com/AlmostReliable/summoningrituals-forge/pull/6
+
 ## [1.1.1] - 2022-09-25
 
 ### Changed
@@ -39,6 +52,7 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.2]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.2
 [1.1.1]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.1
 [1.1.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.0
 [1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.0.0
