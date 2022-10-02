@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
+## [1.1.3] - 2022-10-03
 
-- added entity id to JEI ingredient when advanced tooltips are enabled
-- fix block rendering depth checks and move closer to camera
-- fix mod name being shown twice in block below tooltip
+#### Added
+- entity ID to JEI ingredient when advanced tooltips are enabled
+
+### Fixed
+- block rendering depth checks and camera distance ([#7])
+- mod name being shown twice in block below tooltip
+
+<!-- LINKS -->
+[#7]: https://github.com/AlmostReliable/summoningrituals-forge/issues/7
 
 ## [1.1.2] - 2022-10-02
 
@@ -58,6 +64,7 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.3]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.3
 [1.1.2]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.2
 [1.1.1]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.1
 [1.1.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.0
