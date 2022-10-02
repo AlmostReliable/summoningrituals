@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning].
 
 - added entity id to JEI ingredient when advanced tooltips are enabled
 - fix block rendering depth checks and move closer to camera
+- fix mod name being shown twice in block below tooltip
 
 ## [1.1.2] - 2022-10-02
 

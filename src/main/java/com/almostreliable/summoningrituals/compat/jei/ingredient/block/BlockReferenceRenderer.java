@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.jei.ingredient.block;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+import com.almostreliable.summoningrituals.util.Bruhtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -13,31 +14,26 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BlockReferenceRenderer implements IIngredientRenderer<BlockReference> {
 
     private final Minecraft mc;
     private final BlockRenderDispatcher blockRenderer;
-    private final Map<Integer, List<Component>> tooltipCache;
-    private final Map<Integer, List<Component>> tooltipCacheAdvanced;
     private final int size;
 
     public BlockReferenceRenderer(int size) {
         mc = Minecraft.getInstance();
         blockRenderer = mc.getBlockRenderer();
-        tooltipCache = new HashMap<>();
-        tooltipCacheAdvanced = new HashMap<>();
         this.size = size;
     }
 
@@ -73,21 +69,20 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
 
     @Override
     public List<Component> getTooltip(BlockReference blockReference, TooltipFlag tooltipFlag) {
-        var stack = new ItemStack(blockReference.getDisplayState().getBlock());
+        var displayState = blockReference.getDisplayState();
+        var stack = new ItemStack(displayState.getBlock());
         try {
-            var stateId = Block.getId(blockReference.getDisplayState());
-            var tooltip = getTooltipCache(tooltipFlag).get(stateId);
-            if (tooltip != null) return tooltip;
-
-            tooltip = stack.getTooltipLines(mc.player, tooltipFlag);
-            tooltip.set(
-                0,
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(
                 TextUtils.translate(Constants.TOOLTIP, Constants.BLOCK_BELOW, ChatFormatting.GOLD)
                     .append(": ")
-                    .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
+                    .append(((MutableComponent) stack.getHoverName()).withStyle(ChatFormatting.WHITE))
             );
-            constructTooltip(blockReference, tooltip);
-            getTooltipCache(tooltipFlag).put(stateId, tooltip);
+            if (tooltipFlag.isAdvanced()) {
+                tooltip.add(new TextComponent(Bruhtils.getId(stack.getItem())
+                    .toString()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+            appendStateTooltip(displayState, tooltip);
             return tooltip;
         } catch (Exception e) {
             return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
@@ -105,16 +100,12 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
         return size;
     }
 
-    private Map<Integer, List<Component>> getTooltipCache(TooltipFlag flag) {
-        return flag.isAdvanced() ? tooltipCacheAdvanced : tooltipCache;
-    }
-
-    private void constructTooltip(BlockReference blockReference, List<Component> tooltip) {
-        var defaultState = blockReference.getDisplayState().getBlock().defaultBlockState();
+    private void appendStateTooltip(BlockState displayState, List<Component> tooltip) {
+        var defaultState = displayState.getBlock().defaultBlockState();
         List<String> modifiedProps = new ArrayList<>();
-        for (var property : blockReference.getDisplayState().getProperties()) {
-            if (!blockReference.getDisplayState().getValue(property).equals(defaultState.getValue(property))) {
-                modifiedProps.add(property.getName() + ": " + blockReference.getDisplayState().getValue(property));
+        for (var property : displayState.getProperties()) {
+            if (!displayState.getValue(property).equals(defaultState.getValue(property))) {
+                modifiedProps.add(property.getName() + ": " + displayState.getValue(property));
             }
         }
         if (modifiedProps.isEmpty()) return;
