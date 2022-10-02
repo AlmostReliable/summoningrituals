@@ -19,6 +19,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,15 +42,19 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
     }
 
     @Override
-    public void render(PoseStack stack, BlockReference blockReference) {
+    public void render(PoseStack stack, @Nullable BlockReference blockReference) {
+        if (blockReference == null) return;
         stack.pushPose();
         {
-            stack.translate(0.93f * size, 0.77f * size, 0);
+            RenderSystem.disableDepthTest();
+            RenderSystem.depthMask(false);
+            RenderSystem.defaultBlendFunc();
+
+            stack.translate(0.93f * size, 0.77f * size, 100);
             stack.scale(0.625f * size, 0.625f * size, 0.625f * size);
             stack.mulPose(Vector3f.ZN.rotationDegrees(180));
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
-            RenderSystem.disableDepthTest();
             var bufferSource = mc.renderBuffers().bufferSource();
             blockRenderer.renderSingleBlock(
                 blockReference.getDisplayState(),
@@ -60,6 +65,8 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
                 EmptyModelData.INSTANCE
             );
             bufferSource.endBatch();
+            RenderSystem.depthMask(true);
+            RenderSystem.enableDepthTest();
         }
         stack.popPose();
     }

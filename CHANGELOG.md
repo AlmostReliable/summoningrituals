@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning].
 ## Unreleased
 
 - added entity id to JEI ingredient when advanced tooltips are enabled
+- fix block rendering depth checks and move closer to camera
 
 ## [1.1.2] - 2022-10-02
 
