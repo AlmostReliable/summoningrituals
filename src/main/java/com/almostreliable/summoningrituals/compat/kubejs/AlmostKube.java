@@ -38,6 +38,11 @@ public class AlmostKube extends KubeJSPlugin {
     }
 
     @Override
+    public void registerEvents() {
+        GROUP.register();
+    }
+
+    @Override
     public void registerBindings(BindingsEvent event) {
         if (event.type != ScriptType.SERVER) return;
         event.add("SummoningOutput", OutputWrapper.class);
@@ -53,11 +58,6 @@ public class AlmostKube extends KubeJSPlugin {
     @Override
     public void registerRecipeTypes(RegisterRecipeTypesEvent event) {
         event.register(TextUtils.getRL(Constants.ALTAR), AltarRecipeJS::new);
-    }
-
-    @Override
-    public void registerEvents() {
-        GROUP.register();
     }
 
     @SuppressWarnings("WeakerAccess")

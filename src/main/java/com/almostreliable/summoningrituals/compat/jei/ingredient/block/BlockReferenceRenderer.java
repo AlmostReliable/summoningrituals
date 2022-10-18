@@ -51,7 +51,7 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
             var bufferSource = mc.renderBuffers().bufferSource();
-            //noinspection ConstantConditions
+            // noinspection ConstantConditions
             blockRenderer.renderSingleBlock(
                 blockReference.getDisplayState(),
                 stack,
