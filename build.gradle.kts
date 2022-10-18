@@ -10,13 +10,16 @@ val modBase: String by project
 val modAuthor: String by project
 val modDescription: String by project
 val modCredits: String by project
+val license: String by project
+val extraModsDirectory: String by project
+val recipeViewer: String by project
+val reiVersion: String by project
 val mcVersion: String by project
 val mcVersionRange: String by project
 val forgeVersion: String by project
 val forgeVersionRange: String by project
 val mappingsChannel: String by project
 val mappingsVersion: String by project
-val license: String by project
 val githubUser: String by project
 val githubRepo: String by project
 val jeiVersion: String by project
@@ -26,6 +29,7 @@ val kubeVersionRange: String by project
 
 plugins {
     id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
+    id("io.github.juuxel.loom-quiltflower") version "1.7.4"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
     java
     idea
@@ -57,6 +61,10 @@ loom {
     forge {
         mixinConfig("$modId.mixins.json")
     }
+
+    mixin {
+        defaultRefmapName.set("$modId.refmap.json")
+    }
 }
 
 repositories {
@@ -64,25 +72,31 @@ repositories {
     maven("https://dvs1.progwml6.com/files/maven/")
     maven("https://maven.saps.dev/minecraft")
     flatDir {
-        name = "extra-mods"
-        dir(file("extra-mods-$mcVersion"))
+        name = extraModsDirectory
+        dir(file("$extraModsDirectory-$mcVersion"))
     }
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:$mcVersion")
+    forge("net.minecraftforge:forge:$mcVersion-$forgeVersion")
     mappings(loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:$mappingsChannel-$mcVersion:$mappingsVersion@zip")
     })
-    forge("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
     modCompileOnlyApi("mezz.jei:jei-$mcVersion:$jeiVersion:api")
     modLocalRuntime("mezz.jei:jei-$mcVersion:$jeiVersion")
 
     modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")!!)
 
-    fileTree("extra-mods-$mcVersion") { include("**/*.jar") }
+    when (recipeViewer) {
+        "rei" -> modLocalRuntime("me.shedaniel:RoughlyEnoughItems-forge:$reiVersion")
+        "jei" -> modLocalRuntime("mezz.jei:jei-$mcVersion-forge:$jeiVersion") { isTransitive = false }
+        else -> throw GradleException("Invalid recipeViewer value: $recipeViewer")
+    }
+
+    fileTree("$extraModsDirectory-$mcVersion") { include("**/*.jar") }
         .forEach { f ->
             val sepIndex = f.nameWithoutExtension.lastIndexOf('-')
             if (sepIndex == -1) {
@@ -91,26 +105,19 @@ dependencies {
             val mod = f.nameWithoutExtension.substring(0, sepIndex)
             val version = f.nameWithoutExtension.substring(sepIndex + 1)
             println("Extra mod $mod with version $version detected")
-            modLocalRuntime("extra-mods:$mod:$version")
+            modLocalRuntime("$extraModsDirectory:$mod:$version")
         }
 }
 
 tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-        options.release.set(17)
-    }
-    withType<GenerateModuleMetadata> {
-        enabled = false
-    }
     jar {
         manifest {
             attributes(
                 "Specification-Title" to modName,
                 "Specification-Vendor" to modAuthor,
-                "Specification-Version" to "1",
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to modVersion,
+                "Specification-Version" to archiveVersion,
+                "Implementation-Title" to name,
+                "Implementation-Version" to archiveVersion,
                 "Implementation-Vendor" to modAuthor,
                 "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
                 "Timestamp" to System.currentTimeMillis(),
@@ -122,15 +129,15 @@ tasks {
     processResources {
         val resourceTargets = listOf("META-INF/mods.toml", "pack.mcmeta")
         val replaceProperties = mapOf(
+            "version" to version as String,
             "modId" to modId,
             "modName" to modName,
-            "modVersion" to modVersion,
             "modAuthor" to modAuthor,
             "modDescription" to modDescription,
             "modCredits" to modCredits,
+            "license" to license,
             "mcVersionRange" to mcVersionRange,
             "forgeVersionRange" to forgeVersionRange,
-            "license" to license,
             "githubUser" to githubUser,
             "githubRepo" to githubRepo,
             "jeiVersionRange" to jeiVersionRange,
@@ -142,6 +149,13 @@ tasks {
             expand(replaceProperties)
         }
     }
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(17)
+    }
+    withType<GenerateModuleMetadata> {
+        enabled = false
+    }
 }
 
 extensions.configure<JavaPluginExtension> {
@@ -149,10 +163,8 @@ extensions.configure<JavaPluginExtension> {
 }
 
 buildConfig {
-    buildConfigField("String", "MOD_ID", "\"$modId\"")
-    buildConfigField("String", "MOD_VERSION", "\"$modVersion\"")
-    buildConfigField("String", "MOD_NAME", "\"$modName\"")
-    buildConfigField("String", "MOD_GROUP", "\"$modBase.$modId\"")
-
-    packageName("$modBase.$modId")
+    buildConfigField("String", "MOD_ID", "\"${modId}\"")
+    buildConfigField("String", "MOD_VERSION", "\"${version}\"")
+    buildConfigField("String", "MOD_NAME", "\"${modName}\"")
+    packageName(group as String)
 }
