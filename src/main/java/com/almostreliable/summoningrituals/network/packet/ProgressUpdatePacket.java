@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.network.packet;
 
-import com.almostreliable.summoningrituals.network.ClientHandler;
+import com.almostreliable.summoningrituals.altar.AltarEntity;
 import com.almostreliable.summoningrituals.network.ServerToClientPacket;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -33,14 +33,7 @@ public class ProgressUpdatePacket extends ServerToClientPacket<ProgressUpdatePac
 
     @Override
     protected void handlePacket(ProgressUpdatePacket packet, ClientLevel level) {
-        ClientHandler.handleProgressUpdate(packet, level);
-    }
-
-    public BlockPos getPos() {
-        return pos;
-    }
-
-    public int getProgress() {
-        return progress;
+        if (!(level.getBlockEntity(packet.pos) instanceof AltarEntity altar)) return;
+        altar.setProgress(packet.progress);
     }
 }

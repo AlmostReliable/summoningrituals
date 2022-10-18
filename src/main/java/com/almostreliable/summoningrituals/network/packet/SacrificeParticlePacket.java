@@ -1,12 +1,13 @@
 package com.almostreliable.summoningrituals.network.packet;
 
-import com.almostreliable.summoningrituals.network.ClientHandler;
 import com.almostreliable.summoningrituals.network.ServerToClientPacket;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class SacrificeParticlePacket extends ServerToClientPacket<SacrificeParticlePacket> {
@@ -39,10 +40,19 @@ public class SacrificeParticlePacket extends ServerToClientPacket<SacrificeParti
 
     @Override
     protected void handlePacket(SacrificeParticlePacket packet, ClientLevel level) {
-        ClientHandler.handleSacrificeParticle(packet, level);
-    }
-
-    public List<BlockPos> getPositions() {
-        return positions;
+        var random = new Random();
+        for (var pos : packet.positions) {
+            for (var i = 0; i < 10; i++) {
+                level.addParticle(
+                    ParticleTypes.SOUL,
+                    pos.getX() + random.nextFloat(),
+                    pos.getY() + random.nextFloat(),
+                    pos.getZ() + random.nextFloat(),
+                    0,
+                    0.05f,
+                    0
+                );
+            }
+        }
     }
 }
