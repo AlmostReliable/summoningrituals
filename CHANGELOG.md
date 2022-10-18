@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [1.1.4] - 2022-10-18
+
+### Fixed
+- altar ingredients cache not being correctly reset on reload
+
 ## [1.1.3] - 2022-10-03
 
 #### Added
@@ -64,6 +69,7 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.4]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.4
 [1.1.3]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.3
 [1.1.2]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.2
 [1.1.1]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.1
