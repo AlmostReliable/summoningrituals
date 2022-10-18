@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.network.packet;
 
-import com.almostreliable.summoningrituals.network.ClientHandler;
+import com.almostreliable.summoningrituals.altar.AltarEntity;
 import com.almostreliable.summoningrituals.network.ServerToClientPacket;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -33,14 +33,7 @@ public class ProcessTimeUpdatePacket extends ServerToClientPacket<ProcessTimeUpd
 
     @Override
     protected void handlePacket(ProcessTimeUpdatePacket packet, ClientLevel level) {
-        ClientHandler.handleProcessTimeUpdate(packet, level);
-    }
-
-    public BlockPos getPos() {
-        return pos;
-    }
-
-    public int getProcessTime() {
-        return processTime;
+        if (!(level.getBlockEntity(packet.pos) instanceof AltarEntity altar)) return;
+        altar.setProcessTime(packet.processTime);
     }
 }
