@@ -2,8 +2,8 @@ package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ public class Observable {
 
     private final List<Observer> observers = new ArrayList<>();
 
-    public boolean invoke(Level level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
+    public boolean invoke(ServerLevel level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
         for (var o : observers) {
-            if (!o.run(level, pos, recipe, player)) return false;
+            if (o.run(level, pos, recipe, player)) return false;
         }
         return true;
     }
@@ -26,6 +26,6 @@ public class Observable {
 
     @FunctionalInterface
     public interface Observer {
-        boolean run(Level level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player);
+        boolean run(ServerLevel level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player);
     }
 }

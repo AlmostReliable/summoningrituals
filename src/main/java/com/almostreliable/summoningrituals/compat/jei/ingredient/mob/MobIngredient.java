@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.SpawnEggItem;
@@ -35,12 +34,12 @@ public class MobIngredient {
     }
 
     Component getDisplayName() {
-        if (entity == null) return new TextComponent("Unknown Entity");
+        if (entity == null) return Component.literal("Unknown Entity");
         return entity.getDisplayName();
     }
 
     MutableComponent getRegistryName() {
-        return new TextComponent(Bruhtils.getId(mob).toString());
+        return Component.literal(Bruhtils.getId(mob).toString());
     }
 
     EntityType<?> getEntityType() {

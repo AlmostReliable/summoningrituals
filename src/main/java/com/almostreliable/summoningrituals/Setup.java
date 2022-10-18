@@ -29,7 +29,7 @@ public final class Setup {
 
     private static final DeferredRegister<Block> BLOCKS = createRegistry(ForgeRegistries.BLOCKS);
     private static final DeferredRegister<Item> ITEMS = createRegistry(ForgeRegistries.ITEMS);
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = createRegistry(ForgeRegistries.BLOCK_ENTITIES);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = createRegistry(ForgeRegistries.BLOCK_ENTITY_TYPES);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(
         Registry.RECIPE_TYPE_REGISTRY,
         BuildConfig.MOD_ID
@@ -74,7 +74,7 @@ public final class Setup {
         RECIPE_SERIALIZERS.register(modEventBus);
     }
 
-    private static <T extends IForgeRegistryEntry<T>> DeferredRegister<T> createRegistry(IForgeRegistry<T> registry) {
+    private static <T> DeferredRegister<T> createRegistry(IForgeRegistry<T> registry) {
         return DeferredRegister.create(registry, BuildConfig.MOD_ID);
     }
 

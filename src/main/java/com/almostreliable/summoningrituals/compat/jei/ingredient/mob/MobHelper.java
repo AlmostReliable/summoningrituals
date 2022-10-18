@@ -25,18 +25,6 @@ public class MobHelper implements IIngredientHelper<MobIngredient> {
         return Bruhtils.getId(mob.getEntityType()).toString();
     }
 
-    @SuppressWarnings("removal")
-    @Override
-    public String getModId(MobIngredient mob) {
-        return Bruhtils.getId(mob.getEntityType()).getNamespace();
-    }
-
-    @SuppressWarnings("removal")
-    @Override
-    public String getResourceId(MobIngredient mob) {
-        return Bruhtils.getId(mob.getEntityType()).getPath();
-    }
-
     @Override
     public ResourceLocation getResourceLocation(MobIngredient mob) {
         return Bruhtils.getId(mob.getEntityType());

@@ -12,11 +12,12 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
-import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.recipe.*;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
-import dev.latvian.mods.kubejs.util.ListJS;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -26,9 +27,9 @@ import java.util.List;
 public class AltarRecipeJS extends RecipeJS {
 
     private final RecipeOutputs outputs = new RecipeOutputs();
-    private final List<IngredientJS> inputs = new ArrayList<>();
+    private final List<Ingredient> inputs = new ArrayList<>();
     private final RecipeSacrifices sacrifices = new RecipeSacrifices();
-    private IngredientJS catalyst;
+    private Ingredient catalyst;
     private int recipeTime = 100;
     @Nullable private BlockReference blockBelow;
     private AltarRecipe.DAY_TIME dayTime = AltarRecipe.DAY_TIME.ANY;
@@ -37,11 +38,11 @@ public class AltarRecipeJS extends RecipeJS {
     private boolean serialize;
 
     @Override
-    public void create(ListJS listJS) {
-        if (listJS.size() != 1) {
+    public void create(RecipeArguments args) {
+        if (args.size() != 1) {
             throw new IllegalArgumentException("missing catalyst");
         }
-        this.catalyst = IngredientJS.of(listJS.get(0));
+        this.catalyst = IngredientJS.of(args.get(0));
         serialize = true;
     }
 
@@ -82,6 +83,26 @@ public class AltarRecipeJS extends RecipeJS {
         ConsoleJS.SERVER.debug("Altar Recipe: " + json.toString());
     }
 
+    @Override
+    public boolean hasInput(IngredientMatch match) {
+        return false;
+    }
+
+    @Override
+    public boolean replaceInput(IngredientMatch match, Ingredient with, ItemInputTransformer transformer) {
+        return false;
+    }
+
+    @Override
+    public boolean hasOutput(IngredientMatch match) {
+        return false;
+    }
+
+    @Override
+    public boolean replaceOutput(IngredientMatch match, ItemStack with, ItemOutputTransformer transformer) {
+        return false;
+    }
+
     public AltarRecipeJS itemOutput(ItemOutputBuilder itemOutput) {
         outputs.add(itemOutput.build());
         return this;
@@ -92,7 +113,7 @@ public class AltarRecipeJS extends RecipeJS {
         return this;
     }
 
-    public AltarRecipeJS input(IngredientJS... ingredients) {
+    public AltarRecipeJS input(Ingredient... ingredients) {
         for (var ingredient : ingredients) {
             if (ingredient.isEmpty()) {
                 throw new IllegalArgumentException("ingredient is empty");

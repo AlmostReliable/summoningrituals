@@ -27,18 +27,6 @@ public class BlockReferenceHelper implements IIngredientHelper<BlockReference> {
         return Bruhtils.getId(blockReference.getDisplayState().getBlock()).toString();
     }
 
-    @SuppressWarnings("removal")
-    @Override
-    public String getModId(BlockReference blockReference) {
-        return Bruhtils.getId(blockReference.getDisplayState().getBlock()).getNamespace();
-    }
-
-    @SuppressWarnings("removal")
-    @Override
-    public String getResourceId(BlockReference blockReference) {
-        return Bruhtils.getId(blockReference.getDisplayState().getBlock()).getPath();
-    }
-
     @Override
     public ResourceLocation getResourceLocation(BlockReference blockReference) {
         return Bruhtils.getId(blockReference.getDisplayState().getBlock());

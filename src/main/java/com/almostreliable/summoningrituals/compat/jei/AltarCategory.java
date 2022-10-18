@@ -279,16 +279,4 @@ public class AltarCategory implements IRecipeCategory<AltarRecipe> {
         }
         return tooltip;
     }
-
-    @SuppressWarnings("removal")
-    @Override
-    public ResourceLocation getUid() {
-        return TYPE.getUid();
-    }
-
-    @SuppressWarnings("removal")
-    @Override
-    public Class<? extends AltarRecipe> getRecipeClass() {
-        return TYPE.getRecipeClass();
-    }
 }

@@ -8,54 +8,56 @@ import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOut
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
+import dev.latvian.mods.kubejs.event.EventGroup;
+import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.recipe.RegisterRecipeHandlersEvent;
+import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.rhino.util.wrap.TypeWrappers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
-
-import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 @SuppressWarnings("unused")
 public class AlmostKube extends KubeJSPlugin {
 
+    private static final EventGroup GROUP = EventGroup.of(BuildConfig.MOD_NAME.replace(" ", ""));
+    private static final EventHandler START = GROUP.server("start", () -> SummoningEventJS.class).cancelable();
+    private static final EventHandler COMPLETE = GROUP.server("complete", () -> SummoningEventJS.class);
+
     @Override
     public void init() {
-        AltarEntity.SUMMONING_START.register((level, pos, recipe, player) -> {
-            var event = new SummoningEventJS(true, level, pos, recipe, player);
-            event.post(ScriptType.SERVER, f("{}.start", BuildConfig.MOD_ID));
-            return !event.isCancelled();
-        });
-        AltarEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) -> {
-            new SummoningEventJS(false, level, pos, recipe, player).post(
-                ScriptType.SERVER,
-                f("{}.complete", BuildConfig.MOD_ID)
-            );
-            return true;
-        });
+        AltarEntity.SUMMONING_START.register((level, pos, recipe, player) ->
+            START.post(new SummoningEventJS(level, pos, recipe, player)));
+        AltarEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) ->
+            COMPLETE.post(new SummoningEventJS(level, pos, recipe, player)));
     }
 
     @Override
-    public void addBindings(BindingsEvent event) {
+    public void registerBindings(BindingsEvent event) {
         if (event.type != ScriptType.SERVER) return;
         event.add("SummoningOutput", OutputWrapper.class);
     }
 
     @Override
-    public void addTypeWrappers(ScriptType type, TypeWrappers typeWrappers) {
+    public void registerTypeWrappers(ScriptType type, TypeWrappers typeWrappers) {
         if (type != ScriptType.SERVER) return;
         typeWrappers.register(ItemOutputBuilder.class, OutputWrapper::item);
         typeWrappers.register(MobOutputBuilder.class, OutputWrapper::mob);
     }
 
     @Override
-    public void addRecipes(RegisterRecipeHandlersEvent event) {
+    public void registerRecipeTypes(RegisterRecipeTypesEvent event) {
         event.register(TextUtils.getRL(Constants.ALTAR), AltarRecipeJS::new);
+    }
+
+    @Override
+    public void registerEvents() {
+        GROUP.register();
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -65,11 +67,11 @@ public class AlmostKube extends KubeJSPlugin {
 
         public static ItemOutputBuilder item(@Nullable Object o) {
             if (o instanceof ItemOutputBuilder iob) return iob;
-            ItemStackJS stack = ItemStackJS.of(o);
+            ItemStack stack = ItemStackJS.of(o);
             if (stack.isEmpty()) {
                 ConsoleJS.SERVER.error("ItemStack is empty or null");
             }
-            return new ItemOutputBuilder(stack.getItemStack());
+            return new ItemOutputBuilder(stack);
         }
 
         public static MobOutputBuilder mob(@Nullable Object o) {

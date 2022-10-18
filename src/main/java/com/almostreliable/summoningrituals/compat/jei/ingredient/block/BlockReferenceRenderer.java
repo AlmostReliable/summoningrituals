@@ -15,11 +15,10 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -52,13 +51,15 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
             stack.mulPose(Vector3f.XN.rotationDegrees(30));
             stack.mulPose(Vector3f.YP.rotationDegrees(45));
             var bufferSource = mc.renderBuffers().bufferSource();
+            //noinspection ConstantConditions
             blockRenderer.renderSingleBlock(
                 blockReference.getDisplayState(),
                 stack,
                 bufferSource,
                 LightTexture.FULL_BRIGHT,
                 OverlayTexture.NO_OVERLAY,
-                EmptyModelData.INSTANCE
+                ModelData.EMPTY,
+                null
             );
             bufferSource.endBatch();
             RenderSystem.depthMask(true);
@@ -79,13 +80,13 @@ public class BlockReferenceRenderer implements IIngredientRenderer<BlockReferenc
                     .append(((MutableComponent) stack.getHoverName()).withStyle(ChatFormatting.WHITE))
             );
             if (tooltipFlag.isAdvanced()) {
-                tooltip.add(new TextComponent(Bruhtils.getId(stack.getItem())
+                tooltip.add(Component.literal(Bruhtils.getId(stack.getItem())
                     .toString()).withStyle(ChatFormatting.DARK_GRAY));
             }
             appendStateTooltip(displayState, tooltip);
             return tooltip;
         } catch (Exception e) {
-            return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
+            return List.of(Component.literal("Error rendering tooltip!").append(e.getMessage())
                 .withStyle(ChatFormatting.DARK_RED));
         }
     }

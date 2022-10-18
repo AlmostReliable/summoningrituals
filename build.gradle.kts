@@ -85,9 +85,8 @@ dependencies {
         parchment("org.parchmentmc.data:$mappingsChannel-$mcVersion:$mappingsVersion@zip")
     })
 
-    modCompileOnlyApi("mezz.jei:jei-$mcVersion:$jeiVersion:api")
-    modLocalRuntime("mezz.jei:jei-$mcVersion:$jeiVersion")
-
+    modCompileOnlyApi("mezz.jei:jei-$mcVersion-common-api:$jeiVersion") { isTransitive = false }
+    modCompileOnlyApi("mezz.jei:jei-$mcVersion-forge-api:$jeiVersion") { isTransitive = false }
     modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")!!)
 
     when (recipeViewer) {

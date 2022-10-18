@@ -4,8 +4,6 @@ import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -32,7 +30,7 @@ public class CatalystRenderer extends SizedItemRenderer {
             tooltip.add(TextUtils.translate(Constants.TOOLTIP, f("{}_desc", Constants.CATALYST), ChatFormatting.GRAY));
             return tooltip;
         } catch (RuntimeException | LinkageError e) {
-            return List.of(new TextComponent("Error rendering tooltip!").append(e.getMessage())
+            return List.of(Component.literal("Error rendering tooltip!").append(e.getMessage())
                 .withStyle(ChatFormatting.DARK_RED));
         }
     }

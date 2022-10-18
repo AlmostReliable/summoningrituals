@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -72,7 +71,7 @@ public final class SerializeUtils {
     }
 
     public static EntityType<?> mobFromId(@Nullable ResourceLocation id) {
-        return getFromRegistry(ForgeRegistries.ENTITIES, id);
+        return getFromRegistry(ForgeRegistries.ENTITY_TYPES, id);
     }
 
     public static EntityType<?> mobFromJson(JsonObject json) {
@@ -126,7 +125,7 @@ public final class SerializeUtils {
         }
     }
 
-    private static <T extends IForgeRegistryEntry<T>> T getFromRegistry(
+    private static <T> T getFromRegistry(
         IForgeRegistry<T> registry, @Nullable ResourceLocation id
     ) {
         if (id == null) {

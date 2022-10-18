@@ -2,24 +2,20 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import dev.latvian.mods.kubejs.level.LevelEventJS;
-import dev.latvian.mods.kubejs.level.LevelJS;
-import dev.latvian.mods.kubejs.player.ServerPlayerJS;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
 public class SummoningEventJS extends LevelEventJS {
 
-    private final boolean canCancel;
-    private final Level level;
+    private final ServerLevel level;
     private final BlockPos pos;
     private final AltarRecipe recipe;
     @Nullable private final ServerPlayer player;
 
-    SummoningEventJS(boolean canCancel, Level level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
-        this.canCancel = canCancel;
+    SummoningEventJS(ServerLevel level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
         this.level = level;
         this.pos = pos;
         this.recipe = recipe;
@@ -27,13 +23,8 @@ public class SummoningEventJS extends LevelEventJS {
     }
 
     @Override
-    public boolean canCancel() {
-        return canCancel;
-    }
-
-    @Override
-    public LevelJS getLevel() {
-        return levelOf(level);
+    public ServerLevel getLevel() {
+        return level;
     }
 
     public BlockPos getPos() {
@@ -45,7 +36,7 @@ public class SummoningEventJS extends LevelEventJS {
     }
 
     @Nullable
-    public ServerPlayerJS getPlayer() {
-        return (ServerPlayerJS) getLevel().getPlayer(player);
+    public ServerPlayer getPlayer() {
+        return player;
     }
 }

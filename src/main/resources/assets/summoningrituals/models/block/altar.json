@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench by mo_shark, optimized by Almost Reliable",
 	"parent": "block/block",
+  "render_type": "cutout",
 	"texture_size": [32, 32],
 	"textures": {
 		"texture": "summoningrituals:block/altar",
