@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [1.1.5] - 2022-11-01
+
+### Fixed
+- an extraction dupe bug when taking out items from the altar
+
 ## [1.1.4] - 2022-10-18
 
 ### Fixed
@@ -69,6 +74,7 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.5]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.5
 [1.1.4]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.4
 [1.1.3]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.3
 [1.1.2]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.2
