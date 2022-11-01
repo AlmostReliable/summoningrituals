@@ -260,28 +260,7 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (amount == 0) return ItemStack.EMPTY;
-        validateSlot(slot);
-
-        if (slot == items.size()) return ItemStack.EMPTY;
-        var current = items.get(slot);
-        if (current.isEmpty()) return ItemStack.EMPTY;
-        var toExtract = Math.min(amount, current.getMaxStackSize());
-
-        if (current.getCount() <= toExtract) {
-            if (!simulate) {
-                items.set(slot, ItemStack.EMPTY);
-                onContentsChanged();
-                return current;
-            }
-            return current.copy();
-        }
-        if (!simulate) {
-            items.set(slot, ItemHandlerHelper.copyStackWithSize(current, current.getCount() - toExtract));
-            onContentsChanged();
-        }
-
-        return ItemHandlerHelper.copyStackWithSize(current, toExtract);
+        return ItemStack.EMPTY;
     }
 
     @Override
