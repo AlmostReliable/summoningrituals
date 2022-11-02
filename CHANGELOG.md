@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## Unreleased
+
+### Fixed
+- a rare crash when an item was not resolved correctly from a recipe
+- some entities being not correctly rendered in recipe lookup
+
 ## [1.1.5] - 2022-11-01
 
 ### Fixed
