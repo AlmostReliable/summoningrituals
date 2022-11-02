@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
+## [1.1.6] - 2022-11-02
 
 ### Fixed
 - a rare crash when an item was not resolved correctly from a recipe
@@ -28,5 +28,6 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[1.1.6]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.6
 [1.1.5]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.5
 [1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.0.0
