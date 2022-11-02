@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class SizedItemRenderer implements IIngredientRenderer<ItemStack> {
@@ -24,7 +25,8 @@ public class SizedItemRenderer implements IIngredientRenderer<ItemStack> {
     }
 
     @Override
-    public void render(PoseStack stack, ItemStack item) {
+    public void render(PoseStack stack, @Nullable ItemStack item) {
+        if (item == null) return;
         PoseStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushPose();
         {
