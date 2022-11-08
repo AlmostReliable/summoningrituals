@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import net.fabricmc.loom.task.GenerateSourcesTask
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,9 +29,9 @@ val kubeVersion: String by project
 val kubeVersionRange: String by project
 
 plugins {
-    id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
+    id("dev.architectury.loom") version "1.0-SNAPSHOT"
     id("io.github.juuxel.loom-quiltflower") version "1.7.4"
-    id("com.github.gmazzo.buildconfig") version "3.0.3"
+    id("com.github.gmazzo.buildconfig") version "3.1.0"
     java
     idea
     eclipse
@@ -75,6 +76,7 @@ repositories {
         name = extraModsDirectory
         dir(file("$extraModsDirectory-$mcVersion"))
     }
+    mavenLocal()
 }
 
 dependencies {
@@ -145,6 +147,12 @@ tasks {
         inputs.properties(replaceProperties)
         filesMatching(resourceTargets) {
             expand(replaceProperties)
+        }
+    }
+    withType<GenerateSourcesTask> {
+        if (name != "genSourcesWithQuiltflower") {
+            dependsOn("genSourcesWithQuiltflower")
+            onlyIf { false }
         }
     }
     withType<JavaCompile> {
