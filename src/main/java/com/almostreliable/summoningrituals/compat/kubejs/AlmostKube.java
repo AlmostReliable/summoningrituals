@@ -44,15 +44,15 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void registerBindings(BindingsEvent event) {
-        if (event.type != ScriptType.SERVER) return;
+        if (event.getType() != ScriptType.SERVER) return;
         event.add("SummoningOutput", OutputWrapper.class);
     }
 
     @Override
     public void registerTypeWrappers(ScriptType type, TypeWrappers typeWrappers) {
         if (type != ScriptType.SERVER) return;
-        typeWrappers.register(ItemOutputBuilder.class, OutputWrapper::item);
-        typeWrappers.register(MobOutputBuilder.class, OutputWrapper::mob);
+        typeWrappers.registerSimple(ItemOutputBuilder.class, OutputWrapper::item);
+        typeWrappers.registerSimple(MobOutputBuilder.class, OutputWrapper::mob);
     }
 
     @Override
