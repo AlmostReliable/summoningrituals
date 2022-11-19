@@ -1,0 +1,34 @@
+{
+  "itemGroup.summoningrituals": "Beschwörungsrituale",
+
+  "block.summoningrituals.altar": "Beschwörungsaltar",
+  "block.summoningrituals.indestructible_altar": "Unzerstörbarer Beschwörungsaltar",
+
+  "message.summoningrituals.progress": "Das Beschwörungsritual ist bereits im Gange.",
+  "message.summoningrituals.day": "Es muss Tag sein, um das Ritual zu starten.",
+  "message.summoningrituals.night": "Es muss Nacht sein, um das Ritual zu starten.",
+  "message.summoningrituals.clear": "Das Wetter muss schön sein, um das Ritual zu starten.",
+  "message.summoningrituals.rain": "Es muss regnen, um das Ritual zu starten.",
+  "message.summoningrituals.thunder": "Es muss gewittern, um das Ritual zu starten.",
+  "message.summoningrituals.block_below": "Der Beschwörungsaltar steht nicht auf dem richtigen Block.",
+  "message.summoningrituals.sacrifices": "Es gibt nicht genug Opfergaben um den Beschwörungsaltar herum.",
+  "message.summoningrituals.invalid": "Der Beschwörungsaltar enthält nicht alle benötigten Reagenzien.",
+
+  "label.summoningrituals.region": "Region",
+  "label.summoningrituals.outputs": "Ausgaben",
+
+  "tooltip.summoningrituals.catalyst": "Katalysator",
+  "tooltip.summoningrituals.catalyst_desc": "Zuletzt einfügen, um Ritual zu starten.",
+  "tooltip.summoningrituals.block_below": "Block darunter",
+  "tooltip.summoningrituals.properties": "Relevante Eigenschaften",
+  "tooltip.summoningrituals.region": "Die Region um den Beschwörungsaltar, in der Mobs als Opfergaben gelten.",
+  "tooltip.summoningrituals.day_time": "Benötigte Zeit",
+  "tooltip.summoningrituals.weather": "Benötigtes Wetter",
+
+  "day_time.summoningrituals.day": "Tag",
+  "day_time.summoningrituals.night": "Nacht",
+
+  "weather.summoningrituals.clear": "Schön",
+  "weather.summoningrituals.rain": "Regen",
+  "weather.summoningrituals.thunder": "Gewitter"
+}
