@@ -5,10 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
-- lots of internal changes to support Fabric
-- added native REI support
+## [2.0.0] - 2022-12-20
+
+### Added
+- native REI support
+- invisible mob eggs to item lookup in recipe viewers
+
+### Changed
+- lots of internal changes to make Fabric support possible
 - improved performance when interacting with the altar
+- improved inventory handling
+
+### Fixed
+- some bugs with automation of rituals
 
 ## [1.1.7] - 2022-11-19
 
@@ -45,6 +54,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.0
 [1.1.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.7
 [1.1.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.6
 [1.1.5]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.5
