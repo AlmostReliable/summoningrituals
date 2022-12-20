@@ -37,7 +37,7 @@ public class SacrificeParticlePacket extends ServerToClientPacket<SacrificeParti
     @Override
     protected void handlePacket(SacrificeParticlePacket packet, ClientLevel level) {
         var random = new Random();
-        for (var pos : positions) {
+        for (var pos : packet.positions) {
             for (var i = 0; i < 10; i++) {
                 level.addParticle(
                     ParticleTypes.SOUL,

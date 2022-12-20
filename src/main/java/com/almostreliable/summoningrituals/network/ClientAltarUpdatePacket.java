@@ -48,12 +48,12 @@ public class ClientAltarUpdatePacket extends ServerToClientPacket<ClientAltarUpd
         if (!(level.getBlockEntity(packet.pos) instanceof AltarBlockEntity altar)) {
             return;
         }
-        if (type == PacketType.PROGRESS) {
+        if (packet.type == PacketType.PROGRESS) {
             altar.progress = packet.value;
-        } else if (type == PacketType.PROCESS_TIME) {
+        } else if (packet.type == PacketType.PROCESS_TIME) {
             altar.processTime = packet.value;
         } else {
-            throw new IllegalStateException("Unknown packet type: " + type);
+            throw new IllegalStateException("Unknown packet type: " + packet.type);
         }
     }
 

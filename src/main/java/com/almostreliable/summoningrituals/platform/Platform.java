@@ -28,6 +28,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -57,20 +58,20 @@ public final class Platform {
         event.registerBlockEntityRenderer(Registration.ALTAR_ENTITY.get(), AltarRenderer::new);
     }
 
-    public static void sendProgressUpdate(BlockPos pos, int progress) {
-        sendPacket(ClientAltarUpdatePacket.progressUpdate(pos, progress));
+    public static void sendProgressUpdate(Level level, BlockPos pos, int progress) {
+        sendPacket(level, pos, ClientAltarUpdatePacket.progressUpdate(pos, progress));
     }
 
-    public static void sendProcessTimeUpdate(BlockPos pos, int processTime) {
-        sendPacket(ClientAltarUpdatePacket.processTimeUpdate(pos, processTime));
+    public static void sendProcessTimeUpdate(Level level, BlockPos pos, int processTime) {
+        sendPacket(level, pos, ClientAltarUpdatePacket.processTimeUpdate(pos, processTime));
     }
 
-    public static void sendParticleEmit(List<BlockPos> positions) {
-        sendPacket(new SacrificeParticlePacket(positions));
+    public static void sendParticleEmit(Level level, List<BlockPos> positions) {
+        sendPacket(level, positions.get(0), new SacrificeParticlePacket(positions));
     }
 
-    private static void sendPacket(ServerToClientPacket<?> packet) {
-        PacketHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), packet);
+    private static void sendPacket(Level level, BlockPos pos, ServerToClientPacket<?> packet) {
+        PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(pos)), packet);
     }
 
     public static CompoundTag serializeItemStack(ItemStack stack) {
