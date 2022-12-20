@@ -239,6 +239,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
                     }
                 }
             );
+            inputIngredients.add(EntryIngredients.ofIngredient(recipe.catalyst));
 
             return ImmutableList.copyOf(inputIngredients);
         }
