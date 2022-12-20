@@ -1,10 +1,11 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.util.Bruhtils;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
-import com.google.gson.JsonElement;
+import com.almostreliable.summoningrituals.util.Utils;
 import com.google.gson.JsonObject;
+import manifold.ext.props.rt.api.var;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -12,7 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,7 +23,7 @@ public final class BlockReference implements Predicate<BlockState> {
     private final Block block;
     private final Map<String, String> properties;
     private final Map<Integer, Boolean> testCache;
-    @Nullable private BlockState displayState;
+    @var BlockState displayState;
 
     private BlockReference(Block block, Map<String, String> properties) {
         this.block = block;
@@ -48,17 +48,17 @@ public final class BlockReference implements Predicate<BlockState> {
         return new BlockReference(block, properties);
     }
 
-    public JsonElement toJson() {
+    public JsonObject toJson() {
         var json = new JsonObject();
-        json.addProperty(Constants.BLOCK, Bruhtils.getId(block).toString());
-        if (!properties.isEmpty()) {
+        json.addProperty(Constants.BLOCK, Platform.getId(block).toString());
+        if (!properties.isEmpty) {
             json.add(Constants.PROPERTIES, SerializeUtils.mapToJson(properties));
         }
         return json;
     }
 
     public void toNetwork(FriendlyByteBuf buffer) {
-        buffer.writeResourceLocation(Bruhtils.getId(block));
+        buffer.writeResourceLocation(Platform.getId(block));
         SerializeUtils.mapToNetwork(buffer, properties);
     }
 
@@ -67,16 +67,16 @@ public final class BlockReference implements Predicate<BlockState> {
         var cached = testCache.get(Block.getId(blockState));
         if (cached != null) return cached;
 
-        if (!block.equals(blockState.getBlock())) {
+        if (!block.equals(blockState.block)) {
             testCache.put(Block.getId(blockState), false);
             return false;
         }
 
-        var toCompareProps = blockState.getValues();
+        var toCompareProps = blockState.values;
         for (var prop : properties.entrySet()) {
             if (toCompareProps.entrySet().stream().noneMatch(entry ->
-                entry.getKey().getName().equalsIgnoreCase(prop.getKey()) &&
-                    entry.getValue().toString().equalsIgnoreCase(prop.getValue()))) {
+                entry.key.name.equalsIgnoreCase(prop.key) &&
+                    entry.value.toString().equalsIgnoreCase(prop.value))) {
                 testCache.put(Block.getId(blockState), false);
                 return false;
             }
@@ -89,14 +89,14 @@ public final class BlockReference implements Predicate<BlockState> {
         if (displayState != null) return displayState;
 
         AtomicReference<BlockState> newState = new AtomicReference<>(block.defaultBlockState());
-        for (Property<?> property : newState.get().getProperties()) {
-            Object newValue = properties.get(property.getName());
+        for (Property<?> property : newState.get().properties) {
+            Object newValue = properties.get(property.name);
             if (newValue == null) continue;
             try {
-                newState.set(newState.get().setValue(property, Bruhtils.cast(newValue)));
+                newState.set(newState.get().setValue(property, Utils.cast(newValue)));
             } catch (Exception ignored) {
                 property.getValue(newValue.toString())
-                    .ifPresent(v -> newState.set(newState.get().setValue(property, Bruhtils.cast(v))));
+                    .ifPresent(v -> newState.set(newState.get().setValue(property, Utils.cast(v))));
             }
         }
         displayState = newState.get();

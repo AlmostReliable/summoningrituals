@@ -12,9 +12,9 @@ val modAuthor: String by project
 val modDescription: String by project
 val modCredits: String by project
 val license: String by project
+val manifoldVersion: String by project
 val extraModsDirectory: String by project
 val recipeViewer: String by project
-val reiVersion: String by project
 val mcVersion: String by project
 val mcVersionRange: String by project
 val forgeVersion: String by project
@@ -25,12 +25,14 @@ val githubUser: String by project
 val githubRepo: String by project
 val jeiVersion: String by project
 val jeiVersionRange: String by project
+val reiVersion: String by project
+val reiVersionRange: String by project
 val kubeVersion: String by project
 val kubeVersionRange: String by project
 
 plugins {
     id("dev.architectury.loom") version "1.0-SNAPSHOT"
-    id("io.github.juuxel.loom-quiltflower") version "1.7.4"
+    id("io.github.juuxel.loom-quiltflower") version "1.8.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
     java
     idea
@@ -70,7 +72,9 @@ loom {
 
 repositories {
     maven("https://maven.parchmentmc.org/")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://dvs1.progwml6.com/files/maven/")
+    maven("https://maven.shedaniel.me/")
     maven("https://maven.saps.dev/minecraft")
     flatDir {
         name = extraModsDirectory
@@ -87,8 +91,16 @@ dependencies {
         parchment("org.parchmentmc.data:$mappingsChannel-$mcVersion:$mappingsVersion@zip")
     })
 
+    // manifold
+    implementation("systems.manifold:manifold-ext-rt:$manifoldVersion")
+    annotationProcessor("systems.manifold:manifold-ext:$manifoldVersion")
+    implementation("systems.manifold:manifold-props-rt:$manifoldVersion")
+    annotationProcessor("systems.manifold:manifold-props:$manifoldVersion")
+
     modCompileOnlyApi("mezz.jei:jei-$mcVersion-common-api:$jeiVersion") { isTransitive = false }
     modCompileOnlyApi("mezz.jei:jei-$mcVersion-forge-api:$jeiVersion") { isTransitive = false }
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-forge:$reiVersion") // required for the plugin annotation BruhSit
+    compileOnly("me.shedaniel:REIPluginCompatibilities-forge-annotations:9.+")
     modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")!!)
 
     when (recipeViewer) {
@@ -142,6 +154,7 @@ tasks {
             "githubUser" to githubUser,
             "githubRepo" to githubRepo,
             "jeiVersionRange" to jeiVersionRange,
+            "reiVersionRange" to reiVersionRange,
             "kubeVersionRange" to kubeVersionRange
         )
 
@@ -159,6 +172,7 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.release.set(17)
+        options.compilerArgs.add("-Xplugin:Manifold no-bootstrap")
     }
     withType<GenerateModuleMetadata> {
         enabled = false

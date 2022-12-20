@@ -2,11 +2,11 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.altar.AltarEntity;
+import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
-import com.almostreliable.summoningrituals.util.SerializeUtils;
-import com.almostreliable.summoningrituals.util.TextUtils;
+import com.almostreliable.summoningrituals.util.Utils;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
@@ -31,9 +31,9 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void init() {
-        AltarEntity.SUMMONING_START.register((level, pos, recipe, player) ->
+        AltarBlockEntity.SUMMONING_START.register((level, pos, recipe, player) ->
             START.post(new SummoningEventJS(level, pos, recipe, player)));
-        AltarEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) ->
+        AltarBlockEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) ->
             COMPLETE.post(new SummoningEventJS(level, pos, recipe, player)));
     }
 
@@ -44,7 +44,7 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void registerBindings(BindingsEvent event) {
-        if (event.getType() != ScriptType.SERVER) return;
+        if (event.type != ScriptType.SERVER) return;
         event.add("SummoningOutput", OutputWrapper.class);
     }
 
@@ -57,7 +57,7 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void registerRecipeTypes(RegisterRecipeTypesEvent event) {
-        event.register(TextUtils.getRL(Constants.ALTAR), AltarRecipeJS::new);
+        event.register(Utils.getRL(Constants.ALTAR), AltarRecipeJS::new);
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -68,7 +68,7 @@ public class AlmostKube extends KubeJSPlugin {
         public static ItemOutputBuilder item(@Nullable Object o) {
             if (o instanceof ItemOutputBuilder iob) return iob;
             ItemStack stack = ItemStackJS.of(o);
-            if (stack.isEmpty()) {
+            if (stack.isEmpty) {
                 ConsoleJS.SERVER.error("ItemStack is empty or null");
             }
             return new ItemOutputBuilder(stack);
@@ -78,7 +78,7 @@ public class AlmostKube extends KubeJSPlugin {
             if (o instanceof MobOutputBuilder mob) return mob;
             if (o instanceof CharSequence || o instanceof ResourceLocation) {
                 ResourceLocation id = ResourceLocation.tryParse(o.toString());
-                var mob = SerializeUtils.mobFromId(id);
+                var mob = Platform.mobFromId(id);
                 return new MobOutputBuilder(mob);
             }
             ConsoleJS.SERVER.error("Missing or invalid entity given for SummoningEntityOutput");

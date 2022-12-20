@@ -33,6 +33,13 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.${modId}]]
+modId = "roughlyenoughitems"
+mandatory = false
+versionRange = "${reiVersionRange}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${modId}]]
 modId = "kubejs"
 mandatory = false
 versionRange = "${kubeVersionRange}"

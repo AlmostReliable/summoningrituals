@@ -1,17 +1,13 @@
 package com.almostreliable.summoningrituals.network;
 
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.network.packet.ProcessTimeUpdatePacket;
-import com.almostreliable.summoningrituals.network.packet.ProgressUpdatePacket;
-import com.almostreliable.summoningrituals.network.packet.SacrificeParticlePacket;
-import com.almostreliable.summoningrituals.util.TextUtils;
+import com.almostreliable.summoningrituals.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PacketHandler {
 
-    private static final ResourceLocation ID = TextUtils.getRL(Constants.NETWORK);
+    private static final ResourceLocation ID = Utils.getRL("network");
     private static final String PROTOCOL = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(ID)
         .networkProtocolVersion(() -> PROTOCOL)
@@ -25,12 +21,12 @@ public final class PacketHandler {
     public static void init() {
         var packetId = -1;
         // server to client
-        register(++packetId, ProgressUpdatePacket.class, new ProgressUpdatePacket());
-        register(++packetId, ProcessTimeUpdatePacket.class, new ProcessTimeUpdatePacket());
+        register(++packetId, ClientAltarUpdatePacket.class, new ClientAltarUpdatePacket());
         register(++packetId, SacrificeParticlePacket.class, new SacrificeParticlePacket());
     }
 
-    private static <T> void register(int packetId, Class<T> clazz, IPacket<T> packet) {
+    @SuppressWarnings("SameParameterValue")
+    private static <T> void register(int packetId, Class<T> clazz, Packet<T> packet) {
         CHANNEL.registerMessage(packetId, clazz, packet::encode, packet::decode, packet::handle);
     }
 }

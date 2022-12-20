@@ -1,180 +1,198 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.altar.AltarEntity;
+import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.GameUtils;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
-public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
+public class AltarInventory implements ItemHandler {
 
-    private final AltarEntity parent;
-    private final AltarInvWrapper vanillaInv;
+    private static final int SIZE = 64;
+
+    private final PlatformBlockEntity parent;
+    @val final VanillaWrapper vanillaInv;
     private final Deque<Tuple<ItemStack, Integer>> insertOrder;
-    private List<ItemStack> items;
-    private ItemStack catalyst;
+    private NonNullList<ItemStack> items;
+    @override
+    @var ItemStack catalyst;
 
-    public AltarInventory(AltarEntity parent) {
+    public AltarInventory(PlatformBlockEntity parent) {
         this.parent = parent;
-        vanillaInv = new AltarInvWrapper(this);
-        items = new ArrayList<>();
+        vanillaInv = new VanillaWrapper(this);
+        items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         catalyst = ItemStack.EMPTY;
-        insertOrder = new ArrayDeque<>();
+        insertOrder = new ArrayDeque<>(SIZE);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        var insertList = new ListTag();
-        for (var insert : insertOrder) {
-            var insertTag = new CompoundTag();
-            insert.getA().save(insertTag);
-            insertTag.putInt(Constants.SLOT, insert.getB());
-            insertList.add(insertTag);
+    public CompoundTag serialize() {
+        var insertListTag = new ListTag();
+        for (var e : insertOrder) {
+            var tag = new CompoundTag();
+            e.a.save(tag);
+            tag.putInt(Constants.SLOT, e.b);
+            insertListTag.add(tag);
         }
-        var itemList = new ListTag();
-        for (var slot = 0; slot < items.size(); slot++) {
-            if (!items.get(slot).isEmpty()) {
-                var itemTag = new CompoundTag();
-                itemTag.putInt(Constants.SLOT, slot);
-                items.get(slot).save(itemTag);
-                itemList.add(itemTag);
-            }
+
+        var itemsTag = new ListTag();
+        for (var slot = 0; slot < SIZE; slot++) {
+            if (items.get(slot).isEmpty) continue;
+            var tag = new CompoundTag();
+            tag.putInt(Constants.SLOT, slot);
+            items.get(slot).save(tag);
+            itemsTag.add(tag);
         }
+
         var tag = new CompoundTag();
-        tag.put(Constants.INSERT_ORDER, insertList);
-        tag.putInt(Constants.SIZE, items.size());
-        tag.put(Constants.ITEMS, itemList);
-        tag.put(Constants.CATALYST, catalyst.serializeNBT());
+        tag.put(Constants.INSERT_ORDER, insertListTag);
+        tag.put(Constants.ITEMS, itemsTag);
+        tag.put(Constants.CATALYST, catalyst.serialize());
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        var insertList = tag.getList(Constants.INSERT_ORDER, Tag.TAG_COMPOUND);
+    public void deserialize(CompoundTag tag) {
         insertOrder.clear();
-        for (var insertTag : insertList) {
-            var stack = ItemStack.of((CompoundTag) insertTag);
-            insertOrder.add(new Tuple<>(stack, ((CompoundTag) insertTag).getInt(Constants.SLOT)));
+        var insertListTag = tag.getList(Constants.INSERT_ORDER, Tag.TAG_COMPOUND);
+        for (var e : insertListTag) {
+            var stack = ItemStack.of((CompoundTag) e);
+            var slot = ((CompoundTag) e).getInt(Constants.SLOT);
+            insertOrder.add(new Tuple<>(stack, slot));
         }
-        items = new ArrayList<>();
-        for (var i = 0; i < tag.getInt(Constants.SIZE); i++) {
-            items.add(ItemStack.EMPTY);
+
+        items.clear();
+        var itemsTag = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
+        for (var e : itemsTag) {
+            var slot = ((CompoundTag) e).getInt(Constants.SLOT);
+            var stack = ItemStack.of((CompoundTag) e);
+            items.set(slot, stack);
         }
-        var itemList = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
-        for (var itemTag : itemList) {
-            var slot = ((CompoundTag) itemTag).getInt(Constants.SLOT);
-            if (slot >= 0 && slot < items.size()) {
-                items.set(slot, ItemStack.of((CompoundTag) itemTag));
-            }
-        }
+
         catalyst = ItemStack.of(tag.getCompound(Constants.CATALYST));
     }
 
     @Override
-    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+    public void setStackInSlot(int slot, ItemStack stack) {
         validateSlot(slot);
-        if (slot == items.size()) {
-            setCatalyst(stack);
+
+        if (slot == SIZE) {
+            catalyst = stack;
             return;
         }
+
         items.set(slot, stack);
         onContentsChanged();
     }
 
     public ItemStack handleInsertion(ItemStack stack) {
-        if (stack.isEmpty()) return ItemStack.EMPTY;
+        if (stack.isEmpty) return ItemStack.EMPTY;
 
-        var remaining = stack;
-        for (var i = 0; i < items.size(); i++) {
+        var remaining = stack.copy();
+        for (var i = 0; i < SIZE; i++) {
             remaining = insertItem(i, remaining);
-            if (remaining.isEmpty()) {
+
+            if (remaining.isEmpty) {
                 insertOrder.push(new Tuple<>(stack, i));
                 return ItemStack.EMPTY;
             }
-            if (remaining.getCount() == stack.getCount()) {
+
+            if (remaining.count == stack.count) {
                 continue;
             }
-            stack.shrink(remaining.getCount());
+
+            stack.shrink(remaining.count);
             insertOrder.push(new Tuple<>(stack.copy(), i));
-            return remaining;
         }
 
-        items.add(stack);
-        insertOrder.push(new Tuple<>(stack.copy(), items.size() - 1));
-        onContentsChanged();
-        return ItemStack.EMPTY;
+        return stack;
     }
 
     public void popLastInserted() {
-        assert parent.getLevel() != null && !parent.getLevel().isClientSide;
+        var level = parent.level;
+        assert level != null && !level.isClientSide;
 
-        if (!catalyst.isEmpty()) {
-            GameUtils.dropItem(parent.getLevel(), parent.getBlockPos(), catalyst, true);
+        if (!catalyst.isEmpty) {
+            GameUtils.dropItem(level, parent.blockPos, catalyst, true);
             catalyst = ItemStack.EMPTY;
             onContentsChanged();
             return;
         }
 
-        if (insertOrder.isEmpty()) return;
+        if (insertOrder.isEmpty) return;
+
         var last = insertOrder.pop();
-        var stack = last.getA();
-        int slot = last.getB();
-        items.get(slot).shrink(stack.getCount());
-        if (items.get(slot).isEmpty()) {
-            trimInventory();
+        var stack = last.a;
+        int slot = last.b;
+
+        items.get(slot).shrink(stack.count);
+        if (items.get(slot).isEmpty) {
+            items.set(slot, ItemStack.EMPTY);
         }
         onContentsChanged();
-        GameUtils.dropItem(parent.getLevel(), parent.getBlockPos(), stack, true);
+
+        GameUtils.dropItem(level, parent.blockPos, stack, true);
     }
 
     public void dropContents() {
-        var level = parent.getLevel();
+        var level = parent.level;
         assert level != null && !level.isClientSide;
-        var pos = parent.getBlockPos();
+
+        var pos = parent.blockPos;
         for (var stack : items) {
-            if (stack.isEmpty()) continue;
+            if (stack.isEmpty) continue;
             GameUtils.dropItem(level, pos, stack, false);
         }
-        if (!catalyst.isEmpty()) {
+
+        if (!catalyst.isEmpty) {
             GameUtils.dropItem(level, pos, catalyst, false);
         }
     }
 
     public boolean handleRecipe(AltarRecipe recipe) {
-        var oldItems = new ArrayList<>(items);
+        var itemBackup = createItemBackup();
+
         var toRemove = 0;
-        var removed = 0;
-        for (var input : recipe.getInputs()) {
+        var actualRemoved = 0;
+
+        for (var input : recipe.inputs) {
             toRemove += input.count();
             var inputRemoved = 0;
+
             for (var stack : items) {
-                if (stack.isEmpty() || !input.ingredient().test(stack)) continue;
-                var shrinkCount = Math.min(input.count() - inputRemoved, stack.getCount());
+                if (stack.isEmpty || !input.ingredient().test(stack)) continue;
+
+                var shrinkCount = Math.min(input.count() - inputRemoved, stack.count);
                 stack.shrink(shrinkCount);
                 inputRemoved += shrinkCount;
+
                 if (inputRemoved >= input.count()) break;
             }
-            removed += inputRemoved;
+
+            actualRemoved += inputRemoved;
         }
-        if (removed < toRemove) {
-            items = oldItems;
+
+        if (actualRemoved < toRemove) {
+            items = NonNullList.of(ItemStack.EMPTY, itemBackup.toArray(new ItemStack[0]));
             return false;
         }
+
         catalyst = ItemStack.EMPTY;
         rebuildInsertOrder();
         onContentsChanged();
@@ -182,112 +200,103 @@ public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<
     }
 
     private ItemStack insertItem(int slot, ItemStack stack) {
-        if (stack.isEmpty()) return ItemStack.EMPTY;
-        if (!isItemValid(slot, stack)) return stack;
+        if (stack.isEmpty) return ItemStack.EMPTY;
         validateSlot(slot);
 
-        var current = items.get(slot);
-        var limit = getStackLimit(slot, stack);
-        if (!current.isEmpty()) {
-            if (!ItemHandlerHelper.canItemStacksStack(stack, current)) return stack;
-            limit -= current.getCount();
+        var currentStack = items.get(slot);
+        if (currentStack.isEmpty) {
+            items.set(slot, stack);
+            onContentsChanged();
+            return ItemStack.EMPTY;
         }
-        if (limit <= 0) return stack;
 
-        var reachedLimit = stack.getCount() > limit;
-        if (current.isEmpty()) {
-            items.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
-        } else {
-            current.grow(reachedLimit ? limit : stack.getCount());
-        }
+        if (!currentStack.canStack(stack)) return stack;
+
+        var maxCount = getMaxStackSize(slot, currentStack);
+        var toInsert = Math.min(maxCount - currentStack.count, stack.count);
+        if (toInsert <= 0) return stack;
+
+        currentStack.grow(toInsert);
+        stack.shrink(toInsert);
         onContentsChanged();
 
-        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
+        return stack.isEmpty ? ItemStack.EMPTY : stack;
     }
 
     private void rebuildInsertOrder() {
         insertOrder.clear();
-        trimInventory();
-        for (var i = items.size() - 1; i >= 0; i--) {
-            insertOrder.add(new Tuple<>(items.get(i).copy(), i));
-        }
-    }
-
-    private void trimInventory() {
-        for (var i = items.size() - 1; i >= 0; i--) {
-            if (items.get(i).isEmpty()) items.remove(i);
+        for (var i = SIZE - 1; i >= 0; i--) {
+            var stack = items.get(i);
+            if (stack.isEmpty) continue;
+            insertOrder.add(new Tuple<>(stack.copy(), i));
         }
     }
 
     private void onContentsChanged() {
         parent.setChanged();
-        if (parent.getLevel() == null || parent.getLevel().isClientSide) return;
-        parent.getLevel().sendBlockUpdated(parent.getBlockPos(), parent.getBlockState(), parent.getBlockState(), 1 | 2);
+        if (parent.level == null || parent.level.isClientSide) return;
+        parent.level.sendBlockUpdated(parent.blockPos, parent.blockState, parent.blockState, 1 | 2);
     }
 
     private void validateSlot(int slot) {
-        if (slot < 0 || slot >= items.size() + 1) {
-            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, items.size()));
+        if (slot < 0 || slot >= SIZE + 1) {
+            throw new IllegalStateException(f("Slot {} is not in range [0,{})", slot, SIZE + 1));
         }
     }
 
-    private int getStackLimit(int slot, ItemStack stack) {
-        return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
+    private int getMaxStackSize(int slot, ItemStack stack) {
+        return Math.min(getSlotLimit(slot), stack.maxStackSize);
     }
 
     @Override
     public int getSlots() {
-        return items.size() + 1;
+        return SIZE + 1;
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
-        if (slot == items.size()) {
-            return catalyst;
-        }
+        if (slot == items.size()) return catalyst;
         return items.get(slot);
     }
 
     @Nonnull
     @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
         if (simulate) return ItemStack.EMPTY;
         return parent.handleInteraction(null, stack);
     }
 
     @Nonnull
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return ItemStack.EMPTY;
+    public ItemStack extractItem(int i, int j, boolean bl) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getSlotLimit(int slot) {
         validateSlot(slot);
+        if (slot == SIZE) return 1;
         return 64;
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    public boolean isItemValid(int slot, ItemStack stack) {
         return true;
     }
 
-    public AltarInvWrapper getVanillaInv() {
-        return vanillaInv;
-    }
-
-    public List<ItemStack> getItems() {
-        return items;
-    }
-
-    public ItemStack getCatalyst() {
-        return catalyst;
+    @Override
+    public List<ItemStack> getNoneEmptyItems() {
+        return items.stream().filter(stack -> !stack.isEmpty).collect(Collectors.toList());
     }
 
     public void setCatalyst(ItemStack catalyst) {
         this.catalyst = catalyst;
         onContentsChanged();
+    }
+
+    private List<ItemStack> createItemBackup() {
+        return items.stream().filter(stack -> !stack.isEmpty).map(ItemStack::copy).collect(Collectors.toList());
     }
 }

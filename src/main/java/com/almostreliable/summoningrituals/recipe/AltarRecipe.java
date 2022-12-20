@@ -1,12 +1,14 @@
 package com.almostreliable.summoningrituals.recipe;
 
-import com.almostreliable.summoningrituals.Setup;
-import com.almostreliable.summoningrituals.inventory.AltarInvWrapper;
+import com.almostreliable.summoningrituals.Registration;
+import com.almostreliable.summoningrituals.inventory.VanillaWrapper;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.IngredientStack;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
-import com.almostreliable.summoningrituals.util.TextUtils;
+import com.almostreliable.summoningrituals.util.GameUtils;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
@@ -24,26 +26,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AltarRecipe implements Recipe<AltarInvWrapper> {
+public class AltarRecipe implements Recipe<VanillaWrapper> {
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 
-    private final ResourceLocation recipeId;
-    private final Ingredient catalyst;
-    private final RecipeOutputs outputs;
-    private final NonNullList<IngredientStack> inputs;
-    private final RecipeSacrifices sacrifices;
-    private final int recipeTime;
-    @Nullable private final BlockReference blockBelow;
-    private final DAY_TIME dayTime;
-    private final WEATHER weather;
+    @override
+    @val final ResourceLocation id;
+    @val final Ingredient catalyst;
+    @val final RecipeOutputs outputs;
+    @val final NonNullList<IngredientStack> inputs;
+    @val final RecipeSacrifices sacrifices;
+    @val final int recipeTime;
+    @Nullable
+    @val final BlockReference blockBelow;
+    @val final DAY_TIME dayTime;
+    @val final WEATHER weather;
 
     AltarRecipe(
-        ResourceLocation recipeId, Ingredient catalyst, RecipeOutputs outputs, NonNullList<IngredientStack> inputs,
+        ResourceLocation id, Ingredient catalyst, RecipeOutputs outputs, NonNullList<IngredientStack> inputs,
         RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
         WEATHER weather
     ) {
-        this.recipeId = recipeId;
+        this.id = id;
         this.outputs = outputs;
         this.inputs = inputs;
         this.catalyst = catalyst;
@@ -55,20 +59,20 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     }
 
     @Override
-    public boolean matches(AltarInvWrapper inv, Level level) {
-        if (inv.getCatalyst().isEmpty() || !catalyst.test(inv.getCatalyst())) {
+    public boolean matches(VanillaWrapper inv, Level level) {
+        if (inv.catalyst.isEmpty || !catalyst.test(inv.catalyst)) {
             return false;
         }
 
-        var matchedItems = new Ingredient[inv.getContainerSize()];
+        var matchedItems = new Ingredient[inv.containerSize];
         List<Ingredient> matchedIngredients = new ArrayList<>();
 
-        for (var slot = 0; slot < inv.getInputs().size(); slot++) {
-            var stack = inv.getInputs().get(slot);
-            if (!stack.isEmpty() && matchedItems[slot] == null) {
+        for (var slot = 0; slot < inv.items.size(); slot++) {
+            var stack = inv.items.get(slot);
+            if (!stack.isEmpty && matchedItems[slot] == null) {
                 for (var input : inputs) {
                     if (!matchedIngredients.contains(input.ingredient()) && input.ingredient()
-                        .test(stack) && stack.getCount() >= input.count()) {
+                        .test(stack) && stack.count >= input.count()) {
                         matchedItems[slot] = input.ingredient();
                         matchedIngredients.add(input.ingredient());
                     }
@@ -80,7 +84,7 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     }
 
     @Override
-    public ItemStack assemble(AltarInvWrapper inv) {
+    public ItemStack assemble(VanillaWrapper inv) {
         return ItemStack.EMPTY;
     }
 
@@ -100,51 +104,13 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return recipeId;
-    }
-
-    @Override
     public RecipeSerializer<?> getSerializer() {
-        return Setup.ALTAR_RECIPE.serializer().get();
+        return Registration.ALTAR_RECIPE.serializer().get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return Setup.ALTAR_RECIPE.type().get();
-    }
-
-    public Ingredient getCatalyst() {
-        return catalyst;
-    }
-
-    public RecipeOutputs getOutputs() {
-        return outputs;
-    }
-
-    public NonNullList<IngredientStack> getInputs() {
-        return inputs;
-    }
-
-    public RecipeSacrifices getSacrifices() {
-        return sacrifices;
-    }
-
-    public int getRecipeTime() {
-        return recipeTime;
-    }
-
-    @Nullable
-    public BlockReference getBlockBelow() {
-        return blockBelow;
-    }
-
-    public DAY_TIME getDayTime() {
-        return dayTime;
-    }
-
-    public WEATHER getWeather() {
-        return weather;
+        return Registration.ALTAR_RECIPE.type().get();
     }
 
     public enum WEATHER {
@@ -156,12 +122,12 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
                 case ANY -> true;
-                case CLEAR -> !level.isRaining() && !level.isThundering();
-                case RAIN -> level.isRaining();
-                case THUNDER -> level.isThundering();
+                case CLEAR -> !level.isRaining && !level.isThundering;
+                case RAIN -> level.isRaining;
+                case THUNDER -> level.isThundering;
             };
             if (!check) {
-                TextUtils.sendPlayerMessage(
+                GameUtils.sendPlayerMessage(
                     player,
                     toString().toLowerCase(),
                     ChatFormatting.YELLOW
@@ -179,11 +145,11 @@ public class AltarRecipe implements Recipe<AltarInvWrapper> {
         public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
                 case ANY -> true;
-                case DAY -> level.isDay();
-                case NIGHT -> level.isNight();
+                case DAY -> level.isDay;
+                case NIGHT -> level.isNight;
             };
             if (!check) {
-                TextUtils.sendPlayerMessage(
+                GameUtils.sendPlayerMessage(
                     player,
                     toString().toLowerCase(),
                     ChatFormatting.YELLOW

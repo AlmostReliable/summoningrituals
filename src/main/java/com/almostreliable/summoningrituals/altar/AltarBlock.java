@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -54,11 +53,11 @@ public class AltarBlock extends Block implements EntityBlock {
     public InteractionResult use(
         BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit
     ) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && hand == InteractionHand.MAIN_HAND &&
-            level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            var result = altar.handleInteraction(serverPlayer, player.getItemInHand(InteractionHand.MAIN_HAND));
-            return ItemStack.matches(result, player.getItemInHand(InteractionHand.MAIN_HAND)) ?
-                InteractionResult.PASS : InteractionResult.SUCCESS;
+        if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
+            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.setMainHandItem(altar.handleInteraction(serverPlayer, serverPlayer.mainHandItem));
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return super.use(state, level, pos, player, hand, hit);
     }
@@ -72,7 +71,7 @@ public class AltarBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new AltarEntity(pos, state);
+        return new AltarBlockEntity(pos, state);
     }
 
     @Nullable
@@ -82,7 +81,7 @@ public class AltarBlock extends Block implements EntityBlock {
     ) {
         if (level.isClientSide) return null;
         return (entityLevel, entityState, entityType, entity) -> {
-            if (entity instanceof AltarEntity altar) {
+            if (entity instanceof AltarBlockEntity altar) {
                 altar.tick();
             }
         };
@@ -96,9 +95,9 @@ public class AltarBlock extends Block implements EntityBlock {
             new Vector3f(11.5f, 4.5f, 10.5f)
         );
 
-        var x = pos.getX();
-        var y = pos.getY() + 1;
-        var z = pos.getZ();
+        var x = pos.x;
+        var y = pos.y + 1;
+        var z = pos.z;
         var vec = particlePos[state.getValue(FACING).ordinal() - 2];
         var active = state.getValue(ACTIVE);
 
@@ -116,13 +115,13 @@ public class AltarBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         var superState = super.getStateForPlacement(context);
         var state = superState == null ? defaultBlockState() : superState;
-        return state.setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(ACTIVE, false);
+        return state.setValue(FACING, context.horizontalDirection.opposite).setValue(ACTIVE, false);
     }
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarEntity altar) {
-            altar.playerDestroy(player.isCreative());
+        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
+            altar.playerDestroy(player.isCreative);
         }
         super.playerWillDestroy(level, pos, state, player);
     }

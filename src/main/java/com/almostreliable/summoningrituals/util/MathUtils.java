@@ -11,7 +11,7 @@ public final class MathUtils {
     private MathUtils() {}
 
     public static Vec3 vectorFromPos(Vec3i pos) {
-        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+        return new Vec3(pos.x, pos.y, pos.z);
     }
 
     public static Vec3 shiftToCenter(Vec3 pos) {
@@ -19,7 +19,7 @@ public final class MathUtils {
     }
 
     public static Vec3 shiftToCenter(Vec3i pos) {
-        return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        return new Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
     }
 
     public static int flipCircle(Number degree) {
@@ -39,6 +39,10 @@ public final class MathUtils {
 
     public static float modifier(float current, float max, float fallback) {
         return max == 0 ? fallback : current / max;
+    }
+
+    public static boolean isWithinBounds(double mX, double mY, int x, int y, int width, int height) {
+        return mX >= x && mX <= x + width && mY >= y && mY <= y + height;
     }
 
     private static Vector3f getOppositeVector(Vector3f vector) {

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.util.Bruhtils;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -38,7 +38,7 @@ public class RecipeSacrifices {
         var mobs = json.getAsJsonArray(Constants.MOBS);
         NonNullList<Sacrifice> sacrifices = NonNullList.create();
         for (var entity : mobs) {
-            sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
+            sacrifices.add(Sacrifice.fromJson(entity.asJsonObject));
         }
         var zone = json.has(Constants.REGION) ?
             SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.REGION))
@@ -96,7 +96,7 @@ public class RecipeSacrifices {
     }
 
     public String getDisplayRegion() {
-        return String.format("%dx%dx%d", region.getX(), region.getY(), region.getZ());
+        return String.format("%dx%dx%d", region.x, region.y, region.z);
     }
 
     public boolean isEmpty() {
@@ -110,7 +110,7 @@ public class RecipeSacrifices {
     public record Sacrifice(EntityType<?> mob, int count) implements Predicate<Entity> {
 
         private static Sacrifice fromJson(JsonObject json) {
-            var mob = SerializeUtils.mobFromJson(json);
+            var mob = Platform.mobFromJson(json);
             var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
             return new Sacrifice(mob, count);
         }
@@ -128,7 +128,7 @@ public class RecipeSacrifices {
 
         private JsonElement toJson() {
             JsonObject json = new JsonObject();
-            json.addProperty(Constants.MOB, Bruhtils.getId(mob).toString());
+            json.addProperty(Constants.MOB, Platform.getId(mob).toString());
             if (count > 1) {
                 json.addProperty(Constants.COUNT, count);
             }
@@ -136,7 +136,7 @@ public class RecipeSacrifices {
         }
 
         private void toNetwork(FriendlyByteBuf buffer) {
-            buffer.writeUtf(Bruhtils.getId(mob).toString());
+            buffer.writeUtf(Platform.getId(mob).toString());
             buffer.writeVarInt(count);
         }
     }
