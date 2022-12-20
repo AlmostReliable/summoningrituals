@@ -75,16 +75,11 @@ public final class Platform {
     }
 
     public static CompoundTag serializeItemStack(ItemStack stack) {
-        var tag = new CompoundTag();
-        stack.save(tag);
-        return tag;
+        return stack.serializeNBT();
     }
 
     public static CompoundTag serializeEntity(Entity entity) {
-        var tag = new CompoundTag();
-        var id = entity.encodeId;
-        if (id != null) tag.putString("id", id);
-        return entity.saveWithoutId(tag);
+        return entity.serializeNBT();
     }
 
     @OnlyIn(Dist.CLIENT)
