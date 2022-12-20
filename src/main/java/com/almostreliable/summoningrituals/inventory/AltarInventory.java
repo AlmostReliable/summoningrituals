@@ -270,8 +270,8 @@ public class AltarInventory implements ItemHandler {
 
     @Nonnull
     @Override
-    public ItemStack extractItem(int i, int j, boolean bl) {
-        throw new UnsupportedOperationException();
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return ItemStack.EMPTY;
     }
 
     @Override
