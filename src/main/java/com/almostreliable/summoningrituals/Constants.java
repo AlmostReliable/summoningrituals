@@ -18,13 +18,11 @@ public final class Constants {
     public static final String INVENTORY = "inventory";
     public static final String ITEM = "item";
     public static final String ITEMS = "items";
-    public static final String JEI = "jei";
+    public static final String RECIPE_VIEWER = "recipe_viewer";
     public static final String LABEL = "label";
-    public static final String MESSAGE = "message";
     public static final String MOB = "mob";
     public static final String MOBS = "mobs";
     public static final String NBT = "nbt";
-    public static final String NETWORK = "network";
     public static final String OFFSET = "offset";
     public static final String OUTPUTS = "outputs";
     public static final String PROGRESS = "progress";
@@ -32,7 +30,6 @@ public final class Constants {
     public static final String RECIPE_TIME = "recipe_time";
     public static final String REGION = "region";
     public static final String SACRIFICES = "sacrifices";
-    public static final String SIZE = "size";
     public static final String SLOT = "slot";
     public static final String SPREAD = "spread";
     public static final String TOOLTIP = "tooltip";

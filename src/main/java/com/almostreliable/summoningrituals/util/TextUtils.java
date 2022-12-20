@@ -1,14 +1,10 @@
 package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.BuildConfig;
-import com.almostreliable.summoningrituals.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
-import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
 public final class TextUtils {
@@ -27,26 +23,13 @@ public final class TextUtils {
         return input;
     }
 
-    public static ResourceLocation getRL(String key) {
-        return new ResourceLocation(BuildConfig.MOD_ID, key);
-    }
-
     public static String translateAsString(String type, String key) {
-        return translate(type, key).getString();
+        return translate(type, key).string;
     }
 
     public static MutableComponent translate(String type, String key, ChatFormatting... color) {
         var output = Component.translatable(getTranslationKey(type, key));
         return color.length == 0 ? output : output.withStyle(color[0]);
-    }
-
-    public static void sendPlayerMessage(
-        @Nullable Player player, String translationKey, ChatFormatting color, Object... args
-    ) {
-        if (player == null) return;
-        player.sendSystemMessage(
-            Component.translatable(getTranslationKey(Constants.MESSAGE, translationKey), args).withStyle(color)
-        );
     }
 
     public static MutableComponent colorize(String input, ChatFormatting color) {

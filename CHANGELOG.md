@@ -5,42 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## [1.1.7] - 2022-11-19
+## Unreleased
 
-### Added
-- German translation
-
-### Fixed
-- crash with latest KubeJS version ([#10])
-  - this bumps the minimum KubeJS version to 1902.6.0-build.119
-
-<!-- Links -->
-[#10]: https://github.com/AlmostReliable/summoningrituals-forge/pull/10
-
-## [1.1.6] - 2022-11-02
-
-### Fixed
-- a rare crash when an item was not resolved correctly from a recipe
-- some entities being not correctly rendered in recipe lookup
-
-## [1.1.5] - 2022-11-01
-
-### Changed
-- bumped version to the same one as the 1.18 branch to keep sync
-
-### Fixed
-- an extraction dupe bug when taking out items from the altar
-
-## [1.0.0] - 2022-10-18
-
-1.19 port with KubeJS v6 integration!
+- ported to fabric
+- added invisible mob eggs to input lookups in recipe viewers
+- added REI integration
+- improved inventory handling
+- fixed some bugs with automation of rituals
 
 <!-- Links -->
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[1.1.7]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.7
-[1.1.6]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.6
-[1.1.5]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.5
-[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.0.0
+[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-fabric-1.0.0

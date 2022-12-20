@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "${modId}",
+  "version": "${version}",
+  "name": "${modName}",
+  "description": "${modDescription} | ${modCredits}",
+  "authors": [
+    "${modAuthor}"
+  ],
+  "contact": {
+    "homepage": "https://almostreliable.com/",
+    "email": "team@almostreliable.com",
+    "sources": "https://github.com/${githubUser}/${githubRepo}",
+    "issues": "https://github.com/${githubUser}/${githubRepo}/issues"
+  },
+  "license": "${license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.almostreliable.summoningrituals.SummoningRituals"
+    ],
+    "client": [
+      "com.almostreliable.summoningrituals.SummoningRitualsClient"
+    ],
+    "jei_mod_plugin": [
+      "com.almostreliable.summoningrituals.compat.viewer.jei.AlmostJEI"
+    ],
+    "rei_client": [
+      "com.almostreliable.summoningrituals.compat.viewer.rei.AlmostREI"
+    ]
+  },
+  "mixins": [
+    "summoningrituals.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "fabric-api": "*",
+    "minecraft": ">=${mcVersion}",
+    "java": ">=17"
+  },
+  "suggests": {
+    "kubejs": ">=${kubeMinVersion}"
+  }
+}

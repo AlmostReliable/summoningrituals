@@ -14,12 +14,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @Override
-    public AltarRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+    public AltarRecipe fromJson(ResourceLocation id, JsonObject json) {
         var catalyst = Ingredient.fromJson(json.getAsJsonObject(Constants.CATALYST));
         AltarRecipe.CATALYST_CACHE.add(catalyst);
 
@@ -28,11 +29,11 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         NonNullList<IngredientStack> inputs = NonNullList.create();
         if (json.has(Constants.INPUTS)) {
             var inputJson = json.get(Constants.INPUTS);
-            if (inputJson.isJsonObject()) {
+            if (inputJson.isJsonObject) {
                 inputs.add(IngredientStack.fromJson(inputJson));
             } else {
-                for (var input : inputJson.getAsJsonArray()) {
-                    inputs.add(IngredientStack.fromJson(input.getAsJsonObject()));
+                for (var input : inputJson.asJsonArray) {
+                    inputs.add(IngredientStack.fromJson(input.asJsonObject));
                 }
             }
         }
@@ -58,7 +59,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         );
 
         return new AltarRecipe(
-            recipeId,
+            id,
             catalyst,
             outputs,
             inputs,
@@ -72,7 +73,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @Nullable
     @Override
-    public AltarRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+    public AltarRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
         var catalyst = Ingredient.fromNetwork(buffer);
 
         var outputs = RecipeOutputs.fromNetwork(buffer);
@@ -99,7 +100,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         var weather = WEATHER.values()[buffer.readVarInt()];
 
         return new AltarRecipe(
-            recipeId,
+            id,
             catalyst,
             outputs,
             inputs,
@@ -113,32 +114,32 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, AltarRecipe recipe) {
-        recipe.getCatalyst().toNetwork(buffer);
+        recipe.catalyst.toNetwork(buffer);
 
-        recipe.getOutputs().toNetwork(buffer);
+        recipe.outputs.toNetwork(buffer);
 
-        buffer.writeVarInt(recipe.getInputs().size());
-        for (var input : recipe.getInputs()) {
+        buffer.writeVarInt(recipe.inputs.size());
+        for (var input : recipe.inputs) {
             input.toNetwork(buffer);
         }
 
-        if (recipe.getSacrifices().isEmpty()) {
+        if (recipe.sacrifices.isEmpty) {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            recipe.getSacrifices().toNetwork(buffer);
+            recipe.sacrifices.toNetwork(buffer);
         }
 
-        buffer.writeInt(recipe.getRecipeTime());
+        buffer.writeInt(recipe.recipeTime);
 
-        if (recipe.getBlockBelow() != null) {
+        if (recipe.blockBelow != null) {
             buffer.writeBoolean(true);
-            recipe.getBlockBelow().toNetwork(buffer);
+            recipe.blockBelow.toNetwork(buffer);
         } else {
             buffer.writeBoolean(false);
         }
 
-        buffer.writeVarInt(recipe.getDayTime().ordinal());
-        buffer.writeVarInt(recipe.getWeather().ordinal());
+        buffer.writeVarInt(recipe.dayTime.ordinal());
+        buffer.writeVarInt(recipe.weather.ordinal());
     }
 }

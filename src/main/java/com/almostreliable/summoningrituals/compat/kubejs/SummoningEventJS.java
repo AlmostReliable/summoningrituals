@@ -10,13 +10,13 @@ import javax.annotation.Nullable;
 
 public class SummoningEventJS extends LevelEventJS {
 
-    private final ServerLevel level;
+    private final ServerLevel serverLevel;
     private final BlockPos pos;
     private final AltarRecipe recipe;
     @Nullable private final ServerPlayer player;
 
-    SummoningEventJS(ServerLevel level, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
-        this.level = level;
+    SummoningEventJS(ServerLevel serverLevel, BlockPos pos, AltarRecipe recipe, @Nullable ServerPlayer player) {
+        this.serverLevel = serverLevel;
         this.pos = pos;
         this.recipe = recipe;
         this.player = player;
@@ -24,7 +24,7 @@ public class SummoningEventJS extends LevelEventJS {
 
     @Override
     public ServerLevel getLevel() {
-        return level;
+        return serverLevel;
     }
 
     public BlockPos getPos() {

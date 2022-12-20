@@ -1,8 +1,10 @@
 package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -12,8 +14,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -33,9 +33,9 @@ public final class SerializeUtils {
 
     public static JsonObject vec3ToJson(Vec3i vec) {
         var json = new JsonObject();
-        json.addProperty("x", vec.getX());
-        json.addProperty("y", vec.getY());
-        json.addProperty("z", vec.getZ());
+        json.addProperty("x", vec.x);
+        json.addProperty("y", vec.y);
+        json.addProperty("z", vec.z);
         return json;
     }
 
@@ -47,55 +47,46 @@ public final class SerializeUtils {
     }
 
     public static void vec3ToNetwork(FriendlyByteBuf buffer, Vec3i vec) {
-        buffer.writeVarInt(vec.getX());
-        buffer.writeVarInt(vec.getY());
-        buffer.writeVarInt(vec.getZ());
+        buffer.writeVarInt(vec.x);
+        buffer.writeVarInt(vec.y);
+        buffer.writeVarInt(vec.z);
     }
 
     public static JsonObject stackToJson(ItemStack stack) {
-        if (stack.isEmpty()) {
+        if (stack.isEmpty) {
             throw new IllegalArgumentException("stack is empty");
         }
         var json = new JsonObject();
-        json.addProperty(Constants.ITEM, Bruhtils.getId(stack.getItem()).toString());
-        json.addProperty(Constants.COUNT, stack.getCount());
+        json.addProperty(Constants.ITEM, Platform.getId(stack.getItem()).toString());
+        json.addProperty(Constants.COUNT, stack.count);
         if (stack.hasTag()) {
-            assert stack.getTag() != null;
-            json.addProperty(Constants.NBT, stack.getTag().toString());
+            assert stack.tag != null;
+            json.addProperty(Constants.NBT, stack.tag.toString());
         }
         return json;
     }
 
     public static Block blockFromId(@Nullable ResourceLocation id) {
-        return getFromRegistry(ForgeRegistries.BLOCKS, id);
-    }
-
-    public static EntityType<?> mobFromId(@Nullable ResourceLocation id) {
-        return getFromRegistry(ForgeRegistries.ENTITY_TYPES, id);
-    }
-
-    public static EntityType<?> mobFromJson(JsonObject json) {
-        var id = new ResourceLocation(GsonHelper.getAsString(json, Constants.MOB));
-        return mobFromId(id);
+        return getFromRegistry(Registry.BLOCK, id);
     }
 
     public static EntityType<?> mobFromNetwork(FriendlyByteBuf buffer) {
         var id = new ResourceLocation(buffer.readUtf());
-        return mobFromId(id);
+        return Platform.mobFromId(id);
     }
 
     public static Map<String, String> mapFromJson(JsonObject json) {
         return json.entrySet().stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> entry.getValue().getAsString()
+                entry -> entry.value.asString
             ));
     }
 
     public static JsonObject mapToJson(Map<String, String> map) {
         var json = new JsonObject();
         for (var entry : map.entrySet()) {
-            json.addProperty(entry.getKey(), entry.getValue());
+            json.addProperty(entry.key, entry.value);
         }
         return json;
     }
@@ -112,8 +103,8 @@ public final class SerializeUtils {
     public static void mapToNetwork(FriendlyByteBuf buffer, Map<String, String> map) {
         buffer.writeVarInt(map.size());
         for (var entry : map.entrySet()) {
-            buffer.writeUtf(entry.getKey());
-            buffer.writeUtf(entry.getValue());
+            buffer.writeUtf(entry.key);
+            buffer.writeUtf(entry.value);
         }
     }
 
@@ -125,16 +116,12 @@ public final class SerializeUtils {
         }
     }
 
-    private static <T> T getFromRegistry(
-        IForgeRegistry<T> registry, @Nullable ResourceLocation id
+    public static <T> T getFromRegistry(
+        Registry<T> registry, @Nullable ResourceLocation id
     ) {
         if (id == null) {
             throw new IllegalArgumentException("id is null");
         }
-        var entry = registry.getValue(id);
-        if (entry == null) {
-            throw new IllegalArgumentException(id + " is not registered");
-        }
-        return entry;
+        return registry.get(id);
     }
 }

@@ -1,13 +1,13 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
-import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -58,14 +58,14 @@ public class AltarRecipeJS extends RecipeJS {
         json.add(Constants.OUTPUTS, outputs.toJson());
         JsonArray inputsArray = new JsonArray();
         inputs.forEach(i -> inputsArray.add(i.toJson()));
-        if (!inputsArray.isEmpty()) {
+        if (!inputsArray.isEmpty) {
             if (inputsArray.size() == 1) {
                 json.add(Constants.INPUTS, inputsArray.get(0));
             } else {
                 json.add(Constants.INPUTS, inputsArray);
             }
         }
-        if (!sacrifices.isEmpty()) {
+        if (!sacrifices.isEmpty) {
             json.add(Constants.SACRIFICES, sacrifices.toJson());
         }
         if (recipeTime != 100) {
@@ -115,7 +115,7 @@ public class AltarRecipeJS extends RecipeJS {
 
     public AltarRecipeJS input(Ingredient... ingredients) {
         for (var ingredient : ingredients) {
-            if (ingredient.isEmpty()) {
+            if (ingredient.isEmpty) {
                 throw new IllegalArgumentException("ingredient is empty");
             }
             inputs.add(ingredient);
@@ -130,7 +130,7 @@ public class AltarRecipeJS extends RecipeJS {
 
     public AltarRecipeJS sacrifice(ResourceLocation id, int count) {
         Preconditions.checkNotNull(id);
-        sacrifices.add(SerializeUtils.mobFromId(id), count);
+        sacrifices.add(Platform.mobFromId(id), count);
         return this;
     }
 

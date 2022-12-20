@@ -1,12 +1,15 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.util.Bruhtils;
-import com.almostreliable.summoningrituals.util.GameUtils;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import manifold.ext.props.rt.api.PropOption;
+import manifold.ext.props.rt.api.set;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
@@ -45,7 +48,7 @@ public final class RecipeOutputs {
     public static RecipeOutputs fromJson(JsonArray json) {
         NonNullList<RecipeOutput<?>> recipeOutputs = NonNullList.create();
         for (var output : json) {
-            recipeOutputs.add(RecipeOutput.fromJson(output.getAsJsonObject()));
+            recipeOutputs.add(RecipeOutput.fromJson(output.asJsonObject));
         }
         return new RecipeOutputs(recipeOutputs);
     }
@@ -91,7 +94,7 @@ public final class RecipeOutputs {
     public void forEach(TriConsumer<OutputType, RecipeOutput<?>, Integer> consumer) {
         for (var i = 0; i < outputs.size(); i++) {
             var output = outputs.get(i);
-            consumer.accept(output.getType(), output, i);
+            consumer.accept(output.type, output, i);
         }
     }
 
@@ -101,9 +104,9 @@ public final class RecipeOutputs {
 
     public abstract static class RecipeOutput<T> {
 
-        final T output;
         private final OutputType type;
-        CompoundTag data;
+        @val final T output;
+        @var @set(PropOption.Package) CompoundTag data;
         Vec3i offset = DEFAULT_OFFSET;
         Vec3i spread = DEFAULT_SPREAD;
 
@@ -125,7 +128,7 @@ public final class RecipeOutputs {
             if (json.has(Constants.DATA)) {
                 output.data = SerializeUtils.nbtFromString(GsonHelper.getAsString(json, Constants.DATA));
             }
-            if (output.getCount() > 1) {
+            if (output.count > 1) {
                 if (json.has(Constants.OFFSET)) {
                     output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
                 }
@@ -151,7 +154,7 @@ public final class RecipeOutputs {
             if (buffer.readBoolean()) {
                 output.data = buffer.readNbt();
             }
-            if (output.getCount() > 1) {
+            if (output.count > 1) {
                 output.offset = SerializeUtils.vec3FromNetwork(buffer);
                 output.spread = SerializeUtils.vec3FromNetwork(buffer);
             }
@@ -162,10 +165,10 @@ public final class RecipeOutputs {
         abstract JsonObject toJson();
 
         void writeJsonDefaults(JsonObject json) {
-            if (!data.isEmpty()) {
+            if (!data.isEmpty) {
                 json.addProperty(Constants.DATA, data.toString());
             }
-            if (getCount() > 1) {
+            if (count > 1) {
                 if (!offset.equals(DEFAULT_OFFSET)) {
                     json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
                 }
@@ -176,47 +179,36 @@ public final class RecipeOutputs {
         }
 
         void toNetwork(FriendlyByteBuf buffer) {
-            if (data.isEmpty()) {
+            if (data.isEmpty) {
                 buffer.writeBoolean(false);
             } else {
                 buffer.writeBoolean(true);
                 buffer.writeNbt(data);
             }
-            if (getCount() > 1) {
+            if (count > 1) {
                 SerializeUtils.vec3ToNetwork(buffer, offset);
                 SerializeUtils.vec3ToNetwork(buffer, spread);
             }
         }
 
-        void writeDataToEntity(Entity entity) {
-            if (data.isEmpty()) return;
-            var entityData = entity.serializeNBT();
-            for (var prop : data.getAllKeys()) {
+        Entity writeDataToEntity(Entity entity) {
+            if (data.isEmpty) return entity;
+            var entityData = Platform.serializeEntity(entity);
+            for (var prop : data.allKeys) {
                 entityData.put(prop, Objects.requireNonNull(data.get(prop)));
             }
             entity.load(entityData);
+            return entity;
         }
 
         Vec3 getRandomPos(BlockPos origin) {
-            var x = spread.getX() > 0 ? RANDOM.nextDouble(-spread.getX(), spread.getX()) / 2.0 : 0;
-            var y = spread.getY() > 0 ? RANDOM.nextDouble(-spread.getY(), spread.getY()) / 2.0 : 0;
-            var z = spread.getZ() > 0 ? RANDOM.nextDouble(-spread.getZ(), spread.getZ()) / 2.0 : 0;
+            var x = spread.x > 0 ? RANDOM.nextDouble(-spread.x, spread.x) / 2.0 : 0;
+            var y = spread.y > 0 ? RANDOM.nextDouble(-spread.y, spread.y) / 2.0 : 0;
+            var z = spread.z > 0 ? RANDOM.nextDouble(-spread.z, spread.z) / 2.0 : 0;
             return MathUtils.shiftToCenter(origin).add(MathUtils.vectorFromPos(offset)).add(x, y, z);
         }
 
         abstract void spawn(ServerLevel level, BlockPos origin);
-
-        private OutputType getType() {
-            return type;
-        }
-
-        public T getOutput() {
-            return output;
-        }
-
-        public CompoundTag getData() {
-            return data;
-        }
 
         public abstract int getCount();
     }
@@ -252,40 +244,36 @@ public final class RecipeOutputs {
 
         @Override
         void spawn(ServerLevel level, BlockPos origin) {
-            var count = getCount();
+            var toSpawn = count;
             var stacks = new ArrayList<ItemStack>();
-            while (count > 0) {
-                var stack = output.copy();
-                stack.setCount(Math.min(count, 4));
+            while (toSpawn > 0) {
+                var stack = output.copyWithCount(Math.min(toSpawn, 4));
                 stacks.add(stack);
-                count -= stack.getCount();
+                toSpawn -= stack.count;
             }
 
             for (var stack : stacks) {
-                var pos = getRandomPos(origin);
-                var itemEntity = new ItemEntity(level, pos.x, pos.y, pos.z, stack);
-                writeDataToEntity(itemEntity);
-                GameUtils.spawnEntity(level, itemEntity);
+                ItemEntity.of(level, stack).spawn(level, getRandomPos(origin), this::writeDataToEntity);
             }
         }
 
         @Override
         public int getCount() {
-            return output.getCount();
+            return output.count;
         }
     }
 
     private static final class MobOutput extends RecipeOutput<EntityType<?>> {
 
-        private final int count;
+        private final int mobCount;
 
-        private MobOutput(EntityType<?> mob, int count) {
+        private MobOutput(EntityType<?> mob, int mobCount) {
             super(OutputType.MOB, mob);
-            this.count = count;
+            this.mobCount = mobCount;
         }
 
         private static MobOutput fromJson(JsonObject json) {
-            var mob = SerializeUtils.mobFromJson(json);
+            var mob = Platform.mobFromJson(json);
             var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
             return new MobOutput(mob, count);
         }
@@ -299,9 +287,9 @@ public final class RecipeOutputs {
         @Override
         JsonObject toJson() {
             var json = new JsonObject();
-            json.addProperty(Constants.MOB, Bruhtils.getId(output).toString());
-            if (getCount() > 1) {
-                json.addProperty(Constants.COUNT, getCount());
+            json.addProperty(Constants.MOB, Platform.getId(output).toString());
+            if (mobCount > 1) {
+                json.addProperty(Constants.COUNT, mobCount);
             }
             writeJsonDefaults(json);
             return json;
@@ -310,25 +298,23 @@ public final class RecipeOutputs {
         @Override
         void toNetwork(FriendlyByteBuf buffer) {
             buffer.writeVarInt(1);
-            buffer.writeUtf(Bruhtils.getId(output).toString());
-            buffer.writeVarInt(getCount());
+            buffer.writeUtf(Platform.getId(output).toString());
+            buffer.writeVarInt(mobCount);
             super.toNetwork(buffer);
         }
 
         @Override
         void spawn(ServerLevel level, BlockPos origin) {
-            for (var i = 0; i < count; i++) {
+            for (var i = 0; i < mobCount; i++) {
                 var mobEntity = output.create(level);
                 if (mobEntity == null) return;
-                writeDataToEntity(mobEntity);
-                mobEntity.setPos(getRandomPos(origin));
-                GameUtils.spawnEntity(level, mobEntity);
+                mobEntity.spawn(level, getRandomPos(origin), this::writeDataToEntity);
             }
         }
 
         @Override
         public int getCount() {
-            return count;
+            return mobCount;
         }
     }
 

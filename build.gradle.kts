@@ -12,25 +12,24 @@ val modAuthor: String by project
 val modDescription: String by project
 val modCredits: String by project
 val license: String by project
+val manifoldVersion: String by project
 val extraModsDirectory: String by project
 val recipeViewer: String by project
-val reiVersion: String by project
 val mcVersion: String by project
-val mcVersionRange: String by project
-val forgeVersion: String by project
-val forgeVersionRange: String by project
+val fabricVersion: String by project
+val fabricLoaderVersion: String by project
 val mappingsChannel: String by project
 val mappingsVersion: String by project
 val githubUser: String by project
 val githubRepo: String by project
 val jeiVersion: String by project
-val jeiVersionRange: String by project
+val reiVersion: String by project
 val kubeVersion: String by project
-val kubeVersionRange: String by project
+val kubeMinVersion: String by project
 
 plugins {
-    id("dev.architectury.loom") version "1.0-SNAPSHOT"
-    id("io.github.juuxel.loom-quiltflower") version "1.7.4"
+    id("fabric-loom") version "1.0-SNAPSHOT"
+    id("io.github.juuxel.loom-quiltflower") version "1.8.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
     java
     idea
@@ -44,8 +43,6 @@ base {
 }
 
 loom {
-    silentMojangMappingsLicense()
-
     runs {
         named("client") {
             client()
@@ -59,10 +56,6 @@ loom {
         }
     }
 
-    forge {
-        mixinConfig("$modId.mixins.json")
-    }
-
     mixin {
         defaultRefmapName.set("$modId.refmap.json")
     }
@@ -70,8 +63,11 @@ loom {
 
 repositories {
     maven("https://maven.parchmentmc.org/")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://dvs1.progwml6.com/files/maven/")
+    maven("https://maven.shedaniel.me/")
     maven("https://maven.saps.dev/minecraft")
+    maven("https://maven.blamejared.com/")
     flatDir {
         name = extraModsDirectory
         dir(file("$extraModsDirectory-$mcVersion"))
@@ -81,19 +77,28 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:$mcVersion")
-    forge("net.minecraftforge:forge:$mcVersion-$forgeVersion")
+    modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     mappings(loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:$mappingsChannel-$mcVersion:$mappingsVersion@zip")
     })
 
+    implementation("com.google.code.findbugs:jsr305:3.0.2") // javax annotations
+    // manifold
+    implementation("systems.manifold:manifold-ext-rt:$manifoldVersion")
+    annotationProcessor("systems.manifold:manifold-ext:$manifoldVersion")
+    implementation("systems.manifold:manifold-props-rt:$manifoldVersion")
+    annotationProcessor("systems.manifold:manifold-props:$manifoldVersion")
+
     modCompileOnlyApi("mezz.jei:jei-$mcVersion-common-api:$jeiVersion") { isTransitive = false }
-    modCompileOnlyApi("mezz.jei:jei-$mcVersion-forge-api:$jeiVersion") { isTransitive = false }
-    modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")!!)
+    modCompileOnlyApi("mezz.jei:jei-$mcVersion-fabric-api:$jeiVersion") { isTransitive = false }
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:$reiVersion")
+    modCompileOnly(modLocalRuntime("dev.latvian.mods:kubejs-fabric:$kubeVersion")!!)
 
     when (recipeViewer) {
-        "rei" -> modLocalRuntime("me.shedaniel:RoughlyEnoughItems-forge:$reiVersion")
-        "jei" -> modLocalRuntime("mezz.jei:jei-$mcVersion-forge:$jeiVersion") { isTransitive = false }
+        "rei" -> modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:$reiVersion")
+        "jei" -> modLocalRuntime("mezz.jei:jei-$mcVersion-fabric:$jeiVersion") { isTransitive = false }
         else -> throw GradleException("Invalid recipeViewer value: $recipeViewer")
     }
 
@@ -128,7 +133,7 @@ tasks {
         }
     }
     processResources {
-        val resourceTargets = listOf("META-INF/mods.toml", "pack.mcmeta")
+        val resourceTargets = listOf("fabric.mod.json", "pack.mcmeta")
         val replaceProperties = mapOf(
             "version" to version as String,
             "modId" to modId,
@@ -137,12 +142,10 @@ tasks {
             "modDescription" to modDescription,
             "modCredits" to modCredits,
             "license" to license,
-            "mcVersionRange" to mcVersionRange,
-            "forgeVersionRange" to forgeVersionRange,
+            "mcVersion" to mcVersion,
             "githubUser" to githubUser,
             "githubRepo" to githubRepo,
-            "jeiVersionRange" to jeiVersionRange,
-            "kubeVersionRange" to kubeVersionRange
+            "kubeMinVersion" to kubeMinVersion
         )
 
         inputs.properties(replaceProperties)
@@ -159,6 +162,7 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.release.set(17)
+        options.compilerArgs.add("-Xplugin:Manifold no-bootstrap")
     }
     withType<GenerateModuleMetadata> {
         enabled = false
