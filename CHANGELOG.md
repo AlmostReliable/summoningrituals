@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## Unreleased
+- lots of internal changes to support Fabric
+- added native REI support
+- improved performance when interacting with the altar
+
 ## [1.1.7] - 2022-11-19
 
 ### Added
@@ -15,7 +20,7 @@ and this project adheres to [Semantic Versioning].
   - this bumps the minimum KubeJS version to 1902.6.0-build.119
 
 <!-- Links -->
-[#10]: https://github.com/AlmostReliable/summoningrituals-forge/pull/10
+[#10]: https://github.com/AlmostReliable/summoningrituals/pull/10
 
 ## [1.1.6] - 2022-11-02
 
@@ -40,7 +45,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[1.1.7]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.7
-[1.1.6]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.6
-[1.1.5]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.1.5
-[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.19-1.0.0
+[1.1.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.7
+[1.1.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.6
+[1.1.5]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.5
+[1.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.0.0

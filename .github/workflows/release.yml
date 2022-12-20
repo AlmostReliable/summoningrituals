@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v1.19-*.*.*'
+      - 'v1.19-forge-*.*.*'
 
 env:
   JAVA_DIST: 'zulu'
@@ -70,7 +70,7 @@ jobs:
           set_var JAR_FILE $(eval echo build/libs/${{ env.MOD_ID }}-*-*.jar)
           set_var MINECRAFT_VERSION $(echo ${JAR_FILE%.*} | cut -d- -f2)
           set_var MOD_VERSION $(echo ${JAR_FILE%.*} | cut -d- -f3)
-          set_var RELEASE_TYPE "$(echo ${GITHUB_REF##*/} | cut -d- -f3)"
+          set_var RELEASE_TYPE "$(echo ${GITHUB_REF##*/} | cut -d- -f4)"
           set_var RELEASE_TYPE "$([[ -z $RELEASE_TYPE ]] && echo release || echo $RELEASE_TYPE)"
 
       - name: Install changelog parser
@@ -89,12 +89,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
           files: ${{ env.JAR_FILE }}
-          name: ${{ env.MOD_NAME }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}
-          github-name: v${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}
+          name: ${{ env.MOD_NAME }}-Forge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}
+          github-name: v${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}-Forge
 
           loaders: forge
           game-versions: ${{ env.MINECRAFT_VERSION }}
-          version: ${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}
+          version: ${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+forge
           version-type: ${{ env.RELEASE_TYPE }}
           version-resolver: exact
           java: ${{ env.JAVA_VERSION }}
