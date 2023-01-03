@@ -128,13 +128,11 @@ public final class RecipeOutputs {
             if (json.has(Constants.DATA)) {
                 output.data = SerializeUtils.nbtFromString(GsonHelper.getAsString(json, Constants.DATA));
             }
-            if (output.count > 1) {
-                if (json.has(Constants.OFFSET)) {
-                    output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
-                }
-                if (json.has(Constants.SPREAD)) {
-                    output.spread = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.SPREAD));
-                }
+            if (json.has(Constants.OFFSET)) {
+                output.offset = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.OFFSET));
+            }
+            if (json.has(Constants.SPREAD)) {
+                output.spread = SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.SPREAD));
             }
 
             return output;
@@ -154,10 +152,8 @@ public final class RecipeOutputs {
             if (buffer.readBoolean()) {
                 output.data = buffer.readNbt();
             }
-            if (output.count > 1) {
-                output.offset = SerializeUtils.vec3FromNetwork(buffer);
-                output.spread = SerializeUtils.vec3FromNetwork(buffer);
-            }
+            output.offset = SerializeUtils.vec3FromNetwork(buffer);
+            output.spread = SerializeUtils.vec3FromNetwork(buffer);
 
             return output;
         }
@@ -168,13 +164,11 @@ public final class RecipeOutputs {
             if (!data.isEmpty) {
                 json.addProperty(Constants.DATA, data.toString());
             }
-            if (count > 1) {
-                if (!offset.equals(DEFAULT_OFFSET)) {
-                    json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
-                }
-                if (!spread.equals(DEFAULT_SPREAD)) {
-                    json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
-                }
+            if (!offset.equals(DEFAULT_OFFSET)) {
+                json.add(Constants.OFFSET, SerializeUtils.vec3ToJson(offset));
+            }
+            if (!spread.equals(DEFAULT_SPREAD)) {
+                json.add(Constants.SPREAD, SerializeUtils.vec3ToJson(spread));
             }
         }
 
@@ -185,10 +179,8 @@ public final class RecipeOutputs {
                 buffer.writeBoolean(true);
                 buffer.writeNbt(data);
             }
-            if (count > 1) {
-                SerializeUtils.vec3ToNetwork(buffer, offset);
-                SerializeUtils.vec3ToNetwork(buffer, spread);
-            }
+            SerializeUtils.vec3ToNetwork(buffer, offset);
+            SerializeUtils.vec3ToNetwork(buffer, spread);
         }
 
         Entity writeDataToEntity(Entity entity) {
