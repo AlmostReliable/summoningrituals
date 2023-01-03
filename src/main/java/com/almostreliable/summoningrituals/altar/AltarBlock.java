@@ -14,8 +14,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -24,6 +26,8 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -33,10 +37,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
-public class AltarBlock extends Block implements EntityBlock {
+public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityBlock {
 
     static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
     private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Stream.of(
         Block.box(3, 0, 3, 13, 2, 13),
         Block.box(5, 2, 5, 11, 9, 11),
@@ -45,7 +50,12 @@ public class AltarBlock extends Block implements EntityBlock {
 
     public AltarBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false));
+        registerDefaultState(
+            defaultBlockState()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(ACTIVE, false)
+                .setValue(WATERLOGGED, false)
+        );
     }
 
     @SuppressWarnings("deprecation")
@@ -66,6 +76,17 @@ public class AltarBlock extends Block implements EntityBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public BlockState updateShape(
+        BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos, BlockPos nPos
+    ) {
+        if (state.getValue(WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+        return super.updateShape(state, direction, nState, level, pos, nPos);
     }
 
     @Nullable
@@ -115,7 +136,9 @@ public class AltarBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         var superState = super.getStateForPlacement(context);
         var state = superState == null ? defaultBlockState() : superState;
-        return state.setValue(FACING, context.horizontalDirection.opposite).setValue(ACTIVE, false);
+        return state.setValue(FACING, context.horizontalDirection.opposite)
+            .setValue(ACTIVE, false)
+            .setValue(WATERLOGGED, context.level.getFluidState(context.clickedPos).is(Fluids.WATER));
     }
 
     @Override
@@ -129,7 +152,13 @@ public class AltarBlock extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING).add(ACTIVE);
+        builder.add(FACING).add(ACTIVE).add(WATERLOGGED);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {

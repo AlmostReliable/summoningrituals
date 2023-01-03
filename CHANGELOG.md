@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning].
 
 ## Unreleased
 - fixed offset and spread not being applied to single ouputs
+- made Altar block waterloggable
 
 ## [2.0.0] - 2022-12-20
 
