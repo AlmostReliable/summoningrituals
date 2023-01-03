@@ -138,21 +138,22 @@ public class AltarBlockEntity extends PlatformBlockEntity {
                 sacrifices.stream()
                     .map(EntitySacrifice::kill)
                     .filter(positions -> !positions.isEmpty)
-                    .forEach(Platform::sendParticleEmit);
+                    .forEach(p -> Platform.sendParticleEmit(level, p));
             }
         }
         progress++;
-        Platform.sendProgressUpdate(worldPosition, progress);
+        Platform.sendProgressUpdate(level, worldPosition, progress);
     }
 
     private void resetSummoning(boolean popLastInserted) {
+        assert level != null;
         currentRecipe = null;
         sacrifices = null;
         invokingPlayer = null;
         progress = 0;
-        Platform.sendProgressUpdate(worldPosition, progress);
+        Platform.sendProgressUpdate(level, worldPosition, progress);
         processTime = 0;
-        Platform.sendProcessTimeUpdate(worldPosition, processTime);
+        Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
         changeActivityState(false);
         if (popLastInserted) inventory.popLastInserted();
     }
@@ -178,7 +179,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         invokingPlayer = player;
         processTime = recipe.recipeTime;
         GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
-        Platform.sendProcessTimeUpdate(worldPosition, processTime);
+        Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
     }
 
     @Nullable

@@ -12,8 +12,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -23,8 +23,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
@@ -32,6 +34,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -56,16 +59,23 @@ public final class Platform {
         BlockEntityRendererRegistry.register(blockEntityType, renderer);
     }
 
-    public static void sendProgressUpdate(BlockPos pos, int progress) {
-        ClientAltarUpdatePacket.progressUpdate(pos, progress);
+    public static void sendProgressUpdate(Level level, BlockPos pos, int progress) {
+        ClientAltarUpdatePacket.progressUpdate(level, pos, progress, Platform::sendPacket);
     }
 
-    public static void sendProcessTimeUpdate(BlockPos pos, int processTime) {
-        ClientAltarUpdatePacket.processTimeUpdate(pos, processTime);
+    public static void sendProcessTimeUpdate(Level level, BlockPos pos, int processTime) {
+        ClientAltarUpdatePacket.processTimeUpdate(level, pos, processTime, Platform::sendPacket);
     }
 
-    public static void sendParticleEmit(List<BlockPos> positions) {
-        ClientPlayNetworking.send(SacrificeParticlePacket.CHANNEL, SacrificeParticlePacket.encode(positions));
+    public static void sendParticleEmit(Level level, List<BlockPos> positions) {
+        sendPacket(level, positions.get(0), SacrificeParticlePacket.CHANNEL, SacrificeParticlePacket.encode(positions));
+    }
+
+    private static void sendPacket(Level level, BlockPos pos, ResourceLocation channel, FriendlyByteBuf packet) {
+        var chunk = level.getChunkAt(pos);
+        ((ServerChunkCache) chunk.level.chunkSource).chunkMap
+            .getPlayers(chunk.pos, false)
+            .forEach(serverPlayer -> ServerPlayNetworking.send(serverPlayer, channel, packet));
     }
 
     public static CompoundTag serializeItemStack(ItemStack stack) {
