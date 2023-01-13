@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
-- fixed offset and spread not being applied to single ouputs
-- made Altar block waterloggable
+## [2.0.1] - 2023-01-13
+
+### Added
+- ability to waterlog the Altar blocks ([#12])
+
+### Fixed
+- offset and spread not being applied to single outputs ([#13])
+
+<!-- Links -->
+[#12]: https://github.com/AlmostReliable/summoningrituals/issues/12
+[#13]: https://github.com/AlmostReliable/summoningrituals/issues/13
 
 ## [2.0.0] - 2022-12-20
 
@@ -58,6 +66,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.1
 [2.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.0
 [1.1.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.7
 [1.1.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.6
