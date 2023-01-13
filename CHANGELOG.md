@@ -5,10 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
-- fixed offset and spread not being applied to single ouputs
-- made Altar block waterloggable
+## [1.1.8] - 2023-01-13
 
+### Added
+- ability to waterlog the Altar blocks ([#12])
+
+### Fixed
+- offset and spread not being applied to single outputs ([#13])
+
+<!-- Links -->
+[#12]: https://github.com/AlmostReliable/summoningrituals/issues/12
+[#13]: https://github.com/AlmostReliable/summoningrituals/issues/13
+
+## [1.1.7] - 2022-11-19
 
 ### Added
 - German translation
@@ -39,7 +48,7 @@ and this project adheres to [Semantic Versioning].
 - mod name being shown twice in block below tooltip
 
 <!-- LINKS -->
-[#7]: https://github.com/AlmostReliable/summoningrituals-forge/issues/7
+[#7]: https://github.com/AlmostReliable/summoningrituals/issues/7
 
 ## [1.1.2] - 2022-10-02
 
@@ -50,9 +59,9 @@ and this project adheres to [Semantic Versioning].
 - crash with Blue Skies ([#5], [#6])
 
 <!-- Links -->
-[#4]: https://github.com/AlmostReliable/summoningrituals-forge/pull/4
-[#5]: https://github.com/AlmostReliable/summoningrituals-forge/issues/5
-[#6]: https://github.com/AlmostReliable/summoningrituals-forge/pull/6
+[#4]: https://github.com/AlmostReliable/summoningrituals/pull/4
+[#5]: https://github.com/AlmostReliable/summoningrituals/issues/5
+[#6]: https://github.com/AlmostReliable/summoningrituals/pull/6
 
 ## [1.1.1] - 2022-09-25
 
@@ -77,7 +86,7 @@ and this project adheres to [Semantic Versioning].
 
 <!-- Links -->
 [wchen1990]: https://github.com/wchen1990
-[#1]: https://github.com/AlmostReliable/summoningrituals-forge/pull/1
+[#1]: https://github.com/AlmostReliable/summoningrituals/pull/1
 
 ## [1.0.0] - 2022-09-12
 
@@ -88,12 +97,13 @@ Initial release!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[1.1.7]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.7
-[1.1.6]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.6
-[1.1.5]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.5
-[1.1.4]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.4
-[1.1.3]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.3
-[1.1.2]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.2
-[1.1.1]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.1
-[1.1.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.1.0
-[1.0.0]: https://github.com/AlmostReliable/summoningrituals-forge/releases/tag/v1.18-1.0.0
+[1.1.8]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.8
+[1.1.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.7
+[1.1.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.6
+[1.1.5]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.5
+[1.1.4]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.4
+[1.1.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.3
+[1.1.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.2
+[1.1.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.1
+[1.1.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.1.0
+[1.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.18-1.0.0
