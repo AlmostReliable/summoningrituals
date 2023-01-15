@@ -21,6 +21,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -114,12 +115,7 @@ public class AltarRecipeJS extends RecipeJS {
     }
 
     public AltarRecipeJS input(Ingredient... ingredients) {
-        for (var ingredient : ingredients) {
-            if (ingredient.isEmpty) {
-                throw new IllegalArgumentException("ingredient is empty");
-            }
-            inputs.add(ingredient);
-        }
+        inputs.addAll(Arrays.asList(ingredients));
         return this;
     }
 

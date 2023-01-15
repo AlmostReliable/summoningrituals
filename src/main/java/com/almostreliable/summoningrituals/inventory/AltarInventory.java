@@ -24,7 +24,7 @@ import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarInventory implements ItemHandler {
 
-    private static final int SIZE = 64;
+    public static final int SIZE = 64;
 
     private final PlatformBlockEntity parent;
     @val final VanillaWrapper vanillaInv;
