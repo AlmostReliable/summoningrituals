@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning].
 
 ## Unreleased
 - added maximum input validation to recipe serializer
+- added empty tag validation to recipe serializer
 - fixed NBT not being applied to output and input items
 
 ## [2.0.1] - 2023-01-13
