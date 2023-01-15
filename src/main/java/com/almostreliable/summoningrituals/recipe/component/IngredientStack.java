@@ -10,12 +10,17 @@ import net.minecraft.world.item.crafting.Ingredient;
 public record IngredientStack(Ingredient ingredient, int count) {
 
     public static IngredientStack fromJson(JsonElement json) {
+        IngredientStack ingredientStack;
         if (json instanceof JsonObject jsonObject && jsonObject.has(Constants.COUNT)) {
             var ingredient = Ingredient.fromJson(jsonObject.get(Constants.INGREDIENT));
             var count = GsonHelper.getAsInt(jsonObject, Constants.COUNT);
-            return new IngredientStack(ingredient, count);
+            ingredientStack = new IngredientStack(ingredient, count);
         }
-        return new IngredientStack(Ingredient.fromJson(json), 1);
+        ingredientStack = new IngredientStack(Ingredient.fromJson(json), 1);
+        if (ingredientStack.ingredient.isEmpty) {
+            throw new IllegalArgumentException("Ingredient is empty, maybe wrong tag");
+        }
+        return ingredientStack;
     }
 
     public static IngredientStack fromNetwork(FriendlyByteBuf buffer) {

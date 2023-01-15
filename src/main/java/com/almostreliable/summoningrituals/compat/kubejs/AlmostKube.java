@@ -69,7 +69,7 @@ public class AlmostKube extends KubeJSPlugin {
             if (o instanceof ItemOutputBuilder iob) return iob;
             ItemStack stack = ItemStackJS.of(o);
             if (stack.isEmpty) {
-                ConsoleJS.SERVER.error("ItemStack is empty or null");
+                ConsoleJS.SERVER.error("Empty or null ItemStack specified for SummoningOutput.item");
             }
             return new ItemOutputBuilder(stack);
         }
@@ -81,7 +81,7 @@ public class AlmostKube extends KubeJSPlugin {
                 var mob = Platform.mobFromId(id);
                 return new MobOutputBuilder(mob);
             }
-            ConsoleJS.SERVER.error("Missing or invalid entity given for SummoningEntityOutput");
+            ConsoleJS.SERVER.error("Missing or invalid entity specified for SummoningOutput.mob");
             return new MobOutputBuilder(EntityType.ITEM);
         }
     }
