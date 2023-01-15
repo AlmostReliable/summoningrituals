@@ -7,8 +7,9 @@ import com.almostreliable.summoningrituals.network.SacrificeParticlePacket;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.almostreliable.summoningrituals.util.Utils;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -34,6 +36,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,9 +44,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class Platform {
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private Platform() {}
 
@@ -114,6 +120,21 @@ public final class Platform {
         return mobFromId(id);
     }
 
+    // taken and adapted from Minecraft Forge
+    public static ItemStack itemStackFromJson(JsonObject json) {
+        String itemName = GsonHelper.getAsString(json, "item");
+        Item item = getItem(itemName);
+        if (json.has("nbt")) {
+            CompoundTag nbt = getNBT(json.get("nbt"));
+            CompoundTag tmp = new CompoundTag();
+            tmp.put("tag", nbt);
+            tmp.putString("id", itemName);
+            tmp.putInt("Count", GsonHelper.getAsInt(json, "count", 1));
+            return ItemStack.of(tmp);
+        }
+        return new ItemStack(item, GsonHelper.getAsInt(json, "count", 1));
+    }
+
     public static ResourceLocation getId(Item item) {
         return Registry.ITEM.getKey(item);
     }
@@ -136,5 +157,25 @@ public final class Platform {
         return Registry.BLOCK.getHolder(
             ResourceKey.create(Registry.BLOCK.key(), getId(block))
         ).map(Holder::tags).orElseGet(Stream::empty);
+    }
+
+    // taken and adapted from Minecraft Forge
+    private static Item getItem(String itemName) {
+        var itemKey = new ResourceLocation(itemName);
+        if (!Registry.ITEM.containsKey(itemKey)) throw new JsonSyntaxException("Unknown item '" + itemName + "'");
+        var item = Registry.ITEM.get(itemKey);
+        //noinspection ObjectEquality
+        if (item == Items.AIR) throw new JsonSyntaxException("Invalid item: " + itemName);
+        return Objects.requireNonNull(item);
+    }
+
+    // taken and adapted from Minecraft Forge
+    private static CompoundTag getNBT(JsonElement element) {
+        try {
+            if (element.isJsonObject()) return TagParser.parseTag(GSON.toJson(element));
+            return TagParser.parseTag(GsonHelper.convertToString(element, "nbt"));
+        } catch (CommandSyntaxException e) {
+            throw new JsonSyntaxException("Invalid NBT Entry: " + e);
+        }
     }
 }
