@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.DAY_TIME;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe.WEATHER;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
@@ -15,8 +16,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
-import javax.annotation.Nullable;
-
 public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @Override
@@ -30,10 +29,10 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         if (json.has(Constants.INPUTS)) {
             var inputJson = json.get(Constants.INPUTS);
             if (inputJson.isJsonObject) {
-                inputs.add(IngredientStack.fromJson(inputJson));
+                addInput(inputs, IngredientStack.fromJson(inputJson));
             } else {
                 for (var input : inputJson.asJsonArray) {
-                    inputs.add(IngredientStack.fromJson(input.asJsonObject));
+                    addInput(inputs, IngredientStack.fromJson(input.asJsonObject));
                 }
             }
         }
@@ -71,7 +70,6 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         );
     }
 
-    @Nullable
     @Override
     public AltarRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
         var catalyst = Ingredient.fromNetwork(buffer);
@@ -141,5 +139,12 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
         buffer.writeVarInt(recipe.dayTime.ordinal());
         buffer.writeVarInt(recipe.weather.ordinal());
+    }
+
+    private void addInput(NonNullList<IngredientStack> inputs, IngredientStack input) {
+        if (inputs.size() >= AltarInventory.SIZE) {
+            throw new IllegalArgumentException("Too many inputs, max is " + AltarInventory.SIZE);
+        }
+        inputs.add(input);
     }
 }
