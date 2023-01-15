@@ -34,6 +34,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -106,6 +107,10 @@ public final class Platform {
     public static EntityType<?> mobFromJson(JsonObject json) {
         var id = new ResourceLocation(GsonHelper.getAsString(json, Constants.MOB));
         return mobFromId(id);
+    }
+
+    public static ItemStack itemStackFromJson(JsonObject json) {
+        return CraftingHelper.getItemStack(json, true, true);
     }
 
     public static ResourceLocation getId(Item item) {

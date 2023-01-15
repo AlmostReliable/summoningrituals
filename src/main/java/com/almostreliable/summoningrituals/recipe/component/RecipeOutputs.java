@@ -21,7 +21,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -212,7 +211,7 @@ public final class RecipeOutputs {
         }
 
         private static ItemOutput fromJson(JsonObject json) {
-            var stack = ShapedRecipe.itemStackFromJson(json);
+            var stack = Platform.itemStackFromJson(json);
             return new ItemOutput(stack);
         }
 
