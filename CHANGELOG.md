@@ -5,10 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## Unreleased
-- added maximum input validation to recipe serializer
-- added empty tag validation to recipe serializer
-- fixed NBT not being applied to output and input items
+## [2.0.2] - 2023-01-15
+
+### Added
+- maximum input validation to recipe serializer (64 items)
+- empty tag validation to recipe serializer
+
+### Fixed
+- NBT not being applied to output and input items
 
 ## [2.0.1] - 2023-01-13
 
@@ -33,5 +37,6 @@ Initial release of the Fabric port!
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-fabric-2.0.1
 [2.0.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-fabric-2.0.1
 [2.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-fabric-2.0.0
