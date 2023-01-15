@@ -15,9 +15,10 @@ public record IngredientStack(Ingredient ingredient, int count) {
             var ingredient = Ingredient.fromJson(jsonObject.get(Constants.INGREDIENT));
             var count = GsonHelper.getAsInt(jsonObject, Constants.COUNT);
             ingredientStack = new IngredientStack(ingredient, count);
+        } else {
+            ingredientStack = new IngredientStack(Ingredient.fromJson(json), 1);
         }
-        ingredientStack = new IngredientStack(Ingredient.fromJson(json), 1);
-        if (ingredientStack.ingredient.isEmpty) {
+        if (ingredientStack.ingredient.items.length == 0) {
             throw new IllegalArgumentException("Ingredient is empty, maybe wrong tag");
         }
         return ingredientStack;
