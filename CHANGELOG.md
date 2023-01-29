@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.0.3] - 2023-01-29
+
+### Fixed
+- items with secondary use in off-hand preventing item withdrawal
+- duplication glitches with automation ([#14])
+
+<!-- Links -->
+[#14]: https://github.com/AlmostReliable/summoningrituals/issues/14
+
 ## [2.0.2] - 2023-01-15
 
 ### Added
@@ -72,7 +81,8 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[2.0.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.1
+[2.0.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.3
+[2.0.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.2
 [2.0.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.1
 [2.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.0
 [1.1.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-1.1.7
