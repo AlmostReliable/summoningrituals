@@ -89,8 +89,8 @@ public class AltarBlockEntity extends PlatformBlockEntity {
                 inventory.catalyst = ItemStack.EMPTY;
             } else {
                 handleSummoning(recipe, player);
-                stack.shrink(1);
-                return stack.isEmpty ? ItemStack.EMPTY : stack;
+                var remainder = stack.copyWithCount(stack.getCount() - 1);
+                return remainder.isEmpty ? ItemStack.EMPTY : remainder;
             }
         }
 
