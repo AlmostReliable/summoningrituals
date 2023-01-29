@@ -106,22 +106,23 @@ public class AltarInventory implements ItemHandler {
 
         var remaining = stack.copy();
         for (var i = 0; i < SIZE; i++) {
+            var original = remaining.copy();
             remaining = insertItem(i, remaining);
 
             if (remaining.isEmpty) {
-                insertOrder.push(new Tuple<>(stack, i));
+                insertOrder.push(new Tuple<>(original, i));
                 return ItemStack.EMPTY;
             }
 
-            if (remaining.count == stack.count) {
+            if (remaining.count == original.count) {
                 continue;
             }
 
-            stack.shrink(remaining.count);
-            insertOrder.push(new Tuple<>(stack.copy(), i));
+            original.shrink(remaining.count);
+            insertOrder.push(new Tuple<>(original, i));
         }
 
-        return stack;
+        return remaining;
     }
 
     public void popLastInserted() {
@@ -217,10 +218,10 @@ public class AltarInventory implements ItemHandler {
         if (toInsert <= 0) return stack;
 
         currentStack.grow(toInsert);
-        stack.shrink(toInsert);
+        var remainder = stack.copyWithCount(stack.count - toInsert);
         onContentsChanged();
 
-        return stack.isEmpty ? ItemStack.EMPTY : stack;
+        return remainder.isEmpty ? ItemStack.EMPTY : remainder;
     }
 
     private void rebuildInsertOrder() {
