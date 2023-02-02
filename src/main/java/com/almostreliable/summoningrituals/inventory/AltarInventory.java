@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.inventory;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -92,7 +93,7 @@ public class AltarInventory implements ItemHandler {
     public void setStackInSlot(int slot, ItemStack stack) {
         validateSlot(slot);
 
-        if (slot == SIZE) {
+        if (slot == AltarRecipeSerializer.MAX_INPUTS) {
             catalyst = stack;
             return;
         }
@@ -105,7 +106,7 @@ public class AltarInventory implements ItemHandler {
         if (stack.isEmpty) return ItemStack.EMPTY;
 
         var remaining = stack.copy();
-        for (var i = 0; i < SIZE; i++) {
+        for (var i = 0; i < AltarRecipeSerializer.MAX_INPUTS; i++) {
             var original = remaining.copy();
             remaining = insertItem(i, remaining);
 
@@ -251,14 +252,14 @@ public class AltarInventory implements ItemHandler {
 
     @Override
     public int getSlots() {
-        return SIZE + 1;
+        return AltarRecipeSerializer.MAX_INPUTS + 1;
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
-        if (slot == items.size()) return catalyst;
+        if (slot == AltarRecipeSerializer.MAX_INPUTS) return catalyst;
         return items.get(slot);
     }
 
@@ -278,7 +279,7 @@ public class AltarInventory implements ItemHandler {
     @Override
     public int getSlotLimit(int slot) {
         validateSlot(slot);
-        if (slot == SIZE) return 1;
+        if (slot == AltarRecipeSerializer.MAX_INPUTS) return 1;
         return 64;
     }
 
