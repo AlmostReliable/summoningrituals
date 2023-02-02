@@ -95,7 +95,9 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
 
         var remaining = inventory.handleInsertion(stack);
-        if (player != null) GameUtils.playSound(level, worldPosition, SoundEvents.ITEM_PICKUP);
+        if (player != null && (remaining.isEmpty || stack.count != remaining.count)) {
+            GameUtils.playSound(level, worldPosition, SoundEvents.ITEM_PICKUP);
+        }
         return remaining;
     }
 
