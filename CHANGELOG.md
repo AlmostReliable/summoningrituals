@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.0.4] - 2023-02-02
+
+### Changed
+- inventory size of the Altar is now limited to the recipe with the highest input size
+  - this prevents the Altar from acting as a mass storage for items
+  - the maximum input size of recipes is 64 item stacks
+
+### Fixed
+- insertion sound is no longer played when no item could be inserted into the Altar
+
 ## [2.0.3] - 2023-01-29
 
 ### Fixed
@@ -81,6 +91,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.4]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.4
 [2.0.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.3
 [2.0.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.2
 [2.0.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.1
