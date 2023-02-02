@@ -18,6 +18,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
+    @SuppressWarnings({"StaticNonFinalField", "NonConstantFieldWithUpperCaseName"})
+    public static int MAX_INPUTS;
+
     @Override
     public AltarRecipe fromJson(ResourceLocation id, JsonObject json) {
         var catalyst = Ingredient.fromJson(json.getAsJsonObject(Constants.CATALYST));
@@ -36,6 +39,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
                 }
             }
         }
+        expandMaxInputs(inputs.size());
 
         RecipeSacrifices sacrifices = new RecipeSacrifices();
         if (json.has(Constants.SACRIFICES)) {
@@ -81,6 +85,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         for (var i = 0; i < inputCount; i++) {
             inputs.add(IngredientStack.fromNetwork(buffer));
         }
+        expandMaxInputs(inputs.size());
 
         RecipeSacrifices sacrifices = new RecipeSacrifices();
         if (buffer.readBoolean()) {
@@ -146,5 +151,9 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             throw new IllegalArgumentException("Too many inputs, max is " + AltarInventory.SIZE);
         }
         inputs.add(input);
+    }
+
+    private static void expandMaxInputs(int amount) {
+        if (MAX_INPUTS < amount) MAX_INPUTS = amount;
     }
 }
