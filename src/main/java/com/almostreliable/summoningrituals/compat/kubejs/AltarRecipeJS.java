@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class AltarRecipeJS extends RecipeJS {
+
     public AltarRecipeJS itemOutput(ItemOutputBuilder itemOutput) {
         getValue(AltarRecipeSchema.OUTPUTS).add(itemOutput.build());
         return this;

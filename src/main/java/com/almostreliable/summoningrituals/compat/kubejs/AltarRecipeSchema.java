@@ -14,6 +14,7 @@ import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 
 public interface AltarRecipeSchema {
+
     RecipeKey<InputItem> CATALYST = ItemComponents.INPUT.key(Constants.CATALYST);
 
     RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS).defaultOptional();
