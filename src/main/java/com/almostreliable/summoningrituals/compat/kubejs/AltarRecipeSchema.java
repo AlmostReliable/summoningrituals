@@ -43,7 +43,9 @@ public interface AltarRecipeSchema {
         .preferred(UtilsJS.snakeCaseToCamelCase(Constants.WEATHER))
         .optional(AltarRecipe.WEATHER.ANY);
 
-    RecipeKey<Integer> RECIPE_TIME = NumberComponent.ANY_INT.key(Constants.RECIPE_TIME).defaultOptional();
+    RecipeKey<Integer> RECIPE_TIME = NumberComponent.ANY_INT.key(Constants.RECIPE_TIME)
+        .preferred(UtilsJS.snakeCaseToCamelCase(Constants.RECIPE_TIME))
+        .defaultOptional();
 
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         INPUTS, OUTPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
