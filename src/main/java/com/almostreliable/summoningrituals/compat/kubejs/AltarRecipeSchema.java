@@ -21,11 +21,13 @@ public interface AltarRecipeSchema {
 
     RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS)
         .optional(new RecipeOutputs())
-        .exclude();
+        .exclude()
+        .alwaysWrite();
 
     RecipeKey<RecipeSacrifices> SACRIFICES = SummoningComponents.SACRIFICES.key(Constants.SACRIFICES)
         .optional(new RecipeSacrifices())
-        .exclude();
+        .exclude()
+        .alwaysWrite();
 
     RecipeKey<BlockReference> BLOCK_BELOW = SummoningComponents.BLOCK_REFERENCE.key(Constants.BLOCK_BELOW)
         .defaultOptional()
