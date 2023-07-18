@@ -7,10 +7,10 @@ import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOu
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
+import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Ingredient;
 import org.apache.commons.lang3.ArrayUtils;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -25,7 +25,7 @@ public class AltarRecipeJS extends RecipeJS {
         return this;
     }
 
-    public AltarRecipeJS input(Ingredient... ingredients) {
+    public AltarRecipeJS input(InputItem... ingredients) {
         var arr = ArrayUtils.addAll(getValue(AltarRecipeSchema.INPUTS), ingredients);
         setValue(AltarRecipeSchema.INPUTS, arr);
         return this;
