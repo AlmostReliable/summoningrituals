@@ -44,5 +44,5 @@ public interface AltarRecipeSchema {
 
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         INPUTS, OUTPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
-    );
+    ).constructor(CATALYST);
 }
