@@ -17,17 +17,13 @@ public interface AltarRecipeSchema {
 
     RecipeKey<InputItem> CATALYST = ItemComponents.INPUT.key(Constants.CATALYST);
 
-    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS).defaultOptional();
+    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS).optional(new InputItem[0]);
 
-    RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS)
-        .optional(new RecipeOutputs())
-        .exclude()
-        .alwaysWrite();
+    RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS).noBuilders();
 
     RecipeKey<RecipeSacrifices> SACRIFICES = SummoningComponents.SACRIFICES.key(Constants.SACRIFICES)
-        .optional(new RecipeSacrifices())
-        .exclude()
-        .alwaysWrite();
+        .optional(type -> new RecipeSacrifices())
+        .noBuilders();
 
     RecipeKey<BlockReference> BLOCK_BELOW = SummoningComponents.BLOCK_REFERENCE.key(Constants.BLOCK_BELOW)
         .defaultOptional()
@@ -45,9 +41,14 @@ public interface AltarRecipeSchema {
 
     RecipeKey<Integer> RECIPE_TIME = NumberComponent.ANY_INT.key(Constants.RECIPE_TIME)
         .preferred(UtilsJS.snakeCaseToCamelCase(Constants.RECIPE_TIME))
-        .defaultOptional();
+        .optional(100);
 
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         INPUTS, OUTPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
-    ).constructor(CATALYST);
+    ).constructor((recipe, schemaType, keys, from) -> {
+        // set default values on any new recipe
+        recipe.setValue(INPUTS, new InputItem[0]);
+        recipe.setValue(OUTPUTS, new RecipeOutputs());
+        recipe.setValue(SACRIFICES, new RecipeSacrifices());
+    }, CATALYST);
 }
