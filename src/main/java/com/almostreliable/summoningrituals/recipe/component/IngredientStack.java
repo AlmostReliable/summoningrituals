@@ -12,7 +12,8 @@ public record IngredientStack(Ingredient ingredient, int count) {
     public static IngredientStack fromJson(JsonElement json) {
         IngredientStack ingredientStack;
         if (json instanceof JsonObject jsonObject && jsonObject.has(Constants.COUNT)) {
-            var ingredient = Ingredient.fromJson(jsonObject.get(Constants.INGREDIENT));
+            var ingredient = Ingredient.fromJson(jsonObject.has(Constants.INGREDIENT)
+                ? jsonObject.get(Constants.INGREDIENT) : jsonObject);
             var count = GsonHelper.getAsInt(jsonObject, Constants.COUNT);
             ingredientStack = new IngredientStack(ingredient, count);
         } else {

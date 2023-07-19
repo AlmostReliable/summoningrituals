@@ -6,12 +6,11 @@ import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
-import com.almostreliable.summoningrituals.util.Utils;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
+import dev.latvian.mods.kubejs.recipe.schema.RegisterRecipeSchemasEvent;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
@@ -26,15 +25,15 @@ import javax.annotation.Nullable;
 public class AlmostKube extends KubeJSPlugin {
 
     private static final EventGroup GROUP = EventGroup.of(BuildConfig.MOD_NAME.replace(" ", ""));
-    private static final EventHandler START = GROUP.server("start", () -> SummoningEventJS.class).cancelable();
+    private static final EventHandler START = GROUP.server("start", () -> SummoningEventJS.class).hasResult();
     private static final EventHandler COMPLETE = GROUP.server("complete", () -> SummoningEventJS.class);
 
     @Override
     public void init() {
         AltarBlockEntity.SUMMONING_START.register((level, pos, recipe, player) ->
-            START.post(new SummoningEventJS(level, pos, recipe, player)));
+            START.post(new SummoningEventJS(level, pos, recipe, player)).interruptFalse());
         AltarBlockEntity.SUMMONING_COMPLETE.register((level, pos, recipe, player) ->
-            COMPLETE.post(new SummoningEventJS(level, pos, recipe, player)));
+            COMPLETE.post(new SummoningEventJS(level, pos, recipe, player)).interruptFalse());
     }
 
     @Override
@@ -56,8 +55,8 @@ public class AlmostKube extends KubeJSPlugin {
     }
 
     @Override
-    public void registerRecipeTypes(RegisterRecipeTypesEvent event) {
-        event.register(Utils.getRL(Constants.ALTAR), AltarRecipeJS::new);
+    public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {
+        event.namespace(BuildConfig.MOD_ID).register(Constants.ALTAR, AltarRecipeSchema.SCHEMA);
     }
 
     @SuppressWarnings("WeakerAccess")
