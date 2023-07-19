@@ -3,9 +3,11 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+import com.almostreliable.summoningrituals.recipe.component.IngredientStack;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
@@ -15,6 +17,27 @@ import org.apache.commons.lang3.ArrayUtils;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class AltarRecipeJS extends RecipeJS {
+
+    @Override
+    public InputItem readInputItem(Object from) {
+        if (from instanceof JsonElement json) {
+            var stack = IngredientStack.fromJson(json);
+            return InputItem.of(stack.ingredient(), stack.count());
+        }
+        return super.readInputItem(from);
+    }
+
+    @Override
+    public JsonElement writeInputItem(InputItem value) {
+        if (value.count == 1) {
+            return value.ingredient.toJson();
+        } else {
+            var obj = new JsonObject();
+            obj.add("ingredient", value.ingredient.toJson());
+            obj.addProperty("count", value.count);
+            return obj;
+        }
+    }
 
     public AltarRecipeJS itemOutput(ItemOutputBuilder itemOutput) {
         getValue(AltarRecipeSchema.OUTPUTS).add(itemOutput.build());
