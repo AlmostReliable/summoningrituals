@@ -50,7 +50,7 @@ public final class Platform {
         return new CreativeModeTab(BuildConfig.MOD_ID) {
             @Override
             public ItemStack makeIcon() {
-                return Registration.ALTAR_ITEM.get().defaultInstance;
+                return Registration.ALTAR_ITEM.get().getDefaultInstance();
             }
         };
     }
@@ -88,9 +88,9 @@ public final class Platform {
         BlockRenderDispatcher blockRenderer, BlockReference blockReference, PoseStack stack,
         MultiBufferSource.BufferSource bufferSource
     ) {
-        //noinspection DataFlowIssue
+        // noinspection DataFlowIssue
         blockRenderer.renderSingleBlock(
-            blockReference.displayState,
+            blockReference.getDisplayState(),
             stack,
             bufferSource,
             LightTexture.FULL_BRIGHT,
@@ -133,13 +133,13 @@ public final class Platform {
 
     public static Stream<? extends TagKey<?>> getTagsFor(EntityType<?> entityType) {
         return ForgeRegistries.ENTITY_TYPES.getHolder(
-            ResourceKey.create(ForgeRegistries.ENTITY_TYPES.registryKey, getId(entityType))
+            ResourceKey.create(ForgeRegistries.ENTITY_TYPES.getRegistryKey(), getId(entityType))
         ).map(Holder::tags).orElseGet(Stream::empty);
     }
 
     public static Stream<? extends TagKey<?>> getTagsFor(Block block) {
         return ForgeRegistries.BLOCKS.getHolder(
-            ResourceKey.create(ForgeRegistries.BLOCKS.registryKey, getId(block))
+            ResourceKey.create(ForgeRegistries.BLOCKS.getRegistryKey(), getId(block))
         ).map(Holder::tags).orElseGet(Stream::empty);
     }
 }

@@ -43,7 +43,7 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void registerBindings(BindingsEvent event) {
-        if (event.type != ScriptType.SERVER) return;
+        if (event.getType() != ScriptType.SERVER) return;
         event.add("SummoningOutput", OutputWrapper.class);
     }
 
@@ -67,7 +67,7 @@ public class AlmostKube extends KubeJSPlugin {
         public static ItemOutputBuilder item(@Nullable Object o) {
             if (o instanceof ItemOutputBuilder iob) return iob;
             ItemStack stack = ItemStackJS.of(o);
-            if (stack.isEmpty) {
+            if (stack.isEmpty()) {
                 ConsoleJS.SERVER.error("Empty or null ItemStack specified for SummoningOutput.item");
             }
             return new ItemOutputBuilder(stack);

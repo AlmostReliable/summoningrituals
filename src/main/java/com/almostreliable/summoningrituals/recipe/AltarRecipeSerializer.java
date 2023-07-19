@@ -31,11 +31,11 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         NonNullList<IngredientStack> inputs = NonNullList.create();
         if (json.has(Constants.INPUTS)) {
             var inputJson = json.get(Constants.INPUTS);
-            if (inputJson.isJsonObject) {
+            if (inputJson.isJsonObject()) {
                 addInput(inputs, IngredientStack.fromJson(inputJson));
             } else {
-                for (var input : inputJson.asJsonArray) {
-                    addInput(inputs, IngredientStack.fromJson(input.asJsonObject));
+                for (var input : inputJson.getAsJsonArray()) {
+                    addInput(inputs, IngredientStack.fromJson(input.getAsJsonObject()));
                 }
             }
         }
@@ -117,33 +117,33 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, AltarRecipe recipe) {
-        recipe.catalyst.toNetwork(buffer);
+        recipe.getCatalyst().toNetwork(buffer);
 
-        recipe.outputs.toNetwork(buffer);
+        recipe.getOutputs().toNetwork(buffer);
 
-        buffer.writeVarInt(recipe.inputs.size());
-        for (var input : recipe.inputs) {
+        buffer.writeVarInt(recipe.getInputs().size());
+        for (var input : recipe.getInputs()) {
             input.toNetwork(buffer);
         }
 
-        if (recipe.sacrifices.isEmpty) {
+        if (recipe.getSacrifices().isEmpty()) {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            recipe.sacrifices.toNetwork(buffer);
+            recipe.getSacrifices().toNetwork(buffer);
         }
 
-        buffer.writeInt(recipe.recipeTime);
+        buffer.writeInt(recipe.getRecipeTime());
 
-        if (recipe.blockBelow != null) {
+        if (recipe.getBlockBelow() != null) {
             buffer.writeBoolean(true);
-            recipe.blockBelow.toNetwork(buffer);
+            recipe.getBlockBelow().toNetwork(buffer);
         } else {
             buffer.writeBoolean(false);
         }
 
-        buffer.writeVarInt(recipe.dayTime.ordinal());
-        buffer.writeVarInt(recipe.weather.ordinal());
+        buffer.writeVarInt(recipe.getDayTime().ordinal());
+        buffer.writeVarInt(recipe.getWeather().ordinal());
     }
 
     private void addInput(NonNullList<IngredientStack> inputs, IngredientStack input) {

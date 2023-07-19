@@ -2,8 +2,6 @@ package com.almostreliable.summoningrituals.platform;
 
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.inventory.ItemHandler;
-import manifold.ext.props.rt.api.val;
-import manifold.ext.props.rt.api.var;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,10 +18,10 @@ import javax.annotation.Nullable;
 
 public abstract class PlatformBlockEntity extends BlockEntity {
 
-    @val final AltarInventory inventory;
+    protected final AltarInventory inventory;
     private final LazyOptional<ItemHandler> inventoryCap;
 
-    @var int progress;
+    protected int progress;
 
     protected PlatformBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -47,4 +45,16 @@ public abstract class PlatformBlockEntity extends BlockEntity {
     }
 
     public abstract ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack);
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public AltarInventory getInventory() {
+        return inventory;
+    }
 }

@@ -12,10 +12,10 @@ public final class ItemStackExt {
     private ItemStackExt() {}
 
     public static ItemStack withCount(@This ItemStack thiz, long count) {
-        if (count > thiz.maxStackSize) {
+        if (count > thiz.getMaxStackSize()) {
             throw new IllegalArgumentException("Count cannot be greater than max stack size");
         }
-        thiz.count = (int) count;
+        thiz.setCount((int) count);
         return thiz;
     }
 
@@ -24,10 +24,10 @@ public final class ItemStackExt {
     }
 
     public static boolean canStack(@This ItemStack thiz, ItemStack other) {
-        if (thiz.isEmpty || !thiz.sameItem(other) || thiz.hasTag() != other.hasTag()) return false;
+        if (thiz.isEmpty() || !thiz.sameItem(other) || thiz.hasTag() != other.hasTag()) return false;
         if (!thiz.hasTag()) return true;
-        assert thiz.tag != null;
-        return thiz.tag.equals(other.tag);
+        assert thiz.getTag() != null;
+        return thiz.getTag().equals(other.getTag());
     }
 
     public static CompoundTag serialize(@This ItemStack thiz) {

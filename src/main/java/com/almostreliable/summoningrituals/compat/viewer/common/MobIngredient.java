@@ -22,10 +22,10 @@ public class MobIngredient {
         this.mob = mob;
         this.count = count;
         this.tag = tag;
-        var level = Minecraft.instance.level;
+        var level = Minecraft.getInstance().level;
         if (level != null) {
             entity = mob.create(level);
-            if (entity != null && !tag.isEmpty) {
+            if (entity != null && !tag.isEmpty()) {
                 entity.load(tag);
             }
         }
@@ -37,7 +37,7 @@ public class MobIngredient {
 
     public Component getDisplayName() {
         if (entity == null) return Component.literal("Unknown Entity");
-        return entity.displayName;
+        return entity.getDisplayName();
     }
 
     public MutableComponent getRegistryName() {
@@ -61,6 +61,7 @@ public class MobIngredient {
         return entity;
     }
 
+    @SuppressWarnings("deprecation")
     @Nullable
     public SpawnEggItem getEgg() {
         return SpawnEggItem.byId(mob);

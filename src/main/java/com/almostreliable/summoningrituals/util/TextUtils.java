@@ -24,7 +24,7 @@ public final class TextUtils {
     }
 
     public static String translateAsString(String type, String key) {
-        return translate(type, key).string;
+        return translate(type, key).getString();
     }
 
     public static MutableComponent translate(String type, String key, ChatFormatting... color) {

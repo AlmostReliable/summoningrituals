@@ -25,7 +25,7 @@ public class CatalystRenderer extends SizedItemRenderer {
                 0,
                 TextUtils.translate(Constants.TOOLTIP, Constants.CATALYST, ChatFormatting.GOLD)
                     .append(": ")
-                    .append(TextUtils.colorize(tooltip.get(0).string, ChatFormatting.WHITE))
+                    .append(TextUtils.colorize(tooltip.get(0).getString(), ChatFormatting.WHITE))
             );
             tooltip.add(TextUtils.translate(Constants.TOOLTIP, f("{}_desc", Constants.CATALYST), ChatFormatting.GRAY));
             return tooltip;

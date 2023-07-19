@@ -49,9 +49,9 @@ public class ClientAltarUpdatePacket extends ServerToClientPacket<ClientAltarUpd
             return;
         }
         if (packet.type == PacketType.PROGRESS) {
-            altar.progress = packet.value;
+            altar.setProgress(packet.value);
         } else if (packet.type == PacketType.PROCESS_TIME) {
-            altar.processTime = packet.value;
+            altar.setProcessTime(packet.value);
         } else {
             throw new IllegalStateException("Unknown packet type: " + packet.type);
         }

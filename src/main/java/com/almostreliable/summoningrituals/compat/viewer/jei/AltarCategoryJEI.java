@@ -40,7 +40,10 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
 
     AltarCategoryJEI(IGuiHelper guiHelper) {
         super(
-            guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_ITEM.get().defaultInstance),
+            guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK,
+                Registration.ALTAR_ITEM.get().getDefaultInstance()
+            ),
             new JEIAltarRenderer(BLOCK_SIZE),
             new JEICatalystRenderer(ITEM_SIZE)
         );
@@ -66,16 +69,16 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
         // block below
-        if (recipe.blockBelow != null) {
+        if (recipe.getBlockBelow() != null) {
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - BLOCK_SLOT_SIZE / 2, RENDER_Y - 3)
                 .setCustomRenderer(AlmostJEI.BLOCK_REFERENCE, blockReferenceRenderer)
-                .addIngredient(AlmostJEI.BLOCK_REFERENCE, recipe.blockBelow);
+                .addIngredient(AlmostJEI.BLOCK_REFERENCE, recipe.getBlockBelow());
         }
 
         // catalyst
         builder.addSlot(RecipeIngredientRole.INPUT, CENTER_X - ITEM_SLOT_SIZE / 2, RENDER_Y - 32)
             .setCustomRenderer(VanillaTypes.ITEM_STACK, catalystRenderer)
-            .addIngredients(recipe.catalyst);
+            .addIngredients(recipe.getCatalyst());
 
         // inputs
         handleInputs(
@@ -86,7 +89,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
                     .setCustomRenderer(AlmostJEI.MOB, mobRenderer)
                     .addIngredient(AlmostJEI.MOB, mob);
                 if (egg != null) {
-                    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(egg.defaultInstance);
+                    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(egg.getDefaultInstance());
                 }
             }
         );
@@ -100,7 +103,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
                     .setCustomRenderer(AlmostJEI.MOB, mobRenderer)
                     .addIngredient(AlmostJEI.MOB, mob);
                 if (egg != null) {
-                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(egg.defaultInstance);
+                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(egg.getDefaultInstance());
                 }
             }
         );
@@ -113,9 +116,9 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
         // altar
         stack.pushPose();
         {
-            var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.blockBelow == null ? 0 : 4);
+            var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.getBlockBelow() == null ? 0 : 4);
             stack.translate(CENTER_X - BLOCK_SLOT_SIZE / 2f, altarY, 0);
-            //noinspection DataFlowIssue
+            // noinspection DataFlowIssue
             altarRenderer.render(stack, null);
         }
         stack.popPose();
@@ -129,7 +132,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
             128,
             0x36_A400
         );
-        if (!recipe.sacrifices.isEmpty) {
+        if (!recipe.getSacrifices().isEmpty()) {
             drawLabel(
                 stack,
                 f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.REGION)),
@@ -140,7 +143,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
             );
             drawLabel(
                 stack,
-                recipe.sacrifices.displayRegion,
+                recipe.getSacrifices().getDisplayRegion(),
                 GameUtils.ANCHOR.TOP_LEFT,
                 1,
                 11,

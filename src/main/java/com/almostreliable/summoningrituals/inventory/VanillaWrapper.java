@@ -19,10 +19,10 @@ public class VanillaWrapper extends RecipeWrapper {
     }
 
     public List<ItemStack> getItems() {
-        return delegate.noneEmptyItems;
+        return delegate.getNoneEmptyItems();
     }
 
     public ItemStack getCatalyst() {
-        return delegate.catalyst;
+        return delegate.getCatalyst();
     }
 }

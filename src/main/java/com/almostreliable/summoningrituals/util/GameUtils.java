@@ -32,9 +32,9 @@ public final class GameUtils {
     public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
         ItemEntity.of(level, stack).spawn(
             level,
-            pos.x + (offset ? 0.5 : 0),
-            pos.y + (offset ? 0.5 : 0),
-            pos.z + (offset ? 0.5 : 0)
+            pos.getX() + (offset ? 0.5 : 0),
+            pos.getY() + (offset ? 0.5 : 0),
+            pos.getZ() + (offset ? 0.5 : 0)
         );
     }
 
@@ -55,7 +55,7 @@ public final class GameUtils {
 
             var xOffset = 0;
             var yOffset = 0;
-            var font = Minecraft.instance.font;
+            var font = Minecraft.getInstance().font;
             var width = font.width(text);
             var height = font.lineHeight;
             switch (anchor) {

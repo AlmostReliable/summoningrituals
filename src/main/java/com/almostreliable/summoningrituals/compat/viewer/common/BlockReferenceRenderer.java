@@ -28,8 +28,8 @@ public class BlockReferenceRenderer {
 
     protected BlockReferenceRenderer(int size) {
         this.size = size;
-        mc = Minecraft.instance;
-        blockRenderer = mc.blockRenderer;
+        mc = Minecraft.getInstance();
+        blockRenderer = mc.getBlockRenderer();
     }
 
     public void render(PoseStack stack, @Nullable BlockReference blockReference) {
@@ -55,16 +55,16 @@ public class BlockReferenceRenderer {
     }
 
     public List<Component> getTooltip(BlockReference blockReference, TooltipFlag tooltipFlag) {
-        var displayState = blockReference.displayState;
-        var stack = new ItemStack(displayState.block);
+        var displayState = blockReference.getDisplayState();
+        var stack = new ItemStack(displayState.getBlock());
         try {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(
                 TextUtils.translate(Constants.TOOLTIP, Constants.BLOCK_BELOW, ChatFormatting.GOLD)
                     .append(": ")
-                    .append(((MutableComponent) stack.hoverName).withStyle(ChatFormatting.WHITE))
+                    .append(((MutableComponent) stack.getHoverName()).withStyle(ChatFormatting.WHITE))
             );
-            if (tooltipFlag.isAdvanced) {
+            if (tooltipFlag.isAdvanced()) {
                 tooltip.add(Component.literal(Platform.getId(stack.getItem())
                     .toString()).withStyle(ChatFormatting.DARK_GRAY));
             }
@@ -77,14 +77,14 @@ public class BlockReferenceRenderer {
     }
 
     private void appendStateTooltip(BlockState displayState, List<Component> tooltip) {
-        var defaultState = displayState.block.defaultBlockState();
+        var defaultState = displayState.getBlock().defaultBlockState();
         List<String> modifiedProps = new ArrayList<>();
-        for (var property : displayState.properties) {
+        for (var property : displayState.getProperties()) {
             if (!displayState.getValue(property).equals(defaultState.getValue(property))) {
-                modifiedProps.add(property.name + ": " + displayState.getValue(property));
+                modifiedProps.add(property.getName() + ": " + displayState.getValue(property));
             }
         }
-        if (modifiedProps.isEmpty) return;
+        if (modifiedProps.isEmpty()) return;
 
         tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.PROPERTIES, ChatFormatting.AQUA)
             .append(TextUtils.colorize(":", ChatFormatting.AQUA)));

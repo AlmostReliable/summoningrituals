@@ -9,7 +9,6 @@ import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
-import manifold.ext.props.rt.api.var;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -37,7 +36,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     @Nullable private AltarRecipe currentRecipe;
     @Nullable private List<EntitySacrifice> sacrifices;
     @Nullable private ServerPlayer invokingPlayer;
-    @var int processTime;
+    private int processTime;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_ENTITY.get(), pos, state);
@@ -75,27 +74,27 @@ public class AltarBlockEntity extends PlatformBlockEntity {
             return stack;
         }
 
-        if (stack.isEmpty) {
-            if (player != null && player.isShiftKeyDown) {
+        if (stack.isEmpty()) {
+            if (player != null && player.isShiftKeyDown()) {
                 inventory.popLastInserted();
             }
             return ItemStack.EMPTY;
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
-            inventory.catalyst = stack.getItem().defaultInstance;
+            inventory.setCatalyst(stack.getItem().getDefaultInstance());
             var recipe = findRecipe();
             if (recipe == null) {
-                inventory.catalyst = ItemStack.EMPTY;
+                inventory.setCatalyst(ItemStack.EMPTY);
             } else {
                 handleSummoning(recipe, player);
                 var remainder = stack.copyWithCount(stack.getCount() - 1);
-                return remainder.isEmpty ? ItemStack.EMPTY : remainder;
+                return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
             }
         }
 
         var remaining = inventory.handleInsertion(stack);
-        if (player != null && (remaining.isEmpty || stack.count != remaining.count)) {
+        if (player != null && (remaining.isEmpty() || stack.getCount() != remaining.getCount())) {
             GameUtils.playSound(level, worldPosition, SoundEvents.ITEM_PICKUP);
         }
         return remaining;
@@ -111,7 +110,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     void tick() {
         if (level == null) return;
 
-        if (!inventory.catalyst.isEmpty && currentRecipe == null) {
+        if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
             var recipe = findRecipe();
             if (recipe == null) {
                 resetSummoning(true);
@@ -121,9 +120,9 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
         if (currentRecipe == null) return;
 
-        if (progress >= currentRecipe.recipeTime) {
+        if (progress >= currentRecipe.getRecipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
-                currentRecipe.outputs.handleRecipe((ServerLevel) level, worldPosition);
+                currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
                 SUMMONING_COMPLETE.invoke((ServerLevel) level, worldPosition, currentRecipe, invokingPlayer);
                 GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
                 resetSummoning(false);
@@ -136,10 +135,10 @@ public class AltarBlockEntity extends PlatformBlockEntity {
 
         if (progress == 0) {
             changeActivityState(true);
-            if (sacrifices != null && !sacrifices.isEmpty) {
+            if (sacrifices != null && !sacrifices.isEmpty()) {
                 sacrifices.stream()
                     .map(EntitySacrifice::kill)
-                    .filter(positions -> !positions.isEmpty)
+                    .filter(positions -> !positions.isEmpty())
                     .forEach(p -> Platform.sendParticleEmit(level, p));
             }
         }
@@ -163,11 +162,11 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
-        sacrifices = checkSacrifices(recipe.sacrifices, player);
+        sacrifices = checkSacrifices(recipe.getSacrifices(), player);
         if (sacrifices == null ||
-            !checkBlockBelow(recipe.blockBelow, player) ||
-            !recipe.dayTime.check(level, player) ||
-            !recipe.weather.check(level, player)) {
+            !checkBlockBelow(recipe.getBlockBelow(), player) ||
+            !recipe.getDayTime().check(level, player) ||
+            !recipe.getWeather().check(level, player)) {
             inventory.popLastInserted();
             GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
             return;
@@ -179,7 +178,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
         currentRecipe = recipe;
         invokingPlayer = player;
-        processTime = recipe.recipeTime;
+        processTime = recipe.getRecipeTime();
         GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
         Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
     }
@@ -187,15 +186,15 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     @Nullable
     private AltarRecipe findRecipe() {
         assert level != null && !level.isClientSide;
-        var recipeManager = level.recipeManager;
-        return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE.type().get(), inventory.vanillaInv, level)
+        var recipeManager = level.getRecipeManager();
+        return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE.type().get(), inventory.getVanillaInv(), level)
             .orElse(null);
     }
 
     @Nullable
     private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
-        if (sacrifices.isEmpty) return List.of();
+        if (sacrifices.isEmpty()) return List.of();
         var region = sacrifices.getRegion(worldPosition);
         var entities = level.getEntities(player, region);
         List<EntitySacrifice> toKill = new ArrayList<>();
@@ -226,6 +225,14 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         if (!oldState.getValue(AltarBlock.ACTIVE).equals(state)) {
             level.setBlockAndUpdate(worldPosition, oldState.setValue(AltarBlock.ACTIVE, state));
         }
+    }
+
+    public int getProcessTime() {
+        return processTime;
+    }
+
+    public void setProcessTime(int processTime) {
+        this.processTime = processTime;
     }
 
     private record EntitySacrifice(List<Entity> entities, int count) {

@@ -44,17 +44,17 @@ public class AlmostJEI implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration r) {
-        var guiHelper = r.jeiHelpers.guiHelper;
+        var guiHelper = r.getJeiHelpers().getGuiHelper();
         r.addRecipeCategories(new AltarCategoryJEI(guiHelper));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration r) {
-        var level = Minecraft.instance.level;
+        var level = Minecraft.getInstance().level;
         if (level == null) return;
         r.addRecipes(
             AltarCategoryJEI.TYPE,
-            level.recipeManager.getAllRecipesFor(Registration.ALTAR_RECIPE.type().get())
+            level.getRecipeManager().getAllRecipesFor(Registration.ALTAR_RECIPE.type().get())
         );
     }
 

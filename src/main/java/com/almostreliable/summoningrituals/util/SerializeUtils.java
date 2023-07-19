@@ -34,9 +34,9 @@ public final class SerializeUtils {
 
     public static JsonObject vec3ToJson(Vec3i vec) {
         var json = new JsonObject();
-        json.addProperty("x", vec.x);
-        json.addProperty("y", vec.y);
-        json.addProperty("z", vec.z);
+        json.addProperty("x", vec.getX());
+        json.addProperty("y", vec.getY());
+        json.addProperty("z", vec.getZ());
         return json;
     }
 
@@ -48,21 +48,21 @@ public final class SerializeUtils {
     }
 
     public static void vec3ToNetwork(FriendlyByteBuf buffer, Vec3i vec) {
-        buffer.writeVarInt(vec.x);
-        buffer.writeVarInt(vec.y);
-        buffer.writeVarInt(vec.z);
+        buffer.writeVarInt(vec.getX());
+        buffer.writeVarInt(vec.getY());
+        buffer.writeVarInt(vec.getZ());
     }
 
     public static JsonObject stackToJson(ItemStack stack) {
-        if (stack.isEmpty) {
+        if (stack.isEmpty()) {
             throw new IllegalArgumentException("stack is empty");
         }
         var json = new JsonObject();
         json.addProperty(Constants.ITEM, Platform.getId(stack.getItem()).toString());
-        json.addProperty(Constants.COUNT, stack.count);
+        json.addProperty(Constants.COUNT, stack.getCount());
         if (stack.hasTag()) {
-            assert stack.tag != null;
-            json.addProperty(Constants.NBT, stack.tag.toString());
+            assert stack.getTag() != null;
+            json.addProperty(Constants.NBT, stack.getTag().toString());
         }
         return json;
     }
@@ -80,14 +80,14 @@ public final class SerializeUtils {
         return json.entrySet().stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> entry.value.asString
+                entry -> entry.getValue().getAsString()
             ));
     }
 
     public static JsonObject mapToJson(Map<String, String> map) {
         var json = new JsonObject();
         for (var entry : map.entrySet()) {
-            json.addProperty(entry.key, entry.value);
+            json.addProperty(entry.getKey(), entry.getValue());
         }
         return json;
     }
@@ -104,8 +104,8 @@ public final class SerializeUtils {
     public static void mapToNetwork(FriendlyByteBuf buffer, Map<String, String> map) {
         buffer.writeVarInt(map.size());
         for (var entry : map.entrySet()) {
-            buffer.writeUtf(entry.key);
-            buffer.writeUtf(entry.value);
+            buffer.writeUtf(entry.getKey());
+            buffer.writeUtf(entry.getValue());
         }
     }
 

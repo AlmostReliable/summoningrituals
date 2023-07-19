@@ -41,9 +41,9 @@ public class SacrificeParticlePacket extends ServerToClientPacket<SacrificeParti
             for (var i = 0; i < 10; i++) {
                 level.addParticle(
                     ParticleTypes.SOUL,
-                    pos.x + random.nextFloat(),
-                    pos.y + random.nextFloat(),
-                    pos.z + random.nextFloat(),
+                    pos.getX() + random.nextFloat(),
+                    pos.getY() + random.nextFloat(),
+                    pos.getZ() + random.nextFloat(),
                     0,
                     0.05f,
                     0
