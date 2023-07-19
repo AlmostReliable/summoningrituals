@@ -26,8 +26,7 @@ public interface AltarRecipeSchema {
         .noBuilders();
 
     RecipeKey<BlockReference> BLOCK_BELOW = SummoningComponents.BLOCK_REFERENCE.key(Constants.BLOCK_BELOW)
-        .defaultOptional()
-        .exclude();
+        .defaultOptional();
 
     RecipeKey<AltarRecipe.DAY_TIME> DAY_TIME = new EnumComponent<>(AltarRecipe.DAY_TIME.class)
         .key(Constants.DAY_TIME)
