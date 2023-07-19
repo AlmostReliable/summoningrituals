@@ -28,6 +28,10 @@ public interface AltarRecipeSchema {
         .optional(type -> new RecipeSacrifices())
         .noBuilders();
 
+    RecipeKey<Integer> RECIPE_TIME = NumberComponent.ANY_INT.key(Constants.RECIPE_TIME)
+        .preferred(UtilsJS.snakeCaseToCamelCase(Constants.RECIPE_TIME))
+        .optional(100);
+
     RecipeKey<BlockReference> BLOCK_BELOW = SummoningComponents.BLOCK_REFERENCE.key(Constants.BLOCK_BELOW)
         .defaultOptional();
 
@@ -40,10 +44,6 @@ public interface AltarRecipeSchema {
         .key(Constants.WEATHER)
         .preferred(UtilsJS.snakeCaseToCamelCase(Constants.WEATHER))
         .optional(AltarRecipe.WEATHER.ANY);
-
-    RecipeKey<Integer> RECIPE_TIME = NumberComponent.ANY_INT.key(Constants.RECIPE_TIME)
-        .preferred(UtilsJS.snakeCaseToCamelCase(Constants.RECIPE_TIME))
-        .optional(100);
 
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         OUTPUTS, INPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME

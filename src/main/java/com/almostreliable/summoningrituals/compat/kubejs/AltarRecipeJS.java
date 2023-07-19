@@ -20,8 +20,8 @@ public class AltarRecipeJS extends RecipeJS {
 
     @Override
     public InputItem readInputItem(Object from) {
-        if (from instanceof JsonElement json) {
-            var stack = IngredientStack.fromJson(json);
+        if (from instanceof JsonElement jsonElement) {
+            var stack = IngredientStack.fromJson(jsonElement);
             return InputItem.of(stack.ingredient(), stack.count());
         }
         return super.readInputItem(from);
@@ -55,11 +55,6 @@ public class AltarRecipeJS extends RecipeJS {
         return this;
     }
 
-    public AltarRecipeJS sacrificeRegion(int width, int height) {
-        getValue(AltarRecipeSchema.SACRIFICES).setRegion(new Vec3i(width, height, width));
-        return this;
-    }
-
     public AltarRecipeJS sacrifice(ResourceLocation id, int count) {
         Preconditions.checkNotNull(id);
         getValue(AltarRecipeSchema.SACRIFICES).add(Platform.mobFromId(id), count);
@@ -69,6 +64,11 @@ public class AltarRecipeJS extends RecipeJS {
     public AltarRecipeJS sacrifice(ResourceLocation id) {
         Preconditions.checkNotNull(id);
         return sacrifice(id, 1);
+    }
+
+    public AltarRecipeJS sacrificeRegion(int width, int height) {
+        getValue(AltarRecipeSchema.SACRIFICES).setRegion(new Vec3i(width, height, width));
+        return this;
     }
 
     public AltarRecipeJS blockBelow(ResourceLocation id, JsonObject properties) {

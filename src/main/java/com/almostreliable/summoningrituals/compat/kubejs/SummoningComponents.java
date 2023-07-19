@@ -19,6 +19,34 @@ import java.util.Map;
  */
 public interface SummoningComponents {
 
+    RecipeComponent<RecipeOutputs> OUTPUTS = new RecipeComponent<>() {
+
+        @Override
+        public Class<?> componentClass() {
+            return RecipeOutputs.class;
+        }
+
+        @Override
+        public JsonElement write(RecipeJS recipe, RecipeOutputs value) {
+            return value.toJson();
+        }
+
+        @Override
+        public RecipeOutputs read(RecipeJS recipe, Object from) {
+            if (from instanceof RecipeOutputs outputs) {
+                return outputs;
+            }
+
+            var asList = ListJS.json(from);
+
+            if (asList != null) {
+                return RecipeOutputs.fromJson(asList);
+            }
+
+            throw new RecipeExceptionJS("Invalid outputs: " + from);
+        }
+    };
+
     RecipeComponent<RecipeSacrifices> SACRIFICES = new RecipeComponent<>() {
 
         @Override
@@ -44,7 +72,6 @@ public interface SummoningComponents {
                 }
             }
 
-            // return an empty "new" sacrifices object
             return new RecipeSacrifices();
         }
     };
@@ -75,34 +102,6 @@ public interface SummoningComponents {
             }
 
             throw new RecipeExceptionJS("Invalid block reference: " + from);
-        }
-    };
-
-    RecipeComponent<RecipeOutputs> OUTPUTS = new RecipeComponent<>() {
-
-        @Override
-        public Class<?> componentClass() {
-            return RecipeOutputs.class;
-        }
-
-        @Override
-        public JsonElement write(RecipeJS recipe, RecipeOutputs value) {
-            return value.toJson();
-        }
-
-        @Override
-        public RecipeOutputs read(RecipeJS recipe, Object from) {
-            if (from instanceof RecipeOutputs outputs) {
-                return outputs;
-            }
-
-            var asList = ListJS.json(from);
-
-            if (asList != null) {
-                return RecipeOutputs.fromJson(asList);
-            }
-
-            throw new RecipeExceptionJS("Invalid outputs: " + from);
         }
     };
 }
