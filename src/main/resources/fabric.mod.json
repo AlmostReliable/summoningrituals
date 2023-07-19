@@ -33,12 +33,13 @@
     "summoningrituals.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.9",
-    "fabric-api": "*",
-    "minecraft": ">=${mcVersion}",
+    "fabric": ">=${fabricApiVersion}",
+    "minecraft": ">=${minecraftVersion}",
     "java": ">=17"
   },
   "suggests": {
-    "kubejs": ">=${kubeMinVersion}"
+    "jei": ">=${jeiVersion}",
+    "roughlyenoughitems": ">=${reiVersion}",
+    "kubejs": ">=${kubeVersion}"
   }
 }
