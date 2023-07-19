@@ -28,8 +28,8 @@ val kubeVersion: String by project
 val kubeMinVersion: String by project
 
 plugins {
-    id("fabric-loom") version "1.0-SNAPSHOT"
-    id("io.github.juuxel.loom-quiltflower") version "1.8.0"
+    id("dev.architectury.loom") version "1.2-SNAPSHOT"
+    id("io.github.juuxel.loom-vineflower") version "1.11.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
     java
     idea
