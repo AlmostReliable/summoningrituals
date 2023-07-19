@@ -15,11 +15,14 @@ import dev.latvian.mods.kubejs.util.UtilsJS;
 
 public interface AltarRecipeSchema {
 
-    RecipeKey<InputItem> CATALYST = ItemComponents.INPUT.key(Constants.CATALYST).noBuilders();
+    RecipeKey<InputItem> CATALYST = ItemComponents.INPUT.key(Constants.CATALYST)
+        .noBuilders();
 
-    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS).optional(new InputItem[0]);
+    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS)
+        .optional(new InputItem[0]);
 
-    RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS).noBuilders();
+    RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS)
+        .noBuilders();
 
     RecipeKey<RecipeSacrifices> SACRIFICES = SummoningComponents.SACRIFICES.key(Constants.SACRIFICES)
         .optional(type -> new RecipeSacrifices())
@@ -43,7 +46,7 @@ public interface AltarRecipeSchema {
         .optional(100);
 
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
-        INPUTS, OUTPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
+        OUTPUTS, INPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
     ).constructor((recipe, schemaType, keys, from) -> {
         // set default values on any new recipe
         recipe.setValue(INPUTS, new InputItem[0]);
