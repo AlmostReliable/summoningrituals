@@ -23,13 +23,13 @@ public class REICatalystRenderer extends CatalystRenderer implements EntryRender
     ) {
         stack.pushPose();
         stack.translate(bounds.x, bounds.y, 0);
-        render(stack, entry.value);
+        render(stack, entry.getValue());
         stack.popPose();
     }
 
     @Nullable
     @Override
     public Tooltip getTooltip(EntryStack<ItemStack> entry, TooltipContext context) {
-        return Tooltip.create(context.point, getTooltip(entry.value, context.flag));
+        return Tooltip.create(context.getPoint(), getTooltip(entry.getValue(), context.getFlag()));
     }
 }

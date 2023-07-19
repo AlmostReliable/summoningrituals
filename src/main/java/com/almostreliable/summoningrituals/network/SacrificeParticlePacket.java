@@ -32,9 +32,9 @@ public final class SacrificeParticlePacket {
             for (var i = 0; i < 10; i++) {
                 mc.level.addParticle(
                     ParticleTypes.SOUL,
-                    p.x + random.nextFloat(),
-                    p.y + random.nextFloat(),
-                    p.z + random.nextFloat(),
+                    p.getX() + random.nextFloat(),
+                    p.getY() + random.nextFloat(),
+                    p.getZ() + random.nextFloat(),
                     0,
                     0.05f,
                     0

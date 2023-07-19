@@ -30,6 +30,6 @@ public class REIAltarRenderer extends AltarRenderer implements EntryRenderer<Ite
     @Nullable
     @Override
     public Tooltip getTooltip(EntryStack<ItemStack> entry, TooltipContext context) {
-        return Tooltip.create(context.point, getTooltip(ItemStack.EMPTY, context.flag));
+        return Tooltip.create(context.getPoint(), getTooltip(ItemStack.EMPTY, context.getFlag()));
     }
 }

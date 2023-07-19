@@ -42,7 +42,7 @@ public class BlockReferenceDefinition implements EntryDefinition<BlockReference>
     @Nullable
     @Override
     public ResourceLocation getIdentifier(EntryStack<BlockReference> entry, BlockReference blockReference) {
-        return Platform.getId(blockReference.displayState.block);
+        return Platform.getId(blockReference.getDisplayState().getBlock());
     }
 
     @Override
@@ -67,14 +67,14 @@ public class BlockReferenceDefinition implements EntryDefinition<BlockReference>
 
     @Override
     public long hash(EntryStack<BlockReference> entry, BlockReference blockReference, ComparisonContext context) {
-        int code = Platform.getId(blockReference.displayState.block).hashCode();
-        code = 31 * code + blockReference.displayState.hashCode();
+        int code = Platform.getId(blockReference.getDisplayState().getBlock()).hashCode();
+        code = 31 * code + blockReference.getDisplayState().hashCode();
         return code;
     }
 
     @Override
     public boolean equals(BlockReference blockReference1, BlockReference blockReference2, ComparisonContext context) {
-        return blockReference1.test(blockReference2.displayState);
+        return blockReference1.test(blockReference2.getDisplayState());
     }
 
     @Nullable
@@ -85,11 +85,11 @@ public class BlockReferenceDefinition implements EntryDefinition<BlockReference>
 
     @Override
     public Component asFormattedText(EntryStack<BlockReference> entry, BlockReference blockReference) {
-        return blockReference.displayState.block.name;
+        return blockReference.getDisplayState().getBlock().getName();
     }
 
     @Override
     public Stream<? extends TagKey<?>> getTagsFor(EntryStack<BlockReference> entry, BlockReference blockReference) {
-        return Platform.getTagsFor(blockReference.displayState.block);
+        return Platform.getTagsFor(blockReference.getDisplayState().getBlock());
     }
 }

@@ -42,7 +42,7 @@ public class MobDefinition implements EntryDefinition<MobIngredient> {
     @Nullable
     @Override
     public ResourceLocation getIdentifier(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return Platform.getId(mob.entityType);
+        return Platform.getId(mob.getEntityType());
     }
 
     @Override
@@ -52,30 +52,30 @@ public class MobDefinition implements EntryDefinition<MobIngredient> {
 
     @Override
     public MobIngredient copy(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return new MobIngredient(mob.entityType, mob.count, mob.tag);
+        return new MobIngredient(mob.getEntityType(), mob.getCount(), mob.getTag());
     }
 
     @Override
     public MobIngredient normalize(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return new MobIngredient(mob.entityType, mob.count);
+        return new MobIngredient(mob.getEntityType(), mob.getCount());
     }
 
     @Override
     public MobIngredient wildcard(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return new MobIngredient(mob.entityType, mob.count);
+        return new MobIngredient(mob.getEntityType(), mob.getCount());
     }
 
     @Override
     public long hash(EntryStack<MobIngredient> entry, MobIngredient mob, ComparisonContext context) {
-        int code = Platform.getId(mob.entityType).hashCode();
-        code = 31 * code + mob.tag.hashCode();
+        int code = Platform.getId(mob.getEntityType()).hashCode();
+        code = 31 * code + mob.getTag().hashCode();
         return code;
     }
 
     @SuppressWarnings("ObjectEquality")
     @Override
     public boolean equals(MobIngredient mob1, MobIngredient mob2, ComparisonContext context) {
-        return mob1.entityType == mob2.entityType && mob1.tag.equals(mob2.tag);
+        return mob1.getEntityType() == mob2.getEntityType() && mob1.getTag().equals(mob2.getTag());
     }
 
     @Nullable
@@ -86,11 +86,11 @@ public class MobDefinition implements EntryDefinition<MobIngredient> {
 
     @Override
     public Component asFormattedText(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return mob.displayName;
+        return mob.getDisplayName();
     }
 
     @Override
     public Stream<? extends TagKey<?>> getTagsFor(EntryStack<MobIngredient> entry, MobIngredient mob) {
-        return Platform.getTagsFor(mob.entityType);
+        return Platform.getTagsFor(mob.getEntityType());
     }
 }

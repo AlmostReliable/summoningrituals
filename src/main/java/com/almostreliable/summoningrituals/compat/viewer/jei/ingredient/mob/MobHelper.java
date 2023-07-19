@@ -19,22 +19,22 @@ public class MobHelper implements IIngredientHelper<MobIngredient> {
 
     @Override
     public String getDisplayName(MobIngredient mob) {
-        return mob.displayName.string;
+        return mob.getDisplayName().getString();
     }
 
     @Override
     public String getUniqueId(MobIngredient mob, UidContext context) {
-        return Platform.getId(mob.entityType).toString();
+        return Platform.getId(mob.getEntityType()).toString();
     }
 
     @Override
     public ResourceLocation getResourceLocation(MobIngredient mob) {
-        return Platform.getId(mob.entityType);
+        return Platform.getId(mob.getEntityType());
     }
 
     @Override
     public MobIngredient copyIngredient(MobIngredient mob) {
-        return new MobIngredient(mob.entityType, mob.count, mob.tag);
+        return new MobIngredient(mob.getEntityType(), mob.getCount(), mob.getTag());
     }
 
     @Override
@@ -42,6 +42,6 @@ public class MobHelper implements IIngredientHelper<MobIngredient> {
         if (mob == null) {
             return "Null entity";
         }
-        return "Entity: " + Platform.getId(mob.entityType);
+        return "Entity: " + Platform.getId(mob.getEntityType());
     }
 }

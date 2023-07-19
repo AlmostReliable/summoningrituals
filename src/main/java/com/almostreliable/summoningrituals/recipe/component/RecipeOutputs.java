@@ -6,10 +6,6 @@ import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import manifold.ext.props.rt.api.PropOption;
-import manifold.ext.props.rt.api.set;
-import manifold.ext.props.rt.api.val;
-import manifold.ext.props.rt.api.var;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
@@ -47,7 +43,7 @@ public final class RecipeOutputs {
     public static RecipeOutputs fromJson(JsonArray json) {
         NonNullList<RecipeOutput<?>> recipeOutputs = NonNullList.create();
         for (var output : json) {
-            recipeOutputs.add(RecipeOutput.fromJson(output.asJsonObject));
+            recipeOutputs.add(RecipeOutput.fromJson(output.getAsJsonObject()));
         }
         return new RecipeOutputs(recipeOutputs);
     }
@@ -104,10 +100,11 @@ public final class RecipeOutputs {
     public abstract static class RecipeOutput<T> {
 
         private final OutputType type;
-        @val final T output;
-        @var @set(PropOption.Package) CompoundTag data;
-        Vec3i offset = DEFAULT_OFFSET;
-        Vec3i spread = DEFAULT_SPREAD;
+        protected final T output;
+
+        protected CompoundTag data;
+        protected Vec3i offset = DEFAULT_OFFSET;
+        protected Vec3i spread = DEFAULT_SPREAD;
 
         private RecipeOutput(OutputType type, T output) {
             this.type = type;
@@ -160,7 +157,7 @@ public final class RecipeOutputs {
         abstract JsonObject toJson();
 
         void writeJsonDefaults(JsonObject json) {
-            if (!data.isEmpty) {
+            if (!data.isEmpty()) {
                 json.addProperty(Constants.DATA, data.toString());
             }
             if (!offset.equals(DEFAULT_OFFSET)) {
@@ -172,7 +169,7 @@ public final class RecipeOutputs {
         }
 
         void toNetwork(FriendlyByteBuf buffer) {
-            if (data.isEmpty) {
+            if (data.isEmpty()) {
                 buffer.writeBoolean(false);
             } else {
                 buffer.writeBoolean(true);
@@ -183,9 +180,9 @@ public final class RecipeOutputs {
         }
 
         Entity writeDataToEntity(Entity entity) {
-            if (data.isEmpty) return entity;
+            if (data.isEmpty()) return entity;
             var entityData = Platform.serializeEntity(entity);
-            for (var prop : data.allKeys) {
+            for (var prop : data.getAllKeys()) {
                 entityData.put(prop, Objects.requireNonNull(data.get(prop)));
             }
             entity.load(entityData);
@@ -193,15 +190,23 @@ public final class RecipeOutputs {
         }
 
         Vec3 getRandomPos(BlockPos origin) {
-            var x = spread.x > 0 ? RANDOM.nextDouble(-spread.x, spread.x) / 2.0 : 0;
-            var y = spread.y > 0 ? RANDOM.nextDouble(-spread.y, spread.y) / 2.0 : 0;
-            var z = spread.z > 0 ? RANDOM.nextDouble(-spread.z, spread.z) / 2.0 : 0;
+            var x = spread.getX() > 0 ? RANDOM.nextDouble(-spread.getX(), spread.getX()) / 2.0 : 0;
+            var y = spread.getY() > 0 ? RANDOM.nextDouble(-spread.getY(), spread.getY()) / 2.0 : 0;
+            var z = spread.getZ() > 0 ? RANDOM.nextDouble(-spread.getZ(), spread.getZ()) / 2.0 : 0;
             return MathUtils.shiftToCenter(origin).add(MathUtils.vectorFromPos(offset)).add(x, y, z);
         }
 
         abstract void spawn(ServerLevel level, BlockPos origin);
 
+        public T getOutput() {
+            return output;
+        }
+
         public abstract int getCount();
+
+        public CompoundTag getData() {
+            return data;
+        }
     }
 
     private static final class ItemOutput extends RecipeOutput<ItemStack> {
@@ -235,12 +240,12 @@ public final class RecipeOutputs {
 
         @Override
         void spawn(ServerLevel level, BlockPos origin) {
-            var toSpawn = count;
+            var toSpawn = getCount();
             var stacks = new ArrayList<ItemStack>();
             while (toSpawn > 0) {
                 var stack = output.copyWithCount(Math.min(toSpawn, 4));
                 stacks.add(stack);
-                toSpawn -= stack.count;
+                toSpawn -= stack.getCount();
             }
 
             for (var stack : stacks) {
@@ -250,7 +255,7 @@ public final class RecipeOutputs {
 
         @Override
         public int getCount() {
-            return output.count;
+            return output.getCount();
         }
     }
 

@@ -19,18 +19,18 @@ public class BlockReferenceHelper implements IIngredientHelper<BlockReference> {
 
     @Override
     public String getDisplayName(BlockReference blockReference) {
-        var displayName = blockReference.displayState.block.name;
-        return displayName.string;
+        var displayName = blockReference.getDisplayState().getBlock().getName();
+        return displayName.getString();
     }
 
     @Override
     public String getUniqueId(BlockReference blockReference, UidContext context) {
-        return Platform.getId(blockReference.displayState.block).toString();
+        return Platform.getId(blockReference.getDisplayState().getBlock()).toString();
     }
 
     @Override
     public ResourceLocation getResourceLocation(BlockReference blockReference) {
-        return Platform.getId(blockReference.displayState.block);
+        return Platform.getId(blockReference.getDisplayState().getBlock());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BlockReferenceHelper implements IIngredientHelper<BlockReference> {
         if (blockReference == null) {
             return "Null block reference";
         }
-        return "Block: " + blockReference.displayState.block.name +
-            "\nState: " + blockReference.displayState;
+        return "Block: " + blockReference.getDisplayState().getBlock().getName() +
+            "\nState: " + blockReference.getDisplayState();
     }
 }

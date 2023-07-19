@@ -24,29 +24,29 @@ public class MobRenderer {
 
     protected MobRenderer(int size) {
         this.size = size;
-        mc = Minecraft.instance;
+        mc = Minecraft.getInstance();
     }
 
     public void render(PoseStack stack, @Nullable MobIngredient mob) {
         if (mc.level == null || mc.player == null || mob == null) return;
-        if (mob.entity != null && mob.entity instanceof LivingEntity entity) {
+        if (mob.getEntity() != null && mob.getEntity() instanceof LivingEntity entity) {
             stack.pushPose();
             entity.tickCount = mc.player.tickCount;
             stack.translate(0.5f * size, 0.9f * size, 0);
-            var entityHeight = entity.bbHeight;
+            var entityHeight = entity.getBbHeight();
             var entityScale = Math.min(CREEPER_HEIGHT / entityHeight, 1f);
             var scaleFactor = CREEPER_SCALE * size * entityScale;
             renderEntity(stack, entity, scaleFactor);
             stack.popPose();
         }
-        if (mob.count > 1) {
-            var count = String.valueOf(mob.count);
+        if (mob.getCount() > 1) {
+            var count = String.valueOf(mob.getCount());
             GameUtils.renderCount(stack, count, size, size);
         }
     }
 
     private void renderEntity(PoseStack stack, LivingEntity entity, float scaleFactor) {
-        PoseStack modelView = RenderSystem.modelViewStack;
+        PoseStack modelView = RenderSystem.getModelViewStack();
         modelView.pushPose();
         modelView.mulPoseMatrix(stack.last().pose());
         InventoryScreen.renderEntityInInventory(0, 0, (int) scaleFactor, 75, -20, entity);
@@ -56,9 +56,9 @@ public class MobRenderer {
 
     public List<Component> getTooltip(MobIngredient mob, TooltipFlag tooltipFlag) {
         List<Component> tooltip = new ArrayList<>();
-        tooltip.add(mob.displayName);
-        if (tooltipFlag.isAdvanced) {
-            tooltip.add(mob.registryName.withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(mob.getDisplayName());
+        if (tooltipFlag.isAdvanced()) {
+            tooltip.add(mob.getRegistryName().withStyle(ChatFormatting.DARK_GRAY));
         }
         return tooltip;
     }

@@ -38,7 +38,7 @@ public class RecipeSacrifices {
         var mobs = json.getAsJsonArray(Constants.MOBS);
         NonNullList<Sacrifice> sacrifices = NonNullList.create();
         for (var entity : mobs) {
-            sacrifices.add(Sacrifice.fromJson(entity.asJsonObject));
+            sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
         }
         var zone = json.has(Constants.REGION) ?
             SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.REGION))
@@ -96,7 +96,7 @@ public class RecipeSacrifices {
     }
 
     public String getDisplayRegion() {
-        return String.format("%dx%dx%d", region.x, region.y, region.z);
+        return String.format("%dx%dx%d", region.getX(), region.getY(), region.getZ());
     }
 
     public boolean isEmpty() {

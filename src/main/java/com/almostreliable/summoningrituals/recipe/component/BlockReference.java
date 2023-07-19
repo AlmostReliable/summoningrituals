@@ -5,7 +5,6 @@ import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
 import com.almostreliable.summoningrituals.util.Utils;
 import com.google.gson.JsonObject;
-import manifold.ext.props.rt.api.var;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -23,7 +22,8 @@ public final class BlockReference implements Predicate<BlockState> {
     private final Block block;
     private final Map<String, String> properties;
     private final Map<Integer, Boolean> testCache;
-    @var BlockState displayState;
+
+    private BlockState displayState;
 
     private BlockReference(Block block, Map<String, String> properties) {
         this.block = block;
@@ -51,7 +51,7 @@ public final class BlockReference implements Predicate<BlockState> {
     public JsonObject toJson() {
         var json = new JsonObject();
         json.addProperty(Constants.BLOCK, Platform.getId(block).toString());
-        if (!properties.isEmpty) {
+        if (!properties.isEmpty()) {
             json.add(Constants.PROPERTIES, SerializeUtils.mapToJson(properties));
         }
         return json;
@@ -67,16 +67,16 @@ public final class BlockReference implements Predicate<BlockState> {
         var cached = testCache.get(Block.getId(blockState));
         if (cached != null) return cached;
 
-        if (!block.equals(blockState.block)) {
+        if (!block.equals(blockState.getBlock())) {
             testCache.put(Block.getId(blockState), false);
             return false;
         }
 
-        var toCompareProps = blockState.values;
+        var toCompareProps = blockState.getValues();
         for (var prop : properties.entrySet()) {
             if (toCompareProps.entrySet().stream().noneMatch(entry ->
-                entry.key.name.equalsIgnoreCase(prop.key) &&
-                    entry.value.toString().equalsIgnoreCase(prop.value))) {
+                entry.getKey().getName().equalsIgnoreCase(prop.getKey()) &&
+                    entry.getValue().toString().equalsIgnoreCase(prop.getValue()))) {
                 testCache.put(Block.getId(blockState), false);
                 return false;
             }
@@ -89,8 +89,8 @@ public final class BlockReference implements Predicate<BlockState> {
         if (displayState != null) return displayState;
 
         AtomicReference<BlockState> newState = new AtomicReference<>(block.defaultBlockState());
-        for (Property<?> property : newState.get().properties) {
-            Object newValue = properties.get(property.name);
+        for (Property<?> property : newState.get().getProperties()) {
+            Object newValue = properties.get(property.getName());
             if (newValue == null) continue;
             try {
                 newState.set(newState.get().setValue(property, Utils.cast(newValue)));

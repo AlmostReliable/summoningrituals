@@ -27,16 +27,16 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     private double oldCircleOffset;
 
     public AltarRenderer(Context ignoredContext) {
-        mc = Minecraft.instance;
-        itemRenderer = mc.itemRenderer;
+        mc = Minecraft.getInstance();
+        itemRenderer = mc.getItemRenderer();
     }
 
     @Override
     public void render(
         AltarBlockEntity entity, float partial, PoseStack stack, MultiBufferSource buffer, int light, int overlay
     ) {
-        if (mc.player == null || entity.level == null ||
-            entity.blockPos.distSqr(mc.player.blockPosition()) > Math.pow(MAX_RENDER_DISTANCE, 2)) {
+        if (mc.player == null || entity.getLevel() == null ||
+            entity.getBlockPos().distSqr(mc.player.blockPosition()) > Math.pow(MAX_RENDER_DISTANCE, 2)) {
             return;
         }
 
@@ -45,17 +45,17 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
             stack.translate(HALF, 0.8f, HALF);
             stack.scale(HALF, HALF, HALF);
 
-            var lightAbove = LevelRenderer.getLightColor(entity.level, entity.blockPos.above());
-            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.blockPos));
+            var lightAbove = LevelRenderer.getLightColor(entity.getLevel(), entity.getBlockPos().above());
+            var altarPos = MathUtils.shiftToCenter(MathUtils.vectorFromPos(entity.getBlockPos()));
             var playerPos = mc.player.position();
             var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
 
-            var progress = entity.progress;
-            var processTime = entity.processTime;
+            var progress = entity.getProgress();
+            var processTime = entity.getProcessTime();
 
             stack.translate(0, MAX_PROGRESS_HEIGHT * MathUtils.modifier(progress, processTime, 0), 0);
 
-            if (!entity.inventory.catalyst.isEmpty) {
+            if (!entity.getInventory().getCatalyst().isEmpty()) {
                 stack.pushPose();
                 {
                     stack.translate(0, 1 - 0.75f * MathUtils.modifier(progress, processTime, 0), 0);
@@ -63,19 +63,19 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                     stack.mulPose(Vector3f.YN.rotationDegrees((float) playerAngle));
                     itemRenderer
                         .renderStatic(
-                            entity.inventory.catalyst,
+                            entity.getInventory().getCatalyst(),
                             TransformType.FIXED,
                             lightAbove,
                             overlay,
                             stack,
                             buffer,
-                            (int) entity.blockPos.asLong()
+                            (int) entity.getBlockPos().asLong()
                         );
                 }
                 stack.popPose();
             }
 
-            var axisRotation = MathUtils.singleRotation(entity.level.gameTime);
+            var axisRotation = MathUtils.singleRotation(entity.getLevel().getGameTime());
             var scale = 1 - MathUtils.modifier(progress, processTime, 0);
 
             if (progress == 0 && resetTimer > 0) {
@@ -85,7 +85,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
             stack.scale(scale, scale, scale);
 
-            var inputs = entity.inventory.noneEmptyItems;
+            var inputs = entity.getInventory().getNoneEmptyItems();
             for (var i = 0; i < inputs.size(); i++) {
                 stack.pushPose();
                 {
@@ -109,8 +109,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                     stack.translate(0, newHeight, -ITEM_OFFSET);
 
                     var item = inputs.get(i);
-                    if (!item.isEmpty) {
-                        mc.itemRenderer
+                    if (!item.isEmpty()) {
+                        mc.getItemRenderer()
                             .renderStatic(
                                 item,
                                 TransformType.FIXED,
@@ -118,7 +118,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                                 overlay,
                                 stack,
                                 buffer,
-                                (int) entity.blockPos.asLong()
+                                (int) entity.getBlockPos().asLong()
                             );
                     }
                 }

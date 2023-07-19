@@ -20,16 +20,16 @@ public class VanillaWrapper implements Container {
     }
 
     public List<ItemStack> getItems() {
-        return delegate.noneEmptyItems;
+        return delegate.getNoneEmptyItems();
     }
 
     public ItemStack getCatalyst() {
-        return delegate.catalyst;
+        return delegate.getCatalyst();
     }
 
     @Override
     public int getContainerSize() {
-        return delegate.slots;
+        return delegate.getSlots();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class VanillaWrapper implements Container {
     @Override
     public ItemStack removeItem(int slot, int count) {
         ItemStack stack = delegate.getStackInSlot(slot);
-        return stack.isEmpty ? ItemStack.EMPTY : stack.split(count);
+        return stack.isEmpty() ? ItemStack.EMPTY : stack.split(count);
     }
 
     @Override
@@ -51,15 +51,15 @@ public class VanillaWrapper implements Container {
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
         var stack = getItem(slot);
-        if (stack.isEmpty) return ItemStack.EMPTY;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
         setItem(slot, ItemStack.EMPTY);
         return stack;
     }
 
     @Override
     public boolean isEmpty() {
-        for (int slot = 0; slot < delegate.slots; slot++) {
-            if (!delegate.getStackInSlot(slot).isEmpty) return false;
+        for (int slot = 0; slot < delegate.getSlots(); slot++) {
+            if (!delegate.getStackInSlot(slot).isEmpty()) return false;
         }
         return true;
     }
@@ -71,7 +71,7 @@ public class VanillaWrapper implements Container {
 
     @Override
     public void clearContent() {
-        for (int slot = 0; slot < delegate.slots; slot++) {
+        for (int slot = 0; slot < delegate.getSlots(); slot++) {
             delegate.setStackInSlot(slot, ItemStack.EMPTY);
         }
     }

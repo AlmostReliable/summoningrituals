@@ -23,13 +23,13 @@ public class REIBlockReferenceRenderer extends BlockReferenceRenderer implements
     ) {
         stack.pushPose();
         stack.translate(bounds.x - 1, bounds.y - 1, 0);
-        render(stack, entry.value);
+        render(stack, entry.getValue());
         stack.popPose();
     }
 
     @Nullable
     @Override
     public Tooltip getTooltip(EntryStack<BlockReference> entry, TooltipContext context) {
-        return Tooltip.create(context.point, getTooltip(entry.value, context.flag));
+        return Tooltip.create(context.getPoint(), getTooltip(entry.getValue(), context.getFlag()));
     }
 }

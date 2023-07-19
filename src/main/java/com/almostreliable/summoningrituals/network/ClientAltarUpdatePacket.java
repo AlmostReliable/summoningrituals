@@ -26,9 +26,9 @@ public final class ClientAltarUpdatePacket {
         }
         var type = buffer.readEnum(PacketType.class);
         if (type == PacketType.PROGRESS) {
-            altar.progress = buffer.readInt();
+            altar.setProgress(buffer.readInt());
         } else if (type == PacketType.PROCESS_TIME) {
-            altar.processTime = buffer.readInt();
+            altar.setProcessTime(buffer.readInt());
         } else {
             throw new IllegalStateException("Unknown packet type: " + type);
         }
@@ -56,7 +56,6 @@ public final class ClientAltarUpdatePacket {
         packetSender.accept(level, pos, CHANNEL, encode(pos, processTime, PacketType.PROCESS_TIME));
     }
 
-    @SuppressWarnings("NewClassNamingConvention")
     public interface Consumer4<T1, T2, T3, T4> {
         void accept(T1 t1, T2 t2, T3 t3, T4 t4);
     }

@@ -65,7 +65,7 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
     ) {
         if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setMainHandItem(altar.handleInteraction(serverPlayer, serverPlayer.mainHandItem));
+                serverPlayer.setMainHandItem(altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem()));
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
@@ -116,9 +116,9 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
             new Vector3f(11.5f, 4.5f, 10.5f)
         );
 
-        var x = pos.x;
-        var y = pos.y + 1;
-        var z = pos.z;
+        var x = pos.getX();
+        var y = pos.getY() + 1;
+        var z = pos.getZ();
         var vec = particlePos[state.getValue(FACING).ordinal() - 2];
         var active = state.getValue(ACTIVE);
 
@@ -136,15 +136,15 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         var superState = super.getStateForPlacement(context);
         var state = superState == null ? defaultBlockState() : superState;
-        return state.setValue(FACING, context.horizontalDirection.opposite)
+        return state.setValue(FACING, context.getHorizontalDirection().getOpposite())
             .setValue(ACTIVE, false)
-            .setValue(WATERLOGGED, context.level.getFluidState(context.clickedPos).is(Fluids.WATER));
+            .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
     }
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
-            altar.playerDestroy(player.isCreative);
+            altar.playerDestroy(player.isCreative());
         }
         super.playerWillDestroy(level, pos, state, player);
     }

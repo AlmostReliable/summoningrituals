@@ -77,7 +77,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
         // altar
         ClientEntryStacks.setRenderer(EntryStacks.of(altar), altarRenderer);
         var altarX = offsetX + CENTER_X - BLOCK_SLOT_SIZE / 2;
-        var altarY = offsetY + RENDER_Y - BLOCK_SLOT_SIZE / 2 - (recipe.blockBelow == null ? 0 : 4);
+        var altarY = offsetY + RENDER_Y - BLOCK_SLOT_SIZE / 2 - (recipe.getBlockBelow() == null ? 0 : 4);
         widgets.add(
             Widgets.createSlot(new Rectangle(altarX, altarY, BLOCK_SIZE, BLOCK_SIZE))
                 .entry(EntryStacks.of(altar))
@@ -96,7 +96,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
                 0x36_A400
             )
         );
-        if (!recipe.sacrifices.isEmpty) {
+        if (!recipe.getSacrifices().isEmpty()) {
             widgets.add(
                 labelWidget(
                     f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.REGION)),
@@ -108,7 +108,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
             );
             widgets.add(
                 labelWidget(
-                    recipe.sacrifices.displayRegion,
+                    recipe.getSacrifices().getDisplayRegion(),
                     GameUtils.ANCHOR.TOP_LEFT,
                     offsetX + 1,
                     offsetY + 11,
@@ -131,19 +131,19 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
         }
 
         // block below
-        if (recipe.blockBelow != null) {
+        if (recipe.getBlockBelow() != null) {
             var blockBelowX = offsetX + CENTER_X - BLOCK_SLOT_SIZE / 2;
             var blockBelowY = offsetY + RENDER_Y - 3;
             widgets.add(
                 Widgets.createSlot(new Rectangle(blockBelowX, blockBelowY, BLOCK_SIZE, BLOCK_SIZE))
-                    .entry(EntryStack.of(AlmostREI.BLOCK_REFERENCE, recipe.blockBelow))
+                    .entry(EntryStack.of(AlmostREI.BLOCK_REFERENCE, recipe.getBlockBelow()))
                     .markInput()
                     .disableBackground()
             );
         }
 
         // catalyst
-        var catalystEntry = EntryIngredients.ofIngredient(recipe.catalyst);
+        var catalystEntry = EntryIngredients.ofIngredient(recipe.getCatalyst());
         catalystEntry.forEach(e -> ClientEntryStacks.setRenderer(e, catalystRenderer));
         var catalystX = offsetX + CENTER_X - ITEM_SLOT_SIZE / 2;
         var catalystY = offsetY + RENDER_Y - 32;
@@ -191,7 +191,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
         // tooltips
         widgets.add(Widgets.createDrawableWidget((helper, stack, mX, mY, partial) -> {
             var tooltip = getTooltip(recipe, offsetX, offsetY, mX, mY);
-            if (!tooltip.isEmpty) {
+            if (!tooltip.isEmpty()) {
                 Tooltip.create(tooltip).queue();
             }
         }));
@@ -239,7 +239,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
                     }
                 }
             );
-            inputIngredients.add(EntryIngredients.ofIngredient(recipe.catalyst));
+            inputIngredients.add(EntryIngredients.ofIngredient(recipe.getCatalyst()));
 
             return ImmutableList.copyOf(inputIngredients);
         }
@@ -267,7 +267,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
 
         @Override
         public Optional<ResourceLocation> getDisplayLocation() {
-            return Optional.of(recipe.id);
+            return Optional.of(recipe.getId());
         }
 
         @Override

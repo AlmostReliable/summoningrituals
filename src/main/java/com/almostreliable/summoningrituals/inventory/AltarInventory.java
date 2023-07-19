@@ -5,9 +5,6 @@ import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.util.GameUtils;
-import manifold.ext.props.rt.api.override;
-import manifold.ext.props.rt.api.val;
-import manifold.ext.props.rt.api.var;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
@@ -32,12 +29,12 @@ public class AltarInventory implements ItemHandler {
     public static final int SIZE = 64;
 
     private final PlatformBlockEntity parent;
-    @val final VanillaWrapper vanillaInv;
-    @val final StorageWrapper storageInv;
+    private final VanillaWrapper vanillaInv;
+    private final StorageWrapper storageInv;
     private final Deque<Tuple<ItemStack, Integer>> insertOrder;
+
     private NonNullList<ItemStack> items;
-    @override
-    @var ItemStack catalyst;
+    private ItemStack catalyst;
 
     public AltarInventory(PlatformBlockEntity parent) {
         this.parent = parent;
@@ -53,14 +50,14 @@ public class AltarInventory implements ItemHandler {
         var insertListTag = new ListTag();
         for (var e : insertOrder) {
             var tag = new CompoundTag();
-            e.a.save(tag);
-            tag.putInt(Constants.SLOT, e.b);
+            e.getA().save(tag);
+            tag.putInt(Constants.SLOT, e.getB());
             insertListTag.add(tag);
         }
 
         var itemsTag = new ListTag();
         for (var slot = 0; slot < SIZE; slot++) {
-            if (items.get(slot).isEmpty) continue;
+            if (items.get(slot).isEmpty()) continue;
             var tag = new CompoundTag();
             tag.putInt(Constants.SLOT, slot);
             items.get(slot).save(tag);
@@ -109,23 +106,23 @@ public class AltarInventory implements ItemHandler {
     }
 
     public ItemStack handleInsertion(ItemStack stack) {
-        if (stack.isEmpty) return ItemStack.EMPTY;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
 
         var remaining = stack.copy();
         for (var i = 0; i < AltarRecipeSerializer.MAX_INPUTS; i++) {
             var original = remaining.copy();
             remaining = insertItem(i, remaining);
 
-            if (remaining.isEmpty) {
+            if (remaining.isEmpty()) {
                 insertOrder.push(new Tuple<>(original, i));
                 return ItemStack.EMPTY;
             }
 
-            if (remaining.count == original.count) {
+            if (remaining.getCount() == original.getCount()) {
                 continue;
             }
 
-            original.shrink(remaining.count);
+            original.shrink(remaining.getCount());
             insertOrder.push(new Tuple<>(original, i));
         }
 
@@ -133,42 +130,42 @@ public class AltarInventory implements ItemHandler {
     }
 
     public void popLastInserted() {
-        var level = parent.level;
+        var level = parent.getLevel();
         assert level != null && !level.isClientSide;
 
-        if (!catalyst.isEmpty) {
-            GameUtils.dropItem(level, parent.blockPos, catalyst, true);
+        if (!catalyst.isEmpty()) {
+            GameUtils.dropItem(level, parent.getBlockPos(), catalyst, true);
             catalyst = ItemStack.EMPTY;
             onContentsChanged();
             return;
         }
 
-        if (insertOrder.isEmpty) return;
+        if (insertOrder.isEmpty()) return;
 
         var last = insertOrder.pop();
-        var stack = last.a;
-        int slot = last.b;
+        var stack = last.getA();
+        int slot = last.getB();
 
-        items.get(slot).shrink(stack.count);
-        if (items.get(slot).isEmpty) {
+        items.get(slot).shrink(stack.getCount());
+        if (items.get(slot).isEmpty()) {
             items.set(slot, ItemStack.EMPTY);
         }
         onContentsChanged();
 
-        GameUtils.dropItem(level, parent.blockPos, stack, true);
+        GameUtils.dropItem(level, parent.getBlockPos(), stack, true);
     }
 
     public void dropContents() {
-        var level = parent.level;
+        var level = parent.getLevel();
         assert level != null && !level.isClientSide;
 
-        var pos = parent.blockPos;
+        var pos = parent.getBlockPos();
         for (var stack : items) {
-            if (stack.isEmpty) continue;
+            if (stack.isEmpty()) continue;
             GameUtils.dropItem(level, pos, stack, false);
         }
 
-        if (!catalyst.isEmpty) {
+        if (!catalyst.isEmpty()) {
             GameUtils.dropItem(level, pos, catalyst, false);
         }
     }
@@ -179,14 +176,14 @@ public class AltarInventory implements ItemHandler {
         var toRemove = 0;
         var actualRemoved = 0;
 
-        for (var input : recipe.inputs) {
+        for (var input : recipe.getInputs()) {
             toRemove += input.count();
             var inputRemoved = 0;
 
             for (var stack : items) {
-                if (stack.isEmpty || !input.ingredient().test(stack)) continue;
+                if (stack.isEmpty() || !input.ingredient().test(stack)) continue;
 
-                var shrinkCount = Math.min(input.count() - inputRemoved, stack.count);
+                var shrinkCount = Math.min(input.count() - inputRemoved, stack.getCount());
                 stack.shrink(shrinkCount);
                 inputRemoved += shrinkCount;
 
@@ -208,11 +205,11 @@ public class AltarInventory implements ItemHandler {
     }
 
     private ItemStack insertItem(int slot, ItemStack stack) {
-        if (stack.isEmpty) return ItemStack.EMPTY;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
         validateSlot(slot);
 
         var currentStack = items.get(slot);
-        if (currentStack.isEmpty) {
+        if (currentStack.isEmpty()) {
             items.set(slot, stack);
             onContentsChanged();
             return ItemStack.EMPTY;
@@ -221,29 +218,29 @@ public class AltarInventory implements ItemHandler {
         if (!currentStack.canStack(stack)) return stack;
 
         var maxCount = getMaxStackSize(slot, currentStack);
-        var toInsert = Math.min(maxCount - currentStack.count, stack.count);
+        var toInsert = Math.min(maxCount - currentStack.getCount(), stack.getCount());
         if (toInsert <= 0) return stack;
 
         currentStack.grow(toInsert);
-        var remainder = stack.copyWithCount(stack.count - toInsert);
+        var remainder = stack.copyWithCount(stack.getCount() - toInsert);
         onContentsChanged();
 
-        return remainder.isEmpty ? ItemStack.EMPTY : remainder;
+        return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
     }
 
     private void rebuildInsertOrder() {
         insertOrder.clear();
         for (var i = SIZE - 1; i >= 0; i--) {
             var stack = items.get(i);
-            if (stack.isEmpty) continue;
+            if (stack.isEmpty()) continue;
             insertOrder.add(new Tuple<>(stack.copy(), i));
         }
     }
 
     private void onContentsChanged() {
         parent.setChanged();
-        if (parent.level == null || parent.level.isClientSide) return;
-        parent.level.sendBlockUpdated(parent.blockPos, parent.blockState, parent.blockState, 1 | 2);
+        if (parent.getLevel() == null || parent.getLevel().isClientSide) return;
+        parent.getLevel().sendBlockUpdated(parent.getBlockPos(), parent.getBlockState(), parent.getBlockState(), 1 | 2);
     }
 
     private void validateSlot(int slot) {
@@ -253,7 +250,7 @@ public class AltarInventory implements ItemHandler {
     }
 
     private int getMaxStackSize(int slot, ItemStack stack) {
-        return Math.min(getSlotLimit(slot), stack.maxStackSize);
+        return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
     }
 
     @Override
@@ -290,7 +287,12 @@ public class AltarInventory implements ItemHandler {
 
     @Override
     public List<ItemStack> getNoneEmptyItems() {
-        return items.stream().filter(stack -> !stack.isEmpty).collect(Collectors.toList());
+        return items.stream().filter(stack -> !stack.isEmpty()).collect(Collectors.toList());
+    }
+
+    @Override
+    public ItemStack getCatalyst() {
+        return catalyst;
     }
 
     public void setCatalyst(ItemStack catalyst) {
@@ -298,8 +300,16 @@ public class AltarInventory implements ItemHandler {
         onContentsChanged();
     }
 
+    public VanillaWrapper getVanillaInv() {
+        return vanillaInv;
+    }
+
+    public StorageWrapper getStorageInv() {
+        return storageInv;
+    }
+
     private List<ItemStack> createItemBackup() {
-        return items.stream().filter(stack -> !stack.isEmpty).map(ItemStack::copy).collect(Collectors.toList());
+        return items.stream().filter(stack -> !stack.isEmpty()).map(ItemStack::copy).collect(Collectors.toList());
     }
 
     @SuppressWarnings("UnstableApiUsage")

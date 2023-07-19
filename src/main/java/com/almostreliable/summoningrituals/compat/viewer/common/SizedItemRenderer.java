@@ -18,14 +18,14 @@ public class SizedItemRenderer {
     private final ItemRenderer itemRenderer;
 
     SizedItemRenderer(int size) {
-        mc = Minecraft.instance;
-        this.itemRenderer = mc.itemRenderer;
+        mc = Minecraft.getInstance();
+        this.itemRenderer = mc.getItemRenderer();
         this.size = size;
     }
 
     public void render(PoseStack stack, @Nullable ItemStack item) {
         if (item == null) return;
-        PoseStack modelViewStack = RenderSystem.modelViewStack;
+        PoseStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushPose();
         {
             modelViewStack.mulPoseMatrix(stack.last().pose());

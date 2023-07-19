@@ -55,10 +55,11 @@ public final class Platform {
 
     public static CreativeModeTab createTab() {
         return FabricItemGroupBuilder.build(
-            Utils.getRL("tab"), () -> Registration.ALTAR_ITEM.get().defaultInstance
+            Utils.getRL("tab"), () -> Registration.ALTAR_ITEM.get().getDefaultInstance()
         );
     }
 
+    @SuppressWarnings("deprecation")
     public static <T extends BlockEntity> void registerBlockEntityRenderer(
         BlockEntityType<T> blockEntityType, BlockEntityRendererProvider<T> renderer
     ) {
@@ -79,8 +80,8 @@ public final class Platform {
 
     private static void sendPacket(Level level, BlockPos pos, ResourceLocation channel, FriendlyByteBuf packet) {
         var chunk = level.getChunkAt(pos);
-        ((ServerChunkCache) chunk.level.chunkSource).chunkMap
-            .getPlayers(chunk.pos, false)
+        ((ServerChunkCache) chunk.getLevel().getChunkSource()).chunkMap
+            .getPlayers(chunk.getPos(), false)
             .forEach(serverPlayer -> ServerPlayNetworking.send(serverPlayer, channel, packet));
     }
 
@@ -92,7 +93,7 @@ public final class Platform {
 
     public static CompoundTag serializeEntity(Entity entity) {
         var tag = new CompoundTag();
-        var id = entity.encodeId;
+        var id = entity.getEncodeId();
         if (id != null) tag.putString("id", id);
         return entity.saveWithoutId(tag);
     }
@@ -103,7 +104,7 @@ public final class Platform {
         MultiBufferSource.BufferSource bufferSource
     ) {
         blockRenderer.renderSingleBlock(
-            blockReference.displayState,
+            blockReference.getDisplayState(),
             stack,
             bufferSource,
             LightTexture.FULL_BRIGHT,
@@ -164,7 +165,6 @@ public final class Platform {
         var itemKey = new ResourceLocation(itemName);
         if (!Registry.ITEM.containsKey(itemKey)) throw new JsonSyntaxException("Unknown item '" + itemName + "'");
         var item = Registry.ITEM.get(itemKey);
-        //noinspection ObjectEquality
         if (item == Items.AIR) throw new JsonSyntaxException("Invalid item: " + itemName);
         return Objects.requireNonNull(item);
     }

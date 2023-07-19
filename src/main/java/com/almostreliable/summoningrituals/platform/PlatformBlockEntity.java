@@ -1,8 +1,6 @@
 package com.almostreliable.summoningrituals.platform;
 
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
-import manifold.ext.props.rt.api.val;
-import manifold.ext.props.rt.api.var;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
@@ -17,9 +15,9 @@ import javax.annotation.Nullable;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class PlatformBlockEntity extends BlockEntity {
 
-    @val final AltarInventory inventory;
+    protected final AltarInventory inventory;
 
-    @var int progress;
+    protected int progress;
 
     protected PlatformBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -29,10 +27,22 @@ public abstract class PlatformBlockEntity extends BlockEntity {
     @Nullable
     public Storage<ItemVariant> exposeStorage() {
         if (!remove && progress == 0) {
-            return inventory.storageInv;
+            return inventory.getStorageInv();
         }
         return null;
     }
 
     public abstract ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack);
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public AltarInventory getInventory() {
+        return inventory;
+    }
 }

@@ -19,7 +19,7 @@ public record IngredientStack(Ingredient ingredient, int count) {
         } else {
             ingredientStack = new IngredientStack(Ingredient.fromJson(json), 1);
         }
-        if (ingredientStack.ingredient.items.length == 0) {
+        if (ingredientStack.ingredient.getItems().length == 0) {
             throw new IllegalArgumentException("Ingredient is empty, maybe wrong tag");
         }
         return ingredientStack;
