@@ -48,6 +48,7 @@ public interface AltarRecipeSchema {
     RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         OUTPUTS, INPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
     ).constructor((recipe, schemaType, keys, from) -> {
+        recipe.setValue(CATALYST, from.getValue(recipe, CATALYST));
         // set default values on any new recipe
         recipe.setValue(INPUTS, new InputItem[0]);
         recipe.setValue(OUTPUTS, new RecipeOutputs());
