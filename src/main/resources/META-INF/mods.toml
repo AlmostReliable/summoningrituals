@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "${forgeVersionRange}"
+loaderVersion = "[${forgeLoaderVersion},)"
 issueTrackerURL = "https://github.com/${githubUser}/${githubRepo}/issues"
 license = "${license}"
 
@@ -14,34 +14,34 @@ description = '''${modDescription}'''
 [[dependencies.${modId}]]
 modId = "forge"
 mandatory = true
-versionRange = "${forgeVersionRange}"
+versionRange = "[${forgeVersion},)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${modId}]]
 modId = "minecraft"
 mandatory = true
-versionRange = "${mcVersionRange}"
+versionRange = "[${minecraftVersion},)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${modId}]]
 modId = "jei"
 mandatory = false
-versionRange = "${jeiVersionRange}"
+versionRange = "[${jeiVersion},)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.${modId}]]
 modId = "roughlyenoughitems"
 mandatory = false
-versionRange = "${reiVersionRange}"
+versionRange = "[${reiVersion},)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.${modId}]]
 modId = "kubejs"
 mandatory = false
-versionRange = "${kubeVersionRange}"
+versionRange = "[${kubeVersion},)"
 ordering = "AFTER"
 side = "BOTH"
