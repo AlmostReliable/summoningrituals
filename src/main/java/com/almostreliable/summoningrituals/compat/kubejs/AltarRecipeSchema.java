@@ -18,11 +18,11 @@ public interface AltarRecipeSchema {
     RecipeKey<InputItem> CATALYST = ItemComponents.INPUT.key(Constants.CATALYST)
         .noBuilders();
 
-    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS)
-        .optional(new InputItem[0]);
-
     RecipeKey<RecipeOutputs> OUTPUTS = SummoningComponents.OUTPUTS.key(Constants.OUTPUTS)
         .noBuilders();
+
+    RecipeKey<InputItem[]> INPUTS = ItemComponents.INPUT_ARRAY.key(Constants.INPUTS)
+        .defaultOptional();
 
     RecipeKey<RecipeSacrifices> SACRIFICES = SummoningComponents.SACRIFICES.key(Constants.SACRIFICES)
         .optional(type -> new RecipeSacrifices())
@@ -50,7 +50,6 @@ public interface AltarRecipeSchema {
     ).constructor((recipe, schemaType, keys, from) -> {
         recipe.setValue(CATALYST, from.getValue(recipe, CATALYST));
         // set default values on any new recipe
-        recipe.setValue(INPUTS, new InputItem[0]);
         recipe.setValue(OUTPUTS, new RecipeOutputs());
         recipe.setValue(SACRIFICES, new RecipeSacrifices());
     }, CATALYST);
