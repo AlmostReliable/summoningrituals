@@ -90,7 +90,7 @@ Everything related to versions and their release notes can be found in the [chan
 This project is licensed under the [GNU Lesser General Public License v3.0][license].
 
 <!-- Badges -->
-[workflow_status_badge]: https://img.shields.io/github/actions/workflow/status/AlmostReliable/summoningrituals/build.yml?branch=1.19.2&style=for-the-badge
+[workflow_status_badge]: https://img.shields.io/github/actions/workflow/status/AlmostReliable/summoningrituals/build.yml?branch=1.19-forge&style=for-the-badge
 [workflow_status_link]: https://github.com/AlmostReliable/summoningrituals/actions
 [license_badge]: https://img.shields.io/github/license/AlmostReliable/summoningrituals?style=for-the-badge
 [version_badge]: https://img.shields.io/badge/dynamic/json?color=0078FF&label=release&style=for-the-badge&query=name&url=https://api.razonyang.com/v1/github/tag/AlmostReliable/summoningrituals%3Fprefix=v1.19.2-

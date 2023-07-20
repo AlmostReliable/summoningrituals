@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.0.6] - 2023-07-20
+
+### Fixed
+- mixin crash on startup
+
 ## [2.0.5] - 2023-07-19
 
 ### Changed
@@ -99,6 +104,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.6
 [2.0.5]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.5
 [2.0.4]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.4
 [2.0.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.3
