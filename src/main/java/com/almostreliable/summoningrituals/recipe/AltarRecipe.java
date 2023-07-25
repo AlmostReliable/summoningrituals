@@ -67,8 +67,8 @@ public class AltarRecipe implements Recipe<VanillaWrapper> {
             var stack = inv.getItems().get(slot);
             if (!stack.isEmpty() && matchedItems[slot] == null) {
                 for (var input : inputs) {
-                    if (!matchedIngredients.contains(input.ingredient()) && input.ingredient()
-                        .test(stack) && stack.getCount() >= input.count()) {
+                    if (!matchedIngredients.contains(input.ingredient()) &&
+                        input.ingredient().test(stack) && stack.getCount() >= input.count()) {
                         matchedItems[slot] = input.ingredient();
                         matchedIngredients.add(input.ingredient());
                     }

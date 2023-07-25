@@ -82,7 +82,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
 
         if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
-            inventory.setCatalyst(stack.getItem().getDefaultInstance());
+            inventory.setCatalyst(stack.copyWithCount(1));
             var recipe = findRecipe();
             if (recipe == null) {
                 inventory.setCatalyst(ItemStack.EMPTY);
