@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.0.7] - 2023-07-25
+
+### Added
+- Portuguese translation ([#21])
+
+### Fixed
+- ingredients not properly being serialized and not supporting nbt
+  - bumps minimum KubeJS version to 1902.6.1-build.336
+- catalysts not supporting nbt ingredients
+
+<!-- Links -->
+[#21]: https://github.com/AlmostReliable/summoningrituals/pull/21
+
 ## [2.0.6] - 2023-07-20
 
 ### Fixed
@@ -104,6 +117,7 @@ and this project adheres to [Semantic Versioning].
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
+[2.0.7]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.7
 [2.0.6]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.6
 [2.0.5]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.5
 [2.0.4]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.19-forge-2.0.4
