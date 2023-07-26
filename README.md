@@ -103,10 +103,10 @@ This project is licensed under the [GNU Lesser General Public License v3.0][lice
 <!-- Links -->
 [minecraft]: https://www.minecraft.net/
 [discord]: https://discord.com/invite/ThFnwZCyYY
-[wiki]: https://github.com/AlmostReliable/almostunified/wiki
+[wiki]: https://github.com/AlmostReliable/summoningrituals/wiki
 [curseforge]: https://www.curseforge.com/minecraft/mc-mods/summoningrituals
 [modrinth]: https://modrinth.com/mod/summoningrituals
-[releases]: https://github.com/AlmostReliable/almostunified/releases
+[releases]: https://github.com/AlmostReliable/summoningrituals/releases
 [forge]: http://files.minecraftforge.net/
 [fabric]: https://fabricmc.net/
 [mo_shark]: https://www.curseforge.com/members/mo_shark
