@@ -8,11 +8,10 @@ import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.almostreliable.summoningrituals.util.Utils;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -112,9 +111,9 @@ public class AltarCategory<I, R> {
         );
     }
 
-    protected void drawLabel(PoseStack stack, String text, GameUtils.ANCHOR anchor, int x, int y, int color) {
+    protected void drawLabel(GuiGraphics guiGraphics, String text, GameUtils.ANCHOR anchor, int x, int y, int color) {
         GameUtils.renderText(
-            stack,
+            guiGraphics,
             text,
             anchor,
             x,
@@ -196,7 +195,7 @@ public class AltarCategory<I, R> {
         void accept(int x, int y, MobIngredient mob, @Nullable SpawnEggItem egg);
     }
 
-    public static final class SpriteWidget implements Widget, Predicate<AltarRecipe> {
+    public static final class SpriteWidget implements Renderable, Predicate<AltarRecipe> {
 
         private static final int SPRITE_SIZE = SPRITE_SLOT_SIZE - 2;
 
@@ -208,18 +207,18 @@ public class AltarCategory<I, R> {
             this.renderPredicate = renderPredicate;
         }
 
-        public void render(PoseStack stack, int x, int y) {
+        public void render(GuiGraphics guiGraphics, int x, int y) {
+            PoseStack stack = guiGraphics.pose();
             stack.pushPose();
             stack.translate(x + TEXTURE_WIDTH - 2 * SPRITE_SLOT_SIZE - 1, y, 0);
-            render(stack, 0, 0, 0);
+            render(guiGraphics, 0, 0, 0);
             stack.popPose();
         }
 
         @Override
-        public void render(PoseStack stack, int mX, int mY, float partial) {
-            RenderSystem.setShaderTexture(0, TEXTURE);
-            GuiComponent.blit(
-                stack,
+        public void render(GuiGraphics guiGraphics, int mX, int mY, float partial) {
+            guiGraphics.blit(
+                TEXTURE,
                 0,
                 0,
                 TEXTURE_WIDTH - SPRITE_SLOT_SIZE,
@@ -229,8 +228,8 @@ public class AltarCategory<I, R> {
                 TEXTURE_WIDTH,
                 TEXTURE_HEIGHT
             );
-            GuiComponent.blit(
-                stack,
+            guiGraphics.blit(
+                TEXTURE,
                 1,
                 1,
                 TEXTURE_WIDTH - SPRITE_SLOT_SIZE,

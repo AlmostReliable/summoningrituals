@@ -24,7 +24,7 @@ public final class ItemStackExt {
     }
 
     public static boolean canStack(@This ItemStack thiz, ItemStack other) {
-        if (thiz.isEmpty() || !thiz.sameItem(other) || thiz.hasTag() != other.hasTag()) return false;
+        if (thiz.isEmpty() || !ItemStack.isSameItem(thiz, other) || thiz.hasTag() != other.hasTag()) return false;
         if (!thiz.hasTag()) return true;
         assert thiz.getTag() != null;
         return thiz.getTag().equals(other.getTag());

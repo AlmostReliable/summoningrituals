@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.mixin;
 
-import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +22,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "shouldDropLoot", at = @At("HEAD"), cancellable = true)
     private void summoning$shouldDropLoot(CallbackInfoReturnable<Boolean> cir) {
-        if (getTags().contains(f("{}_sacrificed", BuildConfig.MOD_ID))) {
+        if (getTags().contains(f("{}_sacrificed", SummoningRitualsConstants.MOD_ID))) {
             cir.setReturnValue(false);
         }
     }

@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.util;
 
-import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Utils {
@@ -8,7 +8,7 @@ public final class Utils {
     private Utils() {}
 
     public static ResourceLocation getRL(String key) {
-        return new ResourceLocation(BuildConfig.MOD_ID, key);
+        return new ResourceLocation(SummoningRitualsConstants.MOD_ID, key);
     }
 
     @SuppressWarnings("unchecked")

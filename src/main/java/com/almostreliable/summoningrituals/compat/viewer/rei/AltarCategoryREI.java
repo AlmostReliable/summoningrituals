@@ -123,8 +123,8 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
         for (var sprite : sprites) {
             int spriteOffsetF = spriteOffset;
             widgets.add(
-                Widgets.createDrawableWidget((helper, stack, mX, mY, partial) ->
-                    sprite.render(stack, offsetX, offsetY + spriteOffsetF)
+                Widgets.createDrawableWidget((guiGraphics, mX, mY, partial) ->
+                    sprite.render(guiGraphics, offsetX, offsetY + spriteOffsetF)
                 )
             );
             spriteOffset += SPRITE_SLOT_SIZE + 1;
@@ -189,7 +189,7 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
         );
 
         // tooltips
-        widgets.add(Widgets.createDrawableWidget((helper, stack, mX, mY, partial) -> {
+        widgets.add(Widgets.createDrawableWidget((guiGraphics, mX, mY, partial) -> {
             var tooltip = getTooltip(recipe, offsetX, offsetY, mX, mY);
             if (!tooltip.isEmpty()) {
                 Tooltip.create(tooltip).queue();
@@ -210,8 +210,8 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
     }
 
     private Widget labelWidget(String text, GameUtils.ANCHOR anchor, int x, int y, int color) {
-        return Widgets.createDrawableWidget((helper, stack, mX, mY, partial) ->
-            drawLabel(stack, text, anchor, x, y, color)
+        return Widgets.createDrawableWidget((guiGraphics, mX, mY, partial) ->
+            drawLabel(guiGraphics, text, anchor, x, y, color)
         );
     }
 

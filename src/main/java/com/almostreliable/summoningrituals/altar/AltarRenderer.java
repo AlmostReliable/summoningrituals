@@ -2,14 +2,14 @@ package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemDisplayContext;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
@@ -60,15 +60,16 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                 {
                     stack.translate(0, 1 - 0.75f * MathUtils.modifier(progress, processTime, 0), 0);
                     stack.scale(0.75f, 0.75f, 0.75f);
-                    stack.mulPose(Vector3f.YN.rotationDegrees((float) playerAngle));
+                    stack.mulPose(Axis.YN.rotationDegrees((float) playerAngle));
                     itemRenderer
                         .renderStatic(
                             entity.getInventory().getCatalyst(),
-                            TransformType.FIXED,
+                            ItemDisplayContext.FIXED,
                             lightAbove,
                             overlay,
                             stack,
                             buffer,
+                            entity.getLevel(),
                             (int) entity.getBlockPos().asLong()
                         );
                 }
@@ -103,9 +104,9 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                     var newHeight = (rotationDiff / 180) * MAX_ITEM_HEIGHT;
 
                     var playerOffset = Math.max(1 - altarPos.distanceTo(playerPos) / 8, 0);
-                    newHeight *= playerOffset;
+                    newHeight *= (float) playerOffset;
 
-                    stack.mulPose(Vector3f.YN.rotationDegrees(MathUtils.singleRotation(itemRotation + axisRotation)));
+                    stack.mulPose(Axis.YN.rotationDegrees(MathUtils.singleRotation(itemRotation + axisRotation)));
                     stack.translate(0, newHeight, -ITEM_OFFSET);
 
                     var item = inputs.get(i);
@@ -113,11 +114,12 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                         mc.getItemRenderer()
                             .renderStatic(
                                 item,
-                                TransformType.FIXED,
+                                ItemDisplayContext.FIXED,
                                 lightAbove,
                                 overlay,
                                 stack,
                                 buffer,
+                                entity.getLevel(),
                                 (int) entity.getBlockPos().asLong()
                             );
                     }

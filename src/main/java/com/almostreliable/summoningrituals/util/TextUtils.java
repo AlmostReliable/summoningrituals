@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.util;
 
-import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -37,6 +37,6 @@ public final class TextUtils {
     }
 
     private static String getTranslationKey(String type, String key) {
-        return String.format("%s.%s.%s", type.toLowerCase(), BuildConfig.MOD_ID, key);
+        return String.format("%s.%s.%s", type.toLowerCase(), SummoningRitualsConstants.MOD_ID, key);
     }
 }

@@ -23,7 +23,7 @@ val githubUser: String by project
 val githubRepo: String by project
 
 plugins {
-    id("dev.architectury.loom") version "1.2.+"
+    id("dev.architectury.loom") version "1.3.+"
     id("io.github.juuxel.loom-vineflower") version "1.11.0"
     id("com.github.gmazzo.buildconfig") version "4.0.4"
     java
@@ -31,7 +31,6 @@ plugins {
 
 base {
     version = "$minecraftVersion-$modVersion"
-    group = modPackage
     archivesName.set("$modId-forge")
 }
 
@@ -53,10 +52,12 @@ loom {
 }
 
 repositories {
+    maven("https://oss.sonatype.org/content/repositories/snapshots") // Manifold
     maven("https://maven.parchmentmc.org/") // Parchment
     maven("https://maven.blamejared.com") // JEI
     maven("https://maven.shedaniel.me") // REI
     maven("https://maven.saps.dev/minecraft") // KubeJS
+    maven("https://cursemaven.com") // Jade
     mavenLocal()
 }
 
@@ -68,21 +69,25 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-$minecraftVersion:$parchmentVersion@zip")
     })
 
-    // Project
-    implementation("systems.manifold:manifold-ext-rt:$manifoldVersion")
-    annotationProcessor("systems.manifold:manifold-ext:$manifoldVersion")
-
     // Forge
     forge("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
-    // Compile
+    // Manifold
+    compileOnly("systems.manifold:manifold-ext-rt:$manifoldVersion")
+    annotationProcessor("systems.manifold:manifold-ext:$manifoldVersion")
+
+    // JEI/REI
     modCompileOnlyApi("mezz.jei:jei-$minecraftVersion-common-api:$jeiVersion") { isTransitive = false }
     modCompileOnlyApi("mezz.jei:jei-$minecraftVersion-forge-api:$jeiVersion") { isTransitive = false }
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-forge:$reiVersion")
     compileOnly("me.shedaniel:REIPluginCompatibilities-forge-annotations:9.+")
+
+    // KubeJS
     modCompileOnly("dev.latvian.mods:kubejs-forge:$kubeVersion")
+    localRuntime("io.github.llamalad7:mixinextras-forge:0.2.0-rc.4")
 
     // Runtime
+    modLocalRuntime("curse.maven:jade-324717:4986594") // Jade 11.7.1
     modLocalRuntime("dev.latvian.mods:kubejs-forge:$kubeVersion")
     when (forgeRecipeViewer) {
         "rei" -> modLocalRuntime("me.shedaniel:RoughlyEnoughItems-forge:$reiVersion")
@@ -140,6 +145,10 @@ extensions.configure<JavaPluginExtension> {
 extensions.configure<LoomGradleExtensionAPI> {
     runs {
         forEach {
+            val dir = "run/${it.environment}"
+            println("[Run Config] '${it.name}' directory: $dir")
+            it.runDir(dir)
+            // allows DCEVM hot-swapping when using the JBR (https://github.com/JetBrains/JetBrainsRuntime)
             it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
         }
     }
@@ -150,5 +159,6 @@ buildConfig {
     buildConfigField("String", "MOD_NAME", "\"$modName\"")
     buildConfigField("String", "MOD_VERSION", "\"$version\"")
     packageName(modPackage)
+    className(modName.replace(" ", "") + "Constants")
     useJavaOutput()
 }

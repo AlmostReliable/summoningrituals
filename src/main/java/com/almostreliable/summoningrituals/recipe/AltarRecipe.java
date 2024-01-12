@@ -9,6 +9,7 @@ import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -80,7 +81,7 @@ public class AltarRecipe implements Recipe<VanillaWrapper> {
     }
 
     @Override
-    public ItemStack assemble(VanillaWrapper inv) {
+    public ItemStack assemble(VanillaWrapper inv, RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
@@ -90,7 +91,7 @@ public class AltarRecipe implements Recipe<VanillaWrapper> {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 

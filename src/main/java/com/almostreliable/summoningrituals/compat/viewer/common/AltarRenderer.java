@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.Registration;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -16,7 +16,7 @@ public class AltarRenderer extends SizedItemRenderer {
     }
 
     @Override
-    public void render(PoseStack stack, @Nullable ItemStack item) {
-        super.render(stack, altar);
+    public void render(GuiGraphics guiGraphics, @Nullable ItemStack item) {
+        super.render(guiGraphics, altar);
     }
 }

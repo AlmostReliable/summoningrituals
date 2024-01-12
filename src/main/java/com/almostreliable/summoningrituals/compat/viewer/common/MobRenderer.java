@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,8 +28,9 @@ public class MobRenderer {
         mc = Minecraft.getInstance();
     }
 
-    public void render(PoseStack stack, @Nullable MobIngredient mob) {
+    public void render(GuiGraphics guiGraphics, @Nullable MobIngredient mob) {
         if (mc.level == null || mc.player == null || mob == null) return;
+        PoseStack stack = guiGraphics.pose();
         if (mob.getEntity() != null && mob.getEntity() instanceof LivingEntity entity) {
             stack.pushPose();
             entity.tickCount = mc.player.tickCount;
@@ -36,20 +38,20 @@ public class MobRenderer {
             var entityHeight = entity.getBbHeight();
             var entityScale = Math.min(CREEPER_HEIGHT / entityHeight, 1f);
             var scaleFactor = CREEPER_SCALE * size * entityScale;
-            renderEntity(stack, entity, scaleFactor);
+            renderEntity(guiGraphics, entity, scaleFactor);
             stack.popPose();
         }
         if (mob.getCount() > 1) {
             var count = String.valueOf(mob.getCount());
-            GameUtils.renderCount(stack, count, size, size);
+            GameUtils.renderCount(guiGraphics, count, size, size);
         }
     }
 
-    private void renderEntity(PoseStack stack, LivingEntity entity, float scaleFactor) {
+    private void renderEntity(GuiGraphics guiGraphics, LivingEntity entity, float scaleFactor) {
         PoseStack modelView = RenderSystem.getModelViewStack();
         modelView.pushPose();
-        modelView.mulPoseMatrix(stack.last().pose());
-        InventoryScreen.renderEntityInInventory(0, 0, (int) scaleFactor, 75, -20, entity);
+        modelView.mulPoseMatrix(guiGraphics.pose().last().pose());
+        InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, 0, 0, (int) scaleFactor, 75, -20, entity);
         modelView.popPose();
         RenderSystem.applyModelViewMatrix();
     }

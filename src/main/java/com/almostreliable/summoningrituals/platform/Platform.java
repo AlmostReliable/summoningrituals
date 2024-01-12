@@ -1,6 +1,5 @@
 package com.almostreliable.summoningrituals.platform;
 
-import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.altar.AltarRenderer;
@@ -25,7 +24,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -45,15 +43,6 @@ import java.util.stream.Stream;
 public final class Platform {
 
     private Platform() {}
-
-    public static CreativeModeTab createTab() {
-        return new CreativeModeTab(BuildConfig.MOD_ID) {
-            @Override
-            public ItemStack makeIcon() {
-                return Registration.ALTAR_ITEM.get().getDefaultInstance();
-            }
-        };
-    }
 
     public static void registerBlockEntityRenderer(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(Registration.ALTAR_ENTITY.get(), AltarRenderer::new);

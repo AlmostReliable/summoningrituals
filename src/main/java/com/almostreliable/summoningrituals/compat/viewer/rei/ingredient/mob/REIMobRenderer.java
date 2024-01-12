@@ -8,6 +8,7 @@ import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import javax.annotation.Nullable;
 
@@ -19,11 +20,12 @@ public class REIMobRenderer extends MobRenderer implements EntryRenderer<MobIngr
 
     @Override
     public void render(
-        EntryStack<MobIngredient> entry, PoseStack stack, Rectangle bounds, int mX, int mY, float delta
+        EntryStack<MobIngredient> entry, GuiGraphics guiGraphics, Rectangle bounds, int mX, int mY, float delta
     ) {
+        PoseStack stack = guiGraphics.pose();
         stack.pushPose();
         stack.translate(bounds.x - 1, bounds.y - 1, 0);
-        render(stack, entry.getValue());
+        render(guiGraphics, entry.getValue());
         stack.popPose();
     }
 

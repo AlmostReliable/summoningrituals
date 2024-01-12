@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unused")
 public class AlmostKube extends KubeJSPlugin {
 
-    private static final EventGroup GROUP = EventGroup.of(BuildConfig.MOD_NAME.replace(" ", ""));
+    private static final EventGroup GROUP = EventGroup.of(SummoningRitualsConstants.MOD_NAME.replace(" ", ""));
     private static final EventHandler START = GROUP.server("start", () -> SummoningEventJS.class).hasResult();
     private static final EventHandler COMPLETE = GROUP.server("complete", () -> SummoningEventJS.class);
 
@@ -56,7 +56,7 @@ public class AlmostKube extends KubeJSPlugin {
 
     @Override
     public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {
-        event.namespace(BuildConfig.MOD_ID).register(Constants.ALTAR, AltarRecipeSchema.SCHEMA);
+        event.namespace(SummoningRitualsConstants.MOD_ID).register(Constants.ALTAR, AltarRecipeSchema.SCHEMA);
     }
 
     @SuppressWarnings("WeakerAccess")

@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.almostreliable.summoningrituals.BuildConfig;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Registration;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -240,7 +240,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
             List<BlockPos> positions = new ArrayList<>();
             for (var i = 0; i < count; i++) {
                 var entity = entities.get(i);
-                entity.addTag(f("{}_sacrificed", BuildConfig.MOD_ID));
+                entity.addTag(f("{}_sacrificed", SummoningRitualsConstants.MOD_ID));
                 entity.kill();
                 positions.add(entity.blockPosition());
             }

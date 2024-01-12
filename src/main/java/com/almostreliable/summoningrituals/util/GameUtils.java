@@ -1,9 +1,10 @@
 package com.almostreliable.summoningrituals.util;
 
-import com.almostreliable.summoningrituals.BuildConfig;
+import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -24,8 +25,10 @@ public final class GameUtils {
     ) {
         if (player == null) return;
         player.sendSystemMessage(
-            Component.translatable(String.format("%s.%s.%s", "message", BuildConfig.MOD_ID, translationKey), args)
-                .withStyle(color)
+            Component.translatable(
+                String.format("%s.%s.%s", "message", SummoningRitualsConstants.MOD_ID, translationKey),
+                args
+            ).withStyle(color)
         );
     }
 
@@ -43,11 +46,15 @@ public final class GameUtils {
         level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.5f, 1f);
     }
 
-    public static void renderCount(PoseStack stack, String text, int x, int y) {
-        renderText(stack, text, ANCHOR.BOTTOM_RIGHT, x + 2, y + 2, 1, 0xFF_FFFF);
+    public static void renderCount(GuiGraphics guiGraphics, String text, int x, int y) {
+        renderText(guiGraphics, text, ANCHOR.BOTTOM_RIGHT, x + 2, y + 2, 1, 0xFF_FFFF);
     }
 
-    public static void renderText(PoseStack stack, String text, ANCHOR anchor, int x, int y, float scale, int color) {
+    public static void renderText(
+        GuiGraphics guiGraphics, String text, ANCHOR anchor, int x, int y, float scale, int color
+    ) {
+        PoseStack stack = guiGraphics.pose();
+
         stack.pushPose();
         {
             stack.translate(x, y, 200);
@@ -74,7 +81,7 @@ public final class GameUtils {
                     break;
             }
 
-            font.drawShadow(stack, text, xOffset, yOffset, color);
+            guiGraphics.drawString(Minecraft.getInstance().font, text, xOffset, yOffset, color, true);
         }
         stack.popPose();
     }

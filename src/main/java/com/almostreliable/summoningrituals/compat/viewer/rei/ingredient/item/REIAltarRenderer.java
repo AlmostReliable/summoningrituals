@@ -7,6 +7,7 @@ import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -19,11 +20,12 @@ public class REIAltarRenderer extends AltarRenderer implements EntryRenderer<Ite
 
     @Override
     public void render(
-        EntryStack<ItemStack> entry, PoseStack stack, Rectangle bounds, int mX, int mY, float delta
+        EntryStack<ItemStack> entry, GuiGraphics guiGraphics, Rectangle bounds, int mX, int mY, float delta
     ) {
+        PoseStack stack = guiGraphics.pose();
         stack.pushPose();
         stack.translate(bounds.x - 1, bounds.y - 1, 0);
-        render(stack, null);
+        render(guiGraphics, null);
         stack.popPose();
     }
 

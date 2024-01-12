@@ -22,6 +22,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -44,7 +45,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
                 VanillaTypes.ITEM_STACK,
                 Registration.ALTAR_ITEM.get().getDefaultInstance()
             ),
-            new JEIAltarRenderer(BLOCK_SIZE),
+            new JEIAltarRenderer(BLOCK_SIZE * 2),
             new JEICatalystRenderer(ITEM_SIZE)
         );
 
@@ -111,21 +112,23 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
 
     @Override
     public void draw(
-        AltarRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY
+        AltarRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY
     ) {
+        PoseStack stack = guiGraphics.pose();
+
         // altar
         stack.pushPose();
         {
             var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.getBlockBelow() == null ? 0 : 4);
             stack.translate(CENTER_X - BLOCK_SLOT_SIZE / 2f, altarY, 0);
             // noinspection DataFlowIssue
-            altarRenderer.render(stack, null);
+            altarRenderer.render(guiGraphics, null);
         }
         stack.popPose();
 
         // labels
         drawLabel(
-            stack,
+            guiGraphics,
             f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.OUTPUTS)),
             GameUtils.ANCHOR.BOTTOM_LEFT,
             2,
@@ -134,7 +137,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
         );
         if (!recipe.getSacrifices().isEmpty()) {
             drawLabel(
-                stack,
+                guiGraphics,
                 f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.REGION)),
                 GameUtils.ANCHOR.TOP_LEFT,
                 1,
@@ -142,7 +145,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
                 0x00_A2FF
             );
             drawLabel(
-                stack,
+                guiGraphics,
                 recipe.getSacrifices().getDisplayRegion(),
                 GameUtils.ANCHOR.TOP_LEFT,
                 1,
@@ -155,7 +158,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
         var sprites = conditionSpriteWidgets.stream().filter(s -> s.test(recipe)).toList();
         var spriteOffset = 0;
         for (var sprite : sprites) {
-            sprite.render(stack, 0, spriteOffset);
+            sprite.render(guiGraphics, 0, spriteOffset);
             spriteOffset += SPRITE_SLOT_SIZE + 1;
         }
     }

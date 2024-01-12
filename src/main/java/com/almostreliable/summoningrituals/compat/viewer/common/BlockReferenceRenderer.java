@@ -6,9 +6,10 @@ import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -32,8 +33,9 @@ public class BlockReferenceRenderer {
         blockRenderer = mc.getBlockRenderer();
     }
 
-    public void render(PoseStack stack, @Nullable BlockReference blockReference) {
+    public void render(GuiGraphics guiGraphics, @Nullable BlockReference blockReference) {
         if (blockReference == null) return;
+        PoseStack stack = guiGraphics.pose();
         stack.pushPose();
         {
             RenderSystem.disableDepthTest();
@@ -42,9 +44,9 @@ public class BlockReferenceRenderer {
 
             stack.translate(0.93f * size, 0.77f * size, 100);
             stack.scale(0.625f * size, 0.625f * size, 0.625f * size);
-            stack.mulPose(Vector3f.ZN.rotationDegrees(180));
-            stack.mulPose(Vector3f.XN.rotationDegrees(30));
-            stack.mulPose(Vector3f.YP.rotationDegrees(45));
+            stack.mulPose(Axis.ZN.rotationDegrees(180));
+            stack.mulPose(Axis.XN.rotationDegrees(30));
+            stack.mulPose(Axis.YP.rotationDegrees(45));
             var bufferSource = mc.renderBuffers().bufferSource();
             Platform.renderSingleBlock(blockRenderer, blockReference, stack, bufferSource);
             bufferSource.endBatch();
