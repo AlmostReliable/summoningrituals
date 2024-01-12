@@ -1,12 +1,11 @@
 {
 	"credit": "Made with Blockbench by mo_shark, optimized by Almost Reliable",
 	"parent": "block/block",
-  "render_type": "cutout",
+	"render_type": "cutout",
 	"texture_size": [32, 32],
 	"textures": {
 		"texture": "summoningrituals:block/altar",
 		"candle": "block/candle",
-		"wither": "entity/skeleton/wither_skeleton",
 		"log": "block/dark_oak_log",
 		"particle": "block/dark_oak_planks"
 	},
@@ -56,11 +55,11 @@
 			"to": [9.25, 17, 12.25],
 			"rotation": {"angle": -22.5, "axis": "y", "origin": [7, 15, 9]},
 			"faces": {
-				"north": {"uv": [2, 4, 4, 8], "texture": "#wither"},
-				"east": {"uv": [0, 4, 2, 8], "texture": "#wither"},
-				"south": {"uv": [6, 4, 8, 8], "texture": "#wither"},
-				"west": {"uv": [4, 4, 6, 8], "texture": "#wither"},
-				"up": {"uv": [2, 0, 4, 4], "texture": "#wither"}
+				"north": {"uv": [4, 12, 8, 16], "texture": "#texture"},
+				"east": {"uv": [0, 12, 4, 16], "texture": "#texture"},
+				"south": {"uv": [12, 12, 16, 16], "texture": "#texture"},
+				"west": {"uv": [8, 12, 12, 16], "texture": "#texture"},
+				"up": {"uv": [4, 8, 8, 12], "texture": "#texture"}
 			}
 		},
 		{
