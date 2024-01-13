@@ -45,7 +45,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
                 VanillaTypes.ITEM_STACK,
                 Registration.ALTAR_ITEM.get().getDefaultInstance()
             ),
-            new JEIAltarRenderer(BLOCK_SIZE * 2),
+            new JEIAltarRenderer(BLOCK_SIZE),
             new JEICatalystRenderer(ITEM_SIZE)
         );
 

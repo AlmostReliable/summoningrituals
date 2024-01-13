@@ -24,19 +24,16 @@ public class SizedItemRenderer {
     public void render(GuiGraphics guiGraphics, @Nullable ItemStack item) {
         if (item == null) return;
         PoseStack stack = guiGraphics.pose();
-        PoseStack modelViewStack = RenderSystem.getModelViewStack();
-        modelViewStack.pushPose();
+        stack.pushPose();
         {
-            modelViewStack.mulPoseMatrix(stack.last().pose());
             var scale = size / 16f;
-            modelViewStack.scale(scale, scale, scale);
+            stack.scale(scale, scale, scale);
             RenderSystem.enableDepthTest();
             guiGraphics.renderFakeItem(item, 0, 0);
             guiGraphics.renderItemDecorations(mc.font, item, 0, 0);
             RenderSystem.disableBlend();
         }
-        modelViewStack.popPose();
-        RenderSystem.applyModelViewMatrix();
+        stack.popPose();
     }
 
     public List<Component> getTooltip(ItemStack stack, TooltipFlag tooltipFlag) {

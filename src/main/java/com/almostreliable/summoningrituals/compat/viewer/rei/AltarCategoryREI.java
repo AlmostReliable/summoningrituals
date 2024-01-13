@@ -74,6 +74,18 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
 
         var recipe = display.recipe;
 
+        // block below
+        if (recipe.getBlockBelow() != null) {
+            var blockBelowX = offsetX + CENTER_X - BLOCK_SLOT_SIZE / 2;
+            var blockBelowY = offsetY + RENDER_Y - 3;
+            widgets.add(
+                Widgets.createSlot(new Rectangle(blockBelowX, blockBelowY, BLOCK_SIZE, BLOCK_SIZE))
+                    .entry(EntryStack.of(AlmostREI.BLOCK_REFERENCE, recipe.getBlockBelow()))
+                    .markInput()
+                    .disableBackground()
+            );
+        }
+
         // altar
         ClientEntryStacks.setRenderer(EntryStacks.of(altar), altarRenderer);
         var altarX = offsetX + CENTER_X - BLOCK_SLOT_SIZE / 2;
@@ -128,18 +140,6 @@ public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<Item
                 )
             );
             spriteOffset += SPRITE_SLOT_SIZE + 1;
-        }
-
-        // block below
-        if (recipe.getBlockBelow() != null) {
-            var blockBelowX = offsetX + CENTER_X - BLOCK_SLOT_SIZE / 2;
-            var blockBelowY = offsetY + RENDER_Y - 3;
-            widgets.add(
-                Widgets.createSlot(new Rectangle(blockBelowX, blockBelowY, BLOCK_SIZE, BLOCK_SIZE))
-                    .entry(EntryStack.of(AlmostREI.BLOCK_REFERENCE, recipe.getBlockBelow()))
-                    .markInput()
-                    .disableBackground()
-            );
         }
 
         // catalyst
