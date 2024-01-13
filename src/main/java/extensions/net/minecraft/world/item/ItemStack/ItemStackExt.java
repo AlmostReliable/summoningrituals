@@ -11,18 +11,6 @@ public final class ItemStackExt {
 
     private ItemStackExt() {}
 
-    public static ItemStack withCount(@This ItemStack thiz, long count) {
-        if (count > thiz.getMaxStackSize()) {
-            throw new IllegalArgumentException("Count cannot be greater than max stack size");
-        }
-        thiz.setCount((int) count);
-        return thiz;
-    }
-
-    public static ItemStack copyWithCount(@This ItemStack thiz, int count) {
-        return thiz.copy().withCount(count);
-    }
-
     public static boolean canStack(@This ItemStack thiz, ItemStack other) {
         if (thiz.isEmpty() || !ItemStack.isSameItem(thiz, other) || thiz.hasTag() != other.hasTag()) return false;
         if (!thiz.hasTag()) return true;

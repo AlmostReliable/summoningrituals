@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
 val license: String by project
 val enableAccessWidener: String by project
@@ -23,8 +22,7 @@ val githubUser: String by project
 val githubRepo: String by project
 
 plugins {
-    id("dev.architectury.loom") version "1.3.+"
-    id("io.github.juuxel.loom-vineflower") version "1.11.0"
+    id("dev.architectury.loom") version "1.4.+"
     id("com.github.gmazzo.buildconfig") version "4.0.4"
     java
 }
@@ -48,6 +46,16 @@ loom {
             extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
         }
         println("Access widener enabled for project. Access widener path: ${loom.accessWidenerPath.get()}")
+    }
+
+    runs {
+        forEach {
+            val dir = "run/${it.environment}"
+            println("[Run Config] '${it.name}' directory: $dir")
+            it.runDir(dir)
+            // allows DCEVM hot-swapping when using the JBR (https://github.com/JetBrains/JetBrainsRuntime)
+            it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
+        }
     }
 }
 
@@ -140,18 +148,6 @@ tasks {
 
 extensions.configure<JavaPluginExtension> {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
-
-extensions.configure<LoomGradleExtensionAPI> {
-    runs {
-        forEach {
-            val dir = "run/${it.environment}"
-            println("[Run Config] '${it.name}' directory: $dir")
-            it.runDir(dir)
-            // allows DCEVM hot-swapping when using the JBR (https://github.com/JetBrains/JetBrainsRuntime)
-            it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
-        }
-    }
 }
 
 buildConfig {
