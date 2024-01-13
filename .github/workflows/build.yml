@@ -4,12 +4,24 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - '1.19-forge'
+      - '1.20.1-forge'
     tags-ignore:
       - '**'
+    paths:
+      - 'gradle/**'
+      - '**.java'
+      - '**.kts'
+      - '**.properties'
+      - '**/build.yml'
   pull_request:
     branches:
-      - '1.19-forge'
+      - '1.20.1-forge'
+    paths:
+      - 'gradle/**'
+      - '**.java'
+      - '**.kts'
+      - '**.properties'
+      - '**/build.yml'
 
 env:
   JAVA_DIST: 'zulu'
