@@ -1,0 +1,34 @@
+{
+  "itemGroup.summoningrituals": "Ритуалы призыва",
+
+  "block.summoningrituals.altar": "Алтарь призыва",
+  "block.summoningrituals.indestructible_altar": "Неразрушимый алтарь призыва",
+
+  "message.summoningrituals.progress": "Ритуал уже в процессе призыва.",
+  "message.summoningrituals.day": "Необходим день чтобы начать данный ритуал.",
+  "message.summoningrituals.night": "Необходима ночь чтобы начать данный ритуал.",
+  "message.summoningrituals.clear": "Погода должна быть ясной, чтобы начать данный ритуал.",
+  "message.summoningrituals.rain": "Погода должна быть дождливой, чтобы начать данный ритуал",
+  "message.summoningrituals.thunder": "Погода должна быть штормовой, чтобы начать данный ритуал.",
+  "message.summoningrituals.block_below": "Под алтарем нет нужного блока.",
+  "message.summoningrituals.sacrifices": "Вокруг алтаря нет нужного жертвоприношения.",
+  "message.summoningrituals.invalid": "На алтаре нет необходимых предметов.",
+
+  "label.summoningrituals.region": "Регион",
+  "label.summoningrituals.outputs": "Результат",
+
+  "tooltip.summoningrituals.catalyst": "Каталист",
+  "tooltip.summoningrituals.catalyst_desc": "Вставьте каталист, чтобы начать ритуал.",
+  "tooltip.summoningrituals.block_below": "Блок под алтарём",
+  "tooltip.summoningrituals.properties": "Relevant properties",
+  "tooltip.summoningrituals.region": "Регион вокруг алтаря, где мобы будут принесины в жертву.",
+  "tooltip.summoningrituals.day_time": "Требуемое время",
+  "tooltip.summoningrituals.weather": "Требуемая погода",
+
+  "day_time.summoningrituals.day": "День",
+  "day_time.summoningrituals.night": "Ночь",
+
+  "weather.summoningrituals.clear": "Ясная",
+  "weather.summoningrituals.rain": "Дождливая",
+  "weather.summoningrituals.thunder": "Шторомовая"
+}
