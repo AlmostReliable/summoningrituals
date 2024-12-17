@@ -10,7 +10,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 
 @SuppressWarnings("WeakerAccess")
-@Mod(SummoningRitualsConstants.MOD_ID)
+@Mod(ModConstants.MOD_ID)
 public class SummoningRituals {
 
     public SummoningRituals() {

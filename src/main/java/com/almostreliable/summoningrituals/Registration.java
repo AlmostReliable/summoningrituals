@@ -22,18 +22,16 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.*;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
 @SuppressWarnings("ConstantConditions")
 public final class Registration {
 
-    private static final DeferredRegister<Block> BLOCKS = createRegistry(ForgeRegistries.BLOCKS);
-    private static final DeferredRegister<Item> ITEMS = createRegistry(ForgeRegistries.ITEMS);
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = createRegistry(ForgeRegistries.BLOCK_ENTITY_TYPES);
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.Blocks.createBlocks(ModConstants.MOD_ID);
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.Items.createItems(ModConstants.MOD_ID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(
         ForgeRegistries.RECIPE_TYPES,
         SummoningRitualsConstants.MOD_ID
