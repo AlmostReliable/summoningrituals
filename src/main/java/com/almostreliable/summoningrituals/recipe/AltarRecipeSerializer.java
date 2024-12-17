@@ -9,8 +9,12 @@ import com.almostreliable.summoningrituals.recipe.component.IngredientStack;
 import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -20,6 +24,11 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     @SuppressWarnings({"StaticNonFinalField", "NonConstantFieldWithUpperCaseName"})
     public static int MAX_INPUTS;
+
+    public static final MapCodec<AltarRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+        Ingredient.CODEC_NONEMPTY.fieldOf("catalist").forGetter(AltarRecipe::getCatalyst),
+
+        ))
 
     @Override
     public AltarRecipe fromJson(ResourceLocation id, JsonObject json) {
@@ -155,5 +164,15 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     private static void expandMaxInputs(int amount) {
         if (MAX_INPUTS < amount) MAX_INPUTS = amount;
+    }
+
+    @Override
+    public MapCodec<AltarRecipe> codec() {
+        return null;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> streamCodec() {
+        return null;
     }
 }

@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.inventory;
 import com.almostreliable.summoningrituals.platform.TagSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import java.util.List;
 

@@ -11,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
-public class AltarInventory implements ItemHandler {
+public class AltarInventory implements ItemHandler, RecipeInput {
 
     public static final int SIZE = 64;
 
@@ -315,5 +316,15 @@ public class AltarInventory implements ItemHandler {
             backup.add(stack.copy());
         }
         return backup;
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return getStackInSlot(index);
+    }
+
+    @Override
+    public int size() {
+        return getSlots();
     }
 }

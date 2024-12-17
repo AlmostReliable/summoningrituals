@@ -1,32 +1,21 @@
 package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.network.PacketHandler;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 @SuppressWarnings("WeakerAccess")
 @Mod(ModConstants.MOD_ID)
 public class SummoningRituals {
 
-    public SummoningRituals() {
-        onInitialize();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> {
-            var client = new SummoningRitualsClient();
-            return client::onInitializeClient;
-        });
-    }
-
-    public void onInitialize() {
-        var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(SummoningRituals::onCommonSetup);
-        modEventBus.addListener(SummoningRituals::onRegistryEvent);
-        modEventBus.addListener(SummoningRituals::onCreativeTabContents);
-        Registration.init(modEventBus);
+    public SummoningRituals(IEventBus eventBus) {
+        eventBus.addListener(SummoningRituals::onCommonSetup);
+        eventBus.addListener(SummoningRituals::onRegistryEvent);
+        eventBus.addListener(SummoningRituals::onCreativeTabContents);
+        Registration.init(eventBus);
     }
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {

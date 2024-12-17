@@ -1,8 +1,6 @@
 package com.almostreliable.summoningrituals.platform;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Registration;
-import com.almostreliable.summoningrituals.altar.AltarRenderer;
 import com.almostreliable.summoningrituals.network.ClientAltarUpdatePacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.network.SacrificeParticlePacket;
@@ -30,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.network.PacketDistributor;
@@ -43,10 +40,6 @@ import java.util.stream.Stream;
 public final class Platform {
 
     private Platform() {}
-
-    public static void registerBlockEntityRenderer(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(Registration.ALTAR_ENTITY.get(), AltarRenderer::new);
-    }
 
     public static void sendProgressUpdate(Level level, BlockPos pos, int progress) {
         sendPacket(level, pos, ClientAltarUpdatePacket.progressUpdate(pos, progress));
