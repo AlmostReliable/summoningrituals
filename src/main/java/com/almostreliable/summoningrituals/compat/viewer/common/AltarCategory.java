@@ -3,6 +3,8 @@ package com.almostreliable.summoningrituals.compat.viewer.common;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.component.EntitySpawn;
+import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -11,9 +13,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
@@ -44,10 +46,8 @@ public class AltarCategory<I, R> {
     private static final int INPUT_RADIUS = 47;
 
     protected final ItemStack altar;
-    private final I logo;
     protected final R altarRenderer;
     protected final R catalystRenderer;
-
     protected final List<SpriteWidget> conditionSpriteWidgets = List.of(
         new SpriteWidget(0, altarRecipe -> altarRecipe.dayTime() == AltarRecipe.DAY_TIME.DAY),
         new SpriteWidget(1, altarRecipe -> altarRecipe.dayTime() == AltarRecipe.DAY_TIME.NIGHT),
@@ -55,12 +55,71 @@ public class AltarCategory<I, R> {
         new SpriteWidget(3, altarRecipe -> altarRecipe.weather() == AltarRecipe.WEATHER.RAIN),
         new SpriteWidget(4, altarRecipe -> altarRecipe.weather() == AltarRecipe.WEATHER.THUNDER)
     );
+    private final I logo;
 
     protected AltarCategory(I logo, R altarRenderer, R catalystRenderer) {
         altar = Registration.ALTAR_ITEM.get().getDefaultInstance();
         this.logo = logo;
         this.altarRenderer = altarRenderer;
         this.catalystRenderer = catalystRenderer;
+    }
+
+    protected static void handleInputs(
+        int offsetX, int offsetY, AltarRecipe recipe,
+        ItemInputConsumer itemConsumer,
+        MobInputConsumer mobConsumer
+    ) {
+        var itemInputs = recipe.inputs();
+        var entityInputs = recipe.sacrifices().orElse(RecipeSacrifices.EMPTY);
+        var inputSlots = itemInputs.size() + entityInputs.size();
+
+        for (var i = 0; i < inputSlots; i++) {
+            var x = offsetX + CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
+            var y = offsetY + RENDER_Y + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
+
+            if (i < itemInputs.size()) {
+                List<ItemStack> inputStacks = new ArrayList<>();
+                for (var stack : itemInputs.get(i).ingredient().getItems()) {
+                    stack.setCount(itemInputs.get(i).count());
+                    inputStacks.add(stack);
+                }
+                itemConsumer.accept(x, y, inputStacks);
+            } else {
+                var entityInput = entityInputs.get(i - itemInputs.size());
+                var mobIngredient = new EntityIngredient(entityInput.entity(), entityInput.count());
+                var egg = mobIngredient.getEgg();
+                mobConsumer.accept(x, y, mobIngredient, egg);
+            }
+        }
+    }
+
+    protected static void handleOutputs(
+        int offsetX, int offsetY, AltarRecipe recipe,
+        ItemOutputConsumer itemConsumer,
+        MobOutputConsumer mobConsumer
+    ) {
+        int i = 0;
+        for (var itemOutput : recipe.itemOutputs()) {
+            var x = offsetX + 2 + i * (ITEM_SLOT_SIZE - 1);
+            var y = offsetY + 130;
+            itemConsumer.accept(x, y, itemOutput.item());
+            i++;
+        }
+
+        for (var entityOutput : recipe.entityOutputs()) {
+            var x = offsetX + 2 + i * (ITEM_SLOT_SIZE - 1);
+            var y = offsetY + 130;
+
+            EntitySpawn spawn = entityOutput.entity();
+            var entityIngredient = new EntityIngredient(
+                spawn.entity(),
+                spawn.count(),
+                spawn.nbt().orElse(new CompoundTag())
+            );
+            var egg = entityIngredient.getEgg();
+            mobConsumer.accept(x, y, entityIngredient, egg);
+            i++;
+        }
     }
 
     public I getIcon() {
@@ -75,7 +134,7 @@ public class AltarCategory<I, R> {
         AltarRecipe recipe, int x, int y, double mX, double mY
     ) {
         List<Component> tooltip = new ArrayList<>();
-        if (!recipe.sacrifices().isEmpty() && MathUtils.isWithinBounds(mX, mY, x + 1, y + 1, 30, 20)) {
+        if (recipe.sacrifices().isPresent() && MathUtils.isWithinBounds(mX, mY, x + 1, y + 1, 30, 20)) {
             tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.REGION, ChatFormatting.WHITE));
         }
         if (isSpriteHovered(mX, mY, x, y + 1)) {
@@ -122,58 +181,6 @@ public class AltarCategory<I, R> {
         );
     }
 
-    protected static void handleInputs(
-        int offsetX, int offsetY, AltarRecipe recipe,
-        ItemInputConsumer itemConsumer,
-        MobInputConsumer mobConsumer
-    ) {
-        var itemInputs = recipe.inputs();
-        var mobInputs = recipe.sacrifices();
-        var inputSlots = itemInputs.size() + mobInputs.size();
-
-        for (var i = 0; i < inputSlots; i++) {
-            var x = offsetX + CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
-            var y = offsetY + RENDER_Y + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - ITEM_SLOT_SIZE / 2;
-
-            if (i < itemInputs.size()) {
-                List<ItemStack> inputStacks = new ArrayList<>();
-                for (var stack : itemInputs.get(i).ingredient().getItems()) {
-                    stack.setCount(itemInputs.get(i).count());
-                    inputStacks.add(stack);
-                }
-                itemConsumer.accept(x, y, inputStacks);
-            } else {
-                var mobInput = mobInputs.get(i - itemInputs.size());
-                var mobIngredient = new MobIngredient(mobInput.mob(), mobInput.count());
-                var egg = mobIngredient.getEgg();
-                mobConsumer.accept(x, y, mobIngredient, egg);
-            }
-        }
-    }
-
-    protected static void handleOutputs(
-        int offsetX, int offsetY, AltarRecipe recipe,
-        ItemOutputConsumer itemConsumer,
-        MobOutputConsumer mobConsumer
-    ) {
-        recipe.outputs().forEach((type, output, i) -> {
-            var x = offsetX + 2 + i * (ITEM_SLOT_SIZE - 1);
-            var y = offsetY + 130;
-
-            if (type == RecipeOutputs.OutputType.ITEM) {
-                itemConsumer.accept(x, y, (ItemStack) output.getOutput());
-            } else if (type == RecipeOutputs.OutputType.MOB) {
-                var entityIngredient = new MobIngredient(
-                    (EntityType<?>) output.getOutput(),
-                    output.getCount(),
-                    output.getData()
-                );
-                var egg = entityIngredient.getEgg();
-                mobConsumer.accept(x, y, entityIngredient, egg);
-            }
-        });
-    }
-
     @FunctionalInterface
     protected interface ItemInputConsumer {
         void accept(int x, int y, List<ItemStack> inputs);
@@ -181,7 +188,7 @@ public class AltarCategory<I, R> {
 
     @FunctionalInterface
     protected interface MobInputConsumer {
-        void accept(int x, int y, MobIngredient mob, @Nullable SpawnEggItem egg);
+        void accept(int x, int y, EntityIngredient mob, @Nullable SpawnEggItem egg);
     }
 
     @FunctionalInterface
@@ -191,7 +198,7 @@ public class AltarCategory<I, R> {
 
     @FunctionalInterface
     protected interface MobOutputConsumer {
-        void accept(int x, int y, MobIngredient mob, @Nullable SpawnEggItem egg);
+        void accept(int x, int y, EntityIngredient mob, @Nullable SpawnEggItem egg);
     }
 
     public static final class SpriteWidget implements Renderable, Predicate<AltarRecipe> {

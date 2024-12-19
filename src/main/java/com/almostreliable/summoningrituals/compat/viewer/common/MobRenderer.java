@@ -28,7 +28,7 @@ public class MobRenderer {
         mc = Minecraft.getInstance();
     }
 
-    public void render(GuiGraphics guiGraphics, @Nullable MobIngredient mob) {
+    public void render(GuiGraphics guiGraphics, @Nullable EntityIngredient mob) {
         if (mc.level == null || mc.player == null || mob == null) return;
         PoseStack stack = guiGraphics.pose();
         if (mob.getEntity() != null && mob.getEntity() instanceof LivingEntity entity) {
@@ -56,7 +56,7 @@ public class MobRenderer {
         RenderSystem.applyModelViewMatrix();
     }
 
-    public List<Component> getTooltip(MobIngredient mob, TooltipFlag tooltipFlag) {
+    public List<Component> getTooltip(EntityIngredient mob, TooltipFlag tooltipFlag) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(mob.getDisplayName());
         if (tooltipFlag.isAdvanced()) {

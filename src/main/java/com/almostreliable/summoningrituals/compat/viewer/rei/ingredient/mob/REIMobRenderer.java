@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.mob;
 
-import com.almostreliable.summoningrituals.compat.viewer.common.MobIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.common.MobRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.math.Rectangle;
@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import javax.annotation.Nullable;
 
-public class REIMobRenderer extends MobRenderer implements EntryRenderer<MobIngredient> {
+public class REIMobRenderer extends MobRenderer implements EntryRenderer<EntityIngredient> {
 
     REIMobRenderer(int size) {
         super(size);
@@ -20,7 +20,7 @@ public class REIMobRenderer extends MobRenderer implements EntryRenderer<MobIngr
 
     @Override
     public void render(
-        EntryStack<MobIngredient> entry, GuiGraphics guiGraphics, Rectangle bounds, int mX, int mY, float delta
+        EntryStack<EntityIngredient> entry, GuiGraphics guiGraphics, Rectangle bounds, int mX, int mY, float delta
     ) {
         PoseStack stack = guiGraphics.pose();
         stack.pushPose();
@@ -31,7 +31,7 @@ public class REIMobRenderer extends MobRenderer implements EntryRenderer<MobIngr
 
     @Nullable
     @Override
-    public Tooltip getTooltip(EntryStack<MobIngredient> entry, TooltipContext context) {
+    public Tooltip getTooltip(EntryStack<EntityIngredient> entry, TooltipContext context) {
         return Tooltip.create(context.getPoint(), getTooltip(entry.getValue(), context.getFlag()));
     }
 }

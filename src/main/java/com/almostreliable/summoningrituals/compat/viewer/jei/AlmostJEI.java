@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
 import com.almostreliable.summoningrituals.Registration;
-import com.almostreliable.summoningrituals.compat.viewer.common.MobIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block.BlockReferenceHelper;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block.JEIBlockReferenceRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.mob.JEIMobRenderer;
@@ -28,7 +28,7 @@ import static com.almostreliable.summoningrituals.Constants.RECIPE_VIEWER;
 @JeiPlugin
 public class AlmostJEI implements IModPlugin {
 
-    public static final IIngredientType<MobIngredient> MOB = () -> MobIngredient.class;
+    public static final IIngredientType<EntityIngredient> MOB = () -> EntityIngredient.class;
     public static final IIngredientType<BlockReference> BLOCK_REFERENCE = () -> BlockReference.class;
 
     @Override

@@ -19,6 +19,8 @@ import java.util.function.Predicate;
 
 public record RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
 
+    public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
+    public static final RecipeSacrifices EMPTY = new RecipeSacrifices(List.of(), DEFAULT_ZONE);
     public static final StreamCodec<RegistryFriendlyByteBuf, RecipeSacrifices> STREAM_CODEC = StreamCodec.composite(
         Sacrifice.STREAM_CODEC.apply(ByteBufCodecs.list()),
         RecipeSacrifices::sacrifices,
@@ -26,7 +28,6 @@ public record RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
         RecipeSacrifices::region,
         RecipeSacrifices::new
     );
-    private static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
     public static final Codec<RecipeSacrifices> CODEC = RecordCodecBuilder.create(i -> i.group(
         Sacrifice.CODEC.listOf().fieldOf("entities").forGetter(RecipeSacrifices::sacrifices),
         BlockPos.CODEC.optionalFieldOf("region", DEFAULT_ZONE).forGetter(RecipeSacrifices::region)

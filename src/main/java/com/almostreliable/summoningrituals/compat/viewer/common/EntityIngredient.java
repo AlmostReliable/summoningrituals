@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
-import com.almostreliable.summoningrituals.platform.Platform;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -11,28 +11,28 @@ import net.minecraft.world.item.SpawnEggItem;
 
 import javax.annotation.Nullable;
 
-public class MobIngredient {
+public class EntityIngredient {
 
-    private final EntityType<?> mob;
+    private final Holder<EntityType<?>> entityType;
     private final int count;
     private final CompoundTag tag;
     @Nullable private Entity entity;
 
-    public MobIngredient(EntityType<?> mob, int count, CompoundTag tag) {
-        this.mob = mob;
+    public EntityIngredient(Holder<EntityType<?>> entityType, int count, CompoundTag tag) {
+        this.entityType = entityType;
         this.count = count;
         this.tag = tag;
         var level = Minecraft.getInstance().level;
         if (level != null) {
-            entity = mob.create(level);
-            if (entity != null && !tag.isEmpty()) {
-                entity.load(tag);
+            this.entity = entityType.value().create(level);
+            if (this.entity != null && !tag.isEmpty()) {
+                this.entity.load(tag);
             }
         }
     }
 
-    public MobIngredient(EntityType<?> mob, int count) {
-        this(mob, count, new CompoundTag());
+    public EntityIngredient(Holder<EntityType<?>> entityType, int count) {
+        this(entityType, count, new CompoundTag());
     }
 
     public Component getDisplayName() {
@@ -41,11 +41,13 @@ public class MobIngredient {
     }
 
     public MutableComponent getRegistryName() {
-        return Component.literal(Platform.getId(mob).toString());
+        var key = entityType.getKey();
+        assert key != null;
+        return Component.literal(key.location().toString());
     }
 
-    public EntityType<?> getEntityType() {
-        return mob;
+    public Holder<EntityType<?>> getEntityType() {
+        return entityType;
     }
 
     public int getCount() {
@@ -64,6 +66,6 @@ public class MobIngredient {
     @SuppressWarnings("deprecation")
     @Nullable
     public SpawnEggItem getEgg() {
-        return SpawnEggItem.byId(mob);
+        return SpawnEggItem.byId(entityType.value());
     }
 }

@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.compat.viewer.rei;
 
 import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.SummoningRitualsConstants;
-import com.almostreliable.summoningrituals.compat.viewer.common.MobIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.block.BlockReferenceDefinition;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.mob.MobDefinition;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -19,7 +19,7 @@ import me.shedaniel.rei.forge.REIPluginClient;
 @REIPluginClient
 public class AlmostREI implements REIClientPlugin {
 
-    public static final EntryType<MobIngredient> MOB = EntryType.deferred(Utils.getRL("mob"));
+    public static final EntryType<EntityIngredient> MOB = EntryType.deferred(Utils.getRL("mob"));
     public static final EntryType<BlockReference> BLOCK_REFERENCE = EntryType.deferred(Utils.getRL("block_reference"));
 
     @Override

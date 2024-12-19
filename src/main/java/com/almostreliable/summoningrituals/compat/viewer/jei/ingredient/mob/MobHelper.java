@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.mob;
 
-import com.almostreliable.summoningrituals.compat.viewer.common.MobIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.AlmostJEI;
 import com.almostreliable.summoningrituals.platform.Platform;
 import mezz.jei.api.ingredients.IIngredientHelper;
@@ -10,35 +10,35 @@ import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
 
-public class MobHelper implements IIngredientHelper<MobIngredient> {
+public class MobHelper implements IIngredientHelper<EntityIngredient> {
 
     @Override
-    public IIngredientType<MobIngredient> getIngredientType() {
+    public IIngredientType<EntityIngredient> getIngredientType() {
         return AlmostJEI.MOB;
     }
 
     @Override
-    public String getDisplayName(MobIngredient mob) {
+    public String getDisplayName(EntityIngredient mob) {
         return mob.getDisplayName().getString();
     }
 
     @Override
-    public String getUniqueId(MobIngredient mob, UidContext context) {
+    public String getUniqueId(EntityIngredient mob, UidContext context) {
         return Platform.getId(mob.getEntityType()).toString();
     }
 
     @Override
-    public ResourceLocation getResourceLocation(MobIngredient mob) {
+    public ResourceLocation getResourceLocation(EntityIngredient mob) {
         return Platform.getId(mob.getEntityType());
     }
 
     @Override
-    public MobIngredient copyIngredient(MobIngredient mob) {
-        return new MobIngredient(mob.getEntityType(), mob.getCount(), mob.getTag());
+    public EntityIngredient copyIngredient(EntityIngredient mob) {
+        return new EntityIngredient(mob.getEntityType(), mob.getCount(), mob.getTag());
     }
 
     @Override
-    public String getErrorInfo(@Nullable MobIngredient mob) {
+    public String getErrorInfo(@Nullable EntityIngredient mob) {
         if (mob == null) {
             return "Null entity";
         }
