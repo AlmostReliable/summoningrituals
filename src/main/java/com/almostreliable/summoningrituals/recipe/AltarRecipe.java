@@ -83,12 +83,12 @@ public record AltarRecipe(Ingredient catalyst, List<ItemOutput> itemOutputs, Lis
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return Registration.ALTAR_RECIPE.serializer().get();
+        return Registration.ALTAR_RECIPE_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return Registration.ALTAR_RECIPE.type().get();
+        return Registration.ALTAR_RECIPE_TYPE.get();
     }
 
     public enum WEATHER implements StringRepresentable {

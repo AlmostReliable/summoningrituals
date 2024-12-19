@@ -12,49 +12,37 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public class RecipeSacrifices {
-
-    private static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
-
-    public static final Codec<RecipeSacrifices> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Sacrifice.CODEC.listOf().fieldOf("entities").forGetter(RecipeSacrifices::getSacrifices),
-        BlockPos.CODEC.optionalFieldOf("region", DEFAULT_ZONE).forGetter(RecipeSacrifices::getRegion)
-    ).apply(i, RecipeSacrifices::new));
+public record RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RecipeSacrifices> STREAM_CODEC = StreamCodec.composite(
         Sacrifice.STREAM_CODEC.apply(ByteBufCodecs.list()),
-        RecipeSacrifices::getSacrifices,
+        RecipeSacrifices::sacrifices,
         BlockPos.STREAM_CODEC,
-        RecipeSacrifices::getRegion,
+        RecipeSacrifices::region,
         RecipeSacrifices::new
     );
-
-    public final List<Sacrifice> sacrifices;
-    public BlockPos region = DEFAULT_ZONE;
-
-    public RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
-        this.sacrifices = sacrifices;
-        this.region = region;
-    }
-
-    public List<Sacrifice> getSacrifices() {
-        return sacrifices;
-    }
-
-    public BlockPos getRegion() {
-        return region;
-    }
+    private static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
+    public static final Codec<RecipeSacrifices> CODEC = RecordCodecBuilder.create(i -> i.group(
+        Sacrifice.CODEC.listOf().fieldOf("entities").forGetter(RecipeSacrifices::sacrifices),
+        BlockPos.CODEC.optionalFieldOf("region", DEFAULT_ZONE).forGetter(RecipeSacrifices::region)
+    ).apply(i, RecipeSacrifices::new));
 
     public void add(Holder<EntityType<?>> mob, int count) {
         sacrifices.add(new Sacrifice(mob, count));
     }
 
     public AABB getRegion(BlockPos pos) {
-        return new AABB(pos.offset(region.multiply(-1)), pos.offset(region));
+        BlockPos startBounds = pos.offset(region.multiply(-1));
+        BlockPos endBounds = pos.offset(region);
+        return new AABB(
+            new Vec3(startBounds.getX(), startBounds.getY(), startBounds.getZ()),
+            new Vec3(endBounds.getX(), endBounds.getY(), endBounds.getZ())
+        );
     }
 
     public boolean test(Predicate<? super Sacrifice> predicate) {
@@ -75,10 +63,6 @@ public class RecipeSacrifices {
 
     public boolean isEmpty() {
         return sacrifices.isEmpty();
-    }
-
-    public void setRegion(BlockPos region) {
-        this.region = region.immutable();
     }
 
     public record Sacrifice(Holder<EntityType<?>> entity, int count) {

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public record ItemOutput(ItemStack item, Optional<BlockPos> offset, Optional<BlockPos> spread) implements RecipeOutput {
@@ -39,6 +40,33 @@ public record ItemOutput(ItemStack item, Optional<BlockPos> offset, Optional<Blo
             var entity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack);
             level.addFreshEntity(entity);
             toSpawn -= stack.getCount();
+        }
+    }
+
+    public static class Builder {
+
+        private final ItemStack item;
+        @Nullable
+        private BlockPos offset;
+        @Nullable
+        private BlockPos spread;
+
+        public Builder(ItemStack item) {
+            this.item = item;
+        }
+
+        public Builder offset(BlockPos offset) {
+            this.offset = offset;
+            return this;
+        }
+
+        public Builder spread(BlockPos spread) {
+            this.spread = spread;
+            return this;
+        }
+
+        public ItemOutput build() {
+            return new ItemOutput(item, Optional.ofNullable(offset), Optional.ofNullable(spread));
         }
     }
 }

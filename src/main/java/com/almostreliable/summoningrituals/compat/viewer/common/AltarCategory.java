@@ -3,7 +3,6 @@ package com.almostreliable.summoningrituals.compat.viewer.common;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;

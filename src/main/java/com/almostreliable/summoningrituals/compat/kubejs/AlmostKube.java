@@ -1,20 +1,24 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.SummoningRitualsConstants;
+import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
-import com.almostreliable.summoningrituals.platform.Platform;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
-import dev.latvian.mods.kubejs.KubeJSPlugin;
+import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
+import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
+import com.almostreliable.summoningrituals.util.Utils;
 import dev.latvian.mods.kubejs.event.EventGroup;
+import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.recipe.schema.RegisterRecipeSchemasEvent;
-import dev.latvian.mods.kubejs.script.BindingsEvent;
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaRegistry;
+import dev.latvian.mods.kubejs.script.BindingRegistry;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import dev.latvian.mods.kubejs.util.ConsoleJS;
-import dev.latvian.mods.rhino.util.wrap.TypeWrappers;
+import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +26,9 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public class AlmostKube extends KubeJSPlugin {
+public class AlmostKube implements KubeJSPlugin {
 
-    private static final EventGroup GROUP = EventGroup.of(SummoningRitualsConstants.MOD_NAME.replace(" ", ""));
+    private static final EventGroup GROUP = EventGroup.of(ModConstants.MOD_NAME.replace(" ", ""));
     private static final EventHandler START = GROUP.server("start", () -> SummoningEventJS.class).hasResult();
     private static final EventHandler COMPLETE = GROUP.server("complete", () -> SummoningEventJS.class);
 
@@ -37,26 +41,26 @@ public class AlmostKube extends KubeJSPlugin {
     }
 
     @Override
-    public void registerEvents() {
-        GROUP.register();
+    public void registerEvents(EventGroupRegistry registry) {
+        registry.register(GROUP);
     }
 
     @Override
-    public void registerBindings(BindingsEvent event) {
-        if (event.getType() != ScriptType.SERVER) return;
-        event.add("SummoningOutput", OutputWrapper.class);
+    public void registerBindings(BindingRegistry bindings) {
+        if (bindings.type() != ScriptType.SERVER) return;
+        bindings.add("SummoningOutput", OutputWrapper.class);
     }
 
     @Override
-    public void registerTypeWrappers(ScriptType type, TypeWrappers typeWrappers) {
-        if (type != ScriptType.SERVER) return;
-        typeWrappers.registerSimple(ItemOutputBuilder.class, OutputWrapper::item);
-        typeWrappers.registerSimple(MobOutputBuilder.class, OutputWrapper::mob);
+    public void registerTypeWrappers(TypeWrapperRegistry registry) {
+        if (registry.scriptType() != ScriptType.SERVER) return;
+        registry.register(ItemOutput.class, OutputWrapper::ofItem);
+        registry.register(EntityOutput.class, OutputWrapper::ofEntity);
     }
 
     @Override
-    public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {
-        event.namespace(SummoningRitualsConstants.MOD_ID).register(Constants.ALTAR, AltarRecipeSchema.SCHEMA);
+    public void registerRecipeSchemas(RecipeSchemaRegistry registry) {
+        registry.register(Utils.getRL(Constants.ALTAR), AltarRecipeSchema.SCHEMA);
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -64,24 +68,45 @@ public class AlmostKube extends KubeJSPlugin {
 
         private OutputWrapper() {}
 
-        public static ItemOutputBuilder item(@Nullable Object o) {
-            if (o instanceof ItemOutputBuilder iob) return iob;
-            ItemStack stack = ItemStackJS.of(o);
+        private static ItemOutput ofItem(RegistryAccessContainer registries, @Nullable Object o) {
+            if (o instanceof ItemOutput.Builder iob) return iob.build();
+            if (o instanceof ItemOutput io) return io;
+
+            ItemStack stack = ItemStackJS.wrap(registries, o);
             if (stack.isEmpty()) {
                 ConsoleJS.SERVER.error("Empty or null ItemStack specified for SummoningOutput.item");
             }
-            return new ItemOutputBuilder(stack);
+
+            return new ItemOutput.Builder(stack).build();
         }
 
-        public static MobOutputBuilder mob(@Nullable Object o) {
-            if (o instanceof MobOutputBuilder mob) return mob;
+        private static EntityOutput ofEntity(@Nullable Object o) {
+            if (o instanceof EntityOutput.Builder mob) return mob.build();
+            if (o instanceof EntityOutput entity) return entity;
             if (o instanceof CharSequence || o instanceof ResourceLocation) {
-                ResourceLocation id = ResourceLocation.tryParse(o.toString());
-                var mob = Platform.mobFromId(id);
-                return new MobOutputBuilder(mob);
+                ResourceLocation id = ResourceLocation.parse(o.toString());
+                var mob = BuiltInRegistries.ENTITY_TYPE.getHolder(id).orElseThrow();
+                return new EntityOutput.Builder(mob).build();
             }
+
             ConsoleJS.SERVER.error("Missing or invalid entity specified for SummoningOutput.mob");
-            return new MobOutputBuilder(EntityType.ITEM);
+            return new EntityOutput.Builder(EntityType.ITEM.builtInRegistryHolder()).build();
+        }
+
+        public static ItemOutput.Builder item(ItemStack item) {
+            return new ItemOutput.Builder(item);
+        }
+
+        public static ItemOutput.Builder item(ItemOutput item, int count) {
+            return new ItemOutput.Builder(item.item().copyWithCount(count));
+        }
+
+        public static EntityOutput.Builder entity(Holder<EntityType<?>> entity) {
+            return new EntityOutput.Builder(entity);
+        }
+
+        public static EntityOutput.Builder entity(Holder<EntityType<?>> entity, int count) {
+            return new EntityOutput.Builder(entity, count);
         }
     }
 }

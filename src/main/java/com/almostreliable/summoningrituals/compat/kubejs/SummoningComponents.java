@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -3,7 +3,6 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;

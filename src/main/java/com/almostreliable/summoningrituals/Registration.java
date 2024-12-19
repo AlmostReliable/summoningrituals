@@ -60,7 +60,16 @@ public final class Registration {
         Constants.INDESTRUCTIBLE_ALTAR,
         () -> new BlockItem(INDESTRUCTIBLE_ALTAR_BLOCK.get(), new Properties())
     );
-    public static final RecipeEntry<AltarRecipe> ALTAR_RECIPE = RecipeEntry.register(
+    public static final DeferredHolder<RecipeType<?>, RecipeType<AltarRecipe>> ALTAR_RECIPE_TYPE = RECIPE_TYPES.register(
+        Constants.ALTAR,
+        () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return Constants.ALTAR;
+            }
+        }
+    );
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(
         Constants.ALTAR,
         AltarRecipeSerializer::new
     );
@@ -108,19 +117,4 @@ public final class Registration {
             event.register(Registries.CREATIVE_MODE_TAB, TAB_KEY.location(), () -> TAB);
         }
     }
-
-    //
-    // public record RecipeEntry<T extends Recipe<?>>(RegistryObject<RecipeType<T>> type, RegistryObject<? extends RecipeSerializer<T>> serializer) {
-    //     @SuppressWarnings("SameParameterValue")
-    //     private static <T extends Recipe<?>> RecipeEntry<T> register(
-    //         String id, Supplier<? extends RecipeSerializer<T>> serializer
-    //     ) {
-    //         RegistryObject<RecipeType<T>> type = RECIPE_TYPES.register(id, () -> new RecipeType<>() {
-    //             public String toString() {
-    //                 return id;
-    //             }
-    //         });
-    //         return new RecipeEntry<>(type, RECIPE_SERIALIZERS.register(id, serializer));
-    //     }
-    // }
 }

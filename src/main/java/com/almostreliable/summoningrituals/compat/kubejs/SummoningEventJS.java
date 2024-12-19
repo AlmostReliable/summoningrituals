@@ -1,14 +1,14 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import dev.latvian.mods.kubejs.level.LevelEventJS;
+import dev.latvian.mods.kubejs.level.KubeLevelEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
 
-public class SummoningEventJS extends LevelEventJS {
+public class SummoningEventJS implements KubeLevelEvent {
 
     private final ServerLevel serverLevel;
     private final BlockPos pos;

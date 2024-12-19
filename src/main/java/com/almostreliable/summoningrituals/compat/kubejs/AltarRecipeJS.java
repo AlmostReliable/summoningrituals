@@ -3,8 +3,6 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.ItemOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs.MobOutputBuilder;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
