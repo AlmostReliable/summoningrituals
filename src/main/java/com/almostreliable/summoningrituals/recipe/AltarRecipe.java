@@ -2,28 +2,35 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
-import com.almostreliable.summoningrituals.recipe.component.BlockReference;
-import com.almostreliable.summoningrituals.recipe.component.IngredientStack;
-import com.almostreliable.summoningrituals.recipe.component.RecipeOutputs;
+import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
+import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-public record AltarRecipe(Ingredient catalyst, RecipeOutputs outputs, NonNullList<IngredientStack> inputs,
-                          RecipeSacrifices sacrifices, int recipeTime, @Nullable BlockReference blockBelow, DAY_TIME dayTime,
+public record AltarRecipe(Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> inputs,
+                          Optional<RecipeSacrifices> sacrifices, int recipeTime, Optional<BlockPredicate> blockBelow, DAY_TIME dayTime,
                           WEATHER weather) implements Recipe<AltarInventory> {
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
@@ -84,44 +91,17 @@ public record AltarRecipe(Ingredient catalyst, RecipeOutputs outputs, NonNullLis
         return Registration.ALTAR_RECIPE.type().get();
     }
 
-    public Ingredient getCatalyst() {
-        return catalyst;
-    }
-
-    public RecipeOutputs getOutputs() {
-        return outputs;
-    }
-
-    public NonNullList<IngredientStack> getInputs() {
-        return inputs;
-    }
-
-    public RecipeSacrifices getSacrifices() {
-        return sacrifices;
-    }
-
-    public int getRecipeTime() {
-        return recipeTime;
-    }
-
-    @Nullable
-    public BlockReference getBlockBelow() {
-        return blockBelow;
-    }
-
-    public DAY_TIME getDayTime() {
-        return dayTime;
-    }
-
-    public WEATHER getWeather() {
-        return weather;
-    }
-
-    public enum WEATHER {
+    public enum WEATHER implements StringRepresentable {
         ANY,
         CLEAR,
         RAIN,
         THUNDER;
+
+        public static final Codec<WEATHER> CODEC = StringRepresentable.fromEnum(WEATHER::values);
+        public static final StreamCodec<ByteBuf, WEATHER> STREAM_CODEC = ByteBufCodecs.idMapper(
+            value -> WEATHER.values()[value],
+            WEATHER::ordinal
+        );
 
         public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
@@ -139,12 +119,23 @@ public record AltarRecipe(Ingredient catalyst, RecipeOutputs outputs, NonNullLis
             }
             return check;
         }
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase();
+        }
     }
 
-    public enum DAY_TIME {
+    public enum DAY_TIME implements StringRepresentable {
         ANY,
         DAY,
         NIGHT;
+
+        public static final Codec<DAY_TIME> CODEC = StringRepresentable.fromEnum(DAY_TIME::values);
+        public static final StreamCodec<ByteBuf, DAY_TIME> STREAM_CODEC = ByteBufCodecs.idMapper(
+            value -> DAY_TIME.values()[value],
+            DAY_TIME::ordinal
+        );
 
         public boolean check(Level level, @Nullable ServerPlayer player) {
             var check = switch (this) {
@@ -160,6 +151,11 @@ public record AltarRecipe(Ingredient catalyst, RecipeOutputs outputs, NonNullLis
                 );
             }
             return check;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase();
         }
     }
 }

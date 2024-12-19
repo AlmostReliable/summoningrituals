@@ -70,16 +70,16 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AltarRecipe recipe, IFocusGroup focuses) {
         // block below
-        if (recipe.getBlockBelow() != null) {
+        if (recipe.blockBelow() != null) {
             builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - BLOCK_SLOT_SIZE / 2, RENDER_Y - 3)
                 .setCustomRenderer(AlmostJEI.BLOCK_REFERENCE, blockReferenceRenderer)
-                .addIngredient(AlmostJEI.BLOCK_REFERENCE, recipe.getBlockBelow());
+                .addIngredient(AlmostJEI.BLOCK_REFERENCE, recipe.blockBelow());
         }
 
         // catalyst
         builder.addSlot(RecipeIngredientRole.INPUT, CENTER_X - ITEM_SLOT_SIZE / 2, RENDER_Y - 32)
             .setCustomRenderer(VanillaTypes.ITEM_STACK, catalystRenderer)
-            .addIngredients(recipe.getCatalyst());
+            .addIngredients(recipe.catalyst());
 
         // inputs
         handleInputs(
@@ -119,7 +119,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
         // altar
         stack.pushPose();
         {
-            var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.getBlockBelow() == null ? 0 : 4);
+            var altarY = RENDER_Y - BLOCK_SLOT_SIZE / 2f - (recipe.blockBelow() == null ? 0 : 4);
             stack.translate(CENTER_X - BLOCK_SLOT_SIZE / 2f, altarY, 0);
             // noinspection DataFlowIssue
             altarRenderer.render(guiGraphics, null);
@@ -135,7 +135,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
             128,
             0x36_A400
         );
-        if (!recipe.getSacrifices().isEmpty()) {
+        if (!recipe.sacrifices().isEmpty()) {
             drawLabel(
                 guiGraphics,
                 f("{}:", TextUtils.translateAsString(Constants.LABEL, Constants.REGION)),
@@ -146,7 +146,7 @@ public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRender
             );
             drawLabel(
                 guiGraphics,
-                recipe.getSacrifices().getDisplayRegion(),
+                recipe.sacrifices().getDisplayRegion(),
                 GameUtils.ANCHOR.TOP_LEFT,
                 1,
                 11,

@@ -50,11 +50,11 @@ public class AltarCategory<I, R> {
     protected final R catalystRenderer;
 
     protected final List<SpriteWidget> conditionSpriteWidgets = List.of(
-        new SpriteWidget(0, altarRecipe -> altarRecipe.getDayTime() == AltarRecipe.DAY_TIME.DAY),
-        new SpriteWidget(1, altarRecipe -> altarRecipe.getDayTime() == AltarRecipe.DAY_TIME.NIGHT),
-        new SpriteWidget(2, altarRecipe -> altarRecipe.getWeather() == AltarRecipe.WEATHER.CLEAR),
-        new SpriteWidget(3, altarRecipe -> altarRecipe.getWeather() == AltarRecipe.WEATHER.RAIN),
-        new SpriteWidget(4, altarRecipe -> altarRecipe.getWeather() == AltarRecipe.WEATHER.THUNDER)
+        new SpriteWidget(0, altarRecipe -> altarRecipe.dayTime() == AltarRecipe.DAY_TIME.DAY),
+        new SpriteWidget(1, altarRecipe -> altarRecipe.dayTime() == AltarRecipe.DAY_TIME.NIGHT),
+        new SpriteWidget(2, altarRecipe -> altarRecipe.weather() == AltarRecipe.WEATHER.CLEAR),
+        new SpriteWidget(3, altarRecipe -> altarRecipe.weather() == AltarRecipe.WEATHER.RAIN),
+        new SpriteWidget(4, altarRecipe -> altarRecipe.weather() == AltarRecipe.WEATHER.THUNDER)
     );
 
     protected AltarCategory(I logo, R altarRenderer, R catalystRenderer) {
@@ -76,19 +76,19 @@ public class AltarCategory<I, R> {
         AltarRecipe recipe, int x, int y, double mX, double mY
     ) {
         List<Component> tooltip = new ArrayList<>();
-        if (!recipe.getSacrifices().isEmpty() && MathUtils.isWithinBounds(mX, mY, x + 1, y + 1, 30, 20)) {
+        if (!recipe.sacrifices().isEmpty() && MathUtils.isWithinBounds(mX, mY, x + 1, y + 1, 30, 20)) {
             tooltip.add(TextUtils.translate(Constants.TOOLTIP, Constants.REGION, ChatFormatting.WHITE));
         }
         if (isSpriteHovered(mX, mY, x, y + 1)) {
-            if (recipe.getDayTime() != AltarRecipe.DAY_TIME.ANY) {
-                tooltip.add(createConditionTooltip(Constants.DAY_TIME, recipe.getDayTime().name()));
-            } else if (recipe.getWeather() != AltarRecipe.WEATHER.ANY) {
-                tooltip.add(createConditionTooltip(Constants.WEATHER, recipe.getWeather().name()));
+            if (recipe.dayTime() != AltarRecipe.DAY_TIME.ANY) {
+                tooltip.add(createConditionTooltip(Constants.DAY_TIME, recipe.dayTime().name()));
+            } else if (recipe.weather() != AltarRecipe.WEATHER.ANY) {
+                tooltip.add(createConditionTooltip(Constants.WEATHER, recipe.weather().name()));
             }
         }
-        if (isSpriteHovered(mX, mY, x, y + SPRITE_SLOT_SIZE + 2) && recipe.getDayTime() != AltarRecipe.DAY_TIME.ANY) {
-            if (recipe.getWeather() != AltarRecipe.WEATHER.ANY) {
-                tooltip.add(createConditionTooltip(Constants.WEATHER, recipe.getWeather().name()));
+        if (isSpriteHovered(mX, mY, x, y + SPRITE_SLOT_SIZE + 2) && recipe.dayTime() != AltarRecipe.DAY_TIME.ANY) {
+            if (recipe.weather() != AltarRecipe.WEATHER.ANY) {
+                tooltip.add(createConditionTooltip(Constants.WEATHER, recipe.weather().name()));
             }
         }
         return tooltip;
@@ -128,8 +128,8 @@ public class AltarCategory<I, R> {
         ItemInputConsumer itemConsumer,
         MobInputConsumer mobConsumer
     ) {
-        var itemInputs = recipe.getInputs();
-        var mobInputs = recipe.getSacrifices();
+        var itemInputs = recipe.inputs();
+        var mobInputs = recipe.sacrifices();
         var inputSlots = itemInputs.size() + mobInputs.size();
 
         for (var i = 0; i < inputSlots; i++) {
@@ -157,7 +157,7 @@ public class AltarCategory<I, R> {
         ItemOutputConsumer itemConsumer,
         MobOutputConsumer mobConsumer
     ) {
-        recipe.getOutputs().forEach((type, output, i) -> {
+        recipe.outputs().forEach((type, output, i) -> {
             var x = offsetX + 2 + i * (ITEM_SLOT_SIZE - 1);
             var y = offsetY + 130;
 

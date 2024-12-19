@@ -1,81 +1,55 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
 import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.platform.Platform;
-import com.almostreliable.summoningrituals.util.SerializeUtils;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class RecipeSacrifices {
 
-    private static final Vec3i DEFAULT_ZONE = new Vec3i(3, 2, 3);
+    private static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
 
-    private final NonNullList<Sacrifice> sacrifices;
-    private Vec3i region;
+    public static final Codec<RecipeSacrifices> CODEC = RecordCodecBuilder.create(i -> i.group(
+        Sacrifice.CODEC.listOf().fieldOf("entities").forGetter(RecipeSacrifices::getSacrifices),
+        BlockPos.CODEC.optionalFieldOf("region", DEFAULT_ZONE).forGetter(RecipeSacrifices::getRegion)
+    ).apply(i, RecipeSacrifices::new));
 
-    public RecipeSacrifices() {
-        sacrifices = NonNullList.create();
-        region = DEFAULT_ZONE;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, RecipeSacrifices> STREAM_CODEC = StreamCodec.composite(
+        Sacrifice.STREAM_CODEC.apply(ByteBufCodecs.list()),
+        RecipeSacrifices::getSacrifices,
+        BlockPos.STREAM_CODEC,
+        RecipeSacrifices::getRegion,
+        RecipeSacrifices::new
+    );
 
-    private RecipeSacrifices(NonNullList<Sacrifice> sacrifices, Vec3i region) {
+    public final List<Sacrifice> sacrifices;
+    public BlockPos region = DEFAULT_ZONE;
+
+    public RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
         this.sacrifices = sacrifices;
         this.region = region;
     }
 
-    public static RecipeSacrifices fromJson(JsonObject json) {
-        var mobs = json.getAsJsonArray(Constants.MOBS);
-        NonNullList<Sacrifice> sacrifices = NonNullList.create();
-        for (var entity : mobs) {
-            sacrifices.add(Sacrifice.fromJson(entity.getAsJsonObject()));
-        }
-        var zone = json.has(Constants.REGION) ?
-            SerializeUtils.vec3FromJson(json.getAsJsonObject(Constants.REGION))
-            : DEFAULT_ZONE;
-        return new RecipeSacrifices(sacrifices, zone);
+    public List<Sacrifice> getSacrifices() {
+        return sacrifices;
     }
 
-    public static RecipeSacrifices fromNetwork(FriendlyByteBuf buffer) {
-        var length = buffer.readVarInt();
-        NonNullList<Sacrifice> sacrifices = NonNullList.create();
-        for (var i = 0; i < length; i++) {
-            sacrifices.add(Sacrifice.fromNetwork(buffer));
-        }
-        var zone = SerializeUtils.vec3FromNetwork(buffer);
-        return new RecipeSacrifices(sacrifices, zone);
+    public BlockPos getRegion() {
+        return region;
     }
 
-    public JsonElement toJson() {
-        JsonObject json = new JsonObject();
-        var mobs = new JsonArray();
-        for (var sacrifice : sacrifices) {
-            mobs.add(sacrifice.toJson());
-        }
-        json.add(Constants.MOBS, mobs);
-        json.add(Constants.REGION, SerializeUtils.vec3ToJson(region));
-        return json;
-    }
-
-    public void toNetwork(FriendlyByteBuf buffer) {
-        buffer.writeVarInt(sacrifices.size());
-        for (var sacrifice : sacrifices) {
-            sacrifice.toNetwork(buffer);
-        }
-        SerializeUtils.vec3ToNetwork(buffer, region);
-    }
-
-    public void add(EntityType<?> mob, int count) {
+    public void add(Holder<EntityType<?>> mob, int count) {
         sacrifices.add(new Sacrifice(mob, count));
     }
 
@@ -103,41 +77,27 @@ public class RecipeSacrifices {
         return sacrifices.isEmpty();
     }
 
-    public void setRegion(Vec3i region) {
-        this.region = region;
+    public void setRegion(BlockPos region) {
+        this.region = region.immutable();
     }
 
-    public record Sacrifice(EntityType<?> mob, int count) implements Predicate<Entity> {
+    public record Sacrifice(Holder<EntityType<?>> entity, int count) {
 
-        private static Sacrifice fromJson(JsonObject json) {
-            var mob = Platform.mobFromJson(json);
-            var count = GsonHelper.getAsInt(json, Constants.COUNT, 1);
-            return new Sacrifice(mob, count);
-        }
+        public static final Codec<Sacrifice> CODEC = RecordCodecBuilder.create(i -> i.group(
+            BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity").forGetter(Sacrifice::entity),
+            Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(Sacrifice::count)
+        ).apply(i, Sacrifice::new));
 
-        private static Sacrifice fromNetwork(FriendlyByteBuf buffer) {
-            var mob = SerializeUtils.mobFromNetwork(buffer);
-            var count = buffer.readVarInt();
-            return new Sacrifice(mob, count);
-        }
+        public static final StreamCodec<RegistryFriendlyByteBuf, Sacrifice> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE),
+            Sacrifice::entity,
+            ByteBufCodecs.VAR_INT,
+            Sacrifice::count,
+            Sacrifice::new
+        );
 
-        @Override
-        public boolean test(Entity entity) {
-            return mob.equals(entity.getType());
-        }
-
-        private JsonElement toJson() {
-            JsonObject json = new JsonObject();
-            json.addProperty(Constants.MOB, Platform.getId(mob).toString());
-            if (count > 1) {
-                json.addProperty(Constants.COUNT, count);
-            }
-            return json;
-        }
-
-        private void toNetwork(FriendlyByteBuf buffer) {
-            buffer.writeUtf(Platform.getId(mob).toString());
-            buffer.writeVarInt(count);
+        public boolean test(EntityType<?> type) {
+            return entity().value().equals(type);
         }
     }
 }

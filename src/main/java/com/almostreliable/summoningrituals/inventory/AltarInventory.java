@@ -172,7 +172,7 @@ public class AltarInventory implements ItemHandler, RecipeInput {
         var toRemove = 0;
         var actualRemoved = 0;
 
-        for (var input : recipe.getInputs()) {
+        for (var input : recipe.inputs()) {
             toRemove += input.count();
             var inputRemoved = 0;
 

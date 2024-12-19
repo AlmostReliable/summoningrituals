@@ -26,8 +26,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.almostreliable.summoningrituals.util.TextUtils.f;
-
 public class AltarBlockEntity extends PlatformBlockEntity {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
@@ -120,9 +118,9 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
         if (currentRecipe == null) return;
 
-        if (progress >= currentRecipe.getRecipeTime()) {
+        if (progress >= currentRecipe.recipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
-                currentRecipe.getOutputs().handleRecipe((ServerLevel) level, worldPosition);
+                currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
                 SUMMONING_COMPLETE.invoke((ServerLevel) level, worldPosition, currentRecipe, invokingPlayer);
                 GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
                 resetSummoning(false);
@@ -162,11 +160,11 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
-        sacrifices = checkSacrifices(recipe.getSacrifices(), player);
+        sacrifices = checkSacrifices(recipe.sacrifices(), player);
         if (sacrifices == null ||
-            !checkBlockBelow(recipe.getBlockBelow(), player) ||
-            !recipe.getDayTime().check(level, player) ||
-            !recipe.getWeather().check(level, player)) {
+            !checkBlockBelow(recipe.blockBelow(), player) ||
+            !recipe.dayTime().check(level, player) ||
+            !recipe.weather().check(level, player)) {
             inventory.popLastInserted();
             GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
             return;
@@ -178,7 +176,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         }
         currentRecipe = recipe;
         invokingPlayer = player;
-        processTime = recipe.getRecipeTime();
+        processTime = recipe.recipeTime();
         GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
         Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
     }
