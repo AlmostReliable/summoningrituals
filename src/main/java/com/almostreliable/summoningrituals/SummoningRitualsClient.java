@@ -1,6 +1,8 @@
 package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarRenderer;
+import com.almostreliable.summoningrituals.core.Registration;
+
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -14,6 +16,6 @@ public class SummoningRitualsClient {
     }
 
     public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(Registration.ALTAR_ENTITY.get(), AltarRenderer::new);
+        event.registerBlockEntityRenderer(Registration.ALTAR_BLOCK_ENTITY.get(), AltarRenderer::new);
     }
 }

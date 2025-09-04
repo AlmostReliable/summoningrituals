@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.inventory;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;

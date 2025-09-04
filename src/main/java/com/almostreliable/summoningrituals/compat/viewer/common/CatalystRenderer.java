@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

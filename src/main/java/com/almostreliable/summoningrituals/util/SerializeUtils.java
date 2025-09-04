@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.util;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.google.common.base.Preconditions;

@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.util;
 
-import com.almostreliable.summoningrituals.SummoningRitualsConstants;
+import com.almostreliable.summoningrituals.ModConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,7 @@ public final class GameUtils {
         if (player == null) return;
         player.sendSystemMessage(
             Component.translatable(
-                String.format("%s.%s.%s", "message", SummoningRitualsConstants.MOD_ID, translationKey),
+                String.format("%s.%s.%s", "message", ModConstants.MOD_ID, translationKey),
                 args
             ).withStyle(color)
         );

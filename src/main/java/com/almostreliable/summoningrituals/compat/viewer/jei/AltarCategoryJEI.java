@@ -1,12 +1,12 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.compat.viewer.common.AltarCategory;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block.JEIBlockReferenceRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.item.JEIAltarRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.item.JEICatalystRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.mob.JEIMobRenderer;
+import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -28,7 +28,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-import static com.almostreliable.summoningrituals.Constants.ALTAR;
+import static com.almostreliable.summoningrituals.core.Constants.ALTAR;
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarCategoryJEI extends AltarCategory<IDrawable, IIngredientRenderer<ItemStack>> implements IRecipeCategory<AltarRecipe> {

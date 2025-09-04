@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.util.Utils;

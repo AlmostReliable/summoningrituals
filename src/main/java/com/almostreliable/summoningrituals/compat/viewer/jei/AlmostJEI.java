@@ -1,11 +1,11 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
-import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block.BlockReferenceHelper;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block.JEIBlockReferenceRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.mob.JEIMobRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.mob.MobHelper;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.Utils;
 import me.shedaniel.rei.plugincompatibilities.api.REIPluginCompatIgnore;
@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-import static com.almostreliable.summoningrituals.Constants.RECIPE_VIEWER;
+import static com.almostreliable.summoningrituals.core.Constants.RECIPE_VIEWER;
 
 @REIPluginCompatIgnore
 @JeiPlugin

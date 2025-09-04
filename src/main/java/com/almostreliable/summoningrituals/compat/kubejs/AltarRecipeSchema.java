@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
@@ -44,12 +44,15 @@ public interface AltarRecipeSchema {
         .preferred(UtilsJS.snakeCaseToCamelCase(Constants.WEATHER))
         .optional(AltarRecipe.WEATHER.ANY);
 
-    RecipeSchema SCHEMA = new RecipeSchema(AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
+    RecipeSchema SCHEMA = new RecipeSchema(
+        AltarRecipeJS.class, AltarRecipeJS::new, CATALYST,
         OUTPUTS, INPUTS, SACRIFICES, BLOCK_BELOW, DAY_TIME, WEATHER, RECIPE_TIME
-    ).constructor((recipe, schemaType, keys, from) -> {
-        recipe.setValue(CATALYST, from.getValue(recipe, CATALYST));
-        // set default values on any new recipe
-        recipe.setValue(OUTPUTS, new RecipeOutputs());
-        recipe.setValue(SACRIFICES, new RecipeSacrifices());
-    }, CATALYST);
+    ).constructor(
+        (recipe, schemaType, keys, from) -> {
+            recipe.setValue(CATALYST, from.getValue(recipe, CATALYST));
+            // set default values on any new recipe
+            recipe.setValue(OUTPUTS, new RecipeOutputs());
+            recipe.setValue(SACRIFICES, new RecipeSacrifices());
+        }, CATALYST
+    );
 }

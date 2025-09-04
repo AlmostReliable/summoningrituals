@@ -1,14 +1,15 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Registration;
-import com.almostreliable.summoningrituals.SummoningRitualsConstants;
+import com.almostreliable.summoningrituals.ModConstants;
+import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -26,18 +27,23 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.almostreliable.summoningrituals.util.TextUtils.f;
+
 public class AltarBlockEntity extends PlatformBlockEntity {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
 
-    @Nullable private AltarRecipe currentRecipe;
-    @Nullable private List<EntitySacrifice> sacrifices;
-    @Nullable private ServerPlayer invokingPlayer;
+    @Nullable
+    private AltarRecipe currentRecipe;
+    @Nullable
+    private List<EntitySacrifice> sacrifices;
+    @Nullable
+    private ServerPlayer invokingPlayer;
     private int processTime;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
-        super(Registration.ALTAR_ENTITY.get(), pos, state);
+        super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override
@@ -210,7 +216,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
 
     private boolean checkBlockBelow(@Nullable BlockReference blockBelow, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
-        if (blockBelow == null || blockBelow.test(level.getBlockState(worldPosition.below()))) {
+        if (blockBelow == null || blockBelow.test(level, worldPosition.below())) {
             return true;
         }
         GameUtils.sendPlayerMessage(player, Constants.BLOCK_BELOW, ChatFormatting.YELLOW);
@@ -234,11 +240,12 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     }
 
     private record EntitySacrifice(List<Entity> entities, int count) {
+
         private List<BlockPos> kill() {
             List<BlockPos> positions = new ArrayList<>();
             for (var i = 0; i < count; i++) {
                 var entity = entities.get(i);
-                entity.addTag(f("{}_sacrificed", SummoningRitualsConstants.MOD_ID));
+                entity.addTag(f("{}_sacrificed", ModConstants.MOD_ID));
                 entity.kill();
                 positions.add(entity.blockPosition());
             }

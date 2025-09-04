@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Registration;
+import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.EntitySpawn;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.almostreliable.summoningrituals.Constants.ALTAR;
-import static com.almostreliable.summoningrituals.Constants.RECIPE_VIEWER;
+import static com.almostreliable.summoningrituals.core.Constants.ALTAR;
+import static com.almostreliable.summoningrituals.core.Constants.RECIPE_VIEWER;
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarCategory<I, R> {

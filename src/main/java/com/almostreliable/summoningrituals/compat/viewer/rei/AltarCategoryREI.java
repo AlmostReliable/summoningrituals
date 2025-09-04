@@ -1,10 +1,10 @@
 package com.almostreliable.summoningrituals.compat.viewer.rei;
 
-import com.almostreliable.summoningrituals.Constants;
-import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.compat.viewer.common.AltarCategory;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.item.REIAltarRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.item.REICatalystRenderer;
+import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.almostreliable.summoningrituals.Constants.ALTAR;
+import static com.almostreliable.summoningrituals.core.Constants.ALTAR;
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
 public class AltarCategoryREI extends AltarCategory<Renderer, EntryRenderer<ItemStack>> implements DisplayCategory<AltarCategoryREI.AltarDisplay> {

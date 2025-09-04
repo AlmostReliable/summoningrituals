@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.platform;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.network.ClientAltarUpdatePacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.network.SacrificeParticlePacket;

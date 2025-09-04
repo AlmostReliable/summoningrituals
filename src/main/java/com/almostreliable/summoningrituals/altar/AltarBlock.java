@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
-import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

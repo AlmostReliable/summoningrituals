@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals;
+package com.almostreliable.summoningrituals.core;
 
 public final class Constants {
 

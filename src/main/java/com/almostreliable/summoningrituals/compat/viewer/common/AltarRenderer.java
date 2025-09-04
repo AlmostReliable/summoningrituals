@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
-import com.almostreliable.summoningrituals.Registration;
+import com.almostreliable.summoningrituals.core.Registration;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 

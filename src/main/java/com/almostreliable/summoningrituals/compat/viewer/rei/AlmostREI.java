@@ -1,10 +1,10 @@
 package com.almostreliable.summoningrituals.compat.viewer.rei;
 
-import com.almostreliable.summoningrituals.Registration;
 import com.almostreliable.summoningrituals.SummoningRitualsConstants;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.block.BlockReferenceDefinition;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.mob.MobDefinition;
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.Utils;
