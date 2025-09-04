@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.rei;
 
-import com.almostreliable.summoningrituals.SummoningRitualsConstants;
+import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.block.BlockReferenceDefinition;
 import com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.mob.MobDefinition;
@@ -8,6 +8,7 @@ import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.util.Utils;
+
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
@@ -24,7 +25,7 @@ public class AlmostREI implements REIClientPlugin {
 
     @Override
     public String getPluginProviderName() {
-        return SummoningRitualsConstants.MOD_NAME.replace(" ", "");
+        return ModConstants.MOD_NAME.replace(" ", "");
     }
 
     @Override
