@@ -3,11 +3,11 @@ package com.almostreliable.summoningrituals.core;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +45,7 @@ public final class Registration {
 
     // blocks
     public static final DeferredBlock<AltarBlock> ALTAR_BLOCK = registerBlock(Constants.ALTAR, "Summoning Altar", AltarBlock::new, p -> p.strength(2.5f));
-    public static final DeferredBlock<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = registerBlock(Constants.INDESTRUCTIBLE_ALTAR, "Summoning Altar", AltarBlock::new, p -> p.strength(-1.0f, 3_600_000.0f));
+    public static final DeferredBlock<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = registerBlock(Constants.INDESTRUCTIBLE_ALTAR, "Indestructible Summoning Altar", AltarBlock::new, p -> p.strength(-1.0f, 3_600_000.0f));
 
     // block entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY = registerBlockEntity(ALTAR_BLOCK.getId(), AltarBlockEntity::new, ALTAR_BLOCK, INDESTRUCTIBLE_ALTAR_BLOCK);
@@ -53,8 +53,7 @@ public final class Registration {
     // creative tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register(
         "tab", () -> CreativeModeTab.builder()
-            // .title(SummoningLang.LangEntry.of("tab", "main", ModConstants.MOD_NAME).get())
-            .title(Component.literal(ModConstants.MOD_NAME))
+            .title(SummoningLang.LangEntry.of("tab", "main", ModConstants.MOD_NAME).get())
             .icon(ALTAR_BLOCK::toStack)
             .noScrollBar()
             .displayItems((features, output) -> output.acceptAll(getKnownItems()))
@@ -113,8 +112,8 @@ public final class Registration {
             )
         );
         ITEMS.registerSimpleBlockItem(block);
-        // SummoningLang.LangEntry.of("block", id, name);
-        // SummoningLang.LangEntry.of("item", id, name);
+        SummoningLang.LangEntry.of("block", id, name);
+        SummoningLang.LangEntry.of("item", id, name);
         return block;
     }
 
