@@ -10,7 +10,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -46,9 +48,9 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
     private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Stream.of(
-        Block.box(3, 0, 3, 13, 2, 13),
-        Block.box(5, 2, 5, 11, 9, 11),
-        Block.box(2, 9, 2, 14, 13, 14)
+        box(3, 0, 3, 13, 2, 13),
+        box(5, 2, 5, 11, 9, 11),
+        box(2, 9, 2, 14, 13, 14)
     ).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
 
     public AltarBlock(Properties properties) {
@@ -59,6 +61,19 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
                 .setValue(ACTIVE, false)
                 .setValue(WATERLOGGED, false)
         );
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(
+        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+        InteractionHand hand, BlockHitResult hitResult
+    ) {
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @SuppressWarnings("deprecation")

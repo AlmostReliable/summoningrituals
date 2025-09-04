@@ -1,11 +1,12 @@
 package com.almostreliable.summoningrituals.inventory;
 
+import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.util.GameUtils;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -13,6 +14,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -22,27 +27,26 @@ import java.util.stream.Collectors;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
-public class AltarInventory implements ItemHandler, RecipeInput {
+public class AltarInventory implements IItemHandlerModifiable, INBTSerializable<CompoundTag>, RecipeInput {
 
     public static final int SIZE = 64;
 
-    private final PlatformBlockEntity parent;
-    private final VanillaWrapper vanillaInv;
+    private final AltarBlockEntity parent;
     private final Deque<Tuple<ItemStack, Integer>> insertOrder;
     private final NonNullList<ItemStack> items;
 
     private ItemStack catalyst;
 
-    public AltarInventory(PlatformBlockEntity parent) {
+    public AltarInventory(AltarBlockEntity parent) {
         this.parent = parent;
-        vanillaInv = new VanillaWrapper(this);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         catalyst = ItemStack.EMPTY;
         insertOrder = new ArrayDeque<>(SIZE);
     }
 
     @Override
-    public CompoundTag serialize() {
+    @UnknownNullability
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var insertListTag = new ListTag();
         for (var e : insertOrder) {
             var tag = new CompoundTag();
@@ -68,7 +72,7 @@ public class AltarInventory implements ItemHandler, RecipeInput {
     }
 
     @Override
-    public void deserialize(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         insertOrder.clear();
         var insertListTag = tag.getList(Constants.INSERT_ORDER, Tag.TAG_COMPOUND);
         for (var e : insertListTag) {
@@ -214,7 +218,9 @@ public class AltarInventory implements ItemHandler, RecipeInput {
             return ItemStack.EMPTY;
         }
 
-        if (!currentStack.canStack(stack)) return stack;
+        if (!ItemStack.isSameItem(currentStack, stack)) {
+            return stack;
+        }
 
         var maxCount = getMaxStackSize(slot, currentStack);
         var toInsert = Math.min(maxCount - currentStack.getCount(), stack.getCount());
@@ -287,12 +293,10 @@ public class AltarInventory implements ItemHandler, RecipeInput {
         return true;
     }
 
-    @Override
     public List<ItemStack> getNoneEmptyItems() {
         return items.stream().filter(stack -> !stack.isEmpty()).collect(Collectors.toList());
     }
 
-    @Override
     public ItemStack getCatalyst() {
         return catalyst;
     }
@@ -300,10 +304,6 @@ public class AltarInventory implements ItemHandler, RecipeInput {
     public void setCatalyst(ItemStack catalyst) {
         this.catalyst = catalyst;
         onContentsChanged();
-    }
-
-    public VanillaWrapper getVanillaInv() {
-        return vanillaInv;
     }
 
     private List<ItemStack> createItemBackup() {

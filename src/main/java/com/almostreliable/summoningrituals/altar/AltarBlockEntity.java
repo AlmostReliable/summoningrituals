@@ -3,8 +3,8 @@ package com.almostreliable.summoningrituals.altar;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.platform.Platform;
-import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
@@ -12,6 +12,8 @@ import com.almostreliable.summoningrituals.util.GameUtils;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -21,7 +23,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,10 +34,12 @@ import java.util.List;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
-public class AltarBlockEntity extends PlatformBlockEntity {
+public class AltarBlockEntity extends BlockEntity {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
+
+    protected final AltarInventory inventory;
 
     @Nullable
     private AltarRecipe currentRecipe;
@@ -41,22 +47,44 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     private List<EntitySacrifice> sacrifices;
     @Nullable
     private ServerPlayer invokingPlayer;
+    private int progress;
     private int processTime;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
+        this.inventory = new AltarInventory(this);
+    }
+
+    @Nullable
+    public IItemHandler getCapability(@Nullable Direction ignoredSide) {
+        if (!remove && progress == 0) {
+            return inventory;
+        }
+        return null;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public AltarInventory getInventory() {
+        return inventory;
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        if (tag.contains(Constants.INVENTORY)) inventory.deserialize(tag.getCompound(Constants.INVENTORY));
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(registries, tag.getCompound(Constants.INVENTORY));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put(Constants.INVENTORY, inventory.serialize());
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put(Constants.INVENTORY, inventory.serializeNBT(registries));
     }
 
     @Nullable
@@ -66,13 +94,12 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        var tag = super.getUpdateTag();
-        saveAdditional(tag);
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        var tag = super.getUpdateTag(registries);
+        saveAdditional(tag, registries);
         return tag;
     }
 
-    @Override
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
         if (progress > 0) {
             GameUtils.sendPlayerMessage(player, Constants.PROGRESS, ChatFormatting.RED);
@@ -109,7 +136,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
         assert level != null && !level.isClientSide;
         inventory.dropContents();
         if (creative) return;
-        GameUtils.dropItem(level, worldPosition, new ItemStack(Registration.ALTAR_ITEM.get()), true);
+        GameUtils.dropItem(level, worldPosition, new ItemStack(Registration.ALTAR_BLOCK.get()), true);
     }
 
     void tick() {
@@ -192,7 +219,7 @@ public class AltarBlockEntity extends PlatformBlockEntity {
     private AltarRecipe findRecipe() {
         assert level != null && !level.isClientSide;
         var recipeManager = level.getRecipeManager();
-        return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE.type().get(), inventory.getVanillaInv(), level)
+        return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level)
             .orElse(null);
     }
 
