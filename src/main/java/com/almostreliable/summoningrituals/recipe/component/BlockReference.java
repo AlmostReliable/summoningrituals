@@ -1,14 +1,16 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
 import com.mojang.serialization.Codec;
+
 import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+
 import org.apache.commons.lang3.NotImplementedException;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public final class BlockReference {
 

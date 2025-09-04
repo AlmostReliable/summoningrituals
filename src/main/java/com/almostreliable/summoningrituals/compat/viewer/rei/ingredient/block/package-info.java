@@ -1,6 +1,4 @@
-@ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
-package com.almostreliable.summoningrituals.compat.rei.ingredient.block;
+@NonnullDefault
+package com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.block;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.lwjgl.system.NonnullDefault;

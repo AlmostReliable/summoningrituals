@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.util.MathUtils;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -32,9 +33,11 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.stream.Stream;
 
 public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityBlock {

@@ -1,6 +1,4 @@
-@ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
+@NonnullDefault
 package com.almostreliable.summoningrituals;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.lwjgl.system.NonnullDefault;

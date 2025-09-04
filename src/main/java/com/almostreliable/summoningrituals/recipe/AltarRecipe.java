@@ -6,8 +6,10 @@ import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
+
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.HolderLookup;
@@ -23,15 +25,18 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public record AltarRecipe(Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> inputs,
-                          Optional<RecipeSacrifices> sacrifices, int recipeTime, Optional<BlockPredicate> blockBelow, DAY_TIME dayTime,
-                          WEATHER weather) implements Recipe<AltarInventory> {
+public record AltarRecipe(
+    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> inputs,
+    Optional<RecipeSacrifices> sacrifices, int recipeTime, Optional<BlockPredicate> blockBelow, DAY_TIME dayTime,
+    WEATHER weather
+) implements Recipe<AltarInventory> {
 
     public static final Set<Ingredient> CATALYST_CACHE = new HashSet<>();
 

@@ -9,14 +9,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.SpawnEggItem;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityIngredient {
 
     private final Holder<EntityType<?>> entityType;
     private final int count;
     private final CompoundTag tag;
-    @Nullable private Entity entity;
+    @Nullable
+    private Entity entity;
 
     public EntityIngredient(Holder<EntityType<?>> entityType, int count, CompoundTag tag) {
         this.entityType = entityType;

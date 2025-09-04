@@ -3,12 +3,14 @@ package com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.block;
 import com.almostreliable.summoningrituals.compat.viewer.jei.AlmostJEI;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
+
 import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockReferenceHelper implements IIngredientHelper<BlockReference> {
 

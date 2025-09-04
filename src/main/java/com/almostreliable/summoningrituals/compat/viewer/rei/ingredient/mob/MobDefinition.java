@@ -3,17 +3,20 @@ package com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.mob;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.rei.AlmostREI;
 import com.almostreliable.summoningrituals.platform.Platform;
+
 import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.common.entry.EntrySerializer;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.comparison.ComparisonContext;
 import me.shedaniel.rei.api.common.entry.type.EntryDefinition;
 import me.shedaniel.rei.api.common.entry.type.EntryType;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.stream.Stream;
 
 public class MobDefinition implements EntryDefinition<EntityIngredient> {

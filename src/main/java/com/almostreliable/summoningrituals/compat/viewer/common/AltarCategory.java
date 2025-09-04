@@ -9,7 +9,9 @@ import com.almostreliable.summoningrituals.util.GameUtils;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.TextUtils;
 import com.almostreliable.summoningrituals.util.Utils;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -19,7 +21,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -183,21 +186,25 @@ public class AltarCategory<I, R> {
 
     @FunctionalInterface
     protected interface ItemInputConsumer {
+
         void accept(int x, int y, List<ItemStack> inputs);
     }
 
     @FunctionalInterface
     protected interface MobInputConsumer {
+
         void accept(int x, int y, EntityIngredient mob, @Nullable SpawnEggItem egg);
     }
 
     @FunctionalInterface
     protected interface ItemOutputConsumer {
+
         void accept(int x, int y, ItemStack output);
     }
 
     @FunctionalInterface
     protected interface MobOutputConsumer {
+
         void accept(int x, int y, EntityIngredient mob, @Nullable SpawnEggItem egg);
     }
 

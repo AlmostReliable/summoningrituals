@@ -2,15 +2,17 @@ package com.almostreliable.summoningrituals.compat.viewer.rei.ingredient.block;
 
 import com.almostreliable.summoningrituals.compat.viewer.common.BlockReferenceRenderer;
 import com.almostreliable.summoningrituals.recipe.component.BlockReference;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
+
 import net.minecraft.client.gui.GuiGraphics;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class REIBlockReferenceRenderer extends BlockReferenceRenderer implements EntryRenderer<BlockReference> {
 

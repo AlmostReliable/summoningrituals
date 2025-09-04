@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PlatformBlockEntity extends BlockEntity {
 
@@ -24,7 +24,7 @@ public abstract class PlatformBlockEntity extends BlockEntity {
         this.inventory = new AltarInventory(this);
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public ItemHandler getCapability(@Nullable Direction side) {
         if (!remove && progress == 0) {
             return inventory;

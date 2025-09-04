@@ -1,6 +1,4 @@
-@ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
-package com.almostreliable.summoningrituals.compat.jei.ingredient.item;
+@NonnullDefault
+package com.almostreliable.summoningrituals.compat.viewer.jei.ingredient.item;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.lwjgl.system.NonnullDefault;

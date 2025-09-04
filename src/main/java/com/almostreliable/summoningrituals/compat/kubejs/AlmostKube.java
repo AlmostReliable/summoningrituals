@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.util.Utils;
+
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.event.EventHandler;
@@ -17,13 +18,14 @@ import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
 public class AlmostKube implements KubeJSPlugin {

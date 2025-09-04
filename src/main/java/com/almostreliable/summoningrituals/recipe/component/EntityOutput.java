@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.recipe.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -11,7 +12,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Optional;
 
 public record EntityOutput(EntitySpawn entity, Optional<BlockPos> offset, Optional<BlockPos> spread) implements RecipeOutput {

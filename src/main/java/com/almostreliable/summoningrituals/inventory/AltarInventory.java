@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.util.GameUtils;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -13,7 +14,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -257,7 +257,6 @@ public class AltarInventory implements ItemHandler, RecipeInput {
         return AltarRecipeSerializer.MAX_INPUTS + 1;
     }
 
-    @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
@@ -265,14 +264,12 @@ public class AltarInventory implements ItemHandler, RecipeInput {
         return items.get(slot);
     }
 
-    @Nonnull
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
         if (simulate) return ItemStack.EMPTY;
         return parent.handleInteraction(null, stack);
     }
 
-    @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         return ItemStack.EMPTY;
