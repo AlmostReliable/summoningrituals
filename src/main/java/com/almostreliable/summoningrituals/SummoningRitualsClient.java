@@ -12,10 +12,10 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 public class SummoningRitualsClient {
 
     public SummoningRitualsClient(IEventBus eventBus) {
-        eventBus.addListener(this::registerRenderers);
+        eventBus.addListener(SummoningRitualsClient::registerRenderers);
     }
 
-    public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(Registration.ALTAR_BLOCK_ENTITY.get(), AltarRenderer::new);
     }
 }
