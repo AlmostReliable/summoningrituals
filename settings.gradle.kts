@@ -1,12 +1,9 @@
-pluginManagement {
-    repositories {
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.fabricmc.net/")
-        maven("https://maven.minecraftforge.net/")
-        gradlePluginPortal()
-    }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-val modName = extra.get("modName").toString().replace(" ", "-")
+val modName: String by extra
 val minecraftVersion: String by extra
-rootProject.name = "$modName-$minecraftVersion-Forge"
+rootProject.name = "${modName.replace(" ", "-")}-$minecraftVersion-NeoForge"
+
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
