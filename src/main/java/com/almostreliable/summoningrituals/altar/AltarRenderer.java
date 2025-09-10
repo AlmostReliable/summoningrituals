@@ -1,8 +1,7 @@
 package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.util.MathUtils;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -10,6 +9,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
@@ -50,8 +52,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
             var playerPos = mc.player.position();
             var playerAngle = Math.toDegrees(Math.atan2(altarPos.x - playerPos.x, playerPos.z - altarPos.z)) + 180;
 
-            var progress = entity.getProgress();
-            var processTime = entity.getProcessTime();
+            var progress = entity.getRecipeProgress();
+            var processTime = entity.getRecipeTime();
 
             stack.translate(0, MAX_PROGRESS_HEIGHT * MathUtils.modifier(progress, processTime, 0), 0);
 

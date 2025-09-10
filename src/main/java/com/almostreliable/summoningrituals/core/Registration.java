@@ -78,15 +78,15 @@ public final class Registration {
 
     private Registration() {}
 
-    public static void init(IEventBus modEventBus) {
-        CREATIVE_TABS.register(modEventBus);
-        BLOCKS.register(modEventBus);
-        ITEMS.register(modEventBus);
-        BLOCK_ENTITIES.register(modEventBus);
-        RECIPE_TYPES.register(modEventBus);
-        RECIPE_SERIALIZERS.register(modEventBus);
+    public static void init(IEventBus eventBus) {
+        CREATIVE_TABS.register(eventBus);
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        BLOCK_ENTITIES.register(eventBus);
+        RECIPE_TYPES.register(eventBus);
+        RECIPE_SERIALIZERS.register(eventBus);
 
-        modEventBus.addListener(Registration::registerCapabilities);
+        eventBus.addListener(Registration::registerCapabilities);
     }
 
     private static Collection<ItemStack> getKnownItems() {

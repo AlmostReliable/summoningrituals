@@ -6,8 +6,6 @@ import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.component.BlockReference;
-import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 import com.almostreliable.summoningrituals.util.GameUtils;
 
 import net.minecraft.ChatFormatting;
@@ -15,9 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -34,12 +29,13 @@ import java.util.List;
 
 import static com.almostreliable.summoningrituals.util.TextUtils.f;
 
-public class AltarBlockEntity extends BlockEntity {
+public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
 
-    protected final AltarInventory inventory;
+    // TODO: implement dropping contents on destroy
+    private final AltarInventory inventory;
 
     @Nullable
     private AltarRecipe currentRecipe;
@@ -47,32 +43,18 @@ public class AltarBlockEntity extends BlockEntity {
     private List<EntitySacrifice> sacrifices;
     @Nullable
     private ServerPlayer invokingPlayer;
-    private int progress;
-    private int processTime;
+    private int recipeProgress;
+    private int recipeTime;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
         this.inventory = new AltarInventory(this);
     }
 
-    @Nullable
-    public IItemHandler getCapability(@Nullable Direction ignoredSide) {
-        if (!remove && progress == 0) {
-            return inventory;
-        }
-        return null;
-    }
-
-    public int getProgress() {
-        return progress;
-    }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
-    }
-
-    public AltarInventory getInventory() {
-        return inventory;
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put(Constants.INVENTORY, inventory.serializeNBT(registries));
     }
 
     @Override
@@ -82,26 +64,45 @@ public class AltarBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put(Constants.INVENTORY, inventory.serializeNBT(registries));
-    }
+    public void tick(ServerLevel level) {
+        if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
+            var recipe = findRecipe();
+            if (recipe == null) {
+                resetSummoning(true);
+                return;
+            }
+            handleSummoning(recipe, null);
+        }
+        if (currentRecipe == null) return;
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+        if (recipeProgress >= currentRecipe.recipeTime()) {
+            if (inventory.handleRecipe(currentRecipe)) {
+                // currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
+                SUMMONING_COMPLETE.invoke((ServerLevel) level, worldPosition, currentRecipe, invokingPlayer);
+                GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
+                resetSummoning(false);
+            } else {
+                GameUtils.sendPlayerMessage(invokingPlayer, Constants.INVALID, ChatFormatting.RED);
+                resetSummoning(true);
+            }
+            return;
+        }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        var tag = super.getUpdateTag(registries);
-        saveAdditional(tag, registries);
-        return tag;
+        if (recipeProgress == 0) {
+            changeActivityState(true);
+            if (sacrifices != null && !sacrifices.isEmpty()) {
+                sacrifices.stream()
+                    .map(EntitySacrifice::kill)
+                    .filter(positions -> !positions.isEmpty())
+                    .forEach(p -> Platform.sendParticleEmit(level, p));
+            }
+        }
+        recipeProgress++;
+        Platform.sendProgressUpdate(level, worldPosition, recipeProgress);
     }
 
     public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
-        if (progress > 0) {
+        if (recipeProgress > 0) {
             GameUtils.sendPlayerMessage(player, Constants.PROGRESS, ChatFormatting.RED);
             return stack;
         }
@@ -113,7 +114,7 @@ public class AltarBlockEntity extends BlockEntity {
             return ItemStack.EMPTY;
         }
 
-        if (AltarRecipe.CATALYST_CACHE.stream().anyMatch(ingredient -> ingredient.test(stack))) {
+        if (AltarRecipe.CATALYSTS.stream().anyMatch(ingredient -> ingredient.test(stack))) {
             inventory.setCatalyst(stack.copyWithCount(1));
             var recipe = findRecipe();
             if (recipe == null) {
@@ -132,61 +133,15 @@ public class AltarBlockEntity extends BlockEntity {
         return remaining;
     }
 
-    void playerDestroy(boolean creative) {
-        assert level != null && !level.isClientSide;
-        inventory.dropContents();
-        if (creative) return;
-        GameUtils.dropItem(level, worldPosition, new ItemStack(Registration.ALTAR_BLOCK.get()), true);
-    }
-
-    void tick() {
-        if (level == null) return;
-
-        if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
-            var recipe = findRecipe();
-            if (recipe == null) {
-                resetSummoning(true);
-                return;
-            }
-            handleSummoning(recipe, null);
-        }
-        if (currentRecipe == null) return;
-
-        if (progress >= currentRecipe.recipeTime()) {
-            if (inventory.handleRecipe(currentRecipe)) {
-                currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
-                SUMMONING_COMPLETE.invoke((ServerLevel) level, worldPosition, currentRecipe, invokingPlayer);
-                GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
-                resetSummoning(false);
-            } else {
-                GameUtils.sendPlayerMessage(invokingPlayer, Constants.INVALID, ChatFormatting.RED);
-                resetSummoning(true);
-            }
-            return;
-        }
-
-        if (progress == 0) {
-            changeActivityState(true);
-            if (sacrifices != null && !sacrifices.isEmpty()) {
-                sacrifices.stream()
-                    .map(EntitySacrifice::kill)
-                    .filter(positions -> !positions.isEmpty())
-                    .forEach(p -> Platform.sendParticleEmit(level, p));
-            }
-        }
-        progress++;
-        Platform.sendProgressUpdate(level, worldPosition, progress);
-    }
-
     private void resetSummoning(boolean popLastInserted) {
         assert level != null;
         currentRecipe = null;
         sacrifices = null;
         invokingPlayer = null;
-        progress = 0;
-        Platform.sendProgressUpdate(level, worldPosition, progress);
-        processTime = 0;
-        Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
+        recipeProgress = 0;
+        Platform.sendProgressUpdate(level, worldPosition, recipeProgress);
+        recipeTime = 0;
+        Platform.sendProcessTimeUpdate(level, worldPosition, recipeTime);
         changeActivityState(false);
         if (popLastInserted) inventory.popLastInserted();
     }
@@ -194,15 +149,15 @@ public class AltarBlockEntity extends BlockEntity {
     private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
         assert level != null && !level.isClientSide;
 
-        sacrifices = checkSacrifices(recipe.sacrifices(), player);
-        if (sacrifices == null ||
-            !checkBlockBelow(recipe.blockBelow(), player) ||
-            !recipe.dayTime().check(level, player) ||
-            !recipe.weather().check(level, player)) {
-            inventory.popLastInserted();
-            GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
-            return;
-        }
+        // sacrifices = checkSacrifices(recipe.sacrifices(), player);
+        // if (sacrifices == null ||
+        //     !checkBlockBelow(recipe.blockBelow(), player) ||
+        //     !recipe.dayTime().check(level, player) ||
+        //     !recipe.weather().check(level, player)) {
+        //     inventory.popLastInserted();
+        //     GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
+        //     return;
+        // }
 
         if (!SUMMONING_START.invoke((ServerLevel) level, worldPosition, recipe, player)) {
             resetSummoning(true);
@@ -210,46 +165,38 @@ public class AltarBlockEntity extends BlockEntity {
         }
         currentRecipe = recipe;
         invokingPlayer = player;
-        processTime = recipe.recipeTime();
+        recipeTime = recipe.recipeTime();
         GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
-        Platform.sendProcessTimeUpdate(level, worldPosition, processTime);
+        Platform.sendProcessTimeUpdate(level, worldPosition, recipeTime);
     }
 
     @Nullable
     private AltarRecipe findRecipe() {
-        assert level != null && !level.isClientSide;
-        var recipeManager = level.getRecipeManager();
-        return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level)
-            .orElse(null);
+        return null;
+        // assert level != null && !level.isClientSide;
+        // var recipeManager = level.getRecipeManager();
+        // return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level)
+        //     .orElse(null);
     }
 
-    @Nullable
-    private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, @Nullable ServerPlayer player) {
-        assert level != null && !level.isClientSide;
-        if (sacrifices.isEmpty()) return List.of();
-        var region = sacrifices.getRegion(worldPosition);
-        var entities = level.getEntities(player, region);
-        List<EntitySacrifice> toKill = new ArrayList<>();
-        var success = sacrifices.test(sacrifice -> {
-            var found = entities.stream().filter(sacrifice).toList();
-            if (found.size() < sacrifice.count()) {
-                GameUtils.sendPlayerMessage(player, Constants.SACRIFICES, ChatFormatting.YELLOW);
-                return false;
-            }
-            toKill.add(new EntitySacrifice(found, sacrifice.count()));
-            return true;
-        });
-        return success ? toKill : null;
-    }
-
-    private boolean checkBlockBelow(@Nullable BlockReference blockBelow, @Nullable ServerPlayer player) {
-        assert level != null && !level.isClientSide;
-        if (blockBelow == null || blockBelow.test(level, worldPosition.below())) {
-            return true;
-        }
-        GameUtils.sendPlayerMessage(player, Constants.BLOCK_BELOW, ChatFormatting.YELLOW);
-        return false;
-    }
+    // @Nullable
+    // private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, @Nullable ServerPlayer player) {
+    //     assert level != null && !level.isClientSide;
+    //     if (sacrifices.isEmpty()) return List.of();
+    //     var region = sacrifices.getRegion(worldPosition);
+    //     var entities = level.getEntities(player, region);
+    //     List<EntitySacrifice> toKill = new ArrayList<>();
+    //     var success = sacrifices.test(sacrifice -> {
+    //         var found = entities.stream().filter(sacrifice).toList();
+    //         if (found.size() < sacrifice.count()) {
+    //             GameUtils.sendPlayerMessage(player, Constants.SACRIFICES, ChatFormatting.YELLOW);
+    //             return false;
+    //         }
+    //         toKill.add(new EntitySacrifice(found, sacrifice.count()));
+    //         return true;
+    //     });
+    //     return success ? toKill : null;
+    // }
 
     private void changeActivityState(boolean state) {
         if (level == null || level.isClientSide) return;
@@ -259,12 +206,32 @@ public class AltarBlockEntity extends BlockEntity {
         }
     }
 
-    public int getProcessTime() {
-        return processTime;
+    @Nullable
+    public IItemHandler getCapability(@Nullable Direction ignoredSide) {
+        if (!remove && recipeProgress == 0) {
+            return inventory;
+        }
+        return null;
     }
 
-    public void setProcessTime(int processTime) {
-        this.processTime = processTime;
+    public AltarInventory getInventory() {
+        return inventory;
+    }
+
+    public int getRecipeProgress() {
+        return recipeProgress;
+    }
+
+    public void setRecipeProgress(int recipeProgress) {
+        this.recipeProgress = recipeProgress;
+    }
+
+    public int getRecipeTime() {
+        return recipeTime;
+    }
+
+    public void setRecipeTime(int recipeTime) {
+        this.recipeTime = recipeTime;
     }
 
     private record EntitySacrifice(List<Entity> entities, int count) {

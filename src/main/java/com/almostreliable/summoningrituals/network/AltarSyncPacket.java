@@ -28,7 +28,7 @@ public record AltarSyncPacket(BlockPos altarPos, int recipeProgress, int recipeT
         return TYPE;
     }
 
-    public static void handle(AltarSyncPacket packet, IPayloadContext ctx) {
+    public static void handle(AltarSyncPacket packet, IPayloadContext ignoredCtx) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
 

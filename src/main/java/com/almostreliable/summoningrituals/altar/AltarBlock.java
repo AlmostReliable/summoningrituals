@@ -18,11 +18,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -42,9 +39,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityBlock {
+public class AltarBlock extends TickableEntityBlock implements SimpleWaterloggedBlock {
 
-    static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
+    public static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
     private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Stream.of(
@@ -64,39 +61,26 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(FACING).add(ACTIVE).add(WATERLOGGED);
     }
 
+    @Nullable
     @Override
-    protected ItemInteractionResult useItemOn(
-        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
-        InteractionHand hand, BlockHitResult hitResult
-    ) {
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        var superState = super.getStateForPlacement(context);
+        var state = superState == null ? defaultBlockState() : superState;
+        return state.setValue(FACING, context.getHorizontalDirection().getOpposite())
+            .setValue(ACTIVE, false)
+            .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public InteractionResult use(
-        BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit
-    ) {
-        if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
-            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setMainHandItem(altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem()));
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-        return super.use(state, level, pos, player, hand, hit);
-    }
-
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public BlockState updateShape(
         BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos, BlockPos nPos
@@ -107,27 +91,44 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
         return super.updateShape(state, direction, nState, level, pos, nPos);
     }
 
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new AltarBlockEntity(pos, state);
     }
 
-    @Nullable
+    // TODO: see if this can be used
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
-        Level level, BlockState state, BlockEntityType<T> type
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
+
+    // TODO: see if the passed stack is the same as the main hand item; if so, use that instead
+    @Override
+    protected ItemInteractionResult useItemOn(
+        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+        InteractionHand hand, BlockHitResult hitResult
     ) {
-        if (level.isClientSide) return null;
-        return (entityLevel, entityState, entityType, entity) -> {
-            if (entity instanceof AltarBlockEntity altar) {
-                altar.tick();
+        if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
+            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.setItemInHand(
+                    InteractionHand.MAIN_HAND,
+                    altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem())
+                );
             }
-        };
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        // TODO: extract this complex calculation from the method when the facing changes
         Vector3f[][] particlePos = MathUtils.getHorizontalVectors(
             new Vector3f(3.5f, 1.5f, 9.5f),
             new Vector3f(9.5f, 3.5f, 12.5f),
@@ -147,36 +148,6 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
                 renderCandleInactive(level, x, y, z, vec[i]);
             }
         }
-    }
-
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        var superState = super.getStateForPlacement(context);
-        var state = superState == null ? defaultBlockState() : superState;
-        return state.setValue(FACING, context.getHorizontalDirection().getOpposite())
-            .setValue(ACTIVE, false)
-            .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
-    }
-
-    @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
-            altar.playerDestroy(player.isCreative());
-        }
-        super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(FACING).add(ACTIVE).add(WATERLOGGED);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
