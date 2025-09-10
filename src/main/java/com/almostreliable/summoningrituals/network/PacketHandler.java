@@ -1,32 +1,28 @@
 package com.almostreliable.summoningrituals.network;
 
-import com.almostreliable.summoningrituals.util.Utils;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public final class PacketHandler {
 
-    private static final ResourceLocation ID = Utils.getRL("network");
     private static final String PROTOCOL = "1";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(ID)
-        .networkProtocolVersion(() -> PROTOCOL)
-        .clientAcceptedVersions(PROTOCOL::equals)
-        .serverAcceptedVersions(PROTOCOL::equals)
-        .simpleChannel();
 
     private PacketHandler() {}
 
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    public static void init() {
-        var packetId = -1;
-        // server to client
-        register(++packetId, ClientAltarUpdatePacket.class, new ClientAltarUpdatePacket());
-        register(++packetId, SacrificeParticlePacket.class, new SacrificeParticlePacket());
+    public static void init(IEventBus eventBus) {
+        eventBus.addListener(PacketHandler::onPacketRegistration);
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private static <T> void register(int packetId, Class<T> clazz, Packet<T> packet) {
-        CHANNEL.registerMessage(packetId, clazz, packet::encode, packet::decode, packet::handle);
+    private static void onPacketRegistration(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar(PROTOCOL);
+
+        // server to client
+        registrar.playToClient(AltarSyncPacket.TYPE, AltarSyncPacket.STREAM_CODEC, wrapHandler(AltarSyncPacket::handle));
+    }
+
+    private static <T extends CustomPacketPayload> IPayloadHandler<T> wrapHandler(IPayloadHandler<T> handler) {
+        return (payload, context) -> context.enqueueWork(() -> handler.handle(payload, context));
     }
 }
