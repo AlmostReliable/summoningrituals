@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
-import com.almostreliable.summoningrituals.inventory.AltarInventory;
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.recipe.codec.LootConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
@@ -35,22 +35,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
     ).apply(
         i,
         AltarRecipe::new
-    )).validate(recipe -> {
-        if (recipe.catalyst().isEmpty()) {
-            return DataResult.error(() -> "Catalyst is empty");
-        }
-
-        if (recipe.inputs().isEmpty() && recipe.sacrifices().isEmpty()) {
-            return DataResult.error(() -> "No inputs or sacrifices");
-        }
-
-        // TODO: make configurable
-        if (recipe.inputs().size() > AltarInventory.SIZE) {
-            return DataResult.error(() -> "Too many inputs, max is " + AltarInventory.SIZE);
-        }
-
-        return DataResult.success(recipe);
-    });
+    )).validate(AltarRecipeSerializer::validateRecipe);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = NeoForgeStreamCodecs.composite(
         Ingredient.CONTENTS_STREAM_CODEC,
@@ -69,6 +54,22 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         AltarRecipe::summoningConditions,
         AltarRecipe::new
     );
+
+    private static DataResult<AltarRecipe> validateRecipe(AltarRecipe recipe) {
+        if (recipe.catalyst().isEmpty()) {
+            return DataResult.error(() -> "catalyst is empty");
+        }
+
+        if (recipe.inputs().isEmpty() && recipe.sacrifices().isEmpty()) {
+            return DataResult.error(() -> "no inputs or sacrifices");
+        }
+
+        if (recipe.inputs().size() > Config.COMMON.altarInventorySize.get()) {
+            return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.altarInventorySize.get());
+        }
+
+        return DataResult.success(recipe);
+    }
 
     @Override
     public MapCodec<AltarRecipe> codec() {
