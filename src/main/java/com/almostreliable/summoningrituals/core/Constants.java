@@ -17,7 +17,7 @@ public final class Constants {
     public static final String INVALID = "invalid";
     public static final String INVENTORY = "inventory";
     public static final String ITEM = "item";
-    public static final String ITEMS = "items";
+    public static final String INTERNAL_INVENTORY = "internal_inventory";
     public static final String RECIPE_VIEWER = "recipe_viewer";
     public static final String LABEL = "label";
     public static final String MOB = "mob";
@@ -30,6 +30,7 @@ public final class Constants {
     public static final String RECIPE_TIME = "recipe_time";
     public static final String REGION = "region";
     public static final String SACRIFICES = "sacrifices";
+    public static final String SIZE = "size";
     public static final String SLOT = "slot";
     public static final String SPREAD = "spread";
     public static final String TOOLTIP = "tooltip";
