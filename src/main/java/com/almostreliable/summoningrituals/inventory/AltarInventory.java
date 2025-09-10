@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBTSerializable<CompoundTag> {
 
     private final AltarBlockEntity altar;
-    private final InternalInventory internalInventory;
+    private final InternalInventory inventory;
     private final Deque<Tuple<ItemStack, Integer>> insertOrder;
 
     private ItemStack catalyst;
@@ -37,7 +37,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     public AltarInventory(AltarBlockEntity altar) {
         this.altar = altar;
         int size = Config.COMMON.altarInventorySize.get();
-        this.internalInventory = new InternalInventory(size);
+        this.inventory = new InternalInventory(size);
         this.insertOrder = new ArrayDeque<>(size);
         this.catalyst = ItemStack.EMPTY;
     }
@@ -45,7 +45,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     @Override
     @UnknownNullability
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        ListTag internalInventoryTag = internalInventory.serializeNBT(provider);
+        ListTag inventoryTag = inventory.serializeNBT(provider);
 
         ListTag insertOrderTag = new ListTag();
         for (var entry : insertOrder) {
@@ -56,15 +56,15 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         }
 
         CompoundTag compoundTag = new CompoundTag();
-        compoundTag.put(Constants.INTERNAL_INVENTORY, internalInventoryTag);
+        compoundTag.put(Constants.INVENTORY, inventoryTag);
         compoundTag.put(Constants.INSERT_ORDER, insertOrderTag);
         return (CompoundTag) catalyst.save(provider, compoundTag);
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        ListTag internalInventoryTag = tag.getList(Constants.INTERNAL_INVENTORY, Tag.TAG_COMPOUND);
-        internalInventory.deserializeNBT(provider, internalInventoryTag);
+        ListTag inventoryTag = tag.getList(Constants.INVENTORY, Tag.TAG_COMPOUND);
+        inventory.deserializeNBT(provider, inventoryTag);
 
         ListTag insertOrderTag = tag.getList(Constants.INSERT_ORDER, Tag.TAG_COMPOUND);
         insertOrder.clear();
@@ -79,12 +79,12 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        if (slot == internalInventory.size()) {
+        if (slot == inventory.size()) {
             catalyst = stack;
             return;
         }
 
-        internalInventory.set(slot, stack);
+        inventory.set(slot, stack);
         onContentsChanged();
     }
 
@@ -129,9 +129,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         var stack = last.getA();
         int slot = last.getB();
 
-        internalInventory.get(slot).shrink(stack.getCount());
-        if (internalInventory.get(slot).isEmpty()) {
-            internalInventory.set(slot, ItemStack.EMPTY);
+        inventory.get(slot).shrink(stack.getCount());
+        if (inventory.get(slot).isEmpty()) {
+            inventory.set(slot, ItemStack.EMPTY);
         }
         onContentsChanged();
 
@@ -143,7 +143,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         assert level != null && !level.isClientSide;
 
         var pos = altar.getBlockPos();
-        for (var stack : internalInventory) {
+        for (var stack : inventory) {
             if (stack.isEmpty()) continue;
             GameUtils.dropItem(level, pos, stack, false);
         }
@@ -163,7 +163,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
             toRemove += input.count();
             var inputRemoved = 0;
 
-            for (var stack : internalInventory) {
+            for (var stack : inventory) {
                 if (stack.isEmpty() || !input.ingredient().test(stack)) continue;
 
                 var shrinkCount = Math.min(input.count() - inputRemoved, stack.getCount());
@@ -177,9 +177,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         }
 
         if (actualRemoved < toRemove) {
-            internalInventory.clear();
+            inventory.clear();
             for (int i = 0; i < itemBackup.size(); i++) {
-                internalInventory.add(i, itemBackup.get(i));
+                inventory.add(i, itemBackup.get(i));
             }
             return false;
         }
@@ -194,9 +194,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         if (stack.isEmpty()) return ItemStack.EMPTY;
         validateSlot(slot);
 
-        var currentStack = internalInventory.get(slot);
+        var currentStack = inventory.get(slot);
         if (currentStack.isEmpty()) {
-            internalInventory.set(slot, stack);
+            inventory.set(slot, stack);
             onContentsChanged();
             return ItemStack.EMPTY;
         }
@@ -219,7 +219,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     private void rebuildInsertOrder() {
         insertOrder.clear();
         for (var i = SIZE - 1; i >= 0; i--) {
-            var stack = internalInventory.get(i);
+            var stack = inventory.get(i);
             if (stack.isEmpty()) continue;
             insertOrder.add(new Tuple<>(stack.copy(), i));
         }
@@ -244,7 +244,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     public ItemStack getStackInSlot(int slot) {
         validateSlot(slot);
         if (slot == AltarRecipeSerializer.MAX_INPUTS) return catalyst;
-        return internalInventory.get(slot);
+        return inventory.get(slot);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     }
 
     public List<ItemStack> getNoneEmptyItems() {
-        return internalInventory.stream().filter(stack -> !stack.isEmpty()).collect(Collectors.toList());
+        return inventory.stream().filter(stack -> !stack.isEmpty()).collect(Collectors.toList());
     }
 
     public ItemStack getCatalyst() {
@@ -285,7 +285,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     private List<ItemStack> createItemBackup() {
         List<ItemStack> backup = new ArrayList<>();
-        for (var stack : internalInventory) {
+        for (var stack : inventory) {
             if (stack.isEmpty()) continue;
             backup.add(stack.copy());
         }
