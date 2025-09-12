@@ -3,13 +3,6 @@
   "minVersion": "0.8.5",
   "package": "com.almostreliable.summoningrituals.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "BlockPredicateAccessor",
-    "LivingEntityMixin",
-    "RecipeManagerMixin",
-    "ServerPlayerGameModeMixin"
-  ],
-  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
