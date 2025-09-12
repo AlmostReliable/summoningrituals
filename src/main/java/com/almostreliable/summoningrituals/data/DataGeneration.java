@@ -18,5 +18,6 @@ public final class DataGeneration {
         generator.addProvider(event.includeClient(), new SummoningLang(output));
 
         generator.addProvider(event.includeServer(), new SummoningLoot(output, registryAccess));
+        generator.addProvider(event.includeServer(), new SummoningTags(output, registryAccess, existingFileHelper));
     }
 }

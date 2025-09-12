@@ -33,7 +33,7 @@ class SummoningLoot extends LootTableProvider {
 
         @Override
         protected void generate() {
-            dropSelf(Registration.ALTAR_BLOCK.get());
+            getKnownBlocks().forEach(this::dropSelf);
         }
     }
 }
