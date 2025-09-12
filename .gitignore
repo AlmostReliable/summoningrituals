@@ -1,6 +1,3 @@
-### ForgeGradle ###
-run/
-
 ### Intellij ###
 .idea/
 *.iml
@@ -56,4 +53,5 @@ build/
 .classpath
 
 ### Project ###
-extra-mods-*/
+run/
+**/.cache/
