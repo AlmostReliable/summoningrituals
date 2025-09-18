@@ -9,7 +9,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -102,13 +101,6 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         return new AltarBlockEntity(pos, state);
     }
 
-    // TODO: see if this can be used
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return super.useWithoutItem(state, level, pos, player, hitResult);
-    }
-
-    // TODO: see if the passed stack is the same as the main hand item; if so, use that instead
     @Override
     protected ItemInteractionResult useItemOn(
         ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
@@ -118,7 +110,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.setItemInHand(
                     InteractionHand.MAIN_HAND,
-                    altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem())
+                    altar.handleInteraction(serverPlayer, stack)
                 );
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
