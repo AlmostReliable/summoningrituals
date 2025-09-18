@@ -42,8 +42,8 @@ import java.util.stream.Stream;
 public class AltarBlock extends TickableEntityBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
-    private static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Stream.of(
         box(3, 0, 3, 13, 2, 13),
         box(5, 2, 5, 11, 9, 11),

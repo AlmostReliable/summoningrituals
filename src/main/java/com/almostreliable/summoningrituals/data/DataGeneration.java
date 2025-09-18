@@ -16,6 +16,7 @@ public final class DataGeneration {
         var registryAccess = event.getLookupProvider();
 
         generator.addProvider(event.includeClient(), new SummoningLang(output));
+        generator.addProvider(event.includeClient(), new SummoningModels(output, existingFileHelper));
 
         generator.addProvider(event.includeServer(), new SummoningLoot(output, registryAccess));
         generator.addProvider(event.includeServer(), new SummoningTags(output, registryAccess, existingFileHelper));
