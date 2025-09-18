@@ -12,15 +12,15 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record AltarSyncPacket(BlockPos altarPos, int recipeProgress, int recipeTime) implements CustomPacketPayload {
+public record AltarRecipeSyncPacket(BlockPos altarPos, int recipeProgress, int recipeTime) implements CustomPacketPayload {
 
-    static final Type<AltarSyncPacket> TYPE = new Type<>(Utils.getRL("altar_sync"));
+    static final Type<AltarRecipeSyncPacket> TYPE = new Type<>(Utils.getRL("altar_recipe_sync"));
 
-    static final StreamCodec<FriendlyByteBuf, AltarSyncPacket> STREAM_CODEC = StreamCodec.composite(
-        BlockPos.STREAM_CODEC, AltarSyncPacket::altarPos,
-        ByteBufCodecs.VAR_INT, AltarSyncPacket::recipeProgress,
-        ByteBufCodecs.VAR_INT, AltarSyncPacket::recipeTime,
-        AltarSyncPacket::new
+    static final StreamCodec<FriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC, AltarRecipeSyncPacket::altarPos,
+        ByteBufCodecs.VAR_INT, AltarRecipeSyncPacket::recipeProgress,
+        ByteBufCodecs.VAR_INT, AltarRecipeSyncPacket::recipeTime,
+        AltarRecipeSyncPacket::new
     );
 
     @Override
@@ -28,7 +28,7 @@ public record AltarSyncPacket(BlockPos altarPos, int recipeProgress, int recipeT
         return TYPE;
     }
 
-    public static void handle(AltarSyncPacket packet, IPayloadContext ignoredCtx) {
+    public static void handle(AltarRecipeSyncPacket packet, IPayloadContext ignoredCtx) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
 

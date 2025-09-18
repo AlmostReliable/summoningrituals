@@ -110,7 +110,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.setItemInHand(
                     InteractionHand.MAIN_HAND,
-                    altar.handleInteraction(serverPlayer, stack)
+                    altar.handleInteraction(serverPlayer, stack, false)
                 );
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide);

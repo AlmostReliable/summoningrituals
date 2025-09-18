@@ -4,7 +4,8 @@ import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.inventory.AltarInventory;
-import com.almostreliable.summoningrituals.platform.Platform;
+import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
+import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.util.GameUtils;
 
@@ -52,15 +53,25 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put(Constants.INVENTORY, inventory.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registryAccess) {
+        super.saveAdditional(tag, registryAccess);
+        tag.put(Constants.INVENTORY, inventory.serializeNBT(registryAccess));
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(registries, tag.getCompound(Constants.INVENTORY));
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registryAccess) {
+        super.loadAdditional(tag, registryAccess);
+        if (tag.contains(Constants.INVENTORY)) inventory.deserializeNBT(registryAccess, tag.getCompound(Constants.INVENTORY));
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryAccess) {
+        return inventory.serializeWithoutInsertOrder(registryAccess);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registryAccess) {
+        inventory.deserializeNBT(registryAccess, tag);
     }
 
     @Override
@@ -68,7 +79,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
             var recipe = findRecipe();
             if (recipe == null) {
-                resetSummoning(true);
+                resetSummoning(level, true);
                 return;
             }
             handleSummoning(recipe, null);
@@ -78,12 +89,12 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (recipeProgress >= currentRecipe.recipeTime()) {
             if (inventory.handleRecipe(currentRecipe)) {
                 // currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
-                SUMMONING_COMPLETE.invoke((ServerLevel) level, worldPosition, currentRecipe, invokingPlayer);
+                SUMMONING_COMPLETE.invoke(level, worldPosition, currentRecipe, invokingPlayer);
                 GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
-                resetSummoning(false);
+                resetSummoning(level, false);
             } else {
                 GameUtils.sendPlayerMessage(invokingPlayer, Constants.INVALID, ChatFormatting.RED);
-                resetSummoning(true);
+                resetSummoning(level, true);
             }
             return;
         }
@@ -91,30 +102,36 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (recipeProgress == 0) {
             changeActivityState(true);
             if (sacrifices != null && !sacrifices.isEmpty()) {
-                sacrifices.stream()
-                    .map(EntitySacrifice::kill)
-                    .filter(positions -> !positions.isEmpty())
-                    .forEach(p -> Platform.sendParticleEmit(level, p));
+                for (EntitySacrifice sacrifice : sacrifices) {
+                    sacrifice.kill();
+                }
             }
         }
         recipeProgress++;
-        Platform.sendProgressUpdate(level, worldPosition, recipeProgress);
+        sendAltarRecipeSyncUpdate(level);
     }
 
-    public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack) {
+    public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
         if (recipeProgress > 0) {
-            GameUtils.sendPlayerMessage(player, Constants.PROGRESS, ChatFormatting.RED);
+            if (!simulate) {
+                GameUtils.sendPlayerMessage(player, Constants.PROGRESS, ChatFormatting.RED);
+            }
             return stack;
         }
 
         if (stack.isEmpty()) {
-            if (player != null && player.isShiftKeyDown()) {
+            if (!simulate && player != null && player.isShiftKeyDown()) {
                 inventory.popLastInserted();
             }
             return ItemStack.EMPTY;
         }
 
+        if (simulate) {
+            return ItemStack.EMPTY;
+        }
+
         if (AltarRecipe.CATALYSTS.stream().anyMatch(ingredient -> ingredient.test(stack))) {
+
             inventory.setCatalyst(stack.copyWithCount(1));
             var recipe = findRecipe();
             if (recipe == null) {
@@ -133,21 +150,28 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return remaining;
     }
 
-    private void resetSummoning(boolean popLastInserted) {
-        assert level != null;
+    private void resetSummoning(ServerLevel level, boolean popLastInserted) {
+        assert this.level != null;
         currentRecipe = null;
         sacrifices = null;
         invokingPlayer = null;
         recipeProgress = 0;
-        Platform.sendProgressUpdate(level, worldPosition, recipeProgress);
         recipeTime = 0;
-        Platform.sendProcessTimeUpdate(level, worldPosition, recipeTime);
+        sendAltarRecipeSyncUpdate(level);
         changeActivityState(false);
         if (popLastInserted) inventory.popLastInserted();
     }
 
+    private void sendAltarRecipeSyncUpdate(ServerLevel level) {
+        PacketHandler.sendToTrackingChunk(
+            level,
+            worldPosition,
+            new AltarRecipeSyncPacket(worldPosition, recipeProgress, recipeTime)
+        );
+    }
+
     private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
-        assert level != null && !level.isClientSide;
+        if (!(level instanceof ServerLevel serverLevel)) return;
 
         // sacrifices = checkSacrifices(recipe.sacrifices(), player);
         // if (sacrifices == null ||
@@ -160,14 +184,14 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         // }
 
         if (!SUMMONING_START.invoke((ServerLevel) level, worldPosition, recipe, player)) {
-            resetSummoning(true);
+            resetSummoning(serverLevel, true);
             return;
         }
         currentRecipe = recipe;
         invokingPlayer = player;
         recipeTime = recipe.recipeTime();
         GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
-        Platform.sendProcessTimeUpdate(level, worldPosition, recipeTime);
+        sendAltarRecipeSyncUpdate(serverLevel);
     }
 
     @Nullable

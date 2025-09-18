@@ -33,11 +33,11 @@ public record AltarRecipe(
             return false;
         }
 
-        var matchedItems = new Ingredient[inv.getContainerSize()];
+        var matchedItems = new Ingredient[inv.getSlots()];
         List<Ingredient> matchedIngredients = new ArrayList<>();
 
-        for (var slot = 0; slot < inv.getItems().size(); slot++) {
-            var stack = inv.getItems().get(slot);
+        for (var slot = 0; slot < inv.size(); slot++) {
+            var stack = inv.getStackInSlot(slot);
             if (!stack.isEmpty() && matchedItems[slot] == null) {
                 for (var input : inputs) {
                     if (!matchedIngredients.contains(input.ingredient()) &&
