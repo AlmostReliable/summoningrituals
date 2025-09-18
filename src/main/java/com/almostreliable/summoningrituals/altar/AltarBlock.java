@@ -1,10 +1,10 @@
 package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.util.MathUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -36,6 +36,8 @@ import org.joml.Vector3f;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class AltarBlock extends TickableEntityBlock implements SimpleWaterloggedBlock {
@@ -43,11 +45,13 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     public static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+
     private static final VoxelShape SHAPE = Stream.of(
         box(3, 0, 3, 13, 2, 13),
         box(5, 2, 5, 11, 9, 11),
         box(2, 9, 2, 14, 13, 14)
     ).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
+    private static final Map<Direction, Vector3f[]> CANDLE_POSITIONS = initCandlePositions();
 
     public AltarBlock(Properties properties) {
         super(properties);
@@ -120,41 +124,78 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        // TODO: extract this complex calculation from the method when the facing changes
-        Vector3f[][] particlePos = MathUtils.getHorizontalVectors(
-            new Vector3f(3.5f, 1.5f, 9.5f),
-            new Vector3f(9.5f, 3.5f, 12.5f),
-            new Vector3f(11.5f, 4.5f, 10.5f)
-        );
-
-        var x = pos.getX();
-        var y = pos.getY() + 1;
-        var z = pos.getZ();
-        var vec = particlePos[state.getValue(FACING).ordinal() - 2];
+        var facing = state.getValue(FACING);
         var active = state.getValue(ACTIVE);
 
+        Vector3f[] candlePositions = CANDLE_POSITIONS.get(facing);
+        BlockPos posAbove = pos.above();
+
         for (var i = 0; i < 3; i++) {
-            if (active) {
-                renderCandleActive(level, x, y, z, vec[i]);
-            } else {
-                renderCandleInactive(level, x, y, z, vec[i]);
-            }
+            renderCandleParticles(
+                level,
+                posAbove,
+                candlePositions[i],
+                active ? ParticleTypes.SOUL : ParticleTypes.SMALL_FLAME,
+                active ? 3 : 0
+            );
         }
     }
 
-    private void renderCandleActive(Level level, int x, int y, int z, Vector3f vec) {
+    private void renderCandleParticles(Level level, BlockPos pos, Vector3f candlePosition, ParticleOptions particleType, int yOffset) {
         level.addParticle(
-            ParticleTypes.SOUL,
-            x + vec.x() / 16f,
-            y + (vec.y() + 2) / 16f,
-            z + vec.z() / 16f,
+            particleType,
+            pos.getX() + candlePosition.x() / 16f,
+            pos.getY() + (candlePosition.y() + yOffset) / 16f,
+            pos.getZ() + candlePosition.z() / 16f,
             0,
             0,
             0
         );
     }
 
-    private void renderCandleInactive(Level level, int x, int y, int z, Vector3f vec) {
-        level.addParticle(ParticleTypes.SMALL_FLAME, x + vec.x() / 16f, y + vec.y() / 16f, z + vec.z() / 16f, 0, 0, 0);
+    private static Map<Direction, Vector3f[]> initCandlePositions() {
+        var candlePositions = new EnumMap<Direction, Vector3f[]>(Direction.class);
+
+        var northPositions = new Vector3f[]{
+            new Vector3f(3.5f, 1.5f, 9.5f),
+            new Vector3f(9.5f, 3.5f, 12.5f),
+            new Vector3f(11.5f, 4.5f, 10.5f)
+        };
+        candlePositions.put(Direction.NORTH, northPositions);
+
+        candlePositions.put(
+            Direction.SOUTH, new Vector3f[]{
+                opposite(northPositions[0]),
+                opposite(northPositions[1]),
+                opposite(northPositions[2])
+            }
+        );
+
+        candlePositions.put(
+            Direction.EAST, new Vector3f[]{
+                neighbor(northPositions[0]),
+                neighbor(northPositions[1]),
+                neighbor(northPositions[2])
+            }
+        );
+
+        candlePositions.put(
+            Direction.WEST, new Vector3f[]{
+                opposite(neighbor(northPositions[0])),
+                opposite(neighbor(northPositions[1])),
+                opposite(neighbor(northPositions[2]))
+            }
+        );
+
+        return candlePositions;
+    }
+
+    private static Vector3f opposite(Vector3f v) {
+        return new Vector3f(16f - v.x(), v.y(), 16f - v.z());
+    }
+
+    private static Vector3f neighbor(Vector3f v) {
+        Vector3f o = opposite(v);
+        return new Vector3f(o.z(), v.y(), v.x());
     }
 }
