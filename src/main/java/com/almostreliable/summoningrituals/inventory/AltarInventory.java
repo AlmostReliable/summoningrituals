@@ -58,7 +58,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.put(Constants.INVENTORY, inventoryTag);
         compoundTag.put(Constants.INSERT_ORDER, insertOrderTag);
-        return (CompoundTag) catalyst.save(provider, compoundTag);
+        compoundTag.put(Constants.CATALYST, catalyst.saveOptional(provider));
+
+        return compoundTag;
     }
 
     @Override
@@ -74,7 +76,8 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
             ItemStack.parse(provider, entryTag).ifPresent(stack -> insertOrder.add(new Tuple<>(stack, slot)));
         }
 
-        ItemStack.parse(provider, tag).ifPresent(stack -> this.catalyst = stack);
+        CompoundTag catalystTag = tag.getCompound(Constants.CATALYST);
+        catalyst = ItemStack.parseOptional(provider, catalystTag);
     }
 
     @Override
