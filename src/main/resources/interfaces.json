@@ -1,0 +1,5 @@
+{
+  "com/mojang/blaze3d/vertex/PoseStack": [
+    "com/almostreliable/summoningrituals/extension/PoseStackExtension"
+  ]
+}
