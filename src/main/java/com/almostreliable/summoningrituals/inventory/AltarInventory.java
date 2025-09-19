@@ -211,8 +211,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
             toRemove += input.count();
             var inputRemoved = 0;
 
-            for (int i = 0; i < inventory.size(); i++) {
-                var stack = inventory.get(i);
+            for (ItemStack stack : inventory) {
                 if (stack.isEmpty() || !input.ingredient().test(stack)) continue;
 
                 var shrinkCount = Math.min(input.count() - inputRemoved, stack.getCount());
@@ -286,8 +285,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     public List<ItemStack> getNoneEmptyItems() {
         var items = new ArrayList<ItemStack>();
-        for (var i = 0; i < inventory.size(); i++) {
-            var stack = inventory.get(i);
+        for (ItemStack stack : inventory) {
             if (!stack.isEmpty()) items.add(stack);
         }
         return items;
