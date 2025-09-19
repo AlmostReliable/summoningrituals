@@ -1,9 +1,9 @@
 package com.almostreliable.summoningrituals.data;
 
 import com.almostreliable.summoningrituals.ModConstants;
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.util.Utils;
 
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
@@ -23,7 +23,7 @@ public class SummoningModels extends BlockStateProvider {
     protected void registerStatesAndModels() {
         var altarBlock = Registration.ALTAR_BLOCK;
         var altarBlockId = altarBlock.getId();
-        var altarBlockModelPath = Utils.getRL("block/" + altarBlockId.getPath());
+        var altarBlockModelPath = SummoningRituals.getRL("block/" + altarBlockId.getPath());
 
         altarBlockStateAndModel(altarBlock, altarBlockModelPath);
         itemModels().simpleBlockItem(altarBlock.get());
