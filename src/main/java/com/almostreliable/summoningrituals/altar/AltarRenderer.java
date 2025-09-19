@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.util.MathUtils;
 
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,6 @@ import com.mojang.math.Axis;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
-    private static final int MAX_RENDER_DISTANCE = 32;
     private static final int MAX_ITEM_HEIGHT = 2;
     private static final int MAX_RESET = 60;
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
@@ -24,6 +24,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     private final Minecraft mc;
     private final ItemRenderer itemRenderer;
+    private final int altarRenderDistance;
 
     private float resetTimer;
     private double oldCircleOffset;
@@ -31,6 +32,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     public AltarRenderer(Context ignoredContext) {
         mc = Minecraft.getInstance();
         itemRenderer = mc.getItemRenderer();
+        altarRenderDistance = Config.CLIENT.altarRenderDistance.get();
     }
 
     @Override
@@ -38,7 +40,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         AltarBlockEntity entity, float partial, PoseStack stack, MultiBufferSource buffer, int light, int overlay
     ) {
         if (mc.player == null || entity.getLevel() == null ||
-            entity.getBlockPos().distSqr(mc.player.blockPosition()) > Math.pow(MAX_RENDER_DISTANCE, 2)) {
+            !entity.getBlockPos().closerThan(mc.player.blockPosition(), altarRenderDistance)) {
             return;
         }
 
