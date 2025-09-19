@@ -28,8 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.almostreliable.summoningrituals.util.TextUtils.f;
-
 public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
@@ -264,7 +262,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             List<BlockPos> positions = new ArrayList<>();
             for (var i = 0; i < count; i++) {
                 var entity = entities.get(i);
-                entity.addTag(f("{}_sacrificed", ModConstants.MOD_ID));
+                entity.addTag(ModConstants.MOD_ID + "_sacrificed");
                 entity.kill();
                 positions.add(entity.blockPosition());
             }
