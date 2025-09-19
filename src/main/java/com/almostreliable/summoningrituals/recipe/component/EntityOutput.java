@@ -1,8 +1,5 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +8,9 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -40,8 +40,7 @@ public record EntityOutput(EntitySpawn entity, Optional<BlockPos> offset, Option
         for (var i = 0; i < entity.count(); i++) {
             var mobEntity = entity.entity().value().create(level);
             if (mobEntity == null) return;
-            var pos = getRandomPos(origin);
-            mobEntity.setPos(pos.x(), pos.y(), pos.z());
+            mobEntity.setPos(getRandomPos(origin));
             entity.nbt().ifPresent(nbt -> {
                 var newNbt = new CompoundTag();
                 mobEntity.saveWithoutId(newNbt);
