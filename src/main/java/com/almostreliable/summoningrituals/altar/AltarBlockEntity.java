@@ -101,7 +101,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (recipeProgress == 0) {
             changeActivityState(true);
             if (sacrifices != null && !sacrifices.isEmpty()) {
-                for (EntitySacrifice sacrifice : sacrifices) {
+                for (var sacrifice : sacrifices) {
                     sacrifice.kill();
                 }
             }
@@ -204,7 +204,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     //     if (sacrifices.isEmpty()) return List.of();
     //     var region = sacrifices.getRegion(worldPosition);
     //     var entities = level.getEntities(player, region);
-    //     List<EntitySacrifice> toKill = new ArrayList<>();
+    //     var toKill = new ArrayList<EntitySacrifice>();
     //     var success = sacrifices.test(sacrifice -> {
     //         var found = entities.stream().filter(sacrifice).toList();
     //         if (found.size() < sacrifice.count()) {
@@ -256,7 +256,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private record EntitySacrifice(List<Entity> entities, int count) {
 
         private List<BlockPos> kill() {
-            List<BlockPos> positions = new ArrayList<>();
+            var positions = new ArrayList<BlockPos>();
             for (var i = 0; i < count; i++) {
                 var entity = entities.get(i);
                 entity.addTag(ModConstants.MOD_ID + "_sacrificed");

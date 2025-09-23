@@ -34,7 +34,7 @@ public record AltarRecipe(
         }
 
         var matchedItems = new Ingredient[inv.getSlots()];
-        List<Ingredient> matchedIngredients = new ArrayList<>();
+        var matchedIngredients = new ArrayList<Ingredient>();
 
         for (var slot = 0; slot < inv.size(); slot++) {
             var stack = inv.getStackInSlot(slot);

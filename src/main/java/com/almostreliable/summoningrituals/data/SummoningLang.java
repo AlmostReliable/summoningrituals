@@ -20,7 +20,7 @@ public final class SummoningLang extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        for (LangEntry entry : LangEntry.ENTRIES) {
+        for (var entry : LangEntry.ENTRIES) {
             add(entry.key, entry.value);
         }
     }
@@ -30,7 +30,7 @@ public final class SummoningLang extends LanguageProvider {
         private static final Set<LangEntry> ENTRIES = new HashSet<>();
 
         public static LangEntry of(String prefix, String id, String value) {
-            LangEntry entry = new LangEntry(String.format("%s.%s.%s", prefix, ModConstants.MOD_ID, id), value);
+            var entry = new LangEntry(String.format("%s.%s.%s", prefix, ModConstants.MOD_ID, id), value);
             ENTRIES.add(entry);
             return entry;
         }

@@ -15,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import org.jetbrains.annotations.Nullable;
 
 public final class GameUtils {
@@ -30,8 +28,8 @@ public final class GameUtils {
     }
 
     public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
-        ItemEntity itemEntity = new ItemEntity(level, 0, 0, 0, stack);
-        Vec3 itemEntityPos = new Vec3(pos.getX() + (offset ? 0.5 : 0), pos.getY() + (offset ? 0.5 : 0), pos.getZ() + (offset ? 0.5 : 0));
+        var itemEntity = new ItemEntity(level, 0, 0, 0, stack);
+        var itemEntityPos = new Vec3(pos.getX() + (offset ? 0.5 : 0), pos.getY() + (offset ? 0.5 : 0), pos.getZ() + (offset ? 0.5 : 0));
         itemEntity.setPos(itemEntityPos);
         level.addFreshEntity(itemEntity);
     }
@@ -46,7 +44,7 @@ public final class GameUtils {
     }
 
     public static void renderText(GuiGraphics guiGraphics, String text, ANCHOR anchor, int x, int y, float scale, int color) {
-        PoseStack stack = guiGraphics.pose();
+        var stack = guiGraphics.pose();
 
         stack.pushPose();
         {

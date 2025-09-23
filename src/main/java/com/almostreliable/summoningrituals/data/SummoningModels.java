@@ -5,7 +5,6 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.core.Registration;
 
-import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
@@ -36,12 +35,12 @@ class SummoningModels extends BlockStateProvider {
 
     private void altarBlockStateAndModel(DeferredBlock<?> block, ResourceLocation modelPath) {
         var model = models().getExistingFile(modelPath);
-        String modelPathActive = modelPath.getPath() + "_active";
+        var modelPathActive = modelPath.getPath() + "_active";
         var modelActive = models().getBuilder(modelPathActive).parent(model).texture("texture", modelPathActive);
 
         getVariantBuilder(block.get()).forAllStatesExcept(
             state -> {
-                Direction facing = state.getValue(AltarBlock.FACING);
+                var facing = state.getValue(AltarBlock.FACING);
                 boolean active = state.getValue(AltarBlock.ACTIVE);
                 return ConfiguredModel.builder()
                     .modelFile(active ? modelActive : model)

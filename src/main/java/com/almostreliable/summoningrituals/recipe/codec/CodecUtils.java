@@ -34,15 +34,15 @@ public final class CodecUtils {
         return new StreamCodec<>() {
             @Override
             public C decode(B buffer) {
-                T1 t1 = codec1.decode(buffer);
-                T2 t2 = codec2.decode(buffer);
-                T3 t3 = codec3.decode(buffer);
-                T4 t4 = codec4.decode(buffer);
-                T5 t5 = codec5.decode(buffer);
-                T6 t6 = codec6.decode(buffer);
-                T7 t7 = codec7.decode(buffer);
-                T8 t8 = codec8.decode(buffer);
-                T9 t9 = codec9.decode(buffer);
+                var t1 = codec1.decode(buffer);
+                var t2 = codec2.decode(buffer);
+                var t3 = codec3.decode(buffer);
+                var t4 = codec4.decode(buffer);
+                var t5 = codec5.decode(buffer);
+                var t6 = codec6.decode(buffer);
+                var t7 = codec7.decode(buffer);
+                var t8 = codec8.decode(buffer);
+                var t9 = codec9.decode(buffer);
                 return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9);
             }
 

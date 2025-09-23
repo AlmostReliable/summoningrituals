@@ -119,8 +119,8 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         var facing = state.getValue(FACING);
         var active = state.getValue(ACTIVE);
 
-        Vector3f[] candlePositions = CANDLE_POSITIONS.get(facing);
-        BlockPos posAbove = pos.above();
+        var candlePositions = CANDLE_POSITIONS.get(facing);
+        var posAbove = pos.above();
 
         for (var i = 0; i < 3; i++) {
             renderCandleParticles(
@@ -177,7 +177,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     }
 
     private static Vector3f neighbor(Vector3f v) {
-        Vector3f o = opposite(v);
+        var o = opposite(v);
         return new Vector3f(o.z(), v.y(), v.x());
     }
 }

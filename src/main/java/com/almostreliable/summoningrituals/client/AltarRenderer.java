@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -46,8 +45,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         AltarBlockEntity altar, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight,
         int packedOverlay
     ) {
-        Player player = Minecraft.getInstance().player;
-        Level level = altar.getLevel();
+        var player = Minecraft.getInstance().player;
+        var level = altar.getLevel();
 
         if (player == null || level == null || !altar.getBlockPos().closerThan(player.blockPosition(), altarRenderDistance)) {
             return;
@@ -66,19 +65,19 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         PoseStack stack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level,
         float partialTick, int packedOverlay
     ) {
-        BlockPos altarPos = altar.getBlockPos();
-        Vec3 altarCenterPos = Vec3.atCenterOf(altarPos);
+        var altarPos = altar.getBlockPos();
+        var altarCenterPos = Vec3.atCenterOf(altarPos);
 
-        Vec3 playerPos = player.position();
-        float playerToAltarDistance = (float) altarCenterPos.distanceTo(playerPos);
-        double playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
-        float playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);
+        var playerPos = player.position();
+        var playerToAltarDistance = (float) altarCenterPos.distanceTo(playerPos);
+        var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
+        var playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);
 
         float recipeProgress = altar.getRecipeProgress();
         float recipeTime = altar.getRecipeTime();
-        float recipeProgressRatio = ratio(recipeProgress, recipeTime, 0f);
+        var recipeProgressRatio = ratio(recipeProgress, recipeTime, 0f);
 
-        int lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
+        var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
 
         var renderContext = new RenderContext(
             altar,
@@ -103,10 +102,10 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     }
 
     private void renderCatalyst(RenderContext renderContext) {
-        ItemStack catalyst = renderContext.altar.getInventory().getCatalyst();
+        var catalyst = renderContext.altar.getInventory().getCatalyst();
         if (catalyst.isEmpty()) return;
 
-        PoseStack stack = renderContext.stack;
+        var stack = renderContext.stack;
         stack.pushPose();
         {
             stack.translate(0, invert(0.75f * renderContext.recipeProgressRatio), 0);
@@ -121,20 +120,20 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var inputs = renderContext.altar.getInventory().getNoneEmptyItems();
         if (inputs.isEmpty()) return;
 
-        float axisRotation = clampRotation(renderContext.level.getGameTime());
-        float scale = invert(renderContext.recipeProgressRatio);
+        var axisRotation = clampRotation(renderContext.level.getGameTime());
+        var scale = invert(renderContext.recipeProgressRatio);
         if (recipeProgress == 0 && resetTimer > 0) {
             scale = invert(ratio(resetTimer, MAX_RESET, 0f));
             resetTimer = Math.max(0, resetTimer - renderContext.partialTick);
         }
 
-        PoseStack stack = renderContext.stack;
+        var stack = renderContext.stack;
         stack.summoning$scale(scale);
 
-        for (int i = 0; i < inputs.size(); i++) {
+        for (var i = 0; i < inputs.size(); i++) {
             stack.pushPose();
             {
-                float itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
+                var itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
 
                 float circleOffset;
                 if (recipeProgress > 0) {
@@ -144,11 +143,11 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                     oldCircleOffset = circleOffset;
                 }
 
-                float rotationDiff = clampRotation(axisRotation + itemRotation - circleOffset);
+                var rotationDiff = clampRotation(axisRotation + itemRotation - circleOffset);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
-                float newHeight = (rotationDiff / HALF_CIRCLE) * MAX_ITEM_HEIGHT;
+                var newHeight = (rotationDiff / HALF_CIRCLE) * MAX_ITEM_HEIGHT;
 
-                float playerOffset = Math.max(1f - playerToAltarDistance / 8f, 0f);
+                var playerOffset = Math.max(1f - playerToAltarDistance / 8f, 0f);
                 newHeight *= playerOffset;
 
                 stack.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + axisRotation)));

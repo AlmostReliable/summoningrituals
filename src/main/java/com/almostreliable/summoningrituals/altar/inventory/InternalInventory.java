@@ -5,7 +5,6 @@ import com.almostreliable.summoningrituals.core.Constants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 
@@ -51,13 +50,13 @@ final class InternalInventory implements INBTSerializable<ListTag>, Iterable<Ite
     @Override
     @UnknownNullability
     public ListTag serializeNBT(HolderLookup.Provider provider) {
-        ListTag itemsListTag = new ListTag();
+        var itemsListTag = new ListTag();
 
-        for (int i = 0; i < items.length; i++) {
+        for (var i = 0; i < items.length; i++) {
             if (items[i].isEmpty()) continue;
-            CompoundTag itemTag = new CompoundTag();
+            var itemTag = new CompoundTag();
             itemTag.putInt(Constants.SLOT, i);
-            Tag finishedItemTag = items[i].save(provider, itemTag);
+            var finishedItemTag = items[i].save(provider, itemTag);
             itemsListTag.add(finishedItemTag);
         }
 
@@ -68,9 +67,9 @@ final class InternalInventory implements INBTSerializable<ListTag>, Iterable<Ite
     public void deserializeNBT(HolderLookup.Provider provider, ListTag listTag) {
         items = new ItemStack[listTag.size()];
 
-        for (int i = 0; i < listTag.size(); i++) {
-            CompoundTag itemTag = listTag.getCompound(i);
-            int slot = itemTag.getInt(Constants.SLOT);
+        for (var i = 0; i < listTag.size(); i++) {
+            var itemTag = listTag.getCompound(i);
+            var slot = itemTag.getInt(Constants.SLOT);
             ItemStack.parse(provider, itemTag).ifPresent(stack -> items[slot] = stack);
         }
     }

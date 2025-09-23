@@ -4,7 +4,6 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -31,7 +30,7 @@ public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryD
     }
 
     public static void handle(AltarInventorySyncPacket packet, IPayloadContext ignoredCtx) {
-        ClientLevel level = Minecraft.getInstance().level;
+        var level = Minecraft.getInstance().level;
         if (level == null) return;
 
         level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get())

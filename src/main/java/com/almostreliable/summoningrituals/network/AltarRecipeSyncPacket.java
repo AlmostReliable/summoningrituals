@@ -4,7 +4,6 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -32,7 +31,7 @@ public record AltarRecipeSyncPacket(BlockPos altarPos, int recipeProgress, int r
     }
 
     public static void handle(AltarRecipeSyncPacket packet, IPayloadContext ignoredCtx) {
-        ClientLevel level = Minecraft.getInstance().level;
+        var level = Minecraft.getInstance().level;
         if (level == null) return;
 
         level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get()).ifPresent(altar -> {

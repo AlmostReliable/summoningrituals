@@ -40,8 +40,8 @@ public record RecipeSacrifices(List<Sacrifice> sacrifices, BlockPos region) {
     }
 
     public AABB getRegion(BlockPos pos) {
-        BlockPos startBounds = pos.offset(region.multiply(-1));
-        BlockPos endBounds = pos.offset(region);
+        var startBounds = pos.offset(region.multiply(-1));
+        var endBounds = pos.offset(region);
         return new AABB(
             new Vec3(startBounds.getX(), startBounds.getY(), startBounds.getZ()),
             new Vec3(endBounds.getX(), endBounds.getY(), endBounds.getZ())

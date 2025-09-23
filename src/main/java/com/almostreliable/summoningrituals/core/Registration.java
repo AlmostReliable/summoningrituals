@@ -121,8 +121,8 @@ public final class Registration {
     ) {
         return BLOCK_ENTITIES.register(
             id.getPath(), () -> {
-                Block[] blockArray = new Block[blocks.length];
-                for (int i = 0; i < blocks.length; i++) {
+                var blockArray = new Block[blocks.length];
+                for (var i = 0; i < blocks.length; i++) {
                     blockArray[i] = blocks[i].get();
                 }
                 return Builder.of(factory, blockArray).build(null);
