@@ -13,11 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SummoningTags extends BlockTagsProvider {
+class SummoningTags extends BlockTagsProvider {
 
-    public SummoningTags(
-        PackOutput output, CompletableFuture<HolderLookup.Provider> registries, @Nullable ExistingFileHelper existingFileHelper
-    ) {
+    SummoningTags(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, registries, ModConstants.MOD_ID, existingFileHelper);
     }
 

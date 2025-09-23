@@ -13,7 +13,7 @@ import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
-public class SummoningModels extends BlockStateProvider {
+class SummoningModels extends BlockStateProvider {
 
     SummoningModels(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, ModConstants.MOD_ID, existingFileHelper);
@@ -39,16 +39,15 @@ public class SummoningModels extends BlockStateProvider {
         String modelPathActive = modelPath.getPath() + "_active";
         var modelActive = models().getBuilder(modelPathActive).parent(model).texture("texture", modelPathActive);
 
-        getVariantBuilder(block.get())
-            .forAllStatesExcept(
-                state -> {
-                    Direction facing = state.getValue(AltarBlock.FACING);
-                    boolean active = state.getValue(AltarBlock.ACTIVE);
-                    return ConfiguredModel.builder()
-                        .modelFile(active ? modelActive : model)
-                        .rotationY(((int) facing.toYRot() + 180) % 360)
-                        .build();
-                }, AltarBlock.WATERLOGGED
-            );
+        getVariantBuilder(block.get()).forAllStatesExcept(
+            state -> {
+                Direction facing = state.getValue(AltarBlock.FACING);
+                boolean active = state.getValue(AltarBlock.ACTIVE);
+                return ConfiguredModel.builder()
+                    .modelFile(active ? modelActive : model)
+                    .rotationY(((int) facing.toYRot() + 180) % 360)
+                    .build();
+            }, AltarBlock.WATERLOGGED
+        );
     }
 }

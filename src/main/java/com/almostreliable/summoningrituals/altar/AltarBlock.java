@@ -47,21 +47,14 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    private static final VoxelShape SHAPE = Stream.of(
-        box(3, 0, 3, 13, 2, 13),
-        box(5, 2, 5, 11, 9, 11),
-        box(2, 9, 2, 14, 13, 14)
-    ).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
+    private static final VoxelShape SHAPE = Stream.of(box(3, 0, 3, 13, 2, 13), box(5, 2, 5, 11, 9, 11), box(2, 9, 2, 14, 13, 14))
+        .reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR))
+        .get();
     private static final Map<Direction, Vector3f[]> CANDLE_POSITIONS = initCandlePositions();
 
     public AltarBlock(Properties properties) {
         super(properties);
-        registerDefaultState(
-            defaultBlockState()
-                .setValue(FACING, Direction.NORTH)
-                .setValue(ACTIVE, false)
-                .setValue(WATERLOGGED, false)
-        );
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ACTIVE, false).setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -87,7 +80,8 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public BlockState updateShape(
-        BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos, BlockPos nPos
+        BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos,
+        BlockPos nPos
     ) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
@@ -113,10 +107,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     ) {
         if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setItemInHand(
-                    InteractionHand.MAIN_HAND,
-                    altar.handleInteraction(serverPlayer, stack, false)
-                );
+                serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, altar.handleInteraction(serverPlayer, stack, false));
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
@@ -158,33 +149,23 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         var candlePositions = new EnumMap<Direction, Vector3f[]>(Direction.class);
 
         var northPositions = new Vector3f[]{
-            new Vector3f(3.5f, 1.5f, 9.5f),
-            new Vector3f(9.5f, 3.5f, 12.5f),
-            new Vector3f(11.5f, 4.5f, 10.5f)
+            new Vector3f(3.5f, 1.5f, 9.5f), new Vector3f(9.5f, 3.5f, 12.5f), new Vector3f(11.5f, 4.5f, 10.5f)
         };
         candlePositions.put(Direction.NORTH, northPositions);
 
         candlePositions.put(
-            Direction.SOUTH, new Vector3f[]{
-                opposite(northPositions[0]),
-                opposite(northPositions[1]),
-                opposite(northPositions[2])
-            }
+            Direction.SOUTH,
+            new Vector3f[]{opposite(northPositions[0]), opposite(northPositions[1]), opposite(northPositions[2])}
         );
 
         candlePositions.put(
-            Direction.EAST, new Vector3f[]{
-                neighbor(northPositions[0]),
-                neighbor(northPositions[1]),
-                neighbor(northPositions[2])
-            }
+            Direction.EAST,
+            new Vector3f[]{neighbor(northPositions[0]), neighbor(northPositions[1]), neighbor(northPositions[2])}
         );
 
         candlePositions.put(
             Direction.WEST, new Vector3f[]{
-                opposite(neighbor(northPositions[0])),
-                opposite(neighbor(northPositions[1])),
-                opposite(neighbor(northPositions[2]))
+                opposite(neighbor(northPositions[0])), opposite(neighbor(northPositions[1])), opposite(neighbor(northPositions[2]))
             }
         );
 

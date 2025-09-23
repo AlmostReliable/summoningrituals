@@ -162,11 +162,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     private void sendAltarRecipeSyncUpdate(ServerLevel level) {
-        PacketHandler.sendToTrackingChunk(
-            level,
-            worldPosition,
-            new AltarRecipeSyncPacket(worldPosition, recipeProgress, recipeTime)
-        );
+        PacketHandler.sendToTrackingChunk(level, worldPosition, new AltarRecipeSyncPacket(worldPosition, recipeProgress, recipeTime));
     }
 
     private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
@@ -182,7 +178,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         //     return;
         // }
 
-        if (!SUMMONING_START.invoke((ServerLevel) level, worldPosition, recipe, player)) {
+        if (!SUMMONING_START.invoke(serverLevel, worldPosition, recipe, player)) {
             resetSummoning(serverLevel, true);
             return;
         }

@@ -23,25 +23,15 @@ public final class GameUtils {
 
     private GameUtils() {}
 
-    public static void sendPlayerMessage(
-        @Nullable Player player, String translationKey, ChatFormatting color, Object... args
-    ) {
+    public static void sendPlayerMessage(@Nullable Player player, String translationKey, ChatFormatting color, Object... args) {
         if (player == null) return;
-        player.sendSystemMessage(
-            Component.translatable(
-                String.format("%s.%s.%s", "message", ModConstants.MOD_ID, translationKey),
-                args
-            ).withStyle(color)
-        );
+        player.sendSystemMessage(Component.translatable(String.format("%s.%s.%s", "message", ModConstants.MOD_ID, translationKey), args)
+            .withStyle(color));
     }
 
     public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
         ItemEntity itemEntity = new ItemEntity(level, 0, 0, 0, stack);
-        Vec3 itemEntityPos = new Vec3(
-            pos.getX() + (offset ? 0.5 : 0),
-            pos.getY() + (offset ? 0.5 : 0),
-            pos.getZ() + (offset ? 0.5 : 0)
-        );
+        Vec3 itemEntityPos = new Vec3(pos.getX() + (offset ? 0.5 : 0), pos.getY() + (offset ? 0.5 : 0), pos.getZ() + (offset ? 0.5 : 0));
         itemEntity.setPos(itemEntityPos);
         level.addFreshEntity(itemEntity);
     }
@@ -55,9 +45,7 @@ public final class GameUtils {
         renderText(guiGraphics, text, ANCHOR.BOTTOM_RIGHT, x + 2, y + 2, 1, 0xFF_FFFF);
     }
 
-    public static void renderText(
-        GuiGraphics guiGraphics, String text, ANCHOR anchor, int x, int y, float scale, int color
-    ) {
+    public static void renderText(GuiGraphics guiGraphics, String text, ANCHOR anchor, int x, int y, float scale, int color) {
         PoseStack stack = guiGraphics.pose();
 
         stack.pushPose();

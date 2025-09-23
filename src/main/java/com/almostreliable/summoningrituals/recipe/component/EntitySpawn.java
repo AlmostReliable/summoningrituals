@@ -1,7 +1,5 @@
 package com.almostreliable.summoningrituals.recipe.component;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -10,6 +8,9 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.EntityType;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public record EntitySpawn(Holder<EntityType<?>> entity, int count, Optional<Comp
         ByteBufCodecs.VAR_INT,
         EntitySpawn::count,
         ByteBufCodecs.COMPOUND_TAG,
-        (e) -> e.nbt().orElse(new CompoundTag()),
+        e -> e.nbt().orElse(new CompoundTag()),
         (entityTypeHolder, integer, compoundTag) -> new EntitySpawn(entityTypeHolder, integer, Optional.of(compoundTag))
     );
 }

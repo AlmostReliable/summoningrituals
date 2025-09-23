@@ -32,26 +32,16 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         RecipeSacrifices.CODEC.optionalFieldOf("sacrifices").forGetter(AltarRecipe::sacrifices),
         Codec.INT.optionalFieldOf("recipeTime", 100).forGetter(AltarRecipe::recipeTime),
         LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(AltarRecipe::summoningConditions)
-    ).apply(
-        i,
-        AltarRecipe::new
-    )).validate(AltarRecipeSerializer::validateRecipe);
+    ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = NeoForgeStreamCodecs.composite(
-        Ingredient.CONTENTS_STREAM_CODEC,
-        AltarRecipe::catalyst,
-        ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
-        AltarRecipe::itemOutputs,
-        EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
-        AltarRecipe::entityOutputs,
-        SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()),
-        AltarRecipe::inputs,
-        ByteBufCodecs.optional(RecipeSacrifices.STREAM_CODEC),
-        AltarRecipe::sacrifices,
-        ByteBufCodecs.VAR_INT,
-        AltarRecipe::recipeTime,
-        LootConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()),
-        AltarRecipe::summoningConditions,
+        Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::catalyst,
+        ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
+        EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
+        SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::inputs,
+        ByteBufCodecs.optional(RecipeSacrifices.STREAM_CODEC), AltarRecipe::sacrifices,
+        ByteBufCodecs.VAR_INT, AltarRecipe::recipeTime,
+        LootConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::summoningConditions,
         AltarRecipe::new
     );
 

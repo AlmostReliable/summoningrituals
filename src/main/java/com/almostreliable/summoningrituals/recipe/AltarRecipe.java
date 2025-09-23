@@ -40,8 +40,11 @@ public record AltarRecipe(
             var stack = inv.getStackInSlot(slot);
             if (!stack.isEmpty() && matchedItems[slot] == null) {
                 for (var input : inputs) {
-                    if (!matchedIngredients.contains(input.ingredient()) &&
-                        input.ingredient().test(stack) && stack.getCount() >= input.count()) {
+                    if (
+                        !matchedIngredients.contains(input.ingredient()) &&
+                            input.ingredient().test(stack) &&
+                            stack.getCount() >= input.count()
+                    ) {
                         matchedItems[slot] = input.ingredient();
                         matchedIngredients.add(input.ingredient());
                     }

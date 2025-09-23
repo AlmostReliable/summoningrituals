@@ -27,11 +27,7 @@ public final class PacketHandler {
             AltarInventorySyncPacket.STREAM_CODEC,
             wrapHandler(AltarInventorySyncPacket::handle)
         );
-        registrar.playToClient(
-            AltarRecipeSyncPacket.TYPE,
-            AltarRecipeSyncPacket.STREAM_CODEC,
-            wrapHandler(AltarRecipeSyncPacket::handle)
-        );
+        registrar.playToClient(AltarRecipeSyncPacket.TYPE, AltarRecipeSyncPacket.STREAM_CODEC, wrapHandler(AltarRecipeSyncPacket::handle));
     }
 
     private static <T extends CustomPacketPayload> IPayloadHandler<T> wrapHandler(IPayloadHandler<T> handler) {
@@ -39,10 +35,6 @@ public final class PacketHandler {
     }
 
     public static void sendToTrackingChunk(ServerLevel level, BlockPos pos, CustomPacketPayload packet) {
-        PacketDistributor.sendToPlayersTrackingChunk(
-            level,
-            level.getChunkAt(pos).getPos(),
-            packet
-        );
+        PacketDistributor.sendToPlayersTrackingChunk(level, level.getChunkAt(pos).getPos(), packet);
     }
 }

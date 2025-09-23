@@ -75,56 +75,39 @@ public final class LootConditionStreamCodecs {
     }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
-        emptyOptionalStreamCodec(),
-        $ -> Optional.empty(),
-        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)),
-        LocationPredicate::biomes,
-        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.STRUCTURE)),
-        LocationPredicate::structures,
-        ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)),
-        LocationPredicate::dimension,
-        emptyOptionalStreamCodec(),
-        $ -> Optional.empty(),
-        emptyOptionalStreamCodec(),
-        $ -> Optional.empty(),
-        emptyOptionalStreamCodec(),
-        $ -> Optional.empty(),
-        emptyOptionalStreamCodec(),
-        $ -> Optional.empty(),
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL),
-        LocationPredicate::canSeeSky,
+        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
+        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.STRUCTURE)), LocationPredicate::structures,
+        ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
+        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::canSeeSky,
         LocationPredicate::new
     );
 
     public static final StreamCodec<FriendlyByteBuf, IntRange> INT_RANGE_STREAM_CODEC = StreamCodec.composite(
-        NUMBER_PROVIDER_STREAM_CODEC,
-        intRange -> intRange.min,
-        NUMBER_PROVIDER_STREAM_CODEC,
-        intRange -> intRange.max,
+        NUMBER_PROVIDER_STREAM_CODEC, intRange -> intRange.min,
+        NUMBER_PROVIDER_STREAM_CODEC, intRange -> intRange.max,
         IntRange::new
     );
 
     public static final StreamCodec<FriendlyByteBuf, TimeCheck> TIME_CHECK_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG),
-        TimeCheck::period,
-        INT_RANGE_STREAM_CODEC,
-        TimeCheck::value,
+        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), TimeCheck::period,
+        INT_RANGE_STREAM_CODEC, TimeCheck::value,
         TimeCheck::new
     );
 
     public static final StreamCodec<FriendlyByteBuf, WeatherCheck> WEATHER_CHECK_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL),
-        WeatherCheck::isRaining,
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL),
-        WeatherCheck::isThundering,
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL), WeatherCheck::isRaining,
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL), WeatherCheck::isThundering,
         WeatherCheck::new
     );
 
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationCheck> LOCATION_CHECK_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(LOCATION_PREDICATE_STREAM_CODEC),
-        LocationCheck::predicate,
-        BlockPos.STREAM_CODEC,
-        LocationCheck::offset,
+        ByteBufCodecs.optional(LOCATION_PREDICATE_STREAM_CODEC), LocationCheck::predicate,
+        BlockPos.STREAM_CODEC, LocationCheck::offset,
         LocationCheck::new
     );
 

@@ -18,8 +18,10 @@ public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryD
     static final Type<AltarInventorySyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_inventory_sync"));
 
     static final StreamCodec<FriendlyByteBuf, AltarInventorySyncPacket> STREAM_CODEC = StreamCodec.composite(
-        BlockPos.STREAM_CODEC, AltarInventorySyncPacket::altarPos,
-        ByteBufCodecs.COMPOUND_TAG, AltarInventorySyncPacket::inventoryData,
+        BlockPos.STREAM_CODEC,
+        AltarInventorySyncPacket::altarPos,
+        ByteBufCodecs.COMPOUND_TAG,
+        AltarInventorySyncPacket::inventoryData,
         AltarInventorySyncPacket::new
     );
 
@@ -32,8 +34,7 @@ public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryD
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
 
-        level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get()).ifPresent(
-            altar -> altar.getInventory().deserializeNBT(level.registryAccess(), packet.inventoryData())
-        );
+        level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get())
+            .ifPresent(altar -> altar.getInventory().deserializeNBT(level.registryAccess(), packet.inventoryData()));
     }
 }

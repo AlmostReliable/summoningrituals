@@ -63,8 +63,7 @@ public final class Registration {
     // @formatter:on
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<AltarRecipe>> ALTAR_RECIPE_TYPE = RECIPE_TYPES.register(
-        Constants.ALTAR,
-        () -> new RecipeType<>() {
+        Constants.ALTAR, () -> new RecipeType<>() {
             @Override
             public String toString() {
                 return Constants.ALTAR;
@@ -104,12 +103,10 @@ public final class Registration {
         var block = BLOCKS.registerBlock(
             id,
             factory,
-            propertiesConfigurator.apply(
-                BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.WOOD)
-                    .sound(SoundType.WOOD)
-                    .sound(SoundType.STONE)
-            )
+            propertiesConfigurator.apply(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.WOOD)
+                .sound(SoundType.WOOD)
+                .sound(SoundType.STONE))
         );
         ITEMS.registerSimpleBlockItem(block);
         SummoningLang.LangEntry.of("block", id, name);
@@ -119,7 +116,8 @@ public final class Registration {
 
     @SuppressWarnings("DataFlowIssue")
     private static <E extends BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> registerBlockEntity(
-        ResourceLocation id, BlockEntityType.BlockEntitySupplier<E> factory, DeferredBlock<?>... blocks
+        ResourceLocation id,
+        BlockEntityType.BlockEntitySupplier<E> factory, DeferredBlock<?>... blocks
     ) {
         return BLOCK_ENTITIES.register(
             id.getPath(), () -> {

@@ -43,7 +43,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     @Override
     public void render(
-        AltarBlockEntity altar, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight, int packedOverlay
+        AltarBlockEntity altar, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight,
+        int packedOverlay
     ) {
         Player player = Minecraft.getInstance().player;
         Level level = altar.getLevel();
@@ -62,7 +63,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     }
 
     private void renderInventoryContents(
-        PoseStack stack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level, float partialTick, int packedOverlay
+        PoseStack stack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level,
+        float partialTick, int packedOverlay
     ) {
         BlockPos altarPos = altar.getBlockPos();
         Vec3 altarCenterPos = Vec3.atCenterOf(altarPos);

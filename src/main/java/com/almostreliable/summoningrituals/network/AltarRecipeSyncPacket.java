@@ -17,9 +17,12 @@ public record AltarRecipeSyncPacket(BlockPos altarPos, int recipeProgress, int r
     static final Type<AltarRecipeSyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_recipe_sync"));
 
     static final StreamCodec<FriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
-        BlockPos.STREAM_CODEC, AltarRecipeSyncPacket::altarPos,
-        ByteBufCodecs.VAR_INT, AltarRecipeSyncPacket::recipeProgress,
-        ByteBufCodecs.VAR_INT, AltarRecipeSyncPacket::recipeTime,
+        BlockPos.STREAM_CODEC,
+        AltarRecipeSyncPacket::altarPos,
+        ByteBufCodecs.VAR_INT,
+        AltarRecipeSyncPacket::recipeProgress,
+        ByteBufCodecs.VAR_INT,
+        AltarRecipeSyncPacket::recipeTime,
         AltarRecipeSyncPacket::new
     );
 
