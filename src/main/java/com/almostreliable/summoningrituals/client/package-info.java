@@ -1,4 +1,4 @@
 @NonnullDefault
-package com.almostreliable.summoningrituals.inventory;
+package com.almostreliable.summoningrituals.client;
 
 import org.lwjgl.system.NonnullDefault;

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
+import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;

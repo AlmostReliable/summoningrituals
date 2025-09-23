@@ -1,9 +1,10 @@
 package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.ModConstants;
+import com.almostreliable.summoningrituals.altar.base.TickableBlockEntity;
+import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;

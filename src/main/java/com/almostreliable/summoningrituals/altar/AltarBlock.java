@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.altar.base.TickableEntityBlock;
 import com.almostreliable.summoningrituals.core.Constants;
 
 import net.minecraft.core.BlockPos;

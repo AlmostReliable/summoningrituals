@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.altar;
+package com.almostreliable.summoningrituals.altar.base;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;

@@ -1,5 +1,6 @@
-package com.almostreliable.summoningrituals.altar;
+package com.almostreliable.summoningrituals.client;
 
+import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Config;
 
 import net.minecraft.client.Minecraft;

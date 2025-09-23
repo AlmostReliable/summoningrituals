@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.altar;
+package com.almostreliable.summoningrituals.altar.base;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

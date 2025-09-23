@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals;
 
-import com.almostreliable.summoningrituals.altar.AltarRenderer;
+import com.almostreliable.summoningrituals.client.AltarRenderer;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import net.neoforged.api.distmarker.Dist;
