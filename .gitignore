@@ -1,5 +1,10 @@
 ### Intellij ###
-.idea/
+.idea/*
+# code style
+!.idea/codeStyles/
+# inspections
+!.idea/inspectionProfiles/
+
 *.iml
 *.ipr
 
@@ -52,6 +57,8 @@ build/
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-### Project ###
+### Minecraft ###
+# run config directory
 run/
+# data gen cache
 **/.cache/
