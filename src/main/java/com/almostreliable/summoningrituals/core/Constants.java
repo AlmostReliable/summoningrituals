@@ -17,6 +17,7 @@ public final class Constants {
     public static final String INVALID = "invalid";
     public static final String INVENTORY = "inventory";
     public static final String ITEM = "item";
+    public static final String ITEMS = "items";
     public static final String RECIPE_VIEWER = "recipe_viewer";
     public static final String LABEL = "label";
     public static final String MOB = "mob";

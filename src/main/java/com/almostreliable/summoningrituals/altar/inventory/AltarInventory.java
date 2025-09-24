@@ -74,7 +74,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     @Override
     public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        var inventoryTag = tag.getList(Constants.INVENTORY, Tag.TAG_COMPOUND);
+        var inventoryTag = tag.getCompound(Constants.INVENTORY);
         inventory.deserializeNBT(registryAccess, inventoryTag);
 
         if (tag.contains(Constants.INSERT_ORDER)) {
