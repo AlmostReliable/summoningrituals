@@ -125,12 +125,15 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return ItemStack.EMPTY;
         }
 
+        if (!AltarRecipe.isInput(stack.getItem())) {
+            return stack;
+        }
+
         if (simulate) {
             return ItemStack.EMPTY;
         }
 
-        if (AltarRecipe.CATALYSTS.stream().anyMatch(ingredient -> ingredient.test(stack))) {
-
+        if (AltarRecipe.isCatalyst(stack.getItem())) {
             inventory.setCatalyst(stack.copyWithCount(1));
             var recipe = findRecipe();
             if (recipe == null) {

@@ -122,7 +122,11 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return true;
+        if (slot == getCatalystSlot()) {
+            return AltarRecipe.isCatalyst(stack.getItem());
+        }
+
+        return AltarRecipe.isInput(stack.getItem());
     }
 
     @Override

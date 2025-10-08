@@ -58,6 +58,15 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.altarInventorySize.get());
         }
 
+        for (var stack : recipe.catalyst().getItems()) {
+            AltarRecipe.addCatalyst(stack.getItem());
+        }
+        for (var input : recipe.inputs()) {
+            for (var stack : input.getItems()) {
+                AltarRecipe.addInput(stack.getItem());
+            }
+        }
+
         return DataResult.success(recipe);
     }
 

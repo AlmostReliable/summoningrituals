@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -17,15 +18,18 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public record AltarRecipe(
     Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> inputs,
     Optional<RecipeSacrifices> sacrifices, int recipeTime, List<LootItemCondition> summoningConditions
 ) implements Recipe<AltarInventory> {
 
-    public static final List<Ingredient> CATALYSTS = new ArrayList<>();
+    private static final Set<Item> CATALYSTS = new HashSet<>();
+    private static final Set<Item> INPUTS = new HashSet<>();
 
     @Override
     public boolean matches(AltarInventory inv, Level level) {
@@ -83,5 +87,26 @@ public record AltarRecipe(
     @Override
     public RecipeType<?> getType() {
         return Registration.ALTAR_RECIPE_TYPE.get();
+    }
+
+    public static boolean isCatalyst(Item item) {
+        return CATALYSTS.contains(item);
+    }
+
+    public static boolean isInput(Item item) {
+        return INPUTS.contains(item);
+    }
+
+    public static void addCatalyst(Item item) {
+        CATALYSTS.add(item);
+    }
+
+    public static void addInput(Item item) {
+        INPUTS.add(item);
+    }
+
+    public static void clearCaches() {
+        CATALYSTS.clear();
+        INPUTS.clear();
     }
 }
