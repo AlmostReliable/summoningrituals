@@ -1,0 +1,90 @@
+package com.almostreliable.summoningrituals.recipe.component;
+
+import com.almostreliable.summoningrituals.core.Constants;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
+
+    public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
+    public static final EntityInputs EMPTY = new EntityInputs(List.of(), DEFAULT_ZONE);
+
+    public static final Codec<EntityInputs> CODEC = RecordCodecBuilder.create(i -> i.group(
+        EntityInput.CODEC.listOf().fieldOf("inputs").forGetter(EntityInputs::inputs),
+        BlockPos.CODEC.optionalFieldOf("zone", DEFAULT_ZONE).forGetter(EntityInputs::zone)
+    ).apply(i, EntityInputs::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, EntityInputs> STREAM_CODEC = StreamCodec.composite(
+        EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), EntityInputs::inputs,
+        BlockPos.STREAM_CODEC, EntityInputs::zone,
+        EntityInputs::new
+    );
+
+    @Nullable
+    public List<Entity> getSacrifices(BlockPos pos, Function<AABB, List<Entity>> entityCollector) {
+        var region = constructRegion(pos);
+        var entities = entityCollector.apply(region);
+        var sacrifices = new ArrayList<Entity>();
+
+        for (var input : inputs) {
+            var requiredCount = input.count();
+            var matchingEntities = entities.stream().filter(input).toList();
+
+            if (matchingEntities.size() < requiredCount) return null;
+
+            sacrifices.addAll(matchingEntities.subList(0, requiredCount));
+        }
+
+        return sacrifices;
+    }
+
+    private AABB constructRegion(BlockPos pos) {
+        var startBounds = pos.offset(zone.multiply(-1));
+        var endBounds = pos.offset(zone);
+        return new AABB(
+            new Vec3(startBounds.getX(), startBounds.getY(), startBounds.getZ()),
+            new Vec3(endBounds.getX(), endBounds.getY(), endBounds.getZ())
+        );
+    }
+
+    public boolean isEmpty() {
+        return inputs.isEmpty();
+    }
+
+    public record EntityInput(Holder<EntityType<?>> entityType, int count) implements Predicate<Entity> {
+
+        public static final Codec<EntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
+            BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity").forGetter(EntityInput::entityType),
+            Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(EntityInput::count)
+        ).apply(i, EntityInput::new));
+        public static final StreamCodec<RegistryFriendlyByteBuf, EntityInput> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), EntityInput::entityType,
+            ByteBufCodecs.VAR_INT, EntityInput::count,
+            EntityInput::new
+        );
+
+        @Override
+        public boolean test(Entity entity) {
+            return entity.isAlive() && entityType.equals(entity.getType());
+        }
+    }
+}

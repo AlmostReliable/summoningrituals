@@ -105,13 +105,23 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
         InteractionHand hand, BlockHitResult hitResult
     ) {
-        if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
-            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, altar.handleInteraction(serverPlayer, stack, false));
-            }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        if (!(level.getBlockEntity(pos) instanceof AltarBlockEntity altar)) {
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+
+        if (player instanceof ServerPlayer serverPlayer && hand == InteractionHand.MAIN_HAND) {
+            if (stack.isEmpty()) {
+                if (player.isShiftKeyDown()) {
+                    altar.removeLastInsertedItem();
+                }
+                return ItemInteractionResult.CONSUME;
+            }
+
+            var remainder = altar.handleItemInsertion(serverPlayer, stack, false);
+            serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
+        }
+
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

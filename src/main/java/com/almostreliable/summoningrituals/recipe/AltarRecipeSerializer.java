@@ -2,9 +2,9 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.recipe.codec.LootConditionStreamCodecs;
+import com.almostreliable.summoningrituals.recipe.component.EntityInputs;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
-import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -26,22 +26,22 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     public static final MapCodec<AltarRecipe> CODEC = RecordCodecBuilder.<AltarRecipe> mapCodec(i -> i.group(
         Ingredient.CODEC_NONEMPTY.fieldOf("catalyst").forGetter(AltarRecipe::catalyst),
-        ItemOutput.CODEC.listOf().optionalFieldOf("itemOutputs", List.of()).forGetter(AltarRecipe::itemOutputs),
-        EntityOutput.CODEC.listOf().optionalFieldOf("entityOutputs", List.of()).forGetter(AltarRecipe::entityOutputs),
-        SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf("inputs", List.of()).forGetter(AltarRecipe::inputs),
-        RecipeSacrifices.CODEC.optionalFieldOf("sacrifices").forGetter(AltarRecipe::sacrifices),
-        Codec.INT.optionalFieldOf("recipeTime", 100).forGetter(AltarRecipe::recipeTime),
-        LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(AltarRecipe::summoningConditions)
+        ItemOutput.CODEC.listOf().optionalFieldOf("item_outputs", List.of()).forGetter(AltarRecipe::itemOutputs),
+        EntityOutput.CODEC.listOf().optionalFieldOf("entity_outputs", List.of()).forGetter(AltarRecipe::entityOutputs),
+        SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf("item_inputs", List.of()).forGetter(AltarRecipe::itemInputs),
+        EntityInputs.CODEC.optionalFieldOf("entity_inputs", EntityInputs.EMPTY).forGetter(AltarRecipe::entityInputs),
+        LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("start_conditions", List.of()).forGetter(AltarRecipe::startConditions),
+        Codec.INT.optionalFieldOf("ticks", 100).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = NeoForgeStreamCodecs.composite(
         Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::catalyst,
         ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
-        SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::inputs,
-        ByteBufCodecs.optional(RecipeSacrifices.STREAM_CODEC), AltarRecipe::sacrifices,
-        ByteBufCodecs.VAR_INT, AltarRecipe::recipeTime,
-        LootConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::summoningConditions,
+        SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
+        EntityInputs.STREAM_CODEC, AltarRecipe::entityInputs,
+        LootConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
+        ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new
     );
 
@@ -50,18 +50,18 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "catalyst is empty");
         }
 
-        if (recipe.inputs().isEmpty() && recipe.sacrifices().isEmpty()) {
+        if (recipe.itemInputs().isEmpty() && recipe.entityInputs().isEmpty()) {
             return DataResult.error(() -> "no inputs or sacrifices");
         }
 
-        if (recipe.inputs().size() > Config.COMMON.altarInventorySize.get()) {
+        if (recipe.itemInputs().size() > Config.COMMON.altarInventorySize.get()) {
             return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.altarInventorySize.get());
         }
 
         for (var stack : recipe.catalyst().getItems()) {
             AltarRecipe.addCatalyst(stack.getItem());
         }
-        for (var input : recipe.inputs()) {
+        for (var input : recipe.itemInputs()) {
             for (var stack : input.getItems()) {
                 AltarRecipe.addInput(stack.getItem());
             }

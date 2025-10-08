@@ -44,7 +44,7 @@ final class InternalInventory implements INBTSerializable<CompoundTag>, Iterable
         Arrays.fill(items, ItemStack.EMPTY);
     }
 
-    int size() {
+    int slots() {
         return items.length;
     }
 

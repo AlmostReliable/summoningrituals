@@ -1,16 +1,16 @@
 package com.almostreliable.summoningrituals.recipe;
 
-import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.component.EntityInputs;
 import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
-import com.almostreliable.summoningrituals.recipe.component.RecipeSacrifices;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -20,30 +20,25 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public record AltarRecipe(
-    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> inputs,
-    Optional<RecipeSacrifices> sacrifices, int recipeTime, List<LootItemCondition> summoningConditions
-) implements Recipe<AltarInventory> {
+    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> itemInputs,
+    EntityInputs entityInputs, List<LootItemCondition> startConditions, int ticks
+) implements Recipe<RecipeInput> {
 
     private static final Set<Item> CATALYSTS = new HashSet<>();
     private static final Set<Item> INPUTS = new HashSet<>();
 
     @Override
-    public boolean matches(AltarInventory inv, Level level) {
-        if (inv.getCatalyst().isEmpty() || !catalyst.test(inv.getCatalyst())) {
-            return false;
-        }
-
-        var matchedItems = new Ingredient[inv.getSlots()];
+    public boolean matches(RecipeInput inventory, Level level) {
+        var matchedItems = new Ingredient[inventory.size()];
         var matchedIngredients = new ArrayList<Ingredient>();
 
-        for (var slot = 0; slot < inv.size(); slot++) {
-            var stack = inv.getStackInSlot(slot);
+        for (var slot = 0; slot < inventory.size(); slot++) {
+            var stack = inventory.getItem(slot);
             if (!stack.isEmpty() && matchedItems[slot] == null) {
-                for (var input : inputs) {
+                for (var input : itemInputs) {
                     if (
                         !matchedIngredients.contains(input.ingredient()) &&
                             input.ingredient().test(stack) &&
@@ -56,11 +51,11 @@ public record AltarRecipe(
             }
         }
 
-        return matchedIngredients.size() == inputs.size();
+        return matchedIngredients.size() == itemInputs.size();
     }
 
     @Override
-    public ItemStack assemble(AltarInventory input, HolderLookup.Provider registries) {
+    public ItemStack assemble(RecipeInput inventory, HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
 

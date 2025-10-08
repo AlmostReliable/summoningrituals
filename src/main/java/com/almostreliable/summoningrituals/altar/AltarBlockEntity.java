@@ -3,8 +3,12 @@ package com.almostreliable.summoningrituals.altar;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.base.TickableBlockEntity;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
+import com.almostreliable.summoningrituals.altar.inventory.AltarInventoryHost;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.data.SummoningLang;
+import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+import com.almostreliable.summoningrituals.network.AltarInventorySyncPacket;
 import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -17,22 +21,39 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
-public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity {
+public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity, AltarInventoryHost {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
+    public static final LootContextParamSet LOOT_CONTEXT_PARAM_SET = new LootContextParamSet.Builder()
+        .required(LootContextParams.BLOCK_STATE)
+        .required(LootContextParams.BLOCK_ENTITY)
+        .required(LootContextParams.ORIGIN)
+        .build();
 
     // TODO: implement dropping contents on destroy
     private final AltarInventory inventory;
@@ -75,7 +96,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     @Override
     public void tick(ServerLevel level) {
-        if (!inventory.getCatalyst().isEmpty() && currentRecipe == null) {
+        if (currentRecipe == null && !inventory.getCatalyst().isEmpty()) {
             var recipe = findRecipe();
             if (recipe == null) {
                 resetSummoning(level, true);
@@ -85,11 +106,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         }
         if (currentRecipe == null) return;
 
-        if (recipeProgress >= currentRecipe.recipeTime()) {
+        if (recipeProgress >= currentRecipe.ticks()) {
             if (inventory.handleRecipe(currentRecipe)) {
                 // currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
                 SUMMONING_COMPLETE.invoke(level, worldPosition, currentRecipe, invokingPlayer);
-                GameUtils.playSound(level, worldPosition, SoundEvents.EXPERIENCE_ORB_PICKUP);
+                playOptionalPlayerSound(level, invokingPlayer, false, SoundEvents.EXPERIENCE_ORB_PICKUP);
                 resetSummoning(level, false);
             } else {
                 GameUtils.sendPlayerMessage(invokingPlayer, Constants.INVALID, ChatFormatting.RED);
@@ -110,49 +131,125 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         sendAltarRecipeSyncUpdate(level);
     }
 
-    public ItemStack handleInteraction(@Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
-        if (recipeProgress > 0) {
-            if (!simulate) {
-                GameUtils.sendPlayerMessage(player, Constants.PROGRESS, ChatFormatting.RED);
-            }
+    private void sendOptionalPlayerMessage(@Nullable ServerPlayer player, boolean simulate, LangEntry langEntry, ChatFormatting color) {
+        if (player == null || simulate) return;
+        player.sendSystemMessage(langEntry.get().withStyle(color));
+    }
+
+    private void playOptionalPlayerSound(ServerLevel level, @Nullable ServerPlayer player, boolean simulate, SoundEvent sound) {
+        if (player == null || simulate) return;
+        level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 0.5f, 1f);
+    }
+
+    @Nullable
+    private ItemStack handleCatalystInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+        var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, this.level);
+        recipeHolders.removeIf(h -> h.value().catalyst().test(stack));
+
+        if (recipeHolders.isEmpty()) return null;
+
+        var validRecipes = new HashMap<RecipeHolder<AltarRecipe>, List<Entity>>();
+
+        var lootParams = new LootParams.Builder(level)
+            .withParameter(LootContextParams.BLOCK_STATE, getBlockState())
+            .withParameter(LootContextParams.BLOCK_ENTITY, this)
+            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
+            .create(LOOT_CONTEXT_PARAM_SET);
+        var lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
+
+        for (var recipeHolder : recipeHolders) {
+            var recipe = recipeHolder.value();
+            var entityInputs = recipe.entityInputs().getSacrifices(worldPosition, region -> level.getEntities(player, region));
+            if (entityInputs == null) continue;
+            validRecipes.put(recipeHolder, entityInputs);
+        }
+
+        if (validRecipes.isEmpty()) {
+            return null;
+        }
+
+        validRecipes.keySet().removeIf(recipeHolder -> {
+            var recipe = recipeHolder.value();
+            return !recipe.startConditions().stream().allMatch(condition -> condition.test(lootContext));
+        });
+
+        if (validRecipes.isEmpty()) {
+            playOptionalPlayerSound(level, player, simulate, SoundEvents.CHAIN_BREAK);
             return stack;
         }
 
-        if (stack.isEmpty()) {
-            if (!simulate && player != null && player.isShiftKeyDown()) {
-                inventory.popLastInserted();
-            }
-            return ItemStack.EMPTY;
+        if (validRecipes.size() != 1) {
+            return null;
         }
 
-        if (!AltarRecipe.isInput(stack.getItem())) {
+        var entry = validRecipes.entrySet().iterator().next();
+        var recipe = entry.getKey().value();
+        var entities = entry.getValue(); // TODO: pass entities to event
+        if (!SUMMONING_START.invoke(level, worldPosition, recipe, player)) {
+            resetSummoning(level, true);
             return stack;
         }
 
-        if (simulate) {
-            return ItemStack.EMPTY;
-        }
+        currentRecipe = recipe;
+        invokingPlayer = player;
+        recipeTime = recipe.ticks();
+        playOptionalPlayerSound(level, player, simulate, SoundEvents.BEACON_ACTIVATE);
+        sendAltarRecipeSyncUpdate(level);
 
-        if (AltarRecipe.isCatalyst(stack.getItem())) {
-            inventory.setCatalyst(stack.copyWithCount(1));
-            var recipe = findRecipe();
-            if (recipe == null) {
-                inventory.setCatalyst(ItemStack.EMPTY);
-            } else {
-                handleSummoning(recipe, player);
-                var remainder = stack.copyWithCount(stack.getCount() - 1);
-                return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
-            }
-        }
+        var remainder = stack.copyWithCount(stack.getCount() - 1);
+        return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
+    }
 
-        var remaining = inventory.handleInsertion(stack);
+    private ItemStack handleInputInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+
+        var remaining = inventory.insertInputTracked(stack);
         if (player != null && (remaining.isEmpty() || stack.getCount() != remaining.getCount())) {
-            GameUtils.playSound(level, worldPosition, SoundEvents.ITEM_PICKUP);
+            playOptionalPlayerSound(level, player, simulate, SoundEvents.ITEM_PICKUP);
         }
         return remaining;
     }
 
-    private void resetSummoning(ServerLevel level, boolean popLastInserted) {
+    /*
+    needs to return remainder, should not modify initial stack because it's called from inventory
+     */
+    @Override
+    public ItemStack handleItemInsertion(@Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+        if (!(level instanceof ServerLevel serverLevel)) return stack;
+
+        if (currentRecipe != null) {
+            sendOptionalPlayerMessage(player, simulate, SummoningLang.IN_PROGRESS, ChatFormatting.RED);
+            return stack;
+        }
+
+        if (AltarRecipe.isCatalyst(stack.getItem())) {
+            var remainder = handleCatalystInsertion(serverLevel, player, stack, simulate);
+            if (remainder != null) {
+                return remainder;
+            }
+        }
+
+        if (AltarRecipe.isInput(stack.getItem())) {
+            return handleInputInsertion(serverLevel, player, stack, simulate);
+        }
+
+        return stack;
+    }
+
+    @Override
+    public void spawnItemAboveAltar(ItemStack stack) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        var itemEntity = new ItemEntity(level, 0, 0, 0, stack);
+        var pos = Vec3.atCenterOf(worldPosition.above());
+        itemEntity.setPos(pos);
+        serverLevel.addFreshEntity(itemEntity);
+    }
+
+    public void removeLastInsertedItem() {
+        inventory.removeLastInsertedItem();
+    }
+
+    private void resetSummoning(ServerLevel level, boolean removeLastInsertedItem) {
         assert this.level != null;
         currentRecipe = null;
         sacrifices = null;
@@ -161,64 +258,12 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         recipeTime = 0;
         sendAltarRecipeSyncUpdate(level);
         changeActivityState(false);
-        if (popLastInserted) inventory.popLastInserted();
+        if (removeLastInsertedItem) removeLastInsertedItem();
     }
 
     private void sendAltarRecipeSyncUpdate(ServerLevel level) {
         PacketHandler.sendToTrackingChunk(level, worldPosition, new AltarRecipeSyncPacket(worldPosition, recipeProgress, recipeTime));
     }
-
-    private void handleSummoning(AltarRecipe recipe, @Nullable ServerPlayer player) {
-        if (!(level instanceof ServerLevel serverLevel)) return;
-
-        // sacrifices = checkSacrifices(recipe.sacrifices(), player);
-        // if (sacrifices == null ||
-        //     !checkBlockBelow(recipe.blockBelow(), player) ||
-        //     !recipe.dayTime().check(level, player) ||
-        //     !recipe.weather().check(level, player)) {
-        //     inventory.popLastInserted();
-        //     GameUtils.playSound(level, worldPosition, SoundEvents.CHAIN_BREAK);
-        //     return;
-        // }
-
-        if (!SUMMONING_START.invoke(serverLevel, worldPosition, recipe, player)) {
-            resetSummoning(serverLevel, true);
-            return;
-        }
-        currentRecipe = recipe;
-        invokingPlayer = player;
-        recipeTime = recipe.recipeTime();
-        GameUtils.playSound(level, worldPosition, SoundEvents.BEACON_ACTIVATE);
-        sendAltarRecipeSyncUpdate(serverLevel);
-    }
-
-    @Nullable
-    private AltarRecipe findRecipe() {
-        return null;
-        // assert level != null && !level.isClientSide;
-        // var recipeManager = level.getRecipeManager();
-        // return recipeManager.getRecipeFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level)
-        //     .orElse(null);
-    }
-
-    // @Nullable
-    // private List<EntitySacrifice> checkSacrifices(RecipeSacrifices sacrifices, @Nullable ServerPlayer player) {
-    //     assert level != null && !level.isClientSide;
-    //     if (sacrifices.isEmpty()) return List.of();
-    //     var region = sacrifices.getRegion(worldPosition);
-    //     var entities = level.getEntities(player, region);
-    //     var toKill = new ArrayList<EntitySacrifice>();
-    //     var success = sacrifices.test(sacrifice -> {
-    //         var found = entities.stream().filter(sacrifice).toList();
-    //         if (found.size() < sacrifice.count()) {
-    //             GameUtils.sendPlayerMessage(player, Constants.SACRIFICES, ChatFormatting.YELLOW);
-    //             return false;
-    //         }
-    //         toKill.add(new EntitySacrifice(found, sacrifice.count()));
-    //         return true;
-    //     });
-    //     return success ? toKill : null;
-    // }
 
     private void changeActivityState(boolean state) {
         if (level == null || level.isClientSide) return;
@@ -226,6 +271,15 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (!oldState.getValue(AltarBlock.ACTIVE).equals(state)) {
             level.setBlockAndUpdate(worldPosition, oldState.setValue(AltarBlock.ACTIVE, state));
         }
+    }
+
+    @Override
+    public void onInventoryChanged(Function<HolderLookup.Provider, CompoundTag> serializer) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        setChanged();
+        var inventoryTag = serializer.apply(serverLevel.registryAccess());
+        PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, new AltarInventorySyncPacket(worldPosition, inventoryTag));
     }
 
     @Nullable

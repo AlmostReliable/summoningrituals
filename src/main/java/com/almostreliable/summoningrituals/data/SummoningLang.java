@@ -14,6 +14,13 @@ import java.util.function.Supplier;
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class SummoningLang extends LanguageProvider {
 
+    // @formatter:off
+
+    // messages
+    public static final LangEntry IN_PROGRESS = LangEntry.label("in_progress", "The ritual is already in progress.");
+
+    // @formatter:on
+
     SummoningLang(PackOutput output) {
         super(output, ModConstants.MOD_ID, "en_us");
     }
@@ -33,6 +40,10 @@ public final class SummoningLang extends LanguageProvider {
             var entry = new LangEntry(String.format("%s.%s.%s", prefix, ModConstants.MOD_ID, id), value);
             ENTRIES.add(entry);
             return entry;
+        }
+
+        private static LangEntry label(String id, String value) {
+            return of("message", id, value);
         }
 
         @Override
