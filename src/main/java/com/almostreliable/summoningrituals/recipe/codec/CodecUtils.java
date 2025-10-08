@@ -1,9 +1,11 @@
 package com.almostreliable.summoningrituals.recipe.codec;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
 import com.mojang.datafixers.util.Function9;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 public final class CodecUtils {
@@ -57,6 +59,19 @@ public final class CodecUtils {
                 codec7.encode(buffer, getter7.apply(value));
                 codec8.encode(buffer, getter8.apply(value));
                 codec9.encode(buffer, getter9.apply(value));
+            }
+        };
+    }
+
+    public static <T> StreamCodec<FriendlyByteBuf, Optional<T>> emptyOptionalStreamCodec() {
+        return new StreamCodec<>() {
+
+            @Override
+            public void encode(FriendlyByteBuf buffer, Optional<T> value) {}
+
+            @Override
+            public Optional<T> decode(FriendlyByteBuf buffer) {
+                return Optional.empty();
             }
         };
     }

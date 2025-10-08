@@ -61,28 +61,15 @@ public final class LootConditionStreamCodecs {
         }
     };
 
-    public static <T> StreamCodec<FriendlyByteBuf, Optional<T>> emptyOptionalStreamCodec() {
-        return new StreamCodec<>() {
-
-            @Override
-            public void encode(FriendlyByteBuf buffer, Optional<T> value) {}
-
-            @Override
-            public Optional<T> decode(FriendlyByteBuf buffer) {
-                return Optional.empty();
-            }
-        };
-    }
-
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
-        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.STRUCTURE)), LocationPredicate::structures,
         ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
-        emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::canSeeSky,
         LocationPredicate::new
     );
