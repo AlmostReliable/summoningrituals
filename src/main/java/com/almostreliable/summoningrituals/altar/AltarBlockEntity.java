@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.altar;
 import com.almostreliable.summoningrituals.altar.base.TickableBlockEntity;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventoryHost;
+import com.almostreliable.summoningrituals.compat.AltarObservable;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
@@ -216,7 +217,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         ServerLevel level, @Nullable ServerPlayer player, ItemStack stack
     ) {
         var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, this.level);
-        recipeHolders.removeIf(h -> h.value().catalyst().test(stack));
+        recipeHolders.removeIf(h -> !h.value().catalyst().test(stack));
 
         if (recipeHolders.isEmpty()) return null;
 
