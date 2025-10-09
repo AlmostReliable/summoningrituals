@@ -10,9 +10,14 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
 @SuppressWarnings("WeakerAccess")
 @Mod(ModConstants.MOD_ID)
 public class SummoningRituals {
+
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public SummoningRituals(IEventBus eventBus, ModContainer modContainer) {
         Registration.init(eventBus);
