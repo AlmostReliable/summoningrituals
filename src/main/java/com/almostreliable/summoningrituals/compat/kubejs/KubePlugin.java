@@ -2,7 +2,6 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
-import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningInputBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
@@ -38,7 +37,6 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void registerBindings(BindingRegistry registry) {
         if (!registry.type().isServer()) return;
-        registry.add("SummoningInput", SummoningInputBinding.class);
         registry.add("SummoningOutput", SummoningOutputBinding.class);
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.latvian.mods.rhino.util.HideFromJS;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -96,6 +97,7 @@ public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
             return this;
         }
 
+        @HideFromJS
         public EntityInputs build() {
             return new EntityInputs(inputs, zone);
         }
