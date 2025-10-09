@@ -117,7 +117,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     }
 
     private void renderItemOrbit(RenderContext renderContext, float recipeProgress, float recipeTime, float playerToAltarDistance) {
-        var inputs = renderContext.altar.getInventory().getNoneEmptyItems();
+        var inputs = renderContext.altar.getInventory().getDisplayItems();
         if (inputs.isEmpty()) return;
 
         var axisRotation = clampRotation(renderContext.level.getGameTime());
