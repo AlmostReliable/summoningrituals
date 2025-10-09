@@ -31,7 +31,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf("item_inputs", List.of()).forGetter(AltarRecipe::itemInputs),
         EntityInputs.CODEC.optionalFieldOf("entity_inputs", EntityInputs.EMPTY).forGetter(AltarRecipe::entityInputs),
         LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("start_conditions", List.of()).forGetter(AltarRecipe::startConditions),
-        Codec.INT.optionalFieldOf("ticks", 100).forGetter(AltarRecipe::ticks)
+        Codec.INT.optionalFieldOf("ticks", AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = NeoForgeStreamCodecs.composite(

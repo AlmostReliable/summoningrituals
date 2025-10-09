@@ -34,6 +34,7 @@ public record AltarRecipe(
     EntityInputs entityInputs, List<LootItemCondition> startConditions, int ticks
 ) implements Recipe<RecipeInput> {
 
+    public static final int DEFAULT_TICKS = 40;
     private static final Set<Item> CATALYSTS = new HashSet<>();
     private static final Set<Item> INPUTS = new HashSet<>();
 
