@@ -19,7 +19,7 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
     public static final EntityOutputComponent INSTANCE = new EntityOutputComponent();
-    private static final TypeInfo HOLDER_TYPE_INFO = TypeInfo.of(Holder.class).withParams(TypeInfo.of(EntityType.class));
+    private static final TypeInfo ENTITY_TYPE_INFO = TypeInfo.of(EntityType.class);
 
     @Override
     public Codec<EntityOutput> codec() {
@@ -30,7 +30,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
     public TypeInfo typeInfo() {
         return TypeInfo.of(EntityOutput.class)
             .or(TypeInfo.of(EntityOutput.Builder.class))
-            .or(HOLDER_TYPE_INFO)
+            .or(TypeInfo.of(Holder.class).withParams(ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
     }
@@ -64,7 +64,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
             try {
                 //noinspection unchecked
-                var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, sequence, HOLDER_TYPE_INFO);
+                var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, sequence, ENTITY_TYPE_INFO);
                 return SummoningOutputBinding.entityOutput(entityHolder, count).build();
             } catch (Exception ignored) {
                 // ignored
@@ -73,7 +73,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
         try {
             //noinspection unchecked
-            var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, from, HOLDER_TYPE_INFO);
+            var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, from, ENTITY_TYPE_INFO);
             return SummoningOutputBinding.entityOutput(entityHolder).build();
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid summoning entity output: " + from, e);
