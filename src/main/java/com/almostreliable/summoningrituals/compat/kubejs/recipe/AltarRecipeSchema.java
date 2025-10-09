@@ -53,5 +53,6 @@ public interface AltarRecipeSchema {
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
 
-    RecipeSchema SCHEMA = new RecipeSchema(CATALYST, ITEM_OUTPUTS, ENTITY_OUTPUTS, ITEM_INPUTS, ENTITY_INPUTS, TICKS);
+    RecipeSchema SCHEMA = new RecipeSchema(CATALYST, ITEM_OUTPUTS, ENTITY_OUTPUTS, ITEM_INPUTS, ENTITY_INPUTS, TICKS)
+        .factory(AltarKubeRecipe.FACTORY);
 }
