@@ -67,11 +67,11 @@ public record EntityOutput(
         private final Holder<EntityType<?>> entity;
         private final int count;
         @Nullable
+        private CompoundTag data;
+        @Nullable
         private BlockPos offset;
         @Nullable
         private BlockPos spread;
-        @Nullable
-        private CompoundTag nbt;
 
         public Builder(Holder<EntityType<?>> entity) {
             this(entity, 1);
@@ -80,6 +80,11 @@ public record EntityOutput(
         public Builder(Holder<EntityType<?>> entity, int count) {
             this.entity = entity;
             this.count = count;
+        }
+
+        public Builder data(CompoundTag data) {
+            this.data = data;
+            return this;
         }
 
         public Builder offset(BlockPos offset) {
@@ -93,7 +98,7 @@ public record EntityOutput(
         }
 
         public EntityOutput build() {
-            var entitySpawn = new EntityOutputInfo(entity, count, Optional.ofNullable(nbt));
+            var entitySpawn = new EntityOutputInfo(entity, count, Optional.ofNullable(data));
             return new EntityOutput(entitySpawn, Optional.ofNullable(offset), Optional.ofNullable(spread));
         }
     }
