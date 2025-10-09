@@ -44,8 +44,8 @@ public interface AltarRecipeSchema {
         .allowEmpty()
         .exclude();
     RecipeKey<EntityInputs> ENTITY_INPUTS = EntityInputsComponent.INSTANCE
-        .key("item_inputs", ComponentRole.INPUT)
-        .functionNames(List.of("entityInputs"))
+        .key("entity_inputs", ComponentRole.INPUT)
+        .noFunctions()
         .optional(EntityInputs.EMPTY)
         .exclude();
     RecipeKey<Integer> TICKS = NumberComponent.INT
