@@ -1,16 +1,10 @@
-package com.almostreliable.summoningrituals.recipe.component;
-
-import com.almostreliable.summoningrituals.core.Constants;
+package com.almostreliable.summoningrituals.recipe.input;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -22,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
 
@@ -68,23 +61,5 @@ public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
 
     public boolean isEmpty() {
         return inputs.isEmpty();
-    }
-
-    public record EntityInput(Holder<EntityType<?>> entityType, int count) implements Predicate<Entity> {
-
-        public static final Codec<EntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-            BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity").forGetter(EntityInput::entityType),
-            Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(EntityInput::count)
-        ).apply(i, EntityInput::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, EntityInput> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), EntityInput::entityType,
-            ByteBufCodecs.VAR_INT, EntityInput::count,
-            EntityInput::new
-        );
-
-        @Override
-        public boolean test(Entity entity) {
-            return entity.isAlive() && entityType.equals(entity.getType());
-        }
     }
 }

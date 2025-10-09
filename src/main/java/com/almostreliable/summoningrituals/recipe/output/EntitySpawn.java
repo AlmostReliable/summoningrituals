@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.component;
+package com.almostreliable.summoningrituals.recipe.output;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -2,9 +2,9 @@ package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.recipe.codec.LootConditionStreamCodecs;
-import com.almostreliable.summoningrituals.recipe.component.EntityInputs;
-import com.almostreliable.summoningrituals.recipe.component.EntityOutput;
-import com.almostreliable.summoningrituals.recipe.component.ItemOutput;
+import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
+import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
+import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
