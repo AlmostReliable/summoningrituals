@@ -179,6 +179,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
         if (matchingRecipes.isEmpty()) {
             playOptionalPlayerSound(level, player, simulate, SoundEvents.CHAIN_BREAK);
+            sendOptionalPlayerMessage(player, simulate, SummoningLang.CONDITION_FAIL, ChatFormatting.RED);
             if (simulate) return stack;
             removeLastInsertedItem();
             return remainder;
