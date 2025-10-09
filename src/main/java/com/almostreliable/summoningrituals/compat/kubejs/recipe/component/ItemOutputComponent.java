@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import com.mojang.serialization.Codec;
@@ -23,7 +24,7 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
 
     @Override
     public TypeInfo typeInfo() {
-        return TypeInfo.of(ItemOutput.class).or(TypeInfo.of(ItemOutput.Builder.class)).or(ItemStackJS.TYPE_INFO);
+        return TypeInfo.of(ItemOutput.class).or(TypeInfo.of(ItemOutputBuilder.class)).or(ItemStackJS.TYPE_INFO);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
             return o;
         }
 
-        if (from instanceof ItemOutput.Builder builder) {
+        if (from instanceof ItemOutputBuilder builder) {
             return builder.build();
         }
 

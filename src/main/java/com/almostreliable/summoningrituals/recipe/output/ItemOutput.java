@@ -11,8 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -46,32 +44,5 @@ public record ItemOutput(ItemStack item, Optional<BlockPos> offset, Optional<Blo
         }
 
         return result;
-    }
-
-    public static class Builder {
-
-        private final ItemStack item;
-        @Nullable
-        private BlockPos offset;
-        @Nullable
-        private BlockPos spread;
-
-        public Builder(ItemStack item) {
-            this.item = item;
-        }
-
-        public Builder offset(BlockPos offset) {
-            this.offset = offset;
-            return this;
-        }
-
-        public Builder spread(BlockPos spread) {
-            this.spread = spread;
-            return this;
-        }
-
-        public ItemOutput build() {
-            return new ItemOutput(item, Optional.ofNullable(offset), Optional.ofNullable(spread));
-        }
     }
 }

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.binding;
 
+import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
-import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -10,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 
 public interface SummoningOutputBinding {
 
-    static ItemOutput.Builder itemOutput(ItemStack stack) {
-        return new ItemOutput.Builder(stack);
+    static ItemOutputBuilder itemOutput(ItemStack stack) {
+        return new ItemOutputBuilder(stack);
     }
 
     static EntityOutput.Builder entityOutput(Holder<EntityType<?>> entity) {
