@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.altar;
+package com.almostreliable.summoningrituals.compat;
 
 import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
 
@@ -15,7 +15,7 @@ public class AltarObservable {
 
     private final List<Observer> observers = new ArrayList<>();
 
-    boolean invoke(ServerLevel level, BlockPos pos, RecipeInfoContainer recipeInfo, @Nullable ServerPlayer player) {
+    public boolean invoke(ServerLevel level, BlockPos pos, RecipeInfoContainer recipeInfo, @Nullable ServerPlayer player) {
         for (var o : observers) {
             if (o.run(level, pos, recipeInfo, player)) return false;
         }
