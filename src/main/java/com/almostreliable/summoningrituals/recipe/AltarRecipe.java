@@ -4,8 +4,12 @@ import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
+import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -17,7 +21,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,6 +89,14 @@ public record AltarRecipe(
     @Override
     public RecipeType<?> getType() {
         return Registration.ALTAR_RECIPE_TYPE.get();
+    }
+
+    public <E extends Entity, T extends RecipeOutput<E>> Collection<E> spawnOutputs(ServerLevel level, BlockPos origin, List<T> outputs) {
+        var result = new ArrayList<E>();
+        for (var output : outputs) {
+            result.addAll(output.spawn(level, origin));
+        }
+        return ImmutableList.copyOf(result);
     }
 
     public static boolean isCatalyst(Item item) {

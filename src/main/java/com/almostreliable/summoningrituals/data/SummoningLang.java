@@ -18,6 +18,7 @@ public final class SummoningLang extends LanguageProvider {
 
     // messages
     public static final LangEntry IN_PROGRESS = LangEntry.label("in_progress", "The ritual is already in progress.");
+    public static final LangEntry MISSING_INPUTS = LangEntry.label("missing_inputs", "Some of the required item inputs couldn't be found.");
 
     // @formatter:on
 

@@ -39,7 +39,6 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -96,17 +95,18 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (currentRecipeInfo == null) return;
 
         if (recipeProgress >= recipeTime) {
-            if (inventory.consumeRecipeInputs(level, currentRecipeInfo.recipe())) {
-                // TODO: spawn outputs and gather them in the list for the recipe info
-                // currentRecipe.outputs().handleRecipe((ServerLevel) level, worldPosition);
-                var recipeInfo = RecipeInfoContainer.outputInfo(currentRecipeInfo, List.of(), List.of());
+            var recipe = currentRecipeInfo.recipe();
+            if (inventory.consumeRecipeInputs(level, recipe)) {
+                var itemOutputs = recipe.spawnOutputs(level, worldPosition, recipe.itemOutputs());
+                var entityOutputs = recipe.spawnOutputs(level, worldPosition, recipe.entityOutputs());
+                var recipeInfo = RecipeInfoContainer.outputInfo(currentRecipeInfo, itemOutputs, entityOutputs);
                 SUMMONING_COMPLETE.invoke(level, worldPosition, recipeInfo, invokingPlayer);
                 playOptionalPlayerSound(level, invokingPlayer, false, SoundEvents.EXPERIENCE_ORB_PICKUP);
-                reset(level);
             } else {
-                sendOptionalPlayerMessage(invokingPlayer, false, SummoningLang.IN_PROGRESS, ChatFormatting.RED); // TODO: invalid message
-                reset(level);
+                sendOptionalPlayerMessage(invokingPlayer, false, SummoningLang.MISSING_INPUTS, ChatFormatting.RED);
             }
+
+            reset(level);
             return;
         }
 

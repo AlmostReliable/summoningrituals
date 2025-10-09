@@ -2,12 +2,14 @@ package com.almostreliable.summoningrituals.recipe.output;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 
-public interface RecipeOutput {
+public interface RecipeOutput<T extends Entity> {
 
     BlockPos DEFAULT_OFFSET = new BlockPos(0, 2, 0);
     BlockPos DEFAULT_SPREAD = new BlockPos(1, 0, 1);
@@ -25,7 +27,7 @@ public interface RecipeOutput {
         return Vec3.atCenterOf(origin).add(offsetVector).add(x, y, z);
     }
 
-    void spawn(ServerLevel level, BlockPos origin);
+    Collection<T> spawn(ServerLevel level, BlockPos origin);
 
     Optional<BlockPos> spread();
 
