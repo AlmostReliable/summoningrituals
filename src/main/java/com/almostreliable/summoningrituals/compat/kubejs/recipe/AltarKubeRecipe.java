@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
+import com.almostreliable.summoningrituals.compat.kubejs.builder.EntityInputsBuilder;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
 
 import net.minecraft.core.BlockPos;
 
@@ -18,14 +18,14 @@ public class AltarKubeRecipe extends KubeRecipe {
         AltarKubeRecipe::new
     );
 
-    public AltarKubeRecipe entityInputs(BlockPos zone, Function<EntityInputs.Builder, EntityInputs.Builder> inputs) {
-        var entityInputs = inputs.apply(new EntityInputs.Builder(zone));
+    public AltarKubeRecipe entityInputs(BlockPos zone, Function<EntityInputsBuilder, EntityInputsBuilder> inputs) {
+        var entityInputs = inputs.apply(new EntityInputsBuilder(zone));
         setValue(AltarRecipeSchema.ENTITY_INPUTS, entityInputs.build());
         return this;
     }
 
-    public AltarKubeRecipe entityInputs(Function<EntityInputs.Builder, EntityInputs.Builder> inputs) {
-        var entityInputs = inputs.apply(new EntityInputs.Builder());
+    public AltarKubeRecipe entityInputs(Function<EntityInputsBuilder, EntityInputsBuilder> inputs) {
+        var entityInputs = inputs.apply(new EntityInputsBuilder());
         setValue(AltarRecipeSchema.ENTITY_INPUTS, entityInputs.build());
         return this;
     }

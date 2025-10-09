@@ -1,19 +1,15 @@
 package com.almostreliable.summoningrituals.recipe.input;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.latvian.mods.rhino.util.HideFromJS;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -67,39 +63,5 @@ public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
 
     public boolean isEmpty() {
         return inputs.isEmpty();
-    }
-
-    public static class Builder {
-
-        private final List<EntityInput> inputs = new ArrayList<>();
-        private final BlockPos zone;
-
-        public Builder(BlockPos zone) {
-            this.zone = zone;
-        }
-
-        public Builder() {
-            this(DEFAULT_ZONE);
-        }
-
-        public Builder add(Holder<EntityType<?>> entityType, int count) {
-            inputs.add(new EntityInput(entityType, count));
-            return this;
-        }
-
-        public Builder add(Holder<EntityType<?>> entityType) {
-            add(entityType, 1);
-            return this;
-        }
-
-        public Builder addAll(HolderSet<EntityType<?>> entityTypes) {
-            entityTypes.forEach(this::add);
-            return this;
-        }
-
-        @HideFromJS
-        public EntityInputs build() {
-            return new EntityInputs(inputs, zone);
-        }
     }
 }
