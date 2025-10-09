@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.recipe.codec.LootConditionStreamCodecs;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
@@ -40,7 +40,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
         EntityInputs.STREAM_CODEC, AltarRecipe::entityInputs,
-        LootConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
+        ConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new
     );

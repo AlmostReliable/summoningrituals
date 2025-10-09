@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.codec;
+package com.almostreliable.summoningrituals.recipe.condition;
 
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.core.BlockPos;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.Optional;
 
-public final class LootConditionStreamCodecs {
+public final class ConditionStreamCodecs {
 
     public static final StreamCodec<FriendlyByteBuf, NumberProvider> NUMBER_PROVIDER_STREAM_CODEC = new StreamCodec<>() {
 
@@ -135,5 +135,5 @@ public final class LootConditionStreamCodecs {
         }
     };
 
-    private LootConditionStreamCodecs() {}
+    private ConditionStreamCodecs() {}
 }
