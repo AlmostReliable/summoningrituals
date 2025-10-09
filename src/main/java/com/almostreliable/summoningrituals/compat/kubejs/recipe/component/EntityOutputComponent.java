@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.EntityOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
 import net.minecraft.core.Holder;
@@ -29,7 +30,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
     @Override
     public TypeInfo typeInfo() {
         return TypeInfo.of(EntityOutput.class)
-            .or(TypeInfo.of(EntityOutput.Builder.class))
+            .or(TypeInfo.of(EntityOutputBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
@@ -41,7 +42,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
             return o;
         }
 
-        if (from instanceof EntityOutput.Builder builder) {
+        if (from instanceof EntityOutputBuilder builder) {
             return builder.build();
         }
 

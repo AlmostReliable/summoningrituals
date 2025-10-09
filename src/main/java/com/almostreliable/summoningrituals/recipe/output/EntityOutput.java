@@ -1,19 +1,15 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,46 +56,5 @@ public record EntityOutput(
         }
 
         return result;
-    }
-
-    public static class Builder {
-
-        private final Holder<EntityType<?>> entity;
-        private final int count;
-        @Nullable
-        private CompoundTag data;
-        @Nullable
-        private BlockPos offset;
-        @Nullable
-        private BlockPos spread;
-
-        public Builder(Holder<EntityType<?>> entity) {
-            this(entity, 1);
-        }
-
-        public Builder(Holder<EntityType<?>> entity, int count) {
-            this.entity = entity;
-            this.count = count;
-        }
-
-        public Builder data(CompoundTag data) {
-            this.data = data;
-            return this;
-        }
-
-        public Builder offset(BlockPos offset) {
-            this.offset = offset;
-            return this;
-        }
-
-        public Builder spread(BlockPos spread) {
-            this.spread = spread;
-            return this;
-        }
-
-        public EntityOutput build() {
-            var entitySpawn = new EntityOutputInfo(entity, count, Optional.ofNullable(data));
-            return new EntityOutput(entitySpawn, Optional.ofNullable(offset), Optional.ofNullable(spread));
-        }
     }
 }

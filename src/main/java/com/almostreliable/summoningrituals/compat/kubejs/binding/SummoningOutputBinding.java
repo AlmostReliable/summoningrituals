@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.binding;
 
+import com.almostreliable.summoningrituals.compat.kubejs.builder.EntityOutputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
@@ -14,15 +15,15 @@ public interface SummoningOutputBinding {
         return new ItemOutputBuilder(stack);
     }
 
-    static EntityOutput.Builder entityOutput(Holder<EntityType<?>> entity) {
-        return new EntityOutput.Builder(entity);
+    static EntityOutputBuilder entityOutput(Holder<EntityType<?>> entity) {
+        return new EntityOutputBuilder(entity);
     }
 
-    static EntityOutput.Builder entityOutput(Holder<EntityType<?>> entity, int count) {
-        return new EntityOutput.Builder(entity, count);
+    static EntityOutputBuilder entityOutput(Holder<EntityType<?>> entity, int count) {
+        return new EntityOutputBuilder(entity, count);
     }
 
     static EntityOutput entityOutput(Holder<EntityType<?>> entity, int count, CompoundTag data) {
-        return new EntityOutput.Builder(entity, count).data(data).build();
+        return new EntityOutputBuilder(entity, count).data(data).build();
     }
 }
