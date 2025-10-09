@@ -1,11 +1,13 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
+import com.almostreliable.summoningrituals.recipe.condition.CodecUtils;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
-import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
+import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,7 +15,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -29,18 +30,19 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ItemOutput.CODEC.listOf().optionalFieldOf("item_outputs", List.of()).forGetter(AltarRecipe::itemOutputs),
         EntityOutput.CODEC.listOf().optionalFieldOf("entity_outputs", List.of()).forGetter(AltarRecipe::entityOutputs),
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf("item_inputs", List.of()).forGetter(AltarRecipe::itemInputs),
-        EntityInputs.CODEC.optionalFieldOf("entity_inputs", EntityInputs.EMPTY).forGetter(AltarRecipe::entityInputs),
+        EntityInput.CODEC.listOf().optionalFieldOf("entity_inputs", List.of()).forGetter(AltarRecipe::entityInputs),
         LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("start_conditions", List.of()).forGetter(AltarRecipe::startConditions),
+        BlockPos.CODEC.optionalFieldOf("zone", AltarRecipe.DEFAULT_ZONE).forGetter(AltarRecipe::zone),
         Codec.INT.optionalFieldOf("ticks", AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = NeoForgeStreamCodecs.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = CodecUtils.composite(
         Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::catalyst,
         ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
-        EntityInputs.STREAM_CODEC, AltarRecipe::entityInputs,
+        EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
         ConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
+        BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new
     );

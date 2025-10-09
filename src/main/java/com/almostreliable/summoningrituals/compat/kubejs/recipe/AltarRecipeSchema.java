@@ -1,13 +1,15 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
-import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputsComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.input.EntityInputs;
+import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
@@ -43,16 +45,21 @@ public interface AltarRecipeSchema {
         .optional(List.of())
         .allowEmpty()
         .exclude();
-    RecipeKey<EntityInputs> ENTITY_INPUTS = EntityInputsComponent.INSTANCE
+    RecipeKey<List<EntityInput>> ENTITY_INPUTS = EntityInputComponent.INSTANCE.asList()
         .key("entity_inputs", ComponentRole.INPUT)
-        .noFunctions()
-        .optional(EntityInputs.EMPTY)
+        .functionNames(List.of("entityInputs"))
+        .optional(List.of())
+        .allowEmpty()
+        .exclude();
+    RecipeKey<BlockPos> ZONE = BlockPosComponent.INSTANCE
+        .key("zone", ComponentRole.OTHER)
+        .functionNames(List.of("entityInputZone", "inputZone", "sacrificeZone", "entityZone"))
+        .optional(AltarRecipe.DEFAULT_ZONE)
         .exclude();
     RecipeKey<Integer> TICKS = NumberComponent.INT
         .key("ticks", ComponentRole.OTHER)
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
 
-    RecipeSchema SCHEMA = new RecipeSchema(CATALYST, ITEM_OUTPUTS, ENTITY_OUTPUTS, ITEM_INPUTS, ENTITY_INPUTS, TICKS)
-        .factory(AltarKubeRecipe.FACTORY);
+    RecipeSchema SCHEMA = new RecipeSchema(CATALYST, ITEM_OUTPUTS, ENTITY_OUTPUTS, ITEM_INPUTS, ENTITY_INPUTS, ZONE, TICKS);
 }
