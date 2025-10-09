@@ -34,6 +34,8 @@ public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
 
     @Nullable
     public List<Entity> getSacrifices(BlockPos pos, Function<AABB, List<Entity>> entityCollector) {
+        if (isEmpty()) return List.of();
+
         var region = constructRegion(pos);
         var entities = entityCollector.apply(region);
         var sacrifices = new ArrayList<Entity>();
