@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public record EntityInput(Holder<EntityType<?>> entityType, int count) implements Predicate<Entity> {
 
     public static final Codec<EntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity").forGetter(EntityInput::entityType),
+        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("id").forGetter(EntityInput::entityType),
         Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityInput::count)
     ).apply(i, EntityInput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityInput> STREAM_CODEC = StreamCodec.composite(

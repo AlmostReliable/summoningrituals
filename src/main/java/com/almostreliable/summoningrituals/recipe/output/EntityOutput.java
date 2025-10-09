@@ -25,7 +25,7 @@ public record EntityOutput(
 ) implements RecipeOutput<Entity> {
 
     public static final Codec<EntityOutput> CODEC = RecordCodecBuilder.create(i -> i.group(
-        EntityOutputInfo.CODEC.fieldOf("entity_info").forGetter(EntityOutput::entityInfo),
+        EntityOutputInfo.CODEC.fieldOf("entity").forGetter(EntityOutput::entityInfo),
         BlockPos.CODEC.optionalFieldOf("offset").forGetter(EntityOutput::offset),
         BlockPos.CODEC.optionalFieldOf("spread").forGetter(EntityOutput::spread)
     ).apply(i, EntityOutput::new));
