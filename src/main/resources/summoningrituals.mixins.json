@@ -8,5 +8,8 @@
   },
   "client": [
     "PoseStackMixin"
+  ],
+  "mixins": [
+    "RecipeManagerMixin"
   ]
 }
