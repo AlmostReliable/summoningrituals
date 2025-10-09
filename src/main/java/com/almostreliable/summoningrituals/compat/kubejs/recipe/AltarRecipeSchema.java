@@ -4,6 +4,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockP
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
@@ -11,6 +12,7 @@ import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
@@ -60,6 +62,21 @@ public interface AltarRecipeSchema {
         .key("ticks", ComponentRole.OTHER)
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
+    RecipeKey<List<LootItemCondition>> START_CONDITIONS = LootItemConditionComponent.INSTANCE.asList()
+        .key("start_conditions", ComponentRole.INPUT)
+        .noFunctions()
+        .optional(List.of())
+        .allowEmpty()
+        .exclude();
 
-    RecipeSchema SCHEMA = new RecipeSchema(CATALYST, ITEM_OUTPUTS, ENTITY_OUTPUTS, ITEM_INPUTS, ENTITY_INPUTS, ZONE, TICKS);
+    RecipeSchema SCHEMA = new RecipeSchema(
+        CATALYST,
+        ITEM_OUTPUTS,
+        ENTITY_OUTPUTS,
+        ITEM_INPUTS,
+        ENTITY_INPUTS,
+        ZONE,
+        TICKS,
+        START_CONDITIONS
+    ).factory(AltarKubeRecipe.FACTORY);
 }
