@@ -92,7 +92,7 @@ public record EntityInputs(List<EntityInput> inputs, BlockPos zone) {
             return this;
         }
 
-        public Builder add(HolderSet<EntityType<?>> entityTypes) {
+        public Builder addAll(HolderSet<EntityType<?>> entityTypes) {
             entityTypes.forEach(this::add);
             return this;
         }
