@@ -38,46 +38,40 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
     @Override
     public EntityOutput wrap(Context cx, KubeRecipe recipe, Object from) {
-        if (from instanceof EntityOutput o) {
-            return o;
+        var o = from;
+
+        if (o instanceof EntityOutput entityOutput) {
+            return entityOutput;
         }
 
-        if (from instanceof EntityOutputBuilder builder) {
+        if (o instanceof EntityOutputBuilder builder) {
             return builder.build();
         }
 
         String sequence = null;
-        if (from instanceof ResourceLocation location) {
+        if (o instanceof ResourceLocation location) {
             sequence = location.toString();
-        } else if (from instanceof String string) {
-            sequence = string;
+        } else if (o instanceof String s) {
+            sequence = s;
         }
+
+        var count = 0;
         if (sequence != null) {
             sequence = sequence.trim();
 
-            var count = 1;
             var spaceIndex = sequence.indexOf(' ');
-
             if (spaceIndex >= 2 && sequence.indexOf('x') == spaceIndex - 1) {
                 count = Integer.parseInt(sequence.substring(0, spaceIndex - 1));
-                sequence = sequence.substring(spaceIndex + 1);
-            }
-
-            try {
-                //noinspection unchecked
-                var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, sequence, ENTITY_TYPE_INFO);
-                return SummoningOutputBinding.entityOutput(entityHolder, count).build();
-            } catch (Exception ignored) {
-                // ignored
+                o = sequence.substring(spaceIndex + 1);
             }
         }
 
         try {
             //noinspection unchecked
-            var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, from, ENTITY_TYPE_INFO);
-            return SummoningOutputBinding.entityOutput(entityHolder).build();
+            var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, o, ENTITY_TYPE_INFO);
+            return SummoningOutputBinding.entityOutput(entityHolder, count).build();
         } catch (Exception e) {
-            throw new IllegalArgumentException("invalid summoning entity output: " + from, e);
+            throw new IllegalArgumentException("invalid summoning entity output: " + o, e);
         }
     }
 
