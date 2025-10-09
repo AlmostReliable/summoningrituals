@@ -3,5 +3,8 @@
   "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "item.summoningrituals.altar": "Summoning Altar",
   "item.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
+  "message.summoningrituals.condition_fail": "Not all conditions were met for the ritual.",
+  "message.summoningrituals.in_progress": "The ritual is already in progress.",
+  "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found.",
   "tab.summoningrituals.main": "Summoning Rituals"
 }
