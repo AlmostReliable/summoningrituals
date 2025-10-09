@@ -18,7 +18,7 @@ public record EntityOutputInfo(Holder<EntityType<?>> entity, int count, Optional
 
     public static final Codec<EntityOutputInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
         BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("id").forGetter(EntityOutputInfo::entity),
-        Codec.INT.optionalFieldOf("count", 1).forGetter(EntityOutputInfo::count),
+        Codec.INT.fieldOf("count").forGetter(EntityOutputInfo::count),
         CompoundTag.CODEC.optionalFieldOf("data").forGetter(EntityOutputInfo::data)
     ).apply(i, EntityOutputInfo::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityOutputInfo> STREAM_CODEC = StreamCodec.composite(
