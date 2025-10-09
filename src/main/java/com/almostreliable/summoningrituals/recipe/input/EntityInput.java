@@ -20,7 +20,7 @@ public record EntityInput(Holder<EntityType<?>> entityType, int count) implement
 
     public static final Codec<EntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
         BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity").forGetter(EntityInput::entityType),
-        Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(EntityInput::count)
+        Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityInput::count)
     ).apply(i, EntityInput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityInput> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), EntityInput::entityType,
