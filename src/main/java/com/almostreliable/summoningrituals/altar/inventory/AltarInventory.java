@@ -290,7 +290,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     private void rebuildInsertOrder() {
         insertOrder.clear();
         for (var slot = inventory.slots(); slot >= 0; slot--) {
-            var stack = inventory.get(slot);
+            var stack = getStackInSlot(slot);
             if (stack.isEmpty()) continue;
             trackInsert(slot, stack.copy(), false);
         }
