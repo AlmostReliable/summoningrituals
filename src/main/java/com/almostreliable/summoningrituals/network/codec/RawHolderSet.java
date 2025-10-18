@@ -1,16 +1,25 @@
-package com.almostreliable.summoningrituals.network;
+package com.almostreliable.summoningrituals.network.codec;
 
-import com.mojang.datafixers.util.Either;
-import net.minecraft.core.*;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderOwner;
+import net.minecraft.core.HolderSet;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 
-import java.util.*;
+import com.mojang.datafixers.util.Either;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public record RawHolderSet<T>(Optional<List<ResourceLocation>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData) implements HolderSet<T> {
+@SuppressWarnings("OptionalContainsCollection")
+public record RawHolderSet<T>(
+    Optional<List<ResourceLocation>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
+) implements HolderSet<T> {
 
     @Override
     public Stream<Holder<T>> stream() {
@@ -24,7 +33,7 @@ public record RawHolderSet<T>(Optional<List<ResourceLocation>> ids, Optional<Tag
 
     @Override
     public Either<TagKey<T>, List<Holder<T>>> unwrap() {
-        //noinspection OptionalIsPresent - pls no
+        //noinspection OptionalIsPresent
         if (tag.isPresent()) {
             return Either.left(tag.get());
         }

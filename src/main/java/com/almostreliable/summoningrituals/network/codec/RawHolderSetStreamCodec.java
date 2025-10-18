@@ -1,9 +1,13 @@
-package com.almostreliable.summoningrituals.network;
+package com.almostreliable.summoningrituals.network.codec;
 
-import com.mojang.serialization.Codec;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.core.*;
-import net.minecraft.nbt.*;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryCodecs;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,14 +15,19 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyByteBuf, HolderSet<T>> {
 
+    private static final long TWO_MEBIBYTES = 1 << 21;
     private final ResourceKey<? extends Registry<T>> registryKey;
     private final Codec<HolderSet<T>> originalCodec;
-    private final StreamCodec<ByteBuf, Tag> nbtCodec = ByteBufCodecs.tagCodec(() -> NbtAccounter.create(2097152L));
+    private final StreamCodec<ByteBuf, Tag> nbtCodec = ByteBufCodecs.tagCodec(() -> NbtAccounter.create(TWO_MEBIBYTES));
 
     public RawHolderSetStreamCodec(ResourceKey<? extends Registry<T>> registryKey) {
         this.registryKey = registryKey;
@@ -49,10 +58,11 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
         }
 
         if (tag instanceof ListTag list) {
-            var ids = list.stream()
-                          .filter(t -> t.getType().equals(StringTag.TYPE))
-                          .map(t -> ResourceLocation.parse(t.getAsString())) // TODO error handling? Encode should already ensure this I guess.
-                          .toList();
+            var ids = new ArrayList<ResourceLocation>();
+            for (var t : list) {
+                if (!t.getType().equals(StringTag.TYPE)) continue;
+                ids.add(ResourceLocation.parse(t.getAsString()));
+            }
             return new RawHolderSet<>(Optional.of(ids), Optional.empty(), Optional.empty());
         }
 
@@ -64,12 +74,10 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
         var registryAccess = buffer.registryAccess();
         var registry = registryAccess.registry(registryKey);
         if (registry.isEmpty()) {
-            // Should only be called in server side and here the registry should always be present
-            throw new IllegalStateException("Registry not found: " + registryKey);
+            throw new IllegalStateException("registry not found: " + registryKey);
         }
 
         var regOps = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        // TODO error handling?
         var nbt = originalCodec.encodeStart(regOps, value).getOrThrow();
         nbtCodec.encode(buffer, nbt);
     }
