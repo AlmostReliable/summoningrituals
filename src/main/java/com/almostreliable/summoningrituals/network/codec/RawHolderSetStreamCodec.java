@@ -78,7 +78,12 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
         }
 
         var regOps = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        var nbt = originalCodec.encodeStart(regOps, value).getOrThrow();
-        nbtCodec.encode(buffer, nbt);
+
+        try {
+            var nbt = originalCodec.encodeStart(regOps, value).getOrThrow();
+            nbtCodec.encode(buffer, nbt);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("failed to encode: " + value, e);
+        }
     }
 }
