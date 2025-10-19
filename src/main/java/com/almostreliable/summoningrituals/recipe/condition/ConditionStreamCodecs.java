@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
+import com.almostreliable.summoningrituals.network.codec.RawHolderSetStreamCodec;
+
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -64,7 +66,7 @@ public final class ConditionStreamCodecs {
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
-        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.STRUCTURE)), LocationPredicate::structures,
+        ByteBufCodecs.optional(new RawHolderSetStreamCodec<>(Registries.STRUCTURE)), LocationPredicate::structures,
         ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
