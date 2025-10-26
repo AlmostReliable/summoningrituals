@@ -36,8 +36,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     public AltarInventory(AltarInventoryHost host) {
         this.host = host;
-        int size = Config.COMMON.altarInventorySize.get();
-        this.inventory = new InternalInventory(size);
+        this.inventory = new InternalInventory(Config.COMMON.altarInventorySize);
         this.insertOrder = new Stack<>();
         this.catalyst = ItemStack.EMPTY;
     }
