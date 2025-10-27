@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -124,6 +125,15 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         }
 
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (level instanceof ServerLevel serverLevel &&
+            !state.is(newState.getBlock()) &&
+            level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
+            altar.getInventory().dropContents(serverLevel, pos);
+        }
     }
 
     @Override

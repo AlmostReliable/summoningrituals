@@ -56,7 +56,6 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         .required(LootContextParams.ORIGIN)
         .build();
 
-    // TODO: implement dropping contents on destroy
     private final AltarInventory inventory;
 
     @Nullable

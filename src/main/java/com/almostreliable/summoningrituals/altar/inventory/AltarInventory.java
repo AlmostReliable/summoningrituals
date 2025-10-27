@@ -4,15 +4,18 @@ import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -280,6 +283,28 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         rebuildInsertOrder();
         onContentsChanged();
         return true;
+    }
+
+    public void dropContents(ServerLevel serverLevel, BlockPos blockPos) {
+        for (var stack : inventory) {
+            if (stack.isEmpty()) continue;
+            dropItem(serverLevel, stack, blockPos);
+        }
+        inventory.clear();
+        insertOrder.clear();
+
+        if (!catalyst.isEmpty()) {
+            dropItem(serverLevel, catalyst, blockPos);
+            catalyst = ItemStack.EMPTY;
+        }
+
+        onContentsChanged();
+    }
+
+    private void dropItem(ServerLevel level, ItemStack stack, BlockPos blockPos) {
+        var itemEntity = new ItemEntity(level, 0, 0, 0, stack);
+        itemEntity.setPos(Vec3.atCenterOf(blockPos));
+        level.addFreshEntity(itemEntity);
     }
 
     private void onContentsChanged() {
