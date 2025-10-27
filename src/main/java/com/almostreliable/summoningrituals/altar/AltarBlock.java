@@ -117,8 +117,10 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
                 return ItemInteractionResult.CONSUME;
             }
 
-            var remainder = altar.handleItemInsertion(serverPlayer, stack, false);
-            serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
+            if (!player.isShiftKeyDown()) {
+                var remainder = altar.handleItemInsertion(serverPlayer, stack, false);
+                serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
+            }
         }
 
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
