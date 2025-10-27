@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.altar;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.base.TickableBlockEntity;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventoryHost;
@@ -48,6 +49,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
+    public static final String SACRIFICE_TAG = SummoningRituals.getRL("sacrifice").toString();
     public static final LootContextParamSet LOOT_CONTEXT_PARAM_SET = new LootContextParamSet.Builder()
         .required(LootContextParams.BLOCK_STATE)
         .required(LootContextParams.BLOCK_ENTITY)
@@ -193,6 +195,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             reset(level);
             removeLastInsertedItem();
             return remainder;
+        }
+
+        for (var entityInput : recipeInfo.inputEntities()) {
+            entityInput.addTag(SACRIFICE_TAG);
+            entityInput.kill();
         }
 
         currentRecipeInfo = recipeInfo;
