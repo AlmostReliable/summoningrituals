@@ -2,8 +2,6 @@
   "block.summoningrituals.altar": "Summoning Altar",
   "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "hint.summoningrituals.insert_last": "Insert as the last item to start the ritual.",
-  "hint.summoningrituals.insert_right_click": "Right click to insert an input item.",
-  "hint.summoningrituals.pop_shift_right_click": "Shift right click with empty hand to remove the last inserted item.",
   "item.summoningrituals.altar": "block.summoningrituals.altar",
   "item.summoningrituals.indestructible_altar": "block.summoningrituals.indestructible_altar",
   "label.summoningrituals.catalyst": "Catalyst",

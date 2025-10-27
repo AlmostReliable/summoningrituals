@@ -33,8 +33,6 @@ public final class SummoningLang extends LanguageProvider {
     
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert as the last item to start the ritual.");
-    public static final LangEntry INSERT_RIGHT_CLICK = LangEntry.hint("insert_right_click", "Right click to insert an input item.");
-    public static final LangEntry POP_SHIFT_RIGHT_CLICK = LangEntry.hint("pop_shift_right_click", "Shift right click with empty hand to remove the last inserted item.");
 
     // @formatter:on
 
