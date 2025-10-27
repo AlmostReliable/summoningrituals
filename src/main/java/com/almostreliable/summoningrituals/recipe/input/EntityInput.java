@@ -30,6 +30,6 @@ public record EntityInput(Holder<EntityType<?>> entityType, int count) implement
 
     @Override
     public boolean test(Entity entity) {
-        return entity.isAlive() && entityType.equals(entity.getType());
+        return entity.isAlive() && entityType.value().equals(entity.getType());
     }
 }
