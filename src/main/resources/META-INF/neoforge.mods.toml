@@ -34,3 +34,10 @@ type = "OPTIONAL"
 versionRange = "[${kjsVersion},)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies."${modId}"]]
+modId = "jei"
+type = "OPTIONAL"
+versionRange = "[${jeiVersion},)"
+ordering = "AFTER"
+side = "BOTH"

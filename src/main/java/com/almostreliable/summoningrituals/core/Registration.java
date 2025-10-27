@@ -44,8 +44,8 @@ public final class Registration {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ModConstants.MOD_ID);
 
     // blocks
-    public static final DeferredBlock<AltarBlock> ALTAR_BLOCK = registerBlock(Constants.ALTAR, "Summoning Altar", AltarBlock::new, p -> p.strength(2.5f));
-    public static final DeferredBlock<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = registerBlock(Constants.INDESTRUCTIBLE_ALTAR, "Indestructible Summoning Altar", AltarBlock::new, p -> p.strength(-1.0f, 3_600_000.0f));
+    public static final DeferredBlock<AltarBlock> ALTAR_BLOCK = registerBlock(Constants.ALTAR, SummoningLang.ALTAR, AltarBlock::new, p -> p.strength(2.5f));
+    public static final DeferredBlock<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = registerBlock(Constants.INDESTRUCTIBLE_ALTAR, SummoningLang.INDESTRUCTIBLE_ALTAR, AltarBlock::new, p -> p.strength(-1.0f, 3_600_000.0f));
 
     // block entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY = registerBlockEntity(ALTAR_BLOCK.getId(), AltarBlockEntity::new, ALTAR_BLOCK, INDESTRUCTIBLE_ALTAR_BLOCK);
@@ -97,7 +97,7 @@ public final class Registration {
     }
 
     private static <B extends Block> DeferredBlock<B> registerBlock(
-        String id, String name, Function<BlockBehaviour.Properties, B> factory,
+        String id, SummoningLang.LangEntry langEntry, Function<BlockBehaviour.Properties, B> factory,
         Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesConfigurator
     ) {
         var block = BLOCKS.registerBlock(
@@ -109,8 +109,7 @@ public final class Registration {
                 .sound(SoundType.STONE))
         );
         ITEMS.registerSimpleBlockItem(block);
-        SummoningLang.LangEntry.of("block", id, name);
-        SummoningLang.LangEntry.of("item", id, name);
+        SummoningLang.LangEntry.of("item", id, langEntry.get().getString());
         return block;
     }
 
