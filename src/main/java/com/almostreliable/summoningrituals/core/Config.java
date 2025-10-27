@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.core;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.SummoningRituals;
 
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLPaths;
 
 import com.google.gson.Gson;
@@ -16,24 +17,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public final class Config {
 
-    public static final CommonConfig COMMON = new CommonConfig(ConfigLoader.loadOrCreate(
-        "common",
-        CommonConfigData.class,
-        CommonConfigData::new
-    ));
-    public static final ClientConfig CLIENT = new ClientConfig(ConfigLoader.loadOrCreate(
-        "client",
-        ClientConfigData.class,
-        ClientConfigData::new
-    ));
+    public static CommonConfig COMMON;
+    public static ClientConfig CLIENT;
 
     private Config() {}
 
-    public static void init() {}
+    public static void init() {
+        COMMON = new CommonConfig(ConfigLoader.loadOrCreate(
+            "common",
+            CommonConfigData.class,
+            CommonConfigData::new
+        ));
+        CLIENT = new ClientConfig(ConfigLoader.loadOrCreate(
+            "client",
+            ClientConfigData.class,
+            ClientConfigData::new
+        ));
+    }
+
+    public static void reload() {
+        SummoningRituals.LOGGER.info("Reloading configs");
+        init();
+    }
 
     @SuppressWarnings("ClassCanBeRecord")
     public static final class CommonConfig {
@@ -48,9 +58,13 @@ public final class Config {
     public static final class ClientConfig {
 
         public final int altarRenderDistance;
+        public final Map<String, Float> entitySizes;
+        public final Map<String, Float> entityOffsets;
 
         private ClientConfig(ClientConfigData data) {
             this.altarRenderDistance = Math.clamp(1, data.altarRenderDistance, 128);
+            this.entitySizes = Map.copyOf(data.entitySizes);
+            this.entityOffsets = Map.copyOf(data.entityOffsets);
         }
     }
 
@@ -64,6 +78,15 @@ public final class Config {
     private static final class ClientConfigData {
 
         private final int altarRenderDistance = 32;
+        private final Map<String, Float> entitySizes = Map.of(
+            ResourceLocation.withDefaultNamespace("phantom").toString(), 8f,
+            ResourceLocation.withDefaultNamespace("ghast").toString(), 1.9f
+        );
+        private final Map<String, Float> entityOffsets = Map.of(
+            ResourceLocation.withDefaultNamespace("phantom").toString(), -6f,
+            ResourceLocation.withDefaultNamespace("ghast").toString(), -6f,
+            ResourceLocation.withDefaultNamespace("blaze").toString(), 2f
+        );
     }
 
     private static final class ConfigLoader {

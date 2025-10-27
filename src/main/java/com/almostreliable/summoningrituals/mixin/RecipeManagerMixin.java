@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.mixin;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,7 @@ public abstract class RecipeManagerMixin {
     private void summoning$onReload(
         Map<ResourceLocation, JsonElement> recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci
     ) {
+        Config.reload();
         AltarRecipe.clearCaches();
     }
 
