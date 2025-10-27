@@ -1,6 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.condition;
-
-import com.almostreliable.summoningrituals.network.codec.RawHolderSetStreamCodec;
+package com.almostreliable.summoningrituals.network.codec;
 
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.core.BlockPos;

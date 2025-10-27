@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.recipe.condition.CodecUtils;
-import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
+import com.almostreliable.summoningrituals.network.codec.CodecUtils;
+import com.almostreliable.summoningrituals.network.codec.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;

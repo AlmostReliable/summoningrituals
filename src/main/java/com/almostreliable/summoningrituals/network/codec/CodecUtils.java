@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.condition;
+package com.almostreliable.summoningrituals.network.codec;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
