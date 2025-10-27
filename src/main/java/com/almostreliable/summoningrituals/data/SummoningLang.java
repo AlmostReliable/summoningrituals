@@ -30,6 +30,7 @@ public final class SummoningLang extends LanguageProvider {
     
     // labels
     public static final LangEntry CATALYST = LangEntry.label("catalyst", "Catalyst");
+    public static final LangEntry CONDITIONS = LangEntry.label("conditions", "Conditions");
     
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert as the last item to start the ritual.");

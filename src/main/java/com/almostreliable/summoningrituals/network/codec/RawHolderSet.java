@@ -10,6 +10,7 @@ import net.minecraft.util.RandomSource;
 
 import com.mojang.datafixers.util.Either;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -69,5 +70,19 @@ public record RawHolderSet<T>(
     @Override
     public Iterator<Holder<T>> iterator() {
         return Collections.emptyIterator();
+    }
+
+    @Override
+    public String toString() {
+        var holderNames = new ArrayList<String>();
+        if (ids.isPresent()) {
+            for (var id : ids.get()) {
+                holderNames.add(id.toString());
+            }
+        }
+        if (tag.isPresent()) {
+            holderNames.add(tag.get().location().toString());
+        }
+        return String.join(", ", holderNames);
     }
 }
