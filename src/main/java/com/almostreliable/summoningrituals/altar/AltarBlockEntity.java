@@ -169,7 +169,6 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             // if this is true, the item wasn't an input and the catalyst insertion failed
             playOptionalPlayerSound(serverLevel, player, false, SoundEvents.CHAIN_BREAK);
             sendOptionalPlayerMessage(player, false, matchResult.getMatchIssue().getIssueMessage(), ChatFormatting.RED);
-            removeLastInsertedItem();
         }
 
         return stack;
