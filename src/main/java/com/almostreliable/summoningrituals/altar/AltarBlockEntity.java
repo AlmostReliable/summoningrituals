@@ -14,6 +14,7 @@ import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
+import com.almostreliable.summoningrituals.recipe.RecipeMatchResult;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -42,7 +43,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity, AltarInventoryHost {
@@ -153,10 +153,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return stack;
         }
 
+        RecipeMatchResult matchResult = null;
         if (AltarRecipe.isCatalyst(stack.getItem())) {
-            var remainder = handleCatalystInsertion(serverLevel, player, stack, simulate);
-            if (remainder != null) {
-                return remainder;
+            matchResult = handleCatalystInsertion(serverLevel, player, stack, simulate);
+            if (matchResult.getInteractionRemainder() != null) {
+                return matchResult.getInteractionRemainder();
             }
         }
 
@@ -164,37 +165,32 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return handleInputInsertion(serverLevel, player, stack, simulate);
         }
 
+        if (!simulate && matchResult != null && matchResult.hasIssue()) {
+            // if this is true, the item wasn't an input and the catalyst insertion failed
+            playOptionalPlayerSound(serverLevel, player, false, SoundEvents.CHAIN_BREAK);
+            sendOptionalPlayerMessage(player, false, matchResult.getMatchIssue().getIssueMessage(), ChatFormatting.RED);
+            removeLastInsertedItem();
+        }
+
         return stack;
     }
 
-    @Nullable
-    private ItemStack handleCatalystInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
-        var matchingRecipes = getMatchingRecipes(level, player, stack);
-        if (matchingRecipes == null) return null;
-
-        if (matchingRecipes.size() > 1) {
-            return null;
-        }
+    private RecipeMatchResult handleCatalystInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+        var matchResult = getMatchingRecipes(level, player, stack);
+        if (matchResult.hasIssue()) return matchResult;
 
         if (!simulate) inventory.setCatalyst(stack.copyWithCount(1));
         var remainder = stack.copyWithCount(stack.getCount() - 1);
         remainder = remainder.isEmpty() ? ItemStack.EMPTY : remainder;
+        matchResult.setInteractionRemainder(remainder);
 
-        if (matchingRecipes.isEmpty()) {
-            playOptionalPlayerSound(level, player, simulate, SoundEvents.CHAIN_BREAK);
-            sendOptionalPlayerMessage(player, simulate, SummoningLang.CONDITION_FAIL, ChatFormatting.RED);
-            if (simulate) return stack;
-            removeLastInsertedItem();
-            return remainder;
-        }
+        if (simulate) return matchResult;
 
-        if (simulate) return remainder;
-
-        var recipeInfo = matchingRecipes.iterator().next();
+        var recipeInfo = matchResult.getMatchingRecipe();
         if (!SUMMONING_START.invoke(level, worldPosition, recipeInfo, player)) {
             reset(level);
             removeLastInsertedItem();
-            return remainder;
+            return matchResult;
         }
 
         for (var entityInput : recipeInfo.inputEntities()) {
@@ -208,7 +204,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         sendAltarRecipeSyncUpdate(level);
 
-        return remainder;
+        return matchResult;
     }
 
     private ItemStack handleInputInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
@@ -219,27 +215,19 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return remaining;
     }
 
-    @Nullable
-    private Set<RecipeInfoContainer> getMatchingRecipes(
-        ServerLevel level, @Nullable ServerPlayer player, ItemStack stack
-    ) {
-        var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, this.level);
+    private RecipeMatchResult getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
+        var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
         recipeHolders.removeIf(h -> !h.value().catalyst().test(stack));
-
-        if (recipeHolders.isEmpty()) return null;
+        if (recipeHolders.isEmpty()) return RecipeMatchResult.INVALID_CATALYST;
 
         var matchingRecipes = new HashSet<RecipeInfoContainer>();
-
         for (var recipeHolder : recipeHolders) {
             var recipe = recipeHolder.value();
             var entityInputs = recipe.getSacrifices(worldPosition, region -> level.getEntities(player, region));
             if (entityInputs == null) continue;
             matchingRecipes.add(RecipeInfoContainer.inputInfo(recipeHolder, entityInputs));
         }
-
-        if (matchingRecipes.isEmpty()) {
-            return null;
-        }
+        if (matchingRecipes.isEmpty()) return RecipeMatchResult.MISSING_SACRIFICES;
 
         var lootParams = new LootParams.Builder(level)
             .withParameter(LootContextParams.BLOCK_STATE, getBlockState())
@@ -252,7 +240,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var recipe = recipeInfo.recipe();
             return !recipe.startConditions().stream().allMatch(condition -> condition.test(lootContext));
         });
-        return matchingRecipes;
+        if (matchingRecipes.isEmpty()) return RecipeMatchResult.FAILED_CONDITIONS;
+
+        if (matchingRecipes.size() > 1) return RecipeMatchResult.MULTI_MATCH;
+
+        return RecipeMatchResult.of(matchingRecipes);
     }
 
     private void sendOptionalPlayerMessage(@Nullable ServerPlayer player, boolean simulate, LangEntry langEntry, ChatFormatting color) {

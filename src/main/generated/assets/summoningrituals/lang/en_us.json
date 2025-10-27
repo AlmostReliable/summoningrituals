@@ -7,8 +7,11 @@
   "item.summoningrituals.altar": "block.summoningrituals.altar",
   "item.summoningrituals.indestructible_altar": "block.summoningrituals.indestructible_altar",
   "label.summoningrituals.catalyst": "Catalyst",
-  "message.summoningrituals.condition_fail": "Not all conditions were met for the ritual.",
+  "message.summoningrituals.failed_conditions": "Not all conditions were met for the ritual.",
   "message.summoningrituals.in_progress": "The ritual is already in progress.",
-  "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found.",
+  "message.summoningrituals.invalid_catalyst": "No recipes have been found for this catalyst.",
+  "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found in the Altar.",
+  "message.summoningrituals.missing_sacrifices": "Not all sacrifices were found for the ritual.",
+  "message.summoningrituals.multi_match": "More than one recipe found for this catalyst.",
   "tab.summoningrituals.main": "Summoning Rituals"
 }

@@ -22,8 +22,11 @@ public final class SummoningLang extends LanguageProvider {
     
     // messages
     public static final LangEntry IN_PROGRESS = LangEntry.message("in_progress", "The ritual is already in progress.");
-    public static final LangEntry MISSING_INPUTS = LangEntry.message("missing_inputs", "Some of the required item inputs couldn't be found.");
-    public static final LangEntry CONDITION_FAIL = LangEntry.message("condition_fail", "Not all conditions were met for the ritual.");
+    public static final LangEntry MISSING_INPUTS = LangEntry.message("missing_inputs", "Some of the required item inputs couldn't be found in the Altar.");
+    public static final LangEntry INVALID_CATALYST = LangEntry.message("invalid_catalyst", "No recipes have been found for this catalyst.");
+    public static final LangEntry MISSING_SACRIFICES = LangEntry.message("missing_sacrifices", "Not all sacrifices were found for the ritual.");
+    public static final LangEntry FAILED_CONDITIONS = LangEntry.message("failed_conditions", "Not all conditions were met for the ritual.");
+    public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this catalyst.");
     
     // labels
     public static final LangEntry CATALYST = LangEntry.label("catalyst", "Catalyst");
