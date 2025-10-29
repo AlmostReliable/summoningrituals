@@ -7,20 +7,17 @@ import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.HolderSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
-import net.minecraft.world.level.storage.loot.predicates.WeatherCheck;
 
 import com.mojang.datafixers.util.Either;
 import mezz.jei.api.constants.VanillaTypes;
@@ -205,59 +202,9 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         tooltipLines.addFirst(Either.left(catalystComponent));
     }
 
-    // TODO: make more readable, extract to separate condition classes that also host the codec
     private static void constructConditionsTooltip(ITooltipBuilder tooltip, List<LootItemCondition> conditions) {
         for (var condition : conditions) {
-            switch (condition) {
-                case TimeCheck timeCheck -> {
-                    tooltip.add(conditionComponent("TimeCheck"));
-                    tooltip.add(conditionValueComponent("min", timeCheck.value().min.toString()));
-                    tooltip.add(conditionValueComponent("max", timeCheck.value().max.toString()));
-                }
-                case LocationCheck locationCheck -> {
-                    tooltip.add(conditionComponent("LocationCheck"));
-                    //noinspection OptionalGetWithoutIsPresent
-                    var locationPredicate = locationCheck.predicate().get();
-                    if (locationPredicate.biomes().isPresent()) {
-                        tooltip.add(conditionValueComponent("biomes", readableHolderSet(locationPredicate.biomes().get())));
-                    }
-                    if (locationPredicate.structures().isPresent()) {
-                        tooltip.add(conditionValueComponent("structures", locationPredicate.structures().get()));
-                    }
-                    if (locationPredicate.dimension().isPresent()) {
-                        tooltip.add(conditionValueComponent("dimension", locationPredicate.dimension().get().location()));
-                    }
-                    if (locationPredicate.canSeeSky().isPresent()) {
-                        tooltip.add(conditionValueComponent("canSeeSky", locationPredicate.canSeeSky().get()));
-                    }
-                }
-                case WeatherCheck weatherCheck -> {
-                    tooltip.add(conditionComponent("WeatherCheck"));
-                    if (weatherCheck.isRaining().isPresent()) {
-                        tooltip.add(conditionValueComponent("isRaining", weatherCheck.isRaining().get()));
-                    }
-                    if (weatherCheck.isThundering().isPresent()) {
-                        tooltip.add(conditionValueComponent("isThundering", weatherCheck.isThundering().get()));
-                    }
-                }
-                default -> tooltip.add(Component.literal(condition.toString()).withStyle(ChatFormatting.GRAY));
-            }
+            tooltip.addAll(ConditionRegistry.getTooltip(condition));
         }
-    }
-
-    private static Component conditionComponent(String name) {
-        return Component.literal("- " + name + ":");
-    }
-
-    private static Component conditionValueComponent(String name, Object value) {
-        return Component.literal("> " + name + ": " + value).withStyle(ChatFormatting.GRAY);
-    }
-
-    private static String readableHolderSet(HolderSet<?> holders) {
-        var holderNames = new ArrayList<String>();
-        for (var holder : holders) {
-            holderNames.add(holder.getRegisteredName());
-        }
-        return String.join(", ", holderNames);
     }
 }

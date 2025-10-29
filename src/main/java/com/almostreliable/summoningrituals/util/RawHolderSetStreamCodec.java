@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.network.codec;
+package com.almostreliable.summoningrituals.util;
 
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;

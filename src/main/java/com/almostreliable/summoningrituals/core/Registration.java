@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -84,6 +85,7 @@ public final class Registration {
         BLOCK_ENTITIES.register(eventBus);
         RECIPE_TYPES.register(eventBus);
         RECIPE_SERIALIZERS.register(eventBus);
+        ConditionRegistry.init();
 
         eventBus.addListener(Registration::registerCapabilities);
     }

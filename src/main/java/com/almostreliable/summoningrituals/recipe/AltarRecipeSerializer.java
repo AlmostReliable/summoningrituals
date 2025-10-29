@@ -1,11 +1,11 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.network.codec.CodecUtils;
-import com.almostreliable.summoningrituals.network.codec.ConditionStreamCodecs;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
+import com.almostreliable.summoningrituals.util.CodecUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -41,7 +41,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
         EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
-        ConditionStreamCodecs.LOOT_ITEM_CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
+        ConditionStreamCodecs.CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
         BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new

@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.network.codec;
+package com.almostreliable.summoningrituals.util;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
