@@ -145,7 +145,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         var path = id.getPath();
 
         var readableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
-        if (!namespace.equals("minecraft")) {
+        if (!namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) {
             var modContainer = ModList.get().getModContainerById(namespace);
             if (modContainer.isEmpty()) {
                 return readableName + " (" + namespace + ")";

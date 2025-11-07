@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 
+import com.almostreliable.summoningrituals.core.Constants;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,9 +21,9 @@ import org.jetbrains.annotations.Nullable;
 public class EntityIngredient {
 
     public static final Codec<EntityIngredient> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("entity_type").forGetter(EntityIngredient::getEntityTypeHolder),
-        Codec.INT.fieldOf("count").forGetter(EntityIngredient::getCount),
-        CompoundTag.CODEC.fieldOf("data").forGetter(EntityIngredient::getData)
+        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(EntityIngredient::getEntityTypeHolder),
+        Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityIngredient::getCount),
+        CompoundTag.CODEC.fieldOf(Constants.DATA).forGetter(EntityIngredient::getData)
     ).apply(i, EntityIngredient::new));
 
     private final Holder<EntityType<?>> entityTypeHolder;

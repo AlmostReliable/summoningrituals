@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Config;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
@@ -26,14 +27,16 @@ import java.util.List;
 public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     public static final MapCodec<AltarRecipe> CODEC = RecordCodecBuilder.<AltarRecipe> mapCodec(i -> i.group(
-        Ingredient.CODEC_NONEMPTY.fieldOf("catalyst").forGetter(AltarRecipe::catalyst),
-        ItemOutput.CODEC.listOf().optionalFieldOf("item_outputs", List.of()).forGetter(AltarRecipe::itemOutputs),
-        EntityOutput.CODEC.listOf().optionalFieldOf("entity_outputs", List.of()).forGetter(AltarRecipe::entityOutputs),
-        SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf("item_inputs", List.of()).forGetter(AltarRecipe::itemInputs),
-        EntityInput.CODEC.listOf().optionalFieldOf("entity_inputs", List.of()).forGetter(AltarRecipe::entityInputs),
-        LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("start_conditions", List.of()).forGetter(AltarRecipe::startConditions),
-        BlockPos.CODEC.optionalFieldOf("zone", AltarRecipe.DEFAULT_ZONE).forGetter(AltarRecipe::zone),
-        Codec.INT.optionalFieldOf("ticks", AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
+        Ingredient.CODEC_NONEMPTY.fieldOf(Constants.CATALYST).forGetter(AltarRecipe::catalyst),
+        ItemOutput.CODEC.listOf().optionalFieldOf(Constants.ITEM_OUTPUTS, List.of()).forGetter(AltarRecipe::itemOutputs),
+        EntityOutput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_OUTPUTS, List.of()).forGetter(AltarRecipe::entityOutputs),
+        SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(AltarRecipe::itemInputs),
+        EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
+        LootItemCondition.DIRECT_CODEC.listOf()
+            .optionalFieldOf(Constants.CONDITIONS, List.of())
+            .forGetter(AltarRecipe::startConditions),
+        BlockPos.CODEC.optionalFieldOf(Constants.ZONE, AltarRecipe.DEFAULT_ZONE).forGetter(AltarRecipe::zone),
+        Codec.INT.optionalFieldOf(Constants.TICKS, AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = CodecUtils.composite(
         Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::catalyst,

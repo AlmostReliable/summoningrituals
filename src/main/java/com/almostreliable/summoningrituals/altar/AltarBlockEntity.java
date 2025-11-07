@@ -49,7 +49,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
-    public static final String SACRIFICE_TAG = SummoningRituals.getRL("sacrifice").toString();
+    public static final String SACRIFICE_TAG = SummoningRituals.getRL("marker").toString();
     public static final LootContextParamSet LOOT_CONTEXT_PARAM_SET = new LootContextParamSet.Builder()
         .required(LootContextParams.BLOCK_STATE)
         .required(LootContextParams.BLOCK_ENTITY)

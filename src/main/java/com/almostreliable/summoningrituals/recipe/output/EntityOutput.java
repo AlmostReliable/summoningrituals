@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
+import com.almostreliable.summoningrituals.core.Constants;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -21,9 +23,9 @@ public record EntityOutput(
 ) implements RecipeOutput<Entity> {
 
     public static final Codec<EntityOutput> CODEC = RecordCodecBuilder.create(i -> i.group(
-        EntityOutputInfo.CODEC.fieldOf("entity").forGetter(EntityOutput::entityInfo),
-        BlockPos.CODEC.optionalFieldOf("offset").forGetter(EntityOutput::offset),
-        BlockPos.CODEC.optionalFieldOf("spread").forGetter(EntityOutput::spread)
+        EntityOutputInfo.CODEC.fieldOf(Constants.ENTITY).forGetter(EntityOutput::entityInfo),
+        BlockPos.CODEC.optionalFieldOf(Constants.OFFSET).forGetter(EntityOutput::offset),
+        BlockPos.CODEC.optionalFieldOf(Constants.SPREAD).forGetter(EntityOutput::spread)
     ).apply(i, EntityOutput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityOutput> STREAM_CODEC = StreamCodec.composite(
         EntityOutputInfo.STREAM_CODEC, EntityOutput::entityInfo,

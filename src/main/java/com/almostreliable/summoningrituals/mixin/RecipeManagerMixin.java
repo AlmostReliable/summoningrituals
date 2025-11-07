@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.mixin;
 
+import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -36,7 +37,7 @@ public abstract class RecipeManagerMixin {
         if (FMLEnvironment.production) return;
 
         SummoningRituals.LOGGER.info("========== Added Recipes ==========");
-        recipes.keySet().stream().filter(id -> id.getNamespace().equals("summoningrituals")).forEach(id -> {
+        recipes.keySet().stream().filter(id -> id.getNamespace().equals(ModConstants.MOD_ID)).forEach(id -> {
             SummoningRituals.LOGGER.info("> {}", id);
             SummoningRituals.LOGGER.info(recipes.get(id).toString());
         });

@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.data;
 
 import com.almostreliable.summoningrituals.ModConstants;
+import com.almostreliable.summoningrituals.core.Constants;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
@@ -22,8 +23,8 @@ public final class SummoningLang extends LanguageProvider {
     // @formatter:off
 
     // blocks
-    public static final LangEntry ALTAR = LangEntry.block("altar", "Summoning Altar");
-    public static final LangEntry INDESTRUCTIBLE_ALTAR = LangEntry.block("indestructible_altar", "Indestructible Summoning Altar");
+    public static final LangEntry ALTAR = LangEntry.block(Constants.ALTAR, "Summoning Altar");
+    public static final LangEntry INDESTRUCTIBLE_ALTAR = LangEntry.block(Constants.INDESTRUCTIBLE_ALTAR, "Indestructible Summoning Altar");
     
     // messages
     public static final LangEntry IN_PROGRESS = LangEntry.message("in_progress", "The ritual is already in progress.");
@@ -34,8 +35,8 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this catalyst.");
     
     // labels
-    public static final LangEntry CATALYST = LangEntry.label("catalyst", "Catalyst");
-    public static final LangEntry CONDITIONS = LangEntry.label("conditions", "Conditions");
+    public static final LangEntry CATALYST = LangEntry.label(Constants.CATALYST, "Catalyst");
+    public static final LangEntry CONDITIONS = LangEntry.label(Constants.CONDITIONS, "Conditions");
     
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert last to start the ritual.");

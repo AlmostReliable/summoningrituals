@@ -1,40 +1,28 @@
 package com.almostreliable.summoningrituals.core;
 
-public final class Constants {
+public interface Constants {
 
-    public static final String ACTIVE = "active";
-    public static final String ALTAR = "altar";
-    public static final String BLOCK = "block";
-    public static final String BLOCK_BELOW = "block_below";
-    public static final String CATALYST = "catalyst";
-    public static final String COUNT = "count";
-    public static final String DATA = "data";
-    public static final String DAY_TIME = "day_time";
-    public static final String INDESTRUCTIBLE_ALTAR = "indestructible_altar";
-    public static final String INGREDIENT = "ingredient";
-    public static final String INPUTS = "inputs";
-    public static final String INSERT_ORDER = "insert_order";
-    public static final String INVALID = "invalid";
-    public static final String INVENTORY = "inventory";
-    public static final String ITEM = "item";
-    public static final String ITEMS = "items";
-    public static final String RECIPE_VIEWER = "recipe_viewer";
-    public static final String LABEL = "label";
-    public static final String MOB = "mob";
-    public static final String MOBS = "mobs";
-    public static final String NBT = "nbt";
-    public static final String OFFSET = "offset";
-    public static final String OUTPUTS = "outputs";
-    public static final String PROGRESS = "progress";
-    public static final String PROPERTIES = "properties";
-    public static final String RECIPE_TIME = "recipe_time";
-    public static final String REGION = "region";
-    public static final String SACRIFICES = "sacrifices";
-    public static final String SIZE = "size";
-    public static final String SLOT = "slot";
-    public static final String SPREAD = "spread";
-    public static final String TOOLTIP = "tooltip";
-    public static final String WEATHER = "weather";
-
-    private Constants() {}
+    String ACTIVE = "active";
+    String ALTAR = "altar";
+    String CATALYST = "catalyst";
+    String CONDITIONS = "conditions";
+    String COUNT = "count";
+    String DATA = "data";
+    String ENTITY = "entity";
+    String ENTITY_INPUTS = "entity_inputs";
+    String ENTITY_OUTPUTS = "entity_outputs";
+    String INDESTRUCTIBLE_ALTAR = "indestructible_altar";
+    String INSERT_ORDER = "insert_order";
+    String INVENTORY = "inventory";
+    String ITEM = "item";
+    String ITEMS = "items";
+    String ITEM_INPUTS = "item_inputs";
+    String ITEM_OUTPUTS = "item_outputs";
+    String OFFSET = "offset";
+    String RECIPE_VIEWER = "recipe_viewer";
+    String SIZE = "size";
+    String SLOT = "slot";
+    String SPREAD = "spread";
+    String TICKS = "ticks";
+    String ZONE = "zone";
 }

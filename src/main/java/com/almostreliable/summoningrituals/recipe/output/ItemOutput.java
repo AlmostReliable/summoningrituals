@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
+import com.almostreliable.summoningrituals.core.Constants;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,9 +20,9 @@ import java.util.Optional;
 public record ItemOutput(ItemStack item, Optional<BlockPos> offset, Optional<BlockPos> spread) implements RecipeOutput<ItemEntity> {
 
     public static final Codec<ItemOutput> CODEC = RecordCodecBuilder.create(i -> i.group(
-        ItemStack.STRICT_CODEC.fieldOf("item").forGetter(ItemOutput::item),
-        BlockPos.CODEC.optionalFieldOf("offset").forGetter(ItemOutput::offset),
-        BlockPos.CODEC.optionalFieldOf("spread").forGetter(ItemOutput::spread)
+        ItemStack.STRICT_CODEC.fieldOf(Constants.ITEM).forGetter(ItemOutput::item),
+        BlockPos.CODEC.optionalFieldOf(Constants.OFFSET).forGetter(ItemOutput::offset),
+        BlockPos.CODEC.optionalFieldOf(Constants.SPREAD).forGetter(ItemOutput::spread)
     ).apply(i, ItemOutput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = StreamCodec.composite(
         ItemStack.STREAM_CODEC, ItemOutput::item,

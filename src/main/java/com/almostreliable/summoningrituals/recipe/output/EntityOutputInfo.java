@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
+import com.almostreliable.summoningrituals.core.Constants;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -7,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
 import com.mojang.serialization.Codec;
@@ -17,9 +20,9 @@ import java.util.Optional;
 public record EntityOutputInfo(Holder<EntityType<?>> entity, int count, Optional<CompoundTag> data) {
 
     public static final Codec<EntityOutputInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf("id").forGetter(EntityOutputInfo::entity),
-        Codec.INT.fieldOf("count").forGetter(EntityOutputInfo::count),
-        CompoundTag.CODEC.optionalFieldOf("data").forGetter(EntityOutputInfo::data)
+        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(EntityOutputInfo::entity),
+        Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityOutputInfo::count),
+        CompoundTag.CODEC.optionalFieldOf(Constants.DATA).forGetter(EntityOutputInfo::data)
     ).apply(i, EntityOutputInfo::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityOutputInfo> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), EntityOutputInfo::entity,
