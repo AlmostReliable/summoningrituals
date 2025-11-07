@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
@@ -36,7 +35,7 @@ import java.util.function.Function;
 
 public record AltarRecipe(
     Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> itemInputs,
-    List<EntityInput> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    List<EntityInfo> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);

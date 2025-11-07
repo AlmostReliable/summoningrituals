@@ -2,11 +2,12 @@ package com.almostreliable.summoningrituals.compat.kubejs;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
-import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
-import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInfoComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
@@ -39,13 +40,14 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void registerBindings(BindingRegistry registry) {
         if (!registry.type().isServer()) return;
-        registry.add("SummoningOutput", SummoningOutputBinding.class);
+        registry.add("SummoningItem", SummoningItemBinding.class);
+        registry.add("SummoningEntity", SummoningEntityBinding.class);
     }
 
     @Override
     public void registerRecipeComponents(RecipeComponentFactoryRegistry registry) {
         registry.register(BlockPosComponent.INSTANCE);
-        registry.register(EntityInputComponent.INSTANCE);
+        registry.register(EntityInfoComponent.INSTANCE);
         registry.register(EntityOutputComponent.INSTANCE);
         registry.register(ItemOutputComponent.INSTANCE);
         registry.register(LootItemConditionComponent.INSTANCE);

@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,16 +20,16 @@ import java.util.List;
 import java.util.Optional;
 
 public record EntityOutput(
-    EntityOutputInfo entityInfo, Optional<BlockPos> offset, Optional<BlockPos> spread
+    EntityInfo entityInfo, Optional<BlockPos> offset, Optional<BlockPos> spread
 ) implements RecipeOutput<Entity> {
 
     public static final Codec<EntityOutput> CODEC = RecordCodecBuilder.create(i -> i.group(
-        EntityOutputInfo.CODEC.fieldOf(Constants.ENTITY).forGetter(EntityOutput::entityInfo),
+        EntityInfo.CODEC.fieldOf(Constants.ENTITY).forGetter(EntityOutput::entityInfo),
         BlockPos.CODEC.optionalFieldOf(Constants.OFFSET).forGetter(EntityOutput::offset),
         BlockPos.CODEC.optionalFieldOf(Constants.SPREAD).forGetter(EntityOutput::spread)
     ).apply(i, EntityOutput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityOutput> STREAM_CODEC = StreamCodec.composite(
-        EntityOutputInfo.STREAM_CODEC, EntityOutput::entityInfo,
+        EntityInfo.STREAM_CODEC, EntityOutput::entityInfo,
         ByteBufCodecs.optional(BlockPos.STREAM_CODEC), EntityOutput::offset,
         ByteBufCodecs.optional(BlockPos.STREAM_CODEC), EntityOutput::spread,
         EntityOutput::new
@@ -40,7 +41,7 @@ public record EntityOutput(
         var toSpawn = entityInfo.count();
 
         while (toSpawn > 0) {
-            var entity = entityInfo.entity().value().create(level);
+            var entity = entityInfo.entityInfo().value().create(level);
             if (entity == null) return List.of();
 
             var pos = getRandomPos(origin);

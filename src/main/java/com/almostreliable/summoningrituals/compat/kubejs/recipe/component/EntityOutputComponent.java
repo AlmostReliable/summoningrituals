@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
-import com.almostreliable.summoningrituals.compat.kubejs.builder.EntityOutputBuilder;
+import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityWrapper;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
@@ -27,7 +27,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
     @Override
     public TypeInfo typeInfo() {
         return TypeInfo.of(EntityOutput.class)
-            .or(TypeInfo.of(EntityOutputBuilder.class))
+            .or(TypeInfo.of(SummoningEntityBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(SizedEntityWrapper.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
@@ -35,7 +35,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
     @Override
     public EntityOutput wrap(Context cx, KubeRecipe recipe, Object from) {
-        if (from instanceof EntityOutputBuilder builder) {
+        if (from instanceof SummoningEntityBuilder builder) {
             return builder.build();
         }
 
@@ -43,7 +43,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
             cx,
             from,
             EntityOutput.class,
-            (entity, count) -> SummoningOutputBinding.entityOutput(entity, count).build()
+            (entity, count) -> SummoningEntityBinding.output(entity, count).build()
         );
     }
 

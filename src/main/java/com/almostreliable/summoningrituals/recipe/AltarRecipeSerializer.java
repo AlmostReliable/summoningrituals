@@ -3,7 +3,6 @@ package com.almostreliable.summoningrituals.recipe;
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
-import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 import com.almostreliable.summoningrituals.util.CodecUtils;
@@ -31,7 +30,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ItemOutput.CODEC.listOf().optionalFieldOf(Constants.ITEM_OUTPUTS, List.of()).forGetter(AltarRecipe::itemOutputs),
         EntityOutput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_OUTPUTS, List.of()).forGetter(AltarRecipe::entityOutputs),
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(AltarRecipe::itemInputs),
-        EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
+        EntityInfo.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
         LootItemCondition.DIRECT_CODEC.listOf()
             .optionalFieldOf(Constants.CONDITIONS, List.of())
             .forGetter(AltarRecipe::startConditions),
@@ -43,7 +42,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
-        EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
+        EntityInfo.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
         ConditionStreamCodecs.CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
         BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningOutputBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
@@ -43,7 +43,7 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
             throw new IllegalArgumentException("empty summoning item output: " + from);
         }
 
-        return SummoningOutputBinding.itemOutput(stack).build();
+        return SummoningItemBinding.of(stack).build();
     }
 
     @Override

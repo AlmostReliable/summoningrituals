@@ -175,7 +175,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
 
             var entityOutput = entityOutputs.get(i).entityInfo();
             var entityIngredient = new EntityIngredient(
-                entityOutput.entity(),
+                entityOutput.entityInfo(),
                 entityOutput.count(),
                 entityOutput.data().orElseGet(CompoundTag::new)
             );

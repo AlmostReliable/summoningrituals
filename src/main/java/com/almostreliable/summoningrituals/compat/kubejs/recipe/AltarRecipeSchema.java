@@ -1,12 +1,12 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
-import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInfoComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.input.EntityInput;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
@@ -47,7 +47,7 @@ public interface AltarRecipeSchema {
         .optional(List.of())
         .allowEmpty()
         .exclude();
-    RecipeKey<List<EntityInput>> ENTITY_INPUTS = EntityInputComponent.INSTANCE.asList()
+    RecipeKey<List<EntityInfo>> ENTITY_INPUTS = EntityInfoComponent.INSTANCE.asList()
         .key("entity_inputs", ComponentRole.INPUT)
         .functionNames(List.of("entityInputs"))
         .optional(List.of())
