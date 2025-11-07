@@ -18,8 +18,10 @@ public class WeatherCondition implements ConditionHandler<WeatherCheck> {
 
     public static final WeatherCondition INSTANCE = new WeatherCondition();
     private static final StreamCodec<RegistryFriendlyByteBuf, WeatherCheck> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL), WeatherCheck::isRaining,
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL), WeatherCheck::isThundering,
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL),
+        WeatherCheck::isRaining,
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL),
+        WeatherCheck::isThundering,
         WeatherCheck::new
     );
 
@@ -27,7 +29,6 @@ public class WeatherCondition implements ConditionHandler<WeatherCheck> {
     private static final LangEntry THUNDERING = LangEntry.condition("weather_thundering", "Thundering");
     private static final LangEntry NOT_THUNDERING = LangEntry.condition("weather_not_thundering", "Not Thundering");
     private static final LangEntry RAINING = LangEntry.condition("weather_raining", "Raining");
-    private static final LangEntry NOT_RAINING = LangEntry.condition("weather_not_raining", "Not Raining");
     private static final LangEntry CLEAR = LangEntry.condition("weather_clear", "Clear");
 
     @Override
@@ -46,9 +47,15 @@ public class WeatherCondition implements ConditionHandler<WeatherCheck> {
     @Nullable
     private static LangEntry getDescription(Optional<Boolean> rain, Optional<Boolean> thunder) {
         if (thunder.isPresent()) {
-            boolean allowThunder = thunder.get();
-            if (allowThunder) return THUNDERING;
-            if (rain.isPresent() && !rain.get()) return NOT_RAINING;
+            if (thunder.get()) return THUNDERING;
+
+            if (rain.isPresent()) {
+                if (!rain.get()) {
+                    return CLEAR;
+                }
+                return RAINING;
+            }
+
             return NOT_THUNDERING;
         }
 
@@ -71,6 +78,12 @@ public class WeatherCondition implements ConditionHandler<WeatherCheck> {
         }
 
         public WeatherCheck build() {
+            if (isRaining.isEmpty() && isThundering.isEmpty()) {
+                throw new IllegalArgumentException("weather condition must have at least one of raining or thundering");
+            }
+            if (isRaining.isPresent() && isThundering.isPresent() && !isRaining.get() && isThundering.get()) {
+                throw new IllegalArgumentException("weather condition cannot be thundering but not raining");
+            }
             return new WeatherCheck(isRaining, isThundering);
         }
     }
