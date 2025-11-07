@@ -11,7 +11,6 @@ import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -145,7 +144,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
             } else {
                 // entity inputs
                 var entityInput = entityInputs.get(i - itemInputs.size());
-                var entityIngredient = new EntityIngredient(entityInput.entityType(), entityInput.count());
+                var entityIngredient = new EntityIngredient(entityInput);
                 var entityEgg = entityIngredient.getEgg();
 
                 builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
@@ -174,11 +173,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
             var y = TEXTURE_HEIGHT - 18;
 
             var entityOutput = entityOutputs.get(i).entityInfo();
-            var entityIngredient = new EntityIngredient(
-                entityOutput.entityInfo(),
-                entityOutput.count(),
-                entityOutput.data().orElseGet(CompoundTag::new)
-            );
+            var entityIngredient = new EntityIngredient(entityOutput);
             var entityEgg = entityIngredient.getEgg();
 
             builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)

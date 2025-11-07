@@ -24,5 +24,6 @@ public interface Constants {
     String SLOT = "slot";
     String SPREAD = "spread";
     String TICKS = "ticks";
+    String TOOLTIP = "tooltip";
     String ZONE = "zone";
 }

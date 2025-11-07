@@ -85,7 +85,7 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
     }
 
     private void renderCount(GuiGraphics guiGraphics, EntityIngredient entityIngredient, PoseStack poseStack) {
-        var count = entityIngredient.getCount();
+        var count = entityIngredient.getEntityInfo().count();
         if (count <= 1) return;
         poseStack.translate(10, 9, 200);
         guiGraphics.drawString(mc.font, String.valueOf(count), 0, 0, TEXT_COLOR, true);
@@ -95,6 +95,12 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
     public List<Component> getTooltip(EntityIngredient entity, TooltipFlag tooltipFlag) {
         var tooltip = new ArrayList<Component>();
         tooltip.add(entity.getDisplayName());
+
+        var entityTooltip = entity.getEntityInfo().tooltip();
+        if (!entityTooltip.isEmpty()) {
+            tooltip.addAll(entityTooltip);
+        }
+
         if (tooltipFlag.isAdvanced()) {
             var id = Component.literal(entity.getResourceLocation().toString());
             tooltip.add(id.withStyle(ChatFormatting.DARK_GRAY));

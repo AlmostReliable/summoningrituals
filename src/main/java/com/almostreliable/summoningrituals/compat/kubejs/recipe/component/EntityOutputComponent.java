@@ -2,8 +2,9 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
-import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityOutputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityWrapper;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
 import net.minecraft.core.Holder;
@@ -14,6 +15,8 @@ import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
+
+import java.util.Optional;
 
 public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
@@ -27,7 +30,8 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
     @Override
     public TypeInfo typeInfo() {
         return TypeInfo.of(EntityOutput.class)
-            .or(TypeInfo.of(SummoningEntityBuilder.class))
+            .or(TypeInfo.of(EntityInfo.class))
+            .or(TypeInfo.of(SummoningEntityOutputBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(SizedEntityWrapper.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
@@ -35,15 +39,19 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
 
     @Override
     public EntityOutput wrap(Context cx, KubeRecipe recipe, Object from) {
-        if (from instanceof SummoningEntityBuilder builder) {
-            return builder.build();
+        if (from instanceof SummoningEntityOutputBuilder builder) {
+            return builder.buildOutput();
+        }
+
+        if (from instanceof EntityInfo info) {
+            return new EntityOutput(info, Optional.empty(), Optional.empty());
         }
 
         return SizedEntityWrapper.wrap(
             cx,
             from,
             EntityOutput.class,
-            (entity, count) -> SummoningEntityBinding.output(entity, count).build()
+            (entity, count) -> SummoningEntityBinding.output(entity, count).buildOutput()
         );
     }
 

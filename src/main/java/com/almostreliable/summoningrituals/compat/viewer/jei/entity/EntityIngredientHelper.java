@@ -35,12 +35,12 @@ public class EntityIngredientHelper implements IIngredientHelper<EntityIngredien
 
     @Override
     public EntityIngredient copyIngredient(EntityIngredient entity) {
-        return new EntityIngredient(entity.getEntityTypeHolder(), entity.getCount(), entity.getData());
+        return entity.copy();
     }
 
     @Override
     public long getAmount(EntityIngredient entity) {
-        return entity.getCount();
+        return entity.getEntityInfo().count();
     }
 
     @Override

@@ -41,7 +41,7 @@ public record EntityOutput(
         var toSpawn = entityInfo.count();
 
         while (toSpawn > 0) {
-            var entity = entityInfo.entityInfo().value().create(level);
+            var entity = entityInfo.entity().value().create(level);
             if (entity == null) return List.of();
 
             var pos = getRandomPos(origin);

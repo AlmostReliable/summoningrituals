@@ -1,6 +1,8 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityWrapper;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
@@ -12,8 +14,6 @@ import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
-
-import java.util.Optional;
 
 public class EntityInfoComponent implements RecipeComponent<EntityInfo> {
 
@@ -27,6 +27,7 @@ public class EntityInfoComponent implements RecipeComponent<EntityInfo> {
     @Override
     public TypeInfo typeInfo() {
         return TypeInfo.of(EntityInfo.class)
+            .or(TypeInfo.of(SummoningEntityBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(SizedEntityWrapper.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
@@ -34,10 +35,11 @@ public class EntityInfoComponent implements RecipeComponent<EntityInfo> {
 
     @Override
     public EntityInfo wrap(Context cx, KubeRecipe recipe, Object from) {
-        return SizedEntityWrapper.wrap(
-            cx, from, EntityInfo.class,
-            (entity, count) -> new EntityInfo(entity, count, Optional.empty())
-        );
+        if (from instanceof SummoningEntityBuilder builder) {
+            return builder.build();
+        }
+
+        return SizedEntityWrapper.wrap(cx, from, EntityInfo.class, (entity, count) -> SummoningEntityBinding.input(entity, count).build());
     }
 
     @Override

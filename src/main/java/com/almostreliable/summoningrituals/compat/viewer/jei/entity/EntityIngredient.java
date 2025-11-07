@@ -1,15 +1,13 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
@@ -18,35 +16,25 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
-public class EntityIngredient {
+public final class EntityIngredient {
 
     public static final Codec<EntityIngredient> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(EntityIngredient::getEntityTypeHolder),
-        Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityIngredient::getCount),
-        CompoundTag.CODEC.fieldOf(Constants.DATA).forGetter(EntityIngredient::getData)
+        EntityInfo.CODEC.fieldOf(Constants.ENTITY).forGetter(EntityIngredient::getEntityInfo)
     ).apply(i, EntityIngredient::new));
 
-    private final Holder<EntityType<?>> entityTypeHolder;
-    private final int count;
-    private final CompoundTag data;
+    private final EntityInfo entityInfo;
     @Nullable
     private Entity entity;
 
-    public EntityIngredient(Holder<EntityType<?>> entityTypeHolder, int count, CompoundTag data) {
-        this.entityTypeHolder = entityTypeHolder;
-        this.count = count;
-        this.data = data;
+    public EntityIngredient(EntityInfo entityInfo) {
+        this.entityInfo = entityInfo;
         var level = Minecraft.getInstance().level;
         if (level != null) {
-            entity = entityTypeHolder.value().create(level);
-            if (entity != null && !data.isEmpty()) {
-                entity.load(data);
+            entity = entityInfo.entity().value().create(level);
+            if (entity != null && entityInfo.data().isPresent()) {
+                entity.load(entityInfo.data().get());
             }
         }
-    }
-
-    public EntityIngredient(Holder<EntityType<?>> entityTypeHolder, int count) {
-        this(entityTypeHolder, count, new CompoundTag());
     }
 
     public Component getDisplayName() {
@@ -55,23 +43,11 @@ public class EntityIngredient {
     }
 
     public ResourceLocation getResourceLocation() {
-        return BuiltInRegistries.ENTITY_TYPE.getKey(getEntityType());
+        return BuiltInRegistries.ENTITY_TYPE.getKey(entityInfo.entity().value());
     }
 
-    public Holder<EntityType<?>> getEntityTypeHolder() {
-        return entityTypeHolder;
-    }
-
-    public EntityType<?> getEntityType() {
-        return entityTypeHolder.value();
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public CompoundTag getData() {
-        return data;
+    public EntityInfo getEntityInfo() {
+        return entityInfo;
     }
 
     @Nullable
@@ -81,7 +57,11 @@ public class EntityIngredient {
 
     @Nullable
     public ItemStack getEgg() {
-        var item = SpawnEggItem.byId(getEntityType());
+        var item = SpawnEggItem.byId(entityInfo.entity().value());
         return item == null ? null : new ItemStack(item);
+    }
+
+    public EntityIngredient copy() {
+        return new EntityIngredient(entityInfo);
     }
 }

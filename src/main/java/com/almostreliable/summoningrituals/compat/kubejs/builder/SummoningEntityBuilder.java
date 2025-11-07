@@ -1,17 +1,18 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
-import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SummoningEntityBuilder {
@@ -20,10 +21,7 @@ public class SummoningEntityBuilder {
     private final int count;
     @Nullable
     private CompoundTag data;
-    @Nullable
-    private BlockPos offset;
-    @Nullable
-    private BlockPos spread;
+    private final List<Component> tooltip = new ArrayList<>();
 
     public SummoningEntityBuilder(Holder<EntityType<?>> entity) {
         this(entity, 1);
@@ -39,23 +37,13 @@ public class SummoningEntityBuilder {
         return this;
     }
 
-    public SummoningEntityBuilder offset(BlockPos offset) {
-        this.offset = offset;
-        return this;
-    }
-
-    public SummoningEntityBuilder spread(BlockPos spread) {
-        this.spread = spread;
+    public SummoningEntityBuilder tooltip(List<Component> tooltip) {
+        this.tooltip.addAll(tooltip);
         return this;
     }
 
     @HideFromJS
-    public EntityInfo buildEntityInfo() {
-        return new EntityInfo(entity, count, Optional.ofNullable(data));
-    }
-
-    public EntityOutput build() {
-        var entityInfo = buildEntityInfo();
-        return new EntityOutput(entityInfo, Optional.ofNullable(offset), Optional.ofNullable(spread));
+    public EntityInfo build() {
+        return new EntityInfo(entity, count, Optional.ofNullable(data), tooltip);
     }
 }
