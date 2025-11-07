@@ -71,6 +71,16 @@ public final class StartConditionsBuilder {
         return this;
     }
 
+    public StartConditionsBuilder setOpenSky(boolean openSky) {
+        getOrCreateLocationPredicate().setCanSeeSky(openSky);
+        return this;
+    }
+
+    public StartConditionsBuilder structures(HolderSet<Structure> structures) {
+        getOrCreateLocationPredicate().setStructures(structures);
+        return this;
+    }
+
     public StartConditionsBuilder minTime(int min) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.lowerBound(min)));
         return this;
@@ -78,16 +88,6 @@ public final class StartConditionsBuilder {
 
     public StartConditionsBuilder maxTime(int max) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.upperBound(max)));
-        return this;
-    }
-
-    public StartConditionsBuilder openSky(boolean openSky) {
-        getOrCreateLocationPredicate().setCanSeeSky(openSky);
-        return this;
-    }
-
-    public StartConditionsBuilder structures(HolderSet<Structure> structures) {
-        getOrCreateLocationPredicate().setStructures(structures);
         return this;
     }
 

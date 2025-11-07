@@ -27,18 +27,20 @@ public interface ConditionHandler<T extends LootItemCondition> {
     }
 
     default MutableComponent conditionNamedValueComponent(Component name, Object value) {
-        return Component.literal("> ").append(name).append(": ").append(value.toString()).withStyle(ChatFormatting.GRAY);
+        return Component.literal("> ").append(name).append(": ").withStyle(ChatFormatting.GRAY)
+            .append(Component.literal(value.toString()).withStyle(ChatFormatting.AQUA));
     }
 
     default MutableComponent conditionValueComponent(Object value) {
-        return Component.literal("> ").append(value.toString()).withStyle(ChatFormatting.GRAY);
+        return Component.literal("> ").withStyle(ChatFormatting.GRAY)
+            .append(Component.literal(value.toString()).withStyle(ChatFormatting.AQUA));
     }
 
     default MutableComponent conditionNameValueComponent(Component name, MutableComponent value) {
-        return conditionNameComponent(name).append(value.withStyle(ChatFormatting.GRAY));
+        return conditionNameComponent(name).append(value.withStyle(ChatFormatting.AQUA));
     }
 
     default MutableComponent conditionNameValueComponent(Component name, String value) {
-        return conditionNameComponent(name).append(Component.literal(value).withStyle(ChatFormatting.GRAY));
+        return conditionNameComponent(name).append(Component.literal(value).withStyle(ChatFormatting.AQUA));
     }
 }

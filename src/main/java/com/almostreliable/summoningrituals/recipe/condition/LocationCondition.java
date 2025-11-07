@@ -74,13 +74,13 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             var maxValue = max.get().intValue();
 
             if (minValue == maxValue) {
-                tooltip.add(conditionNamedValueComponent(HEIGHT.get(), minValue));
+                tooltip.add(conditionNameValueComponent(HEIGHT.get(), String.valueOf(minValue)));
                 return;
             }
 
             tooltip.add(conditionNameComponent(HEIGHT.get()));
-            tooltip.add(conditionNameValueComponent(MINIMUM.get(), String.valueOf(minValue)));
-            tooltip.add(conditionNameValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
+            tooltip.add(conditionNamedValueComponent(MINIMUM.get(), String.valueOf(minValue)));
+            tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
 
             return;
         }
@@ -88,14 +88,14 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         if (min.isPresent()) {
             var minValue = min.get().intValue();
             var name = MINIMUM.get().append(" ").append(HEIGHT.get());
-            tooltip.add(conditionNamedValueComponent(name, String.valueOf(minValue)));
+            tooltip.add(conditionNameValueComponent(name, String.valueOf(minValue)));
             return;
         }
 
         if (max.isPresent()) {
             var maxValue = max.get().intValue();
             var name = MAXIMUM.get().append(" ").append(HEIGHT.get());
-            tooltip.add(conditionNamedValueComponent(name, String.valueOf(maxValue)));
+            tooltip.add(conditionNameValueComponent(name, String.valueOf(maxValue)));
         }
     }
 
