@@ -28,53 +28,43 @@ import java.util.stream.Collectors;
 
 // TODO: implement more from the LocationPredicate (light, block below, water)
 @SuppressWarnings("unused")
-public class StartConditionsBuilder {
+public final class StartConditionsBuilder {
 
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
-    private HolderSet<Biome> biomes;
-    @Nullable
-    private ResourceKey<Level> dimension;
-    @Nullable
-    private MinMaxBounds.Doubles height;
-    @Nullable
-    private Boolean openSky;
-    @Nullable
-    private HolderSet<Structure> structures;
+    private LocationPredicate.Builder locationPredicate;
+
+    public StartConditionsBuilder(SourceLine sourceLine) {
+        this.sourceLine = sourceLine;
+    }
 
     public StartConditionsBuilder biomes(HolderSet<Biome> biomes) {
-        Preconditions.checkArgument(this.biomes == null, "biomes have already been set");
-        this.biomes = biomes;
+        getOrCreateLocationPredicate().setBiomes(biomes);
         return this;
     }
 
     public StartConditionsBuilder dimension(ResourceKey<Level> dimension) {
-        Preconditions.checkArgument(this.dimension == null, "dimension has already been set");
-        this.dimension = dimension;
+        getOrCreateLocationPredicate().setDimension(dimension);
         return this;
     }
 
     public StartConditionsBuilder minHeight(int min) {
-        Preconditions.checkArgument(height == null, "height has already been set");
-        height = MinMaxBounds.Doubles.atLeast(min);
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atLeast(min));
         return this;
     }
 
     public StartConditionsBuilder maxHeight(int max) {
-        Preconditions.checkArgument(height == null, "height has already been set");
-        height = MinMaxBounds.Doubles.atMost(max);
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atMost(max));
         return this;
     }
 
     public StartConditionsBuilder height(int height) {
-        Preconditions.checkArgument(this.height == null, "height has already been set");
-        this.height = MinMaxBounds.Doubles.exactly(height);
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.exactly(height));
         return this;
     }
 
     public StartConditionsBuilder height(int min, int max) {
-        Preconditions.checkArgument(height == null, "height has already been set");
-        height = MinMaxBounds.Doubles.between(min, max);
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.between(min, max));
         return this;
     }
 
@@ -89,14 +79,12 @@ public class StartConditionsBuilder {
     }
 
     public StartConditionsBuilder openSky(boolean openSky) {
-        Preconditions.checkArgument(this.openSky == null, "openSky has already been set");
-        this.openSky = openSky;
+        getOrCreateLocationPredicate().setCanSeeSky(openSky);
         return this;
     }
 
     public StartConditionsBuilder structures(HolderSet<Structure> structures) {
-        Preconditions.checkArgument(this.structures == null, "structures have already been set");
-        this.structures = structures;
+        getOrCreateLocationPredicate().setStructures(structures);
         return this;
     }
 
@@ -118,14 +106,9 @@ public class StartConditionsBuilder {
     }
 
     public List<LootItemCondition> build() {
-        var locationPredicate = LocationPredicate.Builder.location();
-        if (biomes != null) locationPredicate.setBiomes(biomes);
-        if (dimension != null) locationPredicate.setDimension(dimension);
-        if (height != null) locationPredicate.setY(height);
-        if (openSky != null) locationPredicate.setCanSeeSky(openSky);
-        if (structures != null) locationPredicate.setStructures(structures);
-
-        conditions.add(LocationCheck.checkLocation(locationPredicate).build());
+        if (locationPredicate != null) {
+            conditions.add(LocationCheck.checkLocation(locationPredicate).build());
+        }
 
         var duplicates = conditions.stream()
             .collect(Collectors.groupingBy(LootItemCondition::getClass, Collectors.counting()))
@@ -140,5 +123,12 @@ public class StartConditionsBuilder {
             "only one condition of each type allowed, duplicates found: %s"
         );
         return conditions;
+    }
+
+    private LocationPredicate.Builder getOrCreateLocationPredicate() {
+        if (locationPredicate == null) {
+            locationPredicate = LocationPredicate.Builder.location();
+        }
+        return locationPredicate;
     }
 }
