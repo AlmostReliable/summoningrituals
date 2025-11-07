@@ -38,6 +38,20 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
         var min = range.min;
         var max = range.max;
 
+        if (min instanceof ConstantValue(var minConstant) && max == null) {
+            var minValue = (int) minConstant;
+            var name = MINIMUM.get().append(" ").append(TIME.get());
+            tooltip.add(conditionNameValueComponent(name, String.valueOf(minValue)));
+            return;
+        }
+
+        if (max instanceof ConstantValue(var maxConstant) && min == null) {
+            var maxValue = (int) maxConstant;
+            var name = MAXIMUM.get().append(" ").append(TIME.get());
+            tooltip.add(conditionNameValueComponent(name, String.valueOf(maxValue)));
+            return;
+        }
+
         if (!(min instanceof ConstantValue(var minConstant)) || !(max instanceof ConstantValue(var maxConstant))) {
             return;
         }
