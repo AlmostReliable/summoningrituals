@@ -26,8 +26,6 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
 
     private static final LangEntry TIME = LangEntry.condition("time", "Time");
     private static final Map<TimeType, LangEntry> TIME_TYPES = LangEntry.enumValues("condition", "time", TimeType.values());
-    private static final LangEntry MIN = LangEntry.condition("time_min", "Minimum");
-    private static final LangEntry MAX = LangEntry.condition("time_max", "Maximum");
 
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, TimeCheck> getStreamCodec() {
@@ -54,8 +52,8 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
         }
 
         tooltip.add(conditionNameComponent(TIME.get()));
-        tooltip.add(conditionValueComponent(MIN.get(), minValue));
-        tooltip.add(conditionValueComponent(MAX.get(), maxValue));
+        tooltip.add(conditionNamedValueComponent(MINIMUM.get(), minValue));
+        tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), maxValue));
     }
 
     public enum TimeType {

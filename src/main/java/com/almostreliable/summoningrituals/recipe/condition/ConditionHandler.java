@@ -15,6 +15,8 @@ public interface ConditionHandler<T extends LootItemCondition> {
 
     LangEntry YES = LangEntry.condition("yes", "Yes");
     LangEntry NO = LangEntry.condition("no", "No");
+    LangEntry MINIMUM = LangEntry.condition("minimum", "Minimum");
+    LangEntry MAXIMUM = LangEntry.condition("maximum", "Maximum");
 
     StreamCodec<RegistryFriendlyByteBuf, T> getStreamCodec();
 
@@ -24,11 +26,19 @@ public interface ConditionHandler<T extends LootItemCondition> {
         return Component.literal("- ").append(name).append(": ");
     }
 
-    default MutableComponent conditionValueComponent(Component name, Object value) {
+    default MutableComponent conditionNamedValueComponent(Component name, Object value) {
         return Component.literal("> ").append(name).append(": ").append(value.toString()).withStyle(ChatFormatting.GRAY);
+    }
+
+    default MutableComponent conditionValueComponent(Object value) {
+        return Component.literal("> ").append(value.toString()).withStyle(ChatFormatting.GRAY);
     }
 
     default MutableComponent conditionNameValueComponent(Component name, MutableComponent value) {
         return conditionNameComponent(name).append(value.withStyle(ChatFormatting.GRAY));
+    }
+
+    default MutableComponent conditionNameValueComponent(Component name, String value) {
+        return conditionNameComponent(name).append(Component.literal(value).withStyle(ChatFormatting.GRAY));
     }
 }

@@ -1,43 +1,34 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.util.CodecUtils;
-import com.almostreliable.summoningrituals.util.RawHolderSetStreamCodec;
+import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+import com.almostreliable.summoningrituals.util.RawHolderSet;
 
-import net.minecraft.advancements.critereon.LocationPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class LocationCondition implements ConditionHandler<LocationCheck> {
 
     public static final LocationCondition INSTANCE = new LocationCondition();
-    private static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
-        ByteBufCodecs.optional(new RawHolderSetStreamCodec<>(Registries.STRUCTURE)), LocationPredicate::structures,
-        ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::canSeeSky,
-        LocationPredicate::new
-    );
+
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationCheck> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(LOCATION_PREDICATE_STREAM_CODEC), LocationCheck::predicate,
+        ByteBufCodecs.optional(ConditionStreamCodecs.LOCATION_PREDICATE_STREAM_CODEC), LocationCheck::predicate,
         BlockPos.STREAM_CODEC, LocationCheck::offset,
         LocationCheck::new
     );
+
+    private static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
+    private static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
+    private static final LangEntry HEIGHT = LangEntry.condition("height", "Height");
+    private static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
+    private static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
 
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, LocationCheck> getStreamCodec() {
@@ -46,28 +37,94 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
 
     @Override
     public void getTooltip(List<Component> tooltip, LocationCheck condition) {
-        tooltip.add(conditionComponent("LocationCheck"));
-        //noinspection OptionalGetWithoutIsPresent
-        var locationPredicate = condition.predicate().get();
-        if (locationPredicate.biomes().isPresent()) {
-            tooltip.add(conditionValueComponent("biomes", readableHolderSet(locationPredicate.biomes().get())));
+        var opt = condition.predicate();
+        if (opt.isEmpty()) return;
+        var predicate = opt.get();
+
+        if (predicate.biomes().isPresent()) {
+            tooltip.add(conditionNameComponent(BIOMES.get()));
+            getHolderSetTooltip(tooltip, predicate.biomes().get());
         }
-        if (locationPredicate.structures().isPresent()) {
-            tooltip.add(conditionValueComponent("structures", locationPredicate.structures().get()));
+        if (predicate.dimension().isPresent()) {
+            var dimension = predicate.dimension().get();
+            tooltip.add(conditionNameValueComponent(DIMENSION.get(), dimension.location().toString()));
         }
-        if (locationPredicate.dimension().isPresent()) {
-            tooltip.add(conditionValueComponent("dimension", locationPredicate.dimension().get().location()));
+        if (predicate.position().isPresent()) {
+            var position = predicate.position().get();
+            var yPos = position.y();
+            getHeightTooltip(tooltip, yPos);
         }
-        if (locationPredicate.canSeeSky().isPresent()) {
-            tooltip.add(conditionValueComponent("canSeeSky", locationPredicate.canSeeSky().get()));
+        if (predicate.canSeeSky().isPresent()) {
+            var openSky = predicate.canSeeSky().get();
+            var value = (openSky ? YES : NO).get();
+            tooltip.add(conditionNameValueComponent(OPEN_SKY.get(), value));
+        }
+        if (predicate.structures().isPresent()) {
+            tooltip.add(conditionNameComponent(STRUCTURES.get()));
+            getHolderSetTooltip(tooltip, predicate.structures().get());
         }
     }
 
-    private static String readableHolderSet(HolderSet<?> holders) {
-        var holderNames = new ArrayList<String>();
-        for (var holder : holders) {
-            holderNames.add(holder.getRegisteredName());
+    private void getHeightTooltip(List<Component> tooltip, MinMaxBounds.Doubles yPos) {
+        var min = yPos.min();
+        var max = yPos.max();
+
+        if (min.isPresent() && max.isPresent()) {
+            var minValue = min.get().intValue();
+            var maxValue = max.get().intValue();
+
+            if (minValue == maxValue) {
+                tooltip.add(conditionNamedValueComponent(HEIGHT.get(), minValue));
+                return;
+            }
+
+            tooltip.add(conditionNameComponent(HEIGHT.get()));
+            tooltip.add(conditionNameValueComponent(MINIMUM.get(), String.valueOf(minValue)));
+            tooltip.add(conditionNameValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
+
+            return;
         }
-        return String.join(", ", holderNames);
+
+        if (min.isPresent()) {
+            var minValue = min.get().intValue();
+            var name = MINIMUM.get().append(" ").append(HEIGHT.get());
+            tooltip.add(conditionNamedValueComponent(name, String.valueOf(minValue)));
+            return;
+        }
+
+        if (max.isPresent()) {
+            var maxValue = max.get().intValue();
+            var name = MAXIMUM.get().append(" ").append(HEIGHT.get());
+            tooltip.add(conditionNamedValueComponent(name, String.valueOf(maxValue)));
+        }
+    }
+
+    private void getHolderSetTooltip(List<Component> tooltip, HolderSet<?> holders) {
+        if (holders instanceof RawHolderSet<?> rawHolderSet) {
+            if (rawHolderSet.tag().isPresent()) {
+                var tag = rawHolderSet.tag().get();
+                var tagId = tag.location().toString();
+                tooltip.add(conditionValueComponent("#" + tagId));
+                return;
+            }
+
+            if (rawHolderSet.ids().isEmpty()) return;
+            var ids = rawHolderSet.ids().get();
+            for (var id : ids) {
+                tooltip.add(conditionValueComponent(id));
+            }
+            return;
+        }
+
+        var holderValue = holders.unwrap();
+        holderValue.ifLeft(tag -> {
+            var tagId = tag.location().toString();
+            tooltip.add(conditionValueComponent("#" + tagId));
+        });
+        holderValue.ifRight(holderList -> {
+            for (var holder : holderList) {
+                tooltip.add(conditionValueComponent(holder.getRegisteredName()));
+            }
+        });
     }
 }
