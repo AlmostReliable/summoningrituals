@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import com.mojang.datafixers.util.Either;
 import mezz.jei.api.constants.VanillaTypes;
@@ -35,7 +34,6 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
 
@@ -107,7 +105,9 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
 
         if (mouseX >= 2 && mouseX <= 14 && mouseY >= 2 && mouseY <= 14) {
             tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
-            constructConditionsTooltip(tooltip, recipeConditions);
+            for (var condition : recipeConditions) {
+                tooltip.addAll(ConditionRegistry.getTooltip(condition));
+            }
         }
     }
 
@@ -200,11 +200,5 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         tooltipLines.removeFirst();
         tooltipLines.addFirst(Either.left(SummoningLang.INSERT_LAST.get().withStyle(ChatFormatting.GRAY)));
         tooltipLines.addFirst(Either.left(catalystComponent));
-    }
-
-    private static void constructConditionsTooltip(ITooltipBuilder tooltip, List<LootItemCondition> conditions) {
-        for (var condition : conditions) {
-            tooltip.addAll(ConditionRegistry.getTooltip(condition));
-        }
     }
 }

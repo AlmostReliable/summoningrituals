@@ -7,7 +7,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -72,6 +77,23 @@ public final class SummoningLang extends LanguageProvider {
 
         private static LangEntry hint(String id, String value) {
             return of("hint", id, value);
+        }
+
+        public static LangEntry condition(String id, String value) {
+            return of("condition", id, value);
+        }
+
+        @SafeVarargs
+        public static <T extends Enum<?>> Map<T, LangEntry> enumValues(String prefix, String idPrefix, T... enumValues) {
+            var enumEntries = new HashMap<T, LangEntry>();
+
+            for (var enumValue : enumValues) {
+                var id = enumValue.name().toLowerCase(Locale.ROOT);
+                var value = StringUtils.capitalize(id);
+                enumEntries.put(enumValue, of(prefix, idPrefix + "_" + id, value));
+            }
+
+            return enumEntries;
         }
 
         @Override
