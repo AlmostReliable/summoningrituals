@@ -16,6 +16,8 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
 import com.google.common.base.Preconditions;
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
+import dev.latvian.mods.kubejs.script.SourceLine;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class StartConditionsBuilder {
 
+    private final SourceLine sourceLine;
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
     private LocationPredicate.Builder locationPredicate;
@@ -99,9 +102,13 @@ public final class StartConditionsBuilder {
     }
 
     public StartConditionsBuilder weather(Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
-        var builder = new WeatherCondition.Builder();
-        var weatherCheck = weather.apply(builder).build();
-        conditions.add(weatherCheck);
+        try {
+            var builder = new WeatherCondition.Builder();
+            var weatherCheck = weather.apply(builder).build();
+            conditions.add(weatherCheck);
+        } catch (IllegalArgumentException e) {
+            throwException(e.getMessage());
+        }
         return this;
     }
 
@@ -130,5 +137,9 @@ public final class StartConditionsBuilder {
             locationPredicate = LocationPredicate.Builder.location();
         }
         return locationPredicate;
+    }
+
+    private void throwException(String message) throws KubeRuntimeException {
+        throw new KubeRuntimeException(message).source(sourceLine);
     }
 }

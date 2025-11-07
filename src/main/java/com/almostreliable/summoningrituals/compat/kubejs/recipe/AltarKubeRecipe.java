@@ -17,7 +17,7 @@ public class AltarKubeRecipe extends KubeRecipe {
     );
 
     public AltarKubeRecipe startConditions(Function<StartConditionsBuilder, StartConditionsBuilder> conditions) {
-        setValue(AltarRecipeSchema.START_CONDITIONS, conditions.apply(new StartConditionsBuilder()).build());
+        setValue(AltarRecipeSchema.START_CONDITIONS, conditions.apply(new StartConditionsBuilder(sourceLine)).build());
         return this;
     }
 }
