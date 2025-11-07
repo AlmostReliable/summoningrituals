@@ -10,7 +10,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
+import net.neoforged.fml.ModList;
+
+import com.google.common.base.CaseFormat;
 
 import java.util.List;
 
@@ -47,7 +51,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         }
         if (predicate.dimension().isPresent()) {
             var dimension = predicate.dimension().get();
-            tooltip.add(conditionNameValueComponent(DIMENSION.get(), dimension.location().toString()));
+            tooltip.add(conditionNameValueComponent(DIMENSION.get(), getReadableId(dimension.location())));
         }
         if (predicate.position().isPresent()) {
             var position = predicate.position().get();
@@ -111,7 +115,8 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             if (rawHolderSet.ids().isEmpty()) return;
             var ids = rawHolderSet.ids().get();
             for (var id : ids) {
-                tooltip.add(conditionValueComponent(id));
+                var readableId = getReadableId(id);
+                tooltip.add(conditionValueComponent(readableId));
             }
             return;
         }
@@ -123,8 +128,33 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         });
         holderValue.ifRight(holderList -> {
             for (var holder : holderList) {
-                tooltip.add(conditionValueComponent(holder.getRegisteredName()));
+                var resourceKey = holder.unwrapKey();
+                if (resourceKey.isEmpty()) {
+                    tooltip.add(conditionValueComponent("unknown"));
+                    continue;
+                }
+
+                var readableId = getReadableId(resourceKey.get().location());
+                tooltip.add(conditionValueComponent(readableId));
             }
         });
+    }
+
+    private static String getReadableId(ResourceLocation id) {
+        var namespace = id.getNamespace();
+        var path = id.getPath();
+
+        var readableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
+        if (!namespace.equals("minecraft")) {
+            var modContainer = ModList.get().getModContainerById(namespace);
+            if (modContainer.isEmpty()) {
+                return readableName + " (" + namespace + ")";
+            }
+
+            var modName = modContainer.get().getModInfo().getDisplayName();
+            return readableName + " (" + modName + ")";
+        }
+
+        return readableName;
     }
 }
