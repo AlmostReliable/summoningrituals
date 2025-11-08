@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 
-import com.almostreliable.summoningrituals.core.Config;
+import com.almostreliable.summoningrituals.client.MeasuringBufferSource;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -17,12 +17,15 @@ import com.mojang.math.Axis;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngredient> {
 
     private static final int TEXT_COLOR = 16_777_215;
     private final Minecraft mc = Minecraft.getInstance();
+    private final Map<String, MeasuringResult> measurementCache = new HashMap<>();
 
     @Override
     public void render(GuiGraphics guiGraphics, EntityIngredient entityIngredient) {
@@ -30,7 +33,6 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
             return;
         }
 
-        // animate entity
         entity.tickCount = mc.player.tickCount;
 
         var poseStack = guiGraphics.pose();
@@ -52,34 +54,43 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
     ) {
         var entityId = entityIngredient.getResourceLocation().toString();
 
-        // move entity to the slot center with configurable y offset
-        var yOffset = Config.CLIENT.entityOffsets.getOrDefault(entityId, 0f);
-        poseStack.translate(8, 15 + yOffset, 100);
-
-        // rotate entity to be slightly tilted to down left
+        poseStack.translate(8, 16, 100);
         poseStack.mulPose(Axis.ZP.rotationDegrees(180));
-        poseStack.mulPose(Axis.YP.rotationDegrees(20));
-        poseStack.mulPose(Axis.XP.rotationDegrees(5));
 
-        // scale entity to fit in the slot depending on its bounding box and config override value
-        var defaultScale = (float) (9 * Math.pow(entity.getBoundingBox().getSize(), -1));
-        var scale = Config.CLIENT.entitySizes.getOrDefault(entityId, defaultScale);
-        poseStack.summoning$scale(scale);
-
-        // set up renderer
         Lighting.setupForEntityInInventory();
         var entityRenderer = mc.getEntityRenderDispatcher();
         entityRenderer.setRenderShadow(false);
         RenderSystem.enableBlend();
 
-        // render entity
+        var measuringResult = measurementCache.computeIfAbsent(
+            entityId, id -> {
+                var measuringBuffer = new MeasuringBufferSource();
+                RenderSystem.runAsFancy(() -> entityRenderer.render(
+                    entity, 0, 0, 0, 0, 1, poseStack, measuringBuffer,
+                    LightTexture.FULL_BRIGHT
+                ));
+
+                if (measuringBuffer.hasData()) {
+                    return new MeasuringResult(measuringBuffer.diagonal(), measuringBuffer.height());
+                }
+
+                var size = (float) entity.getBoundingBox().getSize();
+                return new MeasuringResult(size, 0);
+            }
+        );
+
+        poseStack.translate(0, measuringResult.height(), 0);
+        poseStack.mulPose(Axis.YP.rotationDegrees(20));
+        poseStack.mulPose(Axis.XP.rotationDegrees(5));
+        float scale = 18f / (float) Math.pow(measuringResult.diagonal(), 0.9);
+        poseStack.summoning$scale(scale);
+
         RenderSystem.runAsFancy(() -> entityRenderer.render(
             entity, 0, 0, 0, 0, 1, poseStack, guiGraphics.bufferSource(),
             LightTexture.FULL_BRIGHT
         ));
         guiGraphics.flush();
 
-        // reset renderer
         entityRenderer.setRenderShadow(true);
         Lighting.setupFor3DItems();
     }
@@ -107,4 +118,6 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
         }
         return tooltip;
     }
+
+    private record MeasuringResult(float diagonal, float height) {}
 }
