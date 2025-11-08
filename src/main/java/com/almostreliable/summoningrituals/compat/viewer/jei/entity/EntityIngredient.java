@@ -1,6 +1,5 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 
-import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
 import net.minecraft.client.Minecraft;
@@ -12,15 +11,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
 public final class EntityIngredient {
 
-    public static final Codec<EntityIngredient> CODEC = RecordCodecBuilder.create(i -> i.group(
-        EntityInfo.CODEC.fieldOf(Constants.ENTITY).forGetter(EntityIngredient::getEntityInfo)
-    ).apply(i, EntityIngredient::new));
+    // TODO: improve codec to only encode entity type holder
+    public static final Codec<EntityIngredient> CODEC = EntityInfo.CODEC.xmap(EntityIngredient::new, EntityIngredient::getEntityInfo);
 
     private final EntityInfo entityInfo;
     @Nullable
