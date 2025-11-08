@@ -18,6 +18,7 @@ import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 import com.google.common.base.Preconditions;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.rhino.util.HideFromJS;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,78 +31,79 @@ import java.util.stream.Collectors;
 
 // TODO: implement more from the LocationPredicate (light, block below, water)
 @SuppressWarnings("unused")
-public final class StartConditionsBuilder {
+public final class ConditionsBuilder {
 
     private final SourceLine sourceLine;
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
     private LocationPredicate.Builder locationPredicate;
 
-    public StartConditionsBuilder(SourceLine sourceLine) {
+    @HideFromJS
+    public ConditionsBuilder(SourceLine sourceLine) {
         this.sourceLine = sourceLine;
     }
 
-    public StartConditionsBuilder biomes(HolderSet<Biome> biomes) {
+    public ConditionsBuilder biomes(HolderSet<Biome> biomes) {
         getOrCreateLocationPredicate().setBiomes(biomes);
         return this;
     }
 
-    public StartConditionsBuilder dimension(ResourceKey<Level> dimension) {
+    public ConditionsBuilder dimension(ResourceKey<Level> dimension) {
         getOrCreateLocationPredicate().setDimension(dimension);
         return this;
     }
 
-    public StartConditionsBuilder minHeight(int min) {
+    public ConditionsBuilder minHeight(int min) {
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atLeast(min));
         return this;
     }
 
-    public StartConditionsBuilder maxHeight(int max) {
+    public ConditionsBuilder maxHeight(int max) {
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atMost(max));
         return this;
     }
 
-    public StartConditionsBuilder height(int height) {
+    public ConditionsBuilder height(int height) {
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.exactly(height));
         return this;
     }
 
-    public StartConditionsBuilder height(int min, int max) {
+    public ConditionsBuilder height(int min, int max) {
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.between(min, max));
         return this;
     }
 
-    public StartConditionsBuilder setOpenSky(boolean openSky) {
+    public ConditionsBuilder setOpenSky(boolean openSky) {
         getOrCreateLocationPredicate().setCanSeeSky(openSky);
         return this;
     }
 
-    public StartConditionsBuilder structures(HolderSet<Structure> structures) {
+    public ConditionsBuilder structures(HolderSet<Structure> structures) {
         getOrCreateLocationPredicate().setStructures(structures);
         return this;
     }
 
-    public StartConditionsBuilder minTime(int min) {
+    public ConditionsBuilder minTime(int min) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.lowerBound(min)));
         return this;
     }
 
-    public StartConditionsBuilder maxTime(int max) {
+    public ConditionsBuilder maxTime(int max) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.upperBound(max)));
         return this;
     }
 
-    public StartConditionsBuilder time(int min, int max) {
+    public ConditionsBuilder time(int min, int max) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.range(min, max)));
         return this;
     }
 
-    public StartConditionsBuilder time(TimeCondition.TimeType timeType) {
+    public ConditionsBuilder time(TimeCondition.TimeType timeType) {
         conditions.add(new TimeCheck(Optional.of(24_000L), timeType.range));
         return this;
     }
 
-    public StartConditionsBuilder weather(Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
+    public ConditionsBuilder weather(Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
         try {
             var builder = new WeatherCondition.Builder();
             var weatherCheck = weather.apply(builder).build();
@@ -112,6 +114,7 @@ public final class StartConditionsBuilder {
         return this;
     }
 
+    @HideFromJS
     public List<LootItemCondition> build() {
         if (locationPredicate != null) {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());

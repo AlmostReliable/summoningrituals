@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
-import com.almostreliable.summoningrituals.compat.kubejs.builder.StartConditionsBuilder;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
@@ -16,8 +16,8 @@ public class AltarKubeRecipe extends KubeRecipe {
         AltarKubeRecipe::new
     );
 
-    public AltarKubeRecipe startConditions(Function<StartConditionsBuilder, StartConditionsBuilder> conditions) {
-        setValue(AltarRecipeSchema.START_CONDITIONS, conditions.apply(new StartConditionsBuilder(sourceLine)).build());
+    public AltarKubeRecipe conditions(Function<ConditionsBuilder, ConditionsBuilder> conditions) {
+        setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder(sourceLine)).build());
         return this;
     }
 }

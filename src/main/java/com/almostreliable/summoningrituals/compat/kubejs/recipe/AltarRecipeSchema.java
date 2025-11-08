@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.Entity
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
@@ -27,43 +28,43 @@ import java.util.List;
 public interface AltarRecipeSchema {
 
     RecipeKey<Ingredient> CATALYST = IngredientComponent.INGREDIENT
-        .key("catalyst", ComponentRole.INPUT)
+        .key(Constants.CATALYST, ComponentRole.INPUT)
         .noFunctions();
     RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.INSTANCE.asList()
-        .key("item_outputs", ComponentRole.OUTPUT)
+        .key(Constants.ITEM_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("itemOutputs"))
         .optional(List.of())
         .allowEmpty()
         .exclude();
     RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.INSTANCE.asList()
-        .key("entity_outputs", ComponentRole.OUTPUT)
+        .key(Constants.ENTITY_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("entityOutputs"))
         .optional(List.of())
         .allowEmpty()
         .exclude();
     RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT.asList()
-        .key("item_inputs", ComponentRole.INPUT)
+        .key(Constants.ITEM_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("itemInputs"))
         .optional(List.of())
         .allowEmpty()
         .exclude();
     RecipeKey<List<EntityInfo>> ENTITY_INPUTS = EntityInfoComponent.INSTANCE.asList()
-        .key("entity_inputs", ComponentRole.INPUT)
+        .key(Constants.ENTITY_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("entityInputs"))
         .optional(List.of())
         .allowEmpty()
         .exclude();
     RecipeKey<BlockPos> ZONE = BlockPosComponent.INSTANCE
-        .key("zone", ComponentRole.OTHER)
+        .key(Constants.ZONE, ComponentRole.OTHER)
         .functionNames(List.of("entityInputZone", "inputZone", "sacrificeZone", "entityZone"))
         .optional(AltarRecipe.DEFAULT_ZONE)
         .exclude();
     RecipeKey<Integer> TICKS = NumberComponent.INT
-        .key("ticks", ComponentRole.OTHER)
+        .key(Constants.TICKS, ComponentRole.OTHER)
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
-    RecipeKey<List<LootItemCondition>> START_CONDITIONS = LootItemConditionComponent.INSTANCE.asList()
-        .key("start_conditions", ComponentRole.INPUT)
+    RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.INSTANCE.asList()
+        .key(Constants.CONDITIONS, ComponentRole.INPUT)
         .noFunctions()
         .optional(List.of())
         .allowEmpty()
@@ -77,6 +78,6 @@ public interface AltarRecipeSchema {
         ENTITY_INPUTS,
         ZONE,
         TICKS,
-        START_CONDITIONS
+        CONDITIONS
     ).factory(AltarKubeRecipe.FACTORY);
 }
