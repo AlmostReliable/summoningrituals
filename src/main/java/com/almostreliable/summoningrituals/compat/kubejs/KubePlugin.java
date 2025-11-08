@@ -7,11 +7,13 @@ import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBi
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInfoComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
@@ -21,6 +23,7 @@ import dev.latvian.mods.kubejs.recipe.schema.RecipeComponentFactoryRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeFactoryRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaRegistry;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
+import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 
 public class KubePlugin implements KubeJSPlugin {
 
@@ -47,10 +50,16 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void registerRecipeComponents(RecipeComponentFactoryRegistry registry) {
         registry.register(BlockPosComponent.INSTANCE);
+        registry.register(CommandOutputComponent.INSTANCE);
         registry.register(EntityInfoComponent.INSTANCE);
         registry.register(EntityOutputComponent.INSTANCE);
         registry.register(ItemOutputComponent.INSTANCE);
         registry.register(LootItemConditionComponent.INSTANCE);
+    }
+
+    @Override
+    public void registerTypeWrappers(TypeWrapperRegistry registry) {
+        registry.register(CommandOutput.class, CommandOutputComponent.INSTANCE);
     }
 
     @Override

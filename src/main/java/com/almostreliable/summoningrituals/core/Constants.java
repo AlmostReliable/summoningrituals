@@ -5,6 +5,7 @@ public interface Constants {
     String ACTIVE = "active";
     String ALTAR = "altar";
     String CATALYST = "catalyst";
+    String COMMANDS = "commands";
     String CONDITIONS = "conditions";
     String COUNT = "count";
     String DATA = "data";
@@ -20,6 +21,7 @@ public interface Constants {
     String ITEM_OUTPUTS = "item_outputs";
     String OFFSET = "offset";
     String RECIPE_VIEWER = "recipe_viewer";
+    String REQUIRES_PLAYER = "requires_player";
     String SIZE = "size";
     String SLOT = "slot";
     String SPREAD = "spread";

@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInfoComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
@@ -8,6 +9,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootIt
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
@@ -42,6 +44,11 @@ public interface AltarRecipeSchema {
         .optional(List.of())
         .allowEmpty()
         .exclude();
+    RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.INSTANCE
+        .key(Constants.COMMANDS, ComponentRole.OUTPUT)
+        .noFunctions()
+        .optional(CommandOutput.EMPTY)
+        .exclude();
     RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT.asList()
         .key(Constants.ITEM_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("itemInputs"))
@@ -74,6 +81,7 @@ public interface AltarRecipeSchema {
         CATALYST,
         ITEM_OUTPUTS,
         ENTITY_OUTPUTS,
+        COMMANDS,
         ITEM_INPUTS,
         ENTITY_INPUTS,
         ZONE,

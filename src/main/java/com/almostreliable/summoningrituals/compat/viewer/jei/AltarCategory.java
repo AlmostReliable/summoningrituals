@@ -47,6 +47,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable conditionIcon;
+    private final IDrawable commandsIcon;
     private final EntityIngredientRenderer entityIngredientRenderer = new EntityIngredientRenderer();
 
     AltarCategory(IGuiHelper guiHelper) {
@@ -55,6 +56,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
+        commandsIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.COMMAND_BLOCK.getDefaultInstance());
     }
 
     @Override
@@ -90,9 +92,14 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         background.draw(guiGraphics);
 
         var recipeConditions = recipeHolder.value().startConditions();
-        if (recipeConditions.isEmpty()) return;
+        if (!recipeConditions.isEmpty()) {
+            conditionIcon.draw(guiGraphics, 2, 2);
+        }
 
-        conditionIcon.draw(guiGraphics, 2, 2);
+        var recipeCommands = recipeHolder.value().commands();
+        if (recipeCommands.isPresent()) {
+            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - 16 * 2 - 2, TEXTURE_HEIGHT - 16 * 2 - 5);
+        }
     }
 
     @Override
@@ -100,13 +107,18 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         ITooltipBuilder tooltip, RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY
     ) {
         var recipeConditions = recipeHolder.value().startConditions();
-        if (recipeConditions.isEmpty()) return;
-
-        if (mouseX >= 2 && mouseX <= 14 && mouseY >= 2 && mouseY <= 14) {
+        if (!recipeConditions.isEmpty() && mouseInSlot(mouseX, mouseY, 2, 2)) {
             tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
             for (var condition : recipeConditions) {
                 tooltip.addAll(ConditionRegistry.getTooltip(condition));
             }
+            return;
+        }
+
+        var recipeCommands = recipeHolder.value().commands();
+        if (recipeCommands.isPresent() && mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - 16 * 2 - 2, TEXTURE_HEIGHT - 16 * 2 - 5)) {
+            tooltip.add(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
+            tooltip.addAll(recipeCommands.get().getTooltip());
         }
     }
 
@@ -195,5 +207,9 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         tooltipLines.removeFirst();
         tooltipLines.addFirst(Either.left(SummoningLang.INSERT_LAST.get().withStyle(ChatFormatting.GRAY)));
         tooltipLines.addFirst(Either.left(catalystComponent));
+    }
+
+    private static boolean mouseInSlot(double mouseX, double mouseY, int x, int y) {
+        return mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16;
     }
 }

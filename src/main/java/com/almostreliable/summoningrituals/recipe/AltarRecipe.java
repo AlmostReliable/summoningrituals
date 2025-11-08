@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
@@ -8,6 +9,7 @@ import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,12 +32,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 public record AltarRecipe(
-    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, List<SizedIngredient> itemInputs,
-    List<EntityInfo> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
+    List<SizedIngredient> itemInputs, List<EntityInfo> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
@@ -123,6 +126,11 @@ public record AltarRecipe(
             result.addAll(output.spawn(level, origin));
         }
         return ImmutableList.copyOf(result);
+    }
+
+    public void invokeCommands(ServerLevel level, @Nullable ServerPlayer player) {
+        if (commands.isEmpty()) return;
+        commands.get().invoke(level, player);
     }
 
     private AABB constructRegion(BlockPos pos) {

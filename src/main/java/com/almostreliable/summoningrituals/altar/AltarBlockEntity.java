@@ -99,6 +99,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (recipeProgress >= recipeTime) {
             var recipe = currentRecipeInfo.recipe();
             if (inventory.consumeRecipeInputs(level, recipe)) {
+                recipe.invokeCommands(level, invokingPlayer);
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, recipe.itemOutputs());
                 var entityOutputs = recipe.spawnOutputs(level, worldPosition, recipe.entityOutputs());
                 var recipeInfo = RecipeInfoContainer.outputInfo(currentRecipeInfo, itemOutputs, entityOutputs);

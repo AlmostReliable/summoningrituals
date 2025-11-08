@@ -27,6 +27,7 @@
   "item.summoningrituals.altar": "block.summoningrituals.altar",
   "item.summoningrituals.indestructible_altar": "block.summoningrituals.indestructible_altar",
   "label.summoningrituals.catalyst": "Catalyst",
+  "label.summoningrituals.commands": "Commands",
   "label.summoningrituals.conditions": "Conditions",
   "message.summoningrituals.failed_conditions": "Not all conditions were met for the ritual.",
   "message.summoningrituals.in_progress": "The ritual is already in progress.",

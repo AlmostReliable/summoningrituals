@@ -49,9 +49,11 @@ public final class Config {
     public static final class CommonConfig {
 
         public final int altarInventorySize;
+        public final boolean announceCommandInvoke;
 
         private CommonConfig(CommonConfigData data) {
             this.altarInventorySize = Math.clamp(1, data.altarInventorySize, 64);
+            this.announceCommandInvoke = data.announceCommandInvoke;
         }
     }
 
@@ -72,6 +74,7 @@ public final class Config {
     private static final class CommonConfigData {
 
         private final int altarInventorySize = 16;
+        private final boolean announceCommandInvoke = true;
     }
 
     @SuppressWarnings("FieldMayBeStatic")
