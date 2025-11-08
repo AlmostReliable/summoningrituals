@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuild
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import com.mojang.serialization.Codec;
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.item.ItemStackJS;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
@@ -40,7 +41,7 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
         var registryAccess = ((KubeJSContext) cx).getRegistries();
         var stack = ItemStackJS.wrap(registryAccess, from);
         if (stack.isEmpty()) {
-            throw new IllegalArgumentException("empty summoning item output: " + from);
+            throw new KubeRuntimeException("empty summoning item output: " + from).source(recipe.sourceLine);
         }
 
         return SummoningItemBinding.of(stack).build();

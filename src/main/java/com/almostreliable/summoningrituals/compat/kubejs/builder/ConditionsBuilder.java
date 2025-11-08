@@ -15,7 +15,6 @@ import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
-import com.google.common.base.Preconditions;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.rhino.util.HideFromJS;
@@ -128,10 +127,10 @@ public final class ConditionsBuilder {
             .map(Class::getSimpleName)
             .toList();
 
-        Preconditions.checkArgument(
-            duplicates.isEmpty(),
-            "only one condition of each type allowed, duplicates found: %s"
-        );
+        if (!duplicates.isEmpty()) {
+            throwException("only one condition of each type allowed, duplicates found: " + duplicates);
+        }
+
         return conditions;
     }
 

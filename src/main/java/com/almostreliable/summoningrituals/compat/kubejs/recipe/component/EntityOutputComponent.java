@@ -3,7 +3,6 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityOutputBuilder;
-import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityWrapper;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
@@ -32,7 +31,7 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
         return TypeInfo.of(EntityOutput.class)
             .or(TypeInfo.of(EntityInfo.class))
             .or(TypeInfo.of(SummoningEntityOutputBuilder.class))
-            .or(TypeInfo.of(Holder.class).withParams(SizedEntityWrapper.ENTITY_TYPE_INFO))
+            .or(TypeInfo.of(Holder.class).withParams(EntityInfoComponent.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
     }
@@ -47,9 +46,10 @@ public class EntityOutputComponent implements RecipeComponent<EntityOutput> {
             return new EntityOutput(info, Optional.empty(), Optional.empty());
         }
 
-        return SizedEntityWrapper.wrap(
+        return EntityInfoComponent.wrapSizedEntity(
             cx,
             from,
+            recipe.sourceLine,
             EntityOutput.class,
             (entity, count) -> SummoningEntityBinding.output(entity, count).buildOutput()
         );
