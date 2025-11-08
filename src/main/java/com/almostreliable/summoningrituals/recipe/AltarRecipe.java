@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -45,6 +46,7 @@ public record AltarRecipe(
     public static final int DEFAULT_TICKS = 40;
     private static final Set<Item> CATALYSTS = new HashSet<>();
     private static final Set<Item> INPUTS = new HashSet<>();
+    private static boolean CACHES_INITIALIZED = false;
 
     @Override
     public boolean matches(RecipeInput inventory, Level level) {
@@ -142,24 +144,37 @@ public record AltarRecipe(
         );
     }
 
-    public static boolean isCatalyst(Item item) {
+    public static boolean isCatalyst(RecipeManager recipeManager, Item item) {
+        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
         return CATALYSTS.contains(item);
     }
 
-    public static boolean isInput(Item item) {
+    public static boolean isInput(RecipeManager recipeManager, Item item) {
+        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
         return INPUTS.contains(item);
     }
 
-    public static void addCatalyst(Item item) {
-        CATALYSTS.add(item);
-    }
+    private static void initializeCaches(RecipeManager recipeManager) {
+        var recipes = recipeManager.getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get());
 
-    public static void addInput(Item item) {
-        INPUTS.add(item);
+        for (var recipe : recipes) {
+            var r = recipe.value();
+            for (var catalyst : r.catalyst.getItems()) {
+                CATALYSTS.add(catalyst.getItem());
+            }
+            for (var itemInput : r.itemInputs) {
+                for (var stack : itemInput.getItems()) {
+                    INPUTS.add(stack.getItem());
+                }
+            }
+        }
+
+        CACHES_INITIALIZED = true;
     }
 
     public static void clearCaches() {
         CATALYSTS.clear();
         INPUTS.clear();
+        CACHES_INITIALIZED = false;
     }
 }

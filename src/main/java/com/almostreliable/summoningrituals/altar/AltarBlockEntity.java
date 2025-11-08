@@ -28,6 +28,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -154,14 +155,14 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         }
 
         RecipeMatchResult matchResult = null;
-        if (AltarRecipe.isCatalyst(stack.getItem())) {
+        if (AltarRecipe.isCatalyst(serverLevel.getRecipeManager(), stack.getItem())) {
             matchResult = handleCatalystInsertion(serverLevel, player, stack, simulate);
             if (matchResult.getInteractionRemainder() != null) {
                 return matchResult.getInteractionRemainder();
             }
         }
 
-        if (AltarRecipe.isInput(stack.getItem())) {
+        if (AltarRecipe.isInput(serverLevel.getRecipeManager(), stack.getItem())) {
             return handleInputInsertion(serverLevel, player, stack, simulate);
         }
 
@@ -282,6 +283,13 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return inventory;
         }
         return null;
+    }
+
+    @Nullable
+    @Override
+    public RecipeManager getRecipeManager() {
+        if (level == null) return null;
+        return level.getRecipeManager();
     }
 
     public AltarInventory getInventory() {

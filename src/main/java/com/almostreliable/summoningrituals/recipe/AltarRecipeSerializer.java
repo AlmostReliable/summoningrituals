@@ -69,15 +69,6 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "no item, entity or command outputs");
         }
 
-        for (var stack : recipe.catalyst().getItems()) {
-            AltarRecipe.addCatalyst(stack.getItem());
-        }
-        for (var input : recipe.itemInputs()) {
-            for (var stack : input.getItems()) {
-                AltarRecipe.addInput(stack.getItem());
-            }
-        }
-
         return DataResult.success(recipe);
     }
 
