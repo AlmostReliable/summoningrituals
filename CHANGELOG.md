@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.1.0] - 2025-11-08
 
 - added a condition display to the recipe viewer integration
 - added custom condition builder to KubeJS integration to avoid exposing loot condition builders
@@ -26,4 +29,5 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.1.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.1.0
 [3.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.0.0
