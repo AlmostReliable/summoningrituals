@@ -54,7 +54,7 @@ public record CommandOutput(List<String> commands, List<Component> tooltip, bool
             commandSourceStack = commandSourceStack.withEntity(player);
         }
         for (var command : commands) {
-            if (Config.COMMON.announceCommandInvoke) {
+            if (Config.COMMON.announceCommand.get()) {
                 SummoningRituals.LOGGER.info("Executing ritual output command: {}", command);
             }
             level.getServer().getCommands().performPrefixedCommand(commandSourceStack, command);

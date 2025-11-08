@@ -8,6 +8,7 @@ import com.almostreliable.summoningrituals.network.PacketHandler;
 
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -21,10 +22,10 @@ public final class SummoningRituals {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public SummoningRituals(IEventBus eventBus) {
+    public SummoningRituals(IEventBus eventBus, ModContainer modContainer) {
         Registration.init(eventBus);
         PacketHandler.init(eventBus);
-        Config.init();
+        Config.init(modContainer);
         eventBus.addListener(DataGeneration::init);
         NeoForge.EVENT_BUS.addListener(SummoningRituals::onEntityDeathLoot);
     }

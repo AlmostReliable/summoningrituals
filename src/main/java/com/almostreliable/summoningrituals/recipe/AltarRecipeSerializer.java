@@ -61,8 +61,8 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "no item or entity inputs");
         }
 
-        if (recipe.itemInputs().size() > Config.COMMON.altarInventorySize) {
-            return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.altarInventorySize);
+        if (recipe.itemInputs().size() > Config.COMMON.inventorySize.get()) {
+            return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.inventorySize.get());
         }
 
         if (recipe.itemOutputs().isEmpty() && recipe.entityOutputs().isEmpty() && recipe.commands().isEmpty()) {

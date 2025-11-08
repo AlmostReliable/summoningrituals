@@ -37,7 +37,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     public AltarRenderer(Context context) {
         itemRenderer = context.getItemRenderer();
-        altarRenderDistance = Config.CLIENT.altarRenderDistance;
+        altarRenderDistance = Config.CLIENT.renderDistance.get();
     }
 
     @Override
