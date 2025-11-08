@@ -9,7 +9,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 @Mod(value = ModConstants.MOD_ID, dist = Dist.CLIENT)
-public class SummoningRitualsClient {
+public final class SummoningRitualsClient {
 
     public SummoningRitualsClient(IEventBus eventBus) {
         eventBus.addListener(SummoningRitualsClient::registerRenderers);

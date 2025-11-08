@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 
 @SuppressWarnings("WeakerAccess")
 @Mod(ModConstants.MOD_ID)
-public class SummoningRituals {
+public final class SummoningRituals {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
