@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.wrapper;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import dev.latvian.mods.kubejs.error.InvalidRecipeComponentValueException;
 import dev.latvian.mods.kubejs.holder.HolderWrapper;
@@ -48,11 +49,20 @@ public final class SizedEntityTypeWrapper {
             }
         }
 
+        Holder<EntityType<?>> entityHolder;
         try {
-            Holder<EntityType<?>> entityHolder = Cast.to(HolderWrapper.wrap((KubeJSContext) cx.cx(), o, ENTITY_TYPE_INFO));
-            return factory.apply(entityHolder, count);
+            entityHolder = Cast.to(HolderWrapper.wrap((KubeJSContext) cx.cx(), o, ENTITY_TYPE_INFO));
         } catch (Exception e) {
             throw new InvalidRecipeComponentValueException("invalid summoning entity", component, from).source(cx.recipe().sourceLine);
         }
+
+        if (entityHolder instanceof DeferredHolder<?, ?>) {
+            throw new InvalidRecipeComponentValueException(
+                "unknown entity id for summoning entity",
+                component,
+                from
+            ).source(cx.recipe().sourceLine);
+        }
+        return factory.apply(entityHolder, count);
     }
 }
