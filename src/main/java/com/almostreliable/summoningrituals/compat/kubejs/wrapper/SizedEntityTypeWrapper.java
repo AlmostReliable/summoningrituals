@@ -9,6 +9,7 @@ import dev.latvian.mods.kubejs.holder.HolderWrapper;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
+import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
 import java.util.function.BiFunction;
@@ -48,8 +49,7 @@ public final class SizedEntityTypeWrapper {
         }
 
         try {
-            //noinspection unchecked
-            var entityHolder = (Holder<EntityType<?>>) HolderWrapper.wrap((KubeJSContext) cx, o, ENTITY_TYPE_INFO);
+            Holder<EntityType<?>> entityHolder = Cast.to(HolderWrapper.wrap((KubeJSContext) cx.cx(), o, ENTITY_TYPE_INFO));
             return factory.apply(entityHolder, count);
         } catch (Exception e) {
             throw new InvalidRecipeComponentValueException("invalid summoning entity", component, from).source(cx.recipe().sourceLine);
