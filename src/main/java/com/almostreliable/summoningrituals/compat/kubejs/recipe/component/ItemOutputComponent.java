@@ -5,18 +5,22 @@ import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBi
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
+import net.minecraft.world.item.ItemStack;
+
 import com.mojang.serialization.Codec;
-import dev.latvian.mods.kubejs.error.KubeRuntimeException;
-import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.recipe.KubeRecipe;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
+import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
-import dev.latvian.mods.kubejs.script.KubeJSContext;
-import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
+public record ItemOutputComponent(RecipeComponentType<?> type) implements RecipeComponent<ItemOutput> {
 
-    public static final ItemOutputComponent INSTANCE = new ItemOutputComponent();
+    public static final RecipeComponentType<ItemOutput> TYPE = RecipeComponentType.unit(
+        SummoningRituals.getRL("item_output"),
+        ItemOutputComponent::new
+    );
+    private static final ItemOutput EMPTY = SummoningItemBinding.of(ItemStack.EMPTY).build();
 
     @Override
     public Codec<ItemOutput> codec() {
@@ -25,11 +29,11 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
 
     @Override
     public TypeInfo typeInfo() {
-        return TypeInfo.of(ItemOutput.class).or(TypeInfo.of(ItemOutputBuilder.class)).or(ItemStackJS.TYPE_INFO);
+        return TypeInfo.of(ItemOutput.class).or(TypeInfo.of(ItemOutputBuilder.class)).or(ItemWrapper.TYPE_INFO);
     }
 
     @Override
-    public ItemOutput wrap(Context cx, KubeRecipe recipe, Object from) {
+    public ItemOutput wrap(RecipeScriptContext cx, Object from) {
         if (from instanceof ItemOutput o) {
             return o;
         }
@@ -38,17 +42,7 @@ public class ItemOutputComponent implements RecipeComponent<ItemOutput> {
             return builder.build();
         }
 
-        var registryAccess = ((KubeJSContext) cx).getRegistries();
-        var stack = ItemStackJS.wrap(registryAccess, from);
-        if (stack.isEmpty()) {
-            throw new KubeRuntimeException("empty summoning item output: " + from).source(recipe.sourceLine);
-        }
-
-        return SummoningItemBinding.of(stack).build();
-    }
-
-    @Override
-    public String toString() {
-        return SummoningRituals.getRL("item_output").toString();
+        var stack = ItemWrapper.wrap(cx.cx(), from);
+        return stack.isEmpty() ? EMPTY : SummoningItemBinding.of(stack).build();
     }
 }

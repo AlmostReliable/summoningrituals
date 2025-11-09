@@ -24,6 +24,7 @@ import dev.latvian.mods.kubejs.recipe.component.IngredientComponent;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.component.SizedIngredientComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
+import dev.latvian.mods.kubejs.util.IntBounds;
 
 import java.util.List;
 
@@ -32,36 +33,44 @@ public interface AltarRecipeSchema {
     RecipeKey<Ingredient> CATALYST = IngredientComponent.INGREDIENT
         .key(Constants.CATALYST, ComponentRole.INPUT)
         .noFunctions();
-    RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.INSTANCE.asList()
+    RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.TYPE
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("itemOutputs"))
         .optional(List.of())
-        .allowEmpty()
         .exclude();
-    RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.INSTANCE.asList()
+    RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.TYPE
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("entityOutputs"))
         .optional(List.of())
-        .allowEmpty()
         .exclude();
-    RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.INSTANCE
+    RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.TYPE
         .key(Constants.COMMANDS, ComponentRole.OUTPUT)
         .noFunctions()
         .optional(CommandOutput.EMPTY)
         .exclude();
-    RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT.asList()
+    RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("itemInputs"))
         .optional(List.of())
-        .allowEmpty()
         .exclude();
-    RecipeKey<List<EntityInfo>> ENTITY_INPUTS = EntityInfoComponent.INSTANCE.asList()
+    RecipeKey<List<EntityInfo>> ENTITY_INPUTS = EntityInfoComponent.TYPE
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("entityInputs"))
         .optional(List.of())
-        .allowEmpty()
         .exclude();
-    RecipeKey<BlockPos> ZONE = BlockPosComponent.INSTANCE
+    RecipeKey<BlockPos> ZONE = BlockPosComponent.TYPE
         .key(Constants.ZONE, ComponentRole.OTHER)
         .functionNames(List.of("entityInputZone", "inputZone", "sacrificeZone", "entityZone"))
         .optional(AltarRecipe.DEFAULT_ZONE)
@@ -70,11 +79,13 @@ public interface AltarRecipeSchema {
         .key(Constants.TICKS, ComponentRole.OTHER)
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
-    RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.INSTANCE.asList()
+    RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.TYPE
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
         .key(Constants.CONDITIONS, ComponentRole.INPUT)
         .noFunctions()
         .optional(List.of())
-        .allowEmpty()
         .exclude();
 
     RecipeSchema SCHEMA = new RecipeSchema(

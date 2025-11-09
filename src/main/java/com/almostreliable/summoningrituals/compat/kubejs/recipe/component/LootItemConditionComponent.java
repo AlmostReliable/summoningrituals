@@ -6,11 +6,15 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public class LootItemConditionComponent implements RecipeComponent<LootItemCondition> {
+public record LootItemConditionComponent(RecipeComponentType<?> type) implements RecipeComponent<LootItemCondition> {
 
-    public static final LootItemConditionComponent INSTANCE = new LootItemConditionComponent();
+    public static final RecipeComponentType<LootItemCondition> TYPE = RecipeComponentType.unit(
+        SummoningRituals.getRL("loot_condition"),
+        LootItemConditionComponent::new
+    );
 
     @Override
     public Codec<LootItemCondition> codec() {
@@ -20,10 +24,5 @@ public class LootItemConditionComponent implements RecipeComponent<LootItemCondi
     @Override
     public TypeInfo typeInfo() {
         return TypeInfo.of(LootItemCondition.class);
-    }
-
-    @Override
-    public String toString() {
-        return SummoningRituals.getRL("loot_condition").toString();
     }
 }

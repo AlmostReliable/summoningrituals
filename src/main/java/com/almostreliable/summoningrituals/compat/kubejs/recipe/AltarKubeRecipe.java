@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
-import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
@@ -59,7 +59,7 @@ public class AltarKubeRecipe extends KubeRecipe {
     public static List<String> normalizeCommandList(List<String> commands) {
         var result = new ArrayList<String>();
         for (var command : commands) {
-            result.add(CommandOutputComponent.normalizeCommand(command));
+            result.add(CommandOutputTypeWrapper.normalizeCommand(command));
         }
         return result;
     }
