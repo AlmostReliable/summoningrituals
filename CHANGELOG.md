@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added support for KubeJS 7.2
+- added overload in item binding to specify count directly
+- improved entity wrapper error message when non-existing id is provided
 - improved entity ingredient and renderer
   - bookmark renderer no longer displays count or entity data
   - bookmark serialization now omits values not needed for persisting
