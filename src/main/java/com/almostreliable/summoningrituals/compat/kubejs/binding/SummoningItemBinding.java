@@ -9,4 +9,9 @@ public interface SummoningItemBinding {
     static ItemOutputBuilder of(ItemStack stack) {
         return new ItemOutputBuilder(stack);
     }
+
+    static ItemOutputBuilder of(ItemStack stack, int count) {
+        stack.setCount(count);
+        return of(stack);
+    }
 }
