@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- improved entity ingredient and renderer
+  - bookmark renderer no longer displays count or entity data
+  - bookmark serialization now omits values not needed for persisting
+  - renderer now measures the entity bounds in the origin position allowing for much better y offset calculation
+  - measurements now span across 40 render ticks to track height changes in animations
+  - bookmark and output renderers now use scissor mask to avoid clipping
+  - fixed rotation of entities using an inverted model (ender dragon, bats, etc.)
 
 ## [3.1.0] - 2025-11-08
 

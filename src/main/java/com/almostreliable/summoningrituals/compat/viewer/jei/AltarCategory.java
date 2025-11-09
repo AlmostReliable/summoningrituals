@@ -48,7 +48,6 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
     private final IDrawable icon;
     private final IDrawable conditionIcon;
     private final IDrawable commandsIcon;
-    private final EntityIngredientRenderer entityIngredientRenderer = new EntityIngredientRenderer();
 
     AltarCategory(IGuiHelper guiHelper) {
         background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - 16, TEXTURE_HEIGHT)
@@ -160,7 +159,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
                 var entityEgg = entityIngredient.getEgg();
 
                 builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                    .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, entityIngredientRenderer)
+                    .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientRenderer.INPUT_RENDERER)
                     .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
                 if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
             }
@@ -189,7 +188,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
             var entityEgg = entityIngredient.getEgg();
 
             builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, entityIngredientRenderer)
+                .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientRenderer.OUTPUT_RENDERER)
                 .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
             if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
         }

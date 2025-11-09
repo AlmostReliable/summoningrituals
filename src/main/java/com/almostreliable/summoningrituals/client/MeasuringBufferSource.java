@@ -5,6 +5,8 @@ import net.minecraft.client.renderer.RenderType;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A {@link MultiBufferSource} that captures vertex positions without emitting any real geometry to
  * record min/max x/y/z values from all vertices submitted during a render pass.
@@ -27,43 +29,41 @@ public class MeasuringBufferSource implements MultiBufferSource {
         return instance;
     }
 
-    public boolean hasData() {
-        return instance.hasData();
+    @Nullable
+    public MeasuringResult getData() {
+        return instance.data;
     }
 
-    public float diagonal() {
-        float dx = instance.maxX - instance.minX;
-        float dy = instance.maxY - instance.minY;
-        float dz = instance.maxZ - instance.minZ;
-        return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
-    }
+    public record MeasuringResult(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
 
-    public float height() {
-        return instance.maxY - instance.minY;
+        public static final MeasuringResult EMPTY = new MeasuringResult(0, 0, 0, 0, 0, 0);
+
+        MeasuringResult(float x, float y, float z) {
+            this(x, y, z, x, y, z);
+        }
+
+        MeasuringResult measure(float x, float y, float z) {
+            var mMinX = Math.min(minX, x);
+            var mMinY = Math.min(minY, y);
+            var mMinZ = Math.min(minZ, z);
+            var mMaxX = Math.max(maxX, x);
+            var mMaxY = Math.max(maxY, y);
+            var mMaxZ = Math.max(maxZ, z);
+            return new MeasuringResult(mMinX, mMinY, mMinZ, mMaxX, mMaxY, mMaxZ);
+        }
     }
 
     private static final class MeasuringVertexConsumer implements VertexConsumer {
 
-        private float minX = Float.POSITIVE_INFINITY;
-        private float minY = Float.POSITIVE_INFINITY;
-        private float minZ = Float.POSITIVE_INFINITY;
-        private float maxX = Float.NEGATIVE_INFINITY;
-        private float maxY = Float.NEGATIVE_INFINITY;
-        private float maxZ = Float.NEGATIVE_INFINITY;
-        private boolean hasData = false;
-
-        boolean hasData() {
-            return hasData;
-        }
+        @Nullable
+        private MeasuringResult data;
 
         private void record(float x, float y, float z) {
-            hasData = true;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (z < minZ) minZ = z;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-            if (z > maxZ) maxZ = z;
+            if (data == null) {
+                data = new MeasuringResult(x, y, z);
+            } else {
+                data = data.measure(x, y, z);
+            }
         }
 
         @Override

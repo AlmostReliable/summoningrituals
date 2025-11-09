@@ -54,7 +54,7 @@ public class JeiPlugin implements IModPlugin {
             ENTITY_INGREDIENT,
             List.of(),
             new EntityIngredientHelper(),
-            new EntityIngredientRenderer(),
+            EntityIngredientRenderer.BOOKMARK_RENDERER,
             EntityIngredient.CODEC
         );
     }
