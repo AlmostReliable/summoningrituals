@@ -1,7 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0" is_locked="true">
     <option name="myName" value="Default" />
-    <inspection_tool class="4ec75ed6-b36f-308f-9da0-3ce78ab269dd" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
     <inspection_tool class="AbsoluteAlignmentInUserInterface" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AbstractClassExtendsConcreteClass" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AbstractClassNeverImplemented" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -243,6 +242,7 @@
     <inspection_tool class="ConditionalExpressionWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ConditionalExpressionWithIdenticalBranchesJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ConfigurationAvoidance" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ConflictingShareType" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ConfusingElse" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="reportWhenNoStatementFollow" value="true" />
     </inspection_tool>
@@ -417,6 +417,7 @@
     <inspection_tool class="DeprecatedGradleDependency" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DeprecatedIsStillUsed" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DeprecatedMavenDependency" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="DeprecatedTranslation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="Deprecation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DesignForExtension" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="DestructuringWrongName" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -426,6 +427,7 @@
     <inspection_tool class="DifferentKotlinMavenVersion" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DifferentMavenStdlibVersion" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DifferentStdlibGradleVersion" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="DisallowedTargetInsn" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="DiscouragedInjectionPoint" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DiscouragedShift" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DisjointPackage" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -524,7 +526,9 @@
     <inspection_tool class="EmptyStatementBody" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_reportEmptyBlocks" value="true" />
     </inspection_tool>
-    <inspection_tool class="EmptyStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="EmptyStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_reportEmptyBlocks" value="false" />
+    </inspection_tool>
     <inspection_tool class="EmptySynchronizedStatement" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="EmptyTryBlock" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="EmptyTryBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -804,7 +808,14 @@
     <inspection_tool class="HtmlMissingClosingTag" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="HtmlTagCanBeJavadocTag" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="HtmlUnknownAnchorTarget" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="0" />
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
     <inspection_tool class="HtmlUnknownBooleanAttribute" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
@@ -871,7 +882,7 @@
     <inspection_tool class="IncompleteDestructuring" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="InconsistentCommentForJavaParameter" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InconsistentLanguageLevel" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="InconsistentLineSeparators" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="InconsistentLineSeparators" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InconsistentResourceBundle" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InconsistentTextBlockIndent" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="IncorrectDateTimeFormat" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -887,7 +898,7 @@
     <inspection_tool class="InfiniteRecursionJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InfixCallToOrdinary" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="InjectCancellableBeforeSuperConstructorCall" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="InjectCouldBeOverwrite" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="InjectCouldBeOverwrite" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InjectIntoConstructor" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InjectLocalCaptureCanBeReplacedWithLocal" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InjectedReferences" enabled="true" level="ERROR" enabled_by_default="true" />
@@ -973,14 +984,19 @@
     <inspection_tool class="JSLastCommaInArrayLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSLastCommaInObjectLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSMethodCanBeStatic" enabled="true" level="INFORMATION" enabled_by_default="true" />
-    <inspection_tool class="JSMismatchedCollectionQueryUpdate" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSMismatchedCollectionQueryUpdate" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="queries" value="trace,write,forEach,length,size" />
+      <option name="updates" value="pop,push,shift,splice,unshift,add,insert,remove,reverse,copyWithin,fill,sort" />
+    </inspection_tool>
     <inspection_tool class="JSMissingSwitchBranches" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="JSMissingSwitchDefault" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="JSNonASCIINames" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSNonStrictModeUsed" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JSObjectNullOrUndefined" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSOctalInteger" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="JSPotentiallyInvalidConstructorUsage" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSPotentiallyInvalidConstructorUsage" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myConsiderUppercaseFunctionsToBeConstructors" value="true" />
+    </inspection_tool>
     <inspection_tool class="JSPotentiallyInvalidTargetOfIndexedPropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSPotentiallyInvalidUsageOfClassThis" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSPotentiallyInvalidUsageOfThis" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -990,7 +1006,11 @@
     <inspection_tool class="JSRemoveUnnecessaryParentheses" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="JSStringConcatenationToES6Template" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="JSSuspiciousEqPlus" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSSuspiciousNameCombination" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSSuspiciousNameCombination" enabled="true" level="WARNING" enabled_by_default="true">
+      <group names="x,width,left,right" />
+      <group names="y,height,top,bottom" />
+      <exclude classes="Math" />
+    </inspection_tool>
     <inspection_tool class="JSSwitchVariableDeclarationIssue" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSTestFailedLine" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSTypeOfValues" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1139,6 +1159,7 @@
     </inspection_tool>
     <inspection_tool class="LocalCaptureFailException" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="LocalMayBeArgsOnly" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="LocalMayUseName" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="LocalVariableDeclarationSideOnly" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="LocalVariableHidingMemberVariable" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="m_ignoreInvisibleFields" value="true" />
@@ -1297,6 +1318,7 @@
       </option>
     </inspection_tool>
     <inspection_tool class="MissingMessageConstructor" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="MissingOrInvalidOpcode" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoreObjectMethods" value="true" />
       <option name="ignoreAnonymousClassMethods" value="false" />
@@ -1316,6 +1338,7 @@
     <inspection_tool class="MixinInnerClass" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="MixinSuperClass" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ModifyVariableMayBeArgsOnly" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ModifyVariableMayUseName" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ModsTomlValidation" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ModuleWithTooFewClasses" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="limit" value="10" />
@@ -1780,7 +1803,9 @@
     <inspection_tool class="ReplaceWithIgnoreCaseEquals" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ReplaceWithJavadoc" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="ReplaceWithOperatorAssignment" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myAdditionalRequiredHtmlAttributes" value="" />
+    </inspection_tool>
     <inspection_tool class="ReservedWordUsedAsNameJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ResultOfObjectAllocationIgnored" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ResultSetIndexZero" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1830,6 +1855,7 @@
     <inspection_tool class="ShadowFieldPrefix" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ShadowFinalModification" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ShadowModifiers" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ShareNonLocalRef" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="SharedThreadLocalRandom" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ShellCheck" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ShiftOutOfRange" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2096,6 +2122,7 @@
     <inspection_tool class="UndefinedAction" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UndefinedParamsPresent" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UnimplementedExpectPlatform" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnknownCtNamespace" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UnknownGuard" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnknownLanguage" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="UnnecessarilyQualifiedInnerClassAccess" enabled="true" level="WEAK WARNING" enabled_by_default="true">
@@ -2139,7 +2166,10 @@
       <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
       <option name="m_ignoreAnnotatedVariables" value="false" />
     </inspection_tool>
-    <inspection_tool class="UnnecessaryLocalVariableJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnnecessaryLocalVariableJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
+      <option name="m_ignoreAnnotatedVariables" value="false" />
+    </inspection_tool>
     <inspection_tool class="UnnecessaryModifier" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UnnecessaryModuleDependencyInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WEAK WARNING" enabled_by_default="true">
