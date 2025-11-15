@@ -183,7 +183,7 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
         tooltip.add(entity.getDisplayName());
 
         var entityTooltip = entity.getEntityInfo().tooltip();
-        if (!entityTooltip.isEmpty()) {
+        if (renderCount && !entityTooltip.isEmpty()) {
             tooltip.addAll(entityTooltip);
         }
 
