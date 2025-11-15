@@ -34,12 +34,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
+public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
 
     static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createFromVanilla(Registration.ALTAR_RECIPE_TYPE.get());
     private static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
     private static final int TEXTURE_WIDTH = 188;
     private static final int TEXTURE_HEIGHT = 148;
+    private static final int SLOT_SIZE = 16;
     private static final int CENTER_X = (TEXTURE_WIDTH - 16) / 2;
     private static final int CENTER_Y = TEXTURE_HEIGHT / 2;
     private static final int INPUT_RADIUS = 46;
@@ -49,8 +50,8 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
     private final IDrawable conditionIcon;
     private final IDrawable commandsIcon;
 
-    AltarCategory(IGuiHelper guiHelper) {
-        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - 16, TEXTURE_HEIGHT)
+    AltarJeiCategory(IGuiHelper guiHelper) {
+        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - SLOT_SIZE, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
@@ -76,7 +77,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
 
     @Override
     public int getWidth() {
-        return TEXTURE_WIDTH - 16;
+        return TEXTURE_WIDTH - SLOT_SIZE;
     }
 
     @Override
@@ -97,7 +98,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
 
         var recipeCommands = recipeHolder.value().commands();
         if (recipeCommands.isPresent()) {
-            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - 16 * 2 - 2, TEXTURE_HEIGHT - 16 * 2 - 5);
+            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE * 2 - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
     }
 
@@ -115,7 +116,8 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         }
 
         var recipeCommands = recipeHolder.value().commands();
-        if (recipeCommands.isPresent() && mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - 16 * 2 - 2, TEXTURE_HEIGHT - 16 * 2 - 5)) {
+        if (recipeCommands.isPresent() &&
+            mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - SLOT_SIZE * 2 - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
             tooltip.add(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
             tooltip.addAll(recipeCommands.get().getTooltip());
         }
@@ -128,7 +130,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         var recipe = recipeHolder.value();
         builder.addInputSlot(CENTER_X - 8, CENTER_Y - 42)
             .addIngredients(recipe.catalyst())
-            .addRichTooltipCallback(AltarCategory::constructCatalystTooltip);
+            .addRichTooltipCallback(AltarJeiCategory::constructCatalystTooltip);
         createInputSlots(builder, recipe);
         createOutputSlots(builder, recipe);
     }
@@ -139,12 +141,11 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         var inputSlots = itemInputs.size() + entityInputs.size();
 
         for (var i = 0; i < inputSlots; i++) {
-            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (16 / 2);
-            var y = CENTER_Y - 10 + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (16 / 2);
+            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
+            var y = CENTER_Y - 10 + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
 
             if (i < itemInputs.size()) {
                 // item inputs
-                // TODO: add custom sized ingredient renderer so it says "accepts tag #foo"
                 var itemStacks = new ArrayList<ItemStack>();
                 for (var stack : itemInputs.get(i).ingredient().getItems()) {
                     stack.setCount(itemInputs.get(i).count());
@@ -170,7 +171,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         // item outputs
         var itemOutputs = recipe.itemOutputs();
         for (var i = 0; i < itemOutputs.size(); i++) {
-            var x = 2 + i * 16;
+            var x = 2 + i * SLOT_SIZE;
             var y = TEXTURE_HEIGHT - 18;
 
             var stack = itemOutputs.get(i).item();
@@ -180,7 +181,7 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
         // entity outputs
         var entityOutputs = recipe.entityOutputs();
         for (var i = 0; i < entityOutputs.size(); i++) {
-            var x = 2 + (itemOutputs.size() + i) * 16;
+            var x = 2 + (itemOutputs.size() + i) * SLOT_SIZE;
             var y = TEXTURE_HEIGHT - 18;
 
             var entityOutput = entityOutputs.get(i).entityInfo();
@@ -209,6 +210,6 @@ public class AltarCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>>
     }
 
     private static boolean mouseInSlot(double mouseX, double mouseY, int x, int y) {
-        return mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16;
+        return mouseX >= x && mouseX <= x + SLOT_SIZE && mouseY >= y && mouseY <= y + SLOT_SIZE;
     }
 }

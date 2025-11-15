@@ -32,20 +32,20 @@ public class JeiPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var guiHelper = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new AltarCategory(guiHelper));
+        registration.addRecipeCategories(new AltarJeiCategory(guiHelper));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         var level = Minecraft.getInstance().level;
         if (level == null) return;
-        registration.addRecipes(AltarCategory.TYPE, level.getRecipeManager().getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get()));
+        registration.addRecipes(AltarJeiCategory.TYPE, level.getRecipeManager().getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get()));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(Registration.ALTAR_BLOCK.toStack(), AltarCategory.TYPE);
-        registration.addRecipeCatalyst(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarCategory.TYPE);
+        registration.addRecipeCatalyst(Registration.ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
+        registration.addRecipeCatalyst(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
     }
 
     @Override

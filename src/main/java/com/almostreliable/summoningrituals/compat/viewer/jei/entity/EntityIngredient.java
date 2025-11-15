@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class EntityIngredient {
 
@@ -40,6 +44,24 @@ public final class EntityIngredient {
     public Component getDisplayName() {
         if (entity == null) return Component.literal("Unknown Entity");
         return entity.getDisplayName();
+    }
+
+    public List<Component> getTooltip(boolean includeCustom, boolean advanced) {
+        var tooltip = new ArrayList<Component>();
+        if (entity == null) return tooltip;
+
+        tooltip.add(getDisplayName());
+
+        var entityTooltip = entityInfo.tooltip();
+        if (includeCustom && !entityTooltip.isEmpty()) {
+            tooltip.addAll(entityTooltip);
+        }
+
+        if (advanced) {
+            var id = Component.literal(getResourceLocation().toString());
+            tooltip.add(id.withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return tooltip;
     }
 
     public ResourceLocation getResourceLocation() {

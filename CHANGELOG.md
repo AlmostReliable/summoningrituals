@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - added support for KubeJS 7.2
+- added support for EMI
 - added overload in item binding to specify count directly
 - improved entity wrapper error message when non-existing id is provided
 - improved entity ingredient and renderer

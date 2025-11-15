@@ -1,92 +1,104 @@
-package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
+package com.almostreliable.summoningrituals.compat.viewer.emi.entity;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.MeasuringBufferSource;
-import com.almostreliable.summoningrituals.client.MeasuringBufferSource.MeasuringResult;
+import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.item.TooltipFlag;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import mezz.jei.api.ingredients.IIngredientRenderer;
+import dev.emi.emi.api.render.EmiTooltipComponents;
+import dev.emi.emi.api.stack.EmiStack;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A renderer to handle rendering entities with a similar size and proper offset to fit a slot
- * bounding box. The different instances have options to hide the rendering of the ingredient count,
- * as well as optional clipping to predefined slot bounds.
- * <p>
- * The renderer makes use of the {@link MeasuringBufferSource} to measure the entity vertices.
- * <p>
- * license: Unlicense
- * <p>
- * Check the README license section for more information.
- */
-public final class EntityIngredientRenderer implements IIngredientRenderer<EntityIngredient> {
+public final class EntityEmiStack extends EmiStack {
 
-    public static final EntityIngredientRenderer BOOKMARK_RENDERER = new EntityIngredientRenderer(true, false);
-    public static final EntityIngredientRenderer INPUT_RENDERER = new EntityIngredientRenderer(false, true);
-    public static final EntityIngredientRenderer OUTPUT_RENDERER = new EntityIngredientRenderer(true, true);
+    private static final Minecraft MC = Minecraft.getInstance();
+    private static final Map<String, MeasuringBufferSource.MeasuringResult> MEASURING_RESULT_CACHE = new HashMap<>();
     private static final int TEXT_COLOR = 16_777_215;
     private static final int MEASURE_TICKS = 40;
     private static final int HALF_ROT = 180;
     private static final int SLOT_SIZE = 16;
 
-    private final Minecraft mc = Minecraft.getInstance();
-    private final Map<String, MeasuringResult> measuringResultCache = new HashMap<>();
+    private final EntityIngredient entityIngredient;
     private final boolean scissor;
-    private final boolean renderCount;
 
-    private EntityIngredientRenderer(boolean scissor, boolean renderCount) {
+    private EntityEmiStack(EntityIngredient entityIngredient, boolean scissor) {
+        this.entityIngredient = entityIngredient;
         this.scissor = scissor;
-        this.renderCount = renderCount;
+        this.amount = entityIngredient.getEntityInfo().count();
+    }
+
+    public static EntityEmiStack input(EntityIngredient entityIngredient) {
+        return new EntityEmiStack(entityIngredient, false);
+    }
+
+    public static EntityEmiStack output(EntityIngredient entityIngredient) {
+        return new EntityEmiStack(entityIngredient, true);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, EntityIngredient entityIngredient) {
-        if (mc.level == null || mc.player == null || !(entityIngredient.getEntity() instanceof LivingEntity entity)) {
+    public EmiStack copy() {
+        return new EntityEmiStack(entityIngredient.copy(), scissor);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int x, int y, float delta, int flags) {
+        if (MC.level == null || MC.player == null || !(entityIngredient.getEntity() instanceof LivingEntity entity)) {
             return;
         }
 
         var entityId = entityIngredient.getResourceLocation().toString();
         var measuringResult = measureEntity(entity, entityId);
-        if (measuringResult == MeasuringResult.EMPTY) return;
+        if (measuringResult == MeasuringBufferSource.MeasuringResult.EMPTY) return;
 
-        entity.tickCount = mc.player.tickCount;
+        entity.tickCount = MC.player.tickCount;
 
         var poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            renderEntity(guiGraphics, poseStack, entity, measuringResult);
-        }
-        poseStack.popPose();
+            poseStack.translate(x, y, 0);
 
-        if (!renderCount) return;
-        poseStack.pushPose();
-        {
-            renderCount(guiGraphics, entityIngredient, poseStack);
+            poseStack.pushPose();
+            {
+                var respectScissor = flags == -1; // in recipe display, flags is always -1 (distinction between display and tree view)
+                renderEntity(guiGraphics, poseStack, entity, measuringResult, respectScissor);
+            }
+            poseStack.popPose();
+
+            if ((flags & RENDER_AMOUNT) != 0) {
+                poseStack.pushPose();
+                {
+                    renderCount(guiGraphics, entityIngredient, poseStack);
+                }
+                poseStack.popPose();
+            }
         }
         poseStack.popPose();
     }
 
     @SuppressWarnings("deprecation")
-    private MeasuringResult measureEntity(LivingEntity entity, String entityId) {
-        var cached = measuringResultCache.get(entityId);
+    private MeasuringBufferSource.MeasuringResult measureEntity(LivingEntity entity, String entityId) {
+        var cached = MEASURING_RESULT_CACHE.get(entityId);
         if (cached != null) return cached;
 
-        var entityRenderer = mc.getEntityRenderDispatcher();
+        var entityRenderer = MC.getEntityRenderDispatcher();
         var measuringBuffer = new MeasuringBufferSource();
         var poseStack = new PoseStack();
 
@@ -101,17 +113,18 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
         var measuringResult = measuringBuffer.getData();
         if (measuringResult == null) {
             SummoningRituals.LOGGER.error("failed to measure entity: {}", entityId);
-            return MeasuringResult.EMPTY;
+            return MeasuringBufferSource.MeasuringResult.EMPTY;
         }
-        measuringResultCache.put(entityId, measuringResult);
+        MEASURING_RESULT_CACHE.put(entityId, measuringResult);
         return measuringResult;
     }
 
     @SuppressWarnings("deprecation")
     private void renderEntity(
-        GuiGraphics guiGraphics, PoseStack poseStack, LivingEntity entity, MeasuringResult measuringResult
+        GuiGraphics guiGraphics, PoseStack poseStack, LivingEntity entity, MeasuringBufferSource.MeasuringResult measuringResult,
+        boolean respectScissor
     ) {
-        if (scissor) {
+        if (respectScissor && scissor) {
             // gui graphics scissor doesn't take pose stack into account, bruh
             var absolutePos = poseStack.last().pose().transformPosition(0, 0, 0, new Vector3f());
             var absX = (int) absolutePos.x;
@@ -123,7 +136,7 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
         poseStack.mulPose(Axis.ZP.rotationDegrees(HALF_ROT));
 
         Lighting.setupForEntityInInventory();
-        var entityRenderer = mc.getEntityRenderDispatcher();
+        var entityRenderer = MC.getEntityRenderDispatcher();
         entityRenderer.setRenderShadow(false);
         RenderSystem.enableBlend();
 
@@ -165,18 +178,54 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
 
         entityRenderer.setRenderShadow(true);
         Lighting.setupFor3DItems();
-        if (scissor) guiGraphics.disableScissor();
+        if (respectScissor && scissor) guiGraphics.disableScissor();
     }
 
     private void renderCount(GuiGraphics guiGraphics, EntityIngredient entityIngredient, PoseStack poseStack) {
         var count = entityIngredient.getEntityInfo().count();
         if (count <= 1) return;
         poseStack.translate(10, 9, 200);
-        guiGraphics.drawString(mc.font, String.valueOf(count), 0, 0, TEXT_COLOR, true);
+        guiGraphics.drawString(MC.font, String.valueOf(count), 0, 0, TEXT_COLOR, true);
     }
 
     @Override
-    public List<Component> getTooltip(EntityIngredient entity, TooltipFlag tooltipFlag) {
-        return entity.getTooltip(renderCount, tooltipFlag.isAdvanced());
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public DataComponentPatch getComponentChanges() {
+        return DataComponentPatch.EMPTY;
+    }
+
+    @Override
+    public Object getKey() {
+        return entityIngredient.getEntityInfo().entity().value();
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return entityIngredient.getResourceLocation();
+    }
+
+    @Override
+    public List<Component> getTooltipText() {
+        return List.of(); // not required, entity stacks are not added to index, this is only for search
+    }
+
+    @Override
+    public List<ClientTooltipComponent> getTooltip() {
+        var tooltips = entityIngredient.getTooltip(true, MC.options.advancedItemTooltips);
+        var res = new ArrayList<ClientTooltipComponent>();
+        for (var tooltip : tooltips) {
+            res.add(EmiTooltipComponents.of(tooltip));
+        }
+        EmiTooltipComponents.appendModName(res, getId().getNamespace());
+        return res;
+    }
+
+    @Override
+    public Component getName() {
+        return entityIngredient.getDisplayName();
     }
 }
