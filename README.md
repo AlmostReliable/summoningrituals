@@ -48,6 +48,9 @@ intended for private use or as a fallback if CurseForge and Modrinth are unavail
 
 Redistribution of builds or rehosting is strictly prohibited.
 
+Exceptions to the license above are the `MeasuringBufferSource` and the `EntityIngredientRenderer`. Feel free to use
+them in your own projects. More information on how these were implemented can be found in [this blog post][blog-post].
+
 <!-- Badge Images -->
 [version_badge]: https://img.shields.io/github/v/release/almostreliable/summoningrituals?include_prereleases&filter=v1.21.1-*&style=for-the-badge&logo=github&color=%23181717
 [total_downloads_cf_badge]: https://img.shields.io/curseforge/dt/671040?style=for-the-badge&logo=curseforge&label=CurseForge&color=%23F16436
@@ -72,3 +75,4 @@ Redistribution of builds or rehosting is strictly prohibited.
 [neoforge]: https://neoforged.net/
 [mo_shark]: https://www.curseforge.com/members/mo_shark
 [ne0kys]: https://www.curseforge.com/members/ne0kys
+[blog-post]: https://docs.almostreliable.com/collection/rlnt-blog/entity-gui-rendering.html

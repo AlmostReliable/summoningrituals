@@ -14,10 +14,11 @@ import org.jetbrains.annotations.Nullable;
  * It's used to uniformly scale entities to display them in GUIs. This method is much more reliable
  * than depending on an entity's bounding box since it doesn't always capture the full entity size.
  * <p>
- * idea by: embeddedt
- * authored by: Almost Reliable, rlnt
- * license: This is the only portion of the codebase that is not ARR. Feel free to use it in your mods
- * if you keep the credits.
+ * idea by: embeddedt<br>
+ * authored by: Almost Reliable, rlnt<br>
+ * license: Unlicense
+ * <p>
+ * Check the README license section for more information.
  */
 public class MeasuringBufferSource implements MultiBufferSource {
 

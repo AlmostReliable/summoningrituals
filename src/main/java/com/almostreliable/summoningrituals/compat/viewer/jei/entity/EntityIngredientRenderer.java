@@ -25,6 +25,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A renderer to handle rendering entities with a similar size and proper offset to fit a slot
+ * bounding box. The different instances have options to hide the rendering of the ingredient count,
+ * as well as optional clipping to predefined slot bounds.
+ * <p>
+ * The renderer makes use of the {@link MeasuringBufferSource} to measure the entity vertices.
+ * <p>
+ * license: Unlicense
+ * <p>
+ * Check the README license section for more information.
+ */
 public final class EntityIngredientRenderer implements IIngredientRenderer<EntityIngredient> {
 
     public static final EntityIngredientRenderer BOOKMARK_RENDERER = new EntityIngredientRenderer(true, false);
@@ -63,6 +74,7 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
             renderEntity(guiGraphics, poseStack, entity, measuringResult);
         }
         poseStack.popPose();
+
         if (!renderCount) return;
         poseStack.pushPose();
         {
