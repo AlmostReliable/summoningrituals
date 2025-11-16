@@ -42,7 +42,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     private final IDrawable commandsIcon;
 
     AltarJeiCategory(IGuiHelper guiHelper) {
-        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH - SLOT_SIZE, TEXTURE_HEIGHT)
+        background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
@@ -79,7 +79,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
         var recipeCommands = recipeHolder.value().commands();
         if (recipeCommands.isPresent()) {
-            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE * 2 - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
+            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
     }
 
