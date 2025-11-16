@@ -8,10 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 
 public class RecipeViewerAltarLayout {
 
+    public static final int SLOT_SIZE = 16;
     protected static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
     protected static final int TEXTURE_WIDTH = 188;
     protected static final int TEXTURE_HEIGHT = 148;
-    protected static final int SLOT_SIZE = 16;
     protected static final int CENTER_X = (TEXTURE_WIDTH - SLOT_SIZE) / 2;
     protected static final int CENTER_Y = TEXTURE_HEIGHT / 2;
     private static final int INPUT_RADIUS = 46;

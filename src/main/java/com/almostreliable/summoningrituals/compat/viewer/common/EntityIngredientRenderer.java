@@ -20,6 +20,8 @@ import org.joml.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout.SLOT_SIZE;
+
 /**
  * A renderer to handle rendering entities with a similar size and proper offset to fit a slot
  * bounding box. It supports options to hide the rendering of the count, as well as optional
@@ -37,7 +39,6 @@ public final class EntityIngredientRenderer {
     private static final int TEXT_COLOR = 16_777_215;
     private static final int MEASURE_TICKS = 40;
     private static final int HALF_ROT = 180;
-    private static final int SLOT_SIZE = 16;
 
     private EntityIngredientRenderer() {}
 
