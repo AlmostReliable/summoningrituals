@@ -106,7 +106,8 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - 8, CENTER_Y - 18).addItemLike(Registration.ALTAR_BLOCK);
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - SLOT_SIZE / 2, CENTER_Y - SLOT_SIZE / 2 - 10)
+            .addItemLike(Registration.ALTAR_BLOCK);
 
         var recipe = recipeHolder.value();
         createCatalystSlot((x, y, slot) ->

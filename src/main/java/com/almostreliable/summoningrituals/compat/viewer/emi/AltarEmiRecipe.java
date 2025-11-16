@@ -5,9 +5,15 @@ import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAlta
 import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.CatalystSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
+import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
+import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -122,6 +128,12 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             TEXTURE_HEIGHT
         );
 
+        widgets.add(new InvisibleSlotWidget(
+            EmiStack.of(Registration.ALTAR_BLOCK),
+            CENTER_X - SLOT_SIZE / 2,
+            CENTER_Y - SLOT_SIZE / 2 - 10
+        ));
+
         var recipe = recipeHolder.value();
 
         createCatalystSlot((x, y, slot) ->
@@ -138,5 +150,30 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             recipe, (x, y, slot) ->
                 widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
         );
+
+        if (!recipe.startConditions().isEmpty()) {
+            var slot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2));
+            slot.appendTooltip(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
+
+            for (var condition : recipe.startConditions()) {
+                var conditionTooltips = ConditionRegistry.getTooltip(condition);
+                for (var conditionTooltip : conditionTooltips) {
+                    slot.appendTooltip(conditionTooltip);
+                }
+            }
+        }
+
+        if (recipe.commands().isPresent()) {
+            var slot = widgets.add(new StackWidget(
+                EmiStack.of(Items.COMMAND_BLOCK),
+                TEXTURE_WIDTH - SLOT_SIZE - 2,
+                TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5
+            ));
+            slot.appendTooltip(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
+
+            for (var commandTooltip : recipe.commands().get().getTooltip()) {
+                slot.appendTooltip(commandTooltip);
+            }
+        }
     }
 }
