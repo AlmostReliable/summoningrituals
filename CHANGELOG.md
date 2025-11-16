@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - added support for KubeJS 7.2
 - added support for EMI
 - added overload in item binding to specify count directly
+- added particle effect when entity input is sacrificed
 - improved entity wrapper error message when non-existing id is provided
 - improved entity ingredient and renderer
   - bookmark renderer no longer displays count or entity data

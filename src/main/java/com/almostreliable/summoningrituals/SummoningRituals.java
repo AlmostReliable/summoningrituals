@@ -6,7 +6,9 @@ import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.DataGeneration;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -34,8 +36,27 @@ public final class SummoningRituals {
         return ResourceLocation.fromNamespaceAndPath(ModConstants.MOD_ID, key);
     }
 
+    @SuppressWarnings("resource")
     private static void onEntityDeathLoot(LivingDropsEvent event) {
-        if (event.getEntity().getTags().contains(AltarBlockEntity.SACRIFICE_TAG)) {
+        var entity = event.getEntity();
+        if (!(entity.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        if (entity.getTags().contains(AltarBlockEntity.SACRIFICE_TAG)) {
+            var pos = entity.blockPosition();
+            var rand = level.random;
+            level.sendParticles(
+                ParticleTypes.SOUL,
+                pos.getX() + rand.nextDouble(),
+                pos.getY() + 1,
+                pos.getZ() + rand.nextDouble(),
+                6,
+                0,
+                0,
+                0,
+                0.05
+            );
             event.setCanceled(true);
         }
     }
