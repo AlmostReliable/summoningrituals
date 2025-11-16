@@ -41,3 +41,10 @@ type = "OPTIONAL"
 versionRange = "[${jeiVersion},)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies."${modId}"]]
+modId = "emi"
+type = "OPTIONAL"
+versionRange = "[${emiVersion},)"
+ordering = "AFTER"
+side = "BOTH"
