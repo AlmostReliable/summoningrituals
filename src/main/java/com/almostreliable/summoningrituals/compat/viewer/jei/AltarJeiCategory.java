@@ -1,9 +1,8 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
-import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
-import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -12,7 +11,6 @@ import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -34,16 +32,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
+public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
 
     static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createFromVanilla(Registration.ALTAR_RECIPE_TYPE.get());
-    private static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
-    private static final int TEXTURE_WIDTH = 188;
-    private static final int TEXTURE_HEIGHT = 148;
-    private static final int SLOT_SIZE = 16;
-    private static final int CENTER_X = (TEXTURE_WIDTH - 16) / 2;
-    private static final int CENTER_Y = TEXTURE_HEIGHT / 2;
-    private static final int INPUT_RADIUS = 46;
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -73,16 +64,6 @@ public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecip
     @Override
     public IDrawable getIcon() {
         return icon;
-    }
-
-    @Override
-    public int getWidth() {
-        return TEXTURE_WIDTH - SLOT_SIZE;
-    }
-
-    @Override
-    public int getHeight() {
-        return TEXTURE_HEIGHT;
     }
 
     @Override
@@ -128,71 +109,63 @@ public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecip
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - 8, CENTER_Y - 18).addItemLike(Registration.ALTAR_BLOCK);
 
         var recipe = recipeHolder.value();
-        builder.addInputSlot(CENTER_X - 8, CENTER_Y - 42)
-            .addIngredients(recipe.catalyst())
-            .addRichTooltipCallback(AltarJeiCategory::constructCatalystTooltip);
-        createInputSlots(builder, recipe);
-        createOutputSlots(builder, recipe);
-    }
+        createCatalystSlot((x, y, slot) ->
+            builder.addInputSlot(x, y)
+                .addIngredients(recipe.catalyst())
+                .addRichTooltipCallback(AltarJeiCategory::constructCatalystTooltip));
 
-    private void createInputSlots(IRecipeLayoutBuilder builder, AltarRecipe recipe) {
-        var itemInputs = recipe.itemInputs();
-        var entityInputs = recipe.entityInputs();
-        var inputSlots = itemInputs.size() + entityInputs.size();
+        createInputSlots(
+            recipe, (x, y, slot) -> {
+                var itemInputs = recipe.itemInputs();
+                if (slot < itemInputs.size()) {
+                    // item inputs
+                    var itemInput = itemInputs.get(slot);
+                    var itemStacks = new ArrayList<ItemStack>();
+                    for (var stack : itemInput.ingredient().getItems()) {
+                        stack.setCount(itemInput.count());
+                        itemStacks.add(stack);
+                    }
 
-        for (var i = 0; i < inputSlots; i++) {
-            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
-            var y = CENTER_Y - 10 + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
+                    builder.addInputSlot(x, y).addItemStacks(itemStacks);
+                } else {
+                    // entity inputs
+                    var entityInput = recipe.entityInputs().get(slot - itemInputs.size());
+                    var entityIngredient = new EntityIngredient(entityInput);
+                    var entityEgg = entityIngredient.getEgg();
 
-            if (i < itemInputs.size()) {
-                // item inputs
-                var itemStacks = new ArrayList<ItemStack>();
-                for (var stack : itemInputs.get(i).ingredient().getItems()) {
-                    stack.setCount(itemInputs.get(i).count());
-                    itemStacks.add(stack);
+                    builder.addSlot(RecipeIngredientRole.INPUT, x, y)
+                        .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.INPUT_RENDERER)
+                        .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
+
+                    if (entityEgg == null) return;
+                    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
                 }
-
-                builder.addInputSlot(x, y).addItemStacks(itemStacks);
-            } else {
-                // entity inputs
-                var entityInput = entityInputs.get(i - itemInputs.size());
-                var entityIngredient = new EntityIngredient(entityInput);
-                var entityEgg = entityIngredient.getEgg();
-
-                builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                    .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.INPUT_RENDERER)
-                    .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
-                if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
             }
-        }
-    }
+        );
 
-    private void createOutputSlots(IRecipeLayoutBuilder builder, AltarRecipe recipe) {
-        // item outputs
-        var itemOutputs = recipe.itemOutputs();
-        for (var i = 0; i < itemOutputs.size(); i++) {
-            var x = 2 + i * SLOT_SIZE;
-            var y = TEXTURE_HEIGHT - 18;
+        createOutputSlots(
+            recipe, (x, y, slot) -> {
+                // item outputs
+                var itemOutputs = recipe.itemOutputs();
+                if (slot < itemOutputs.size()) {
+                    var stack = itemOutputs.get(slot).item();
+                    builder.addOutputSlot(x, y).addItemStack(stack);
+                } else {
+                    // entity outputs
+                    var entityOutputs = recipe.entityOutputs();
+                    var entityOutput = entityOutputs.get(slot - itemOutputs.size()).entityInfo();
+                    var entityIngredient = new EntityIngredient(entityOutput);
+                    var entityEgg = entityIngredient.getEgg();
 
-            var stack = itemOutputs.get(i).item();
-            builder.addOutputSlot(x, y).addItemStack(stack);
-        }
+                    builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
+                        .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.OUTPUT_RENDERER)
+                        .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
 
-        // entity outputs
-        var entityOutputs = recipe.entityOutputs();
-        for (var i = 0; i < entityOutputs.size(); i++) {
-            var x = 2 + (itemOutputs.size() + i) * SLOT_SIZE;
-            var y = TEXTURE_HEIGHT - 18;
-
-            var entityOutput = entityOutputs.get(i).entityInfo();
-            var entityIngredient = new EntityIngredient(entityOutput);
-            var entityEgg = entityIngredient.getEgg();
-
-            builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.OUTPUT_RENDERER)
-                .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
-            if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
-        }
+                    if (entityEgg == null) return;
+                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
+                }
+            }
+        );
     }
 
     private static void constructCatalystTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {

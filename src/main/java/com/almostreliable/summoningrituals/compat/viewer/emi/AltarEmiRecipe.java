@@ -1,11 +1,10 @@
 package com.almostreliable.summoningrituals.compat.viewer.emi;
 
-import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
 import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.CatalystSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
-import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.resources.ResourceLocation;
@@ -22,15 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AltarEmiRecipe implements EmiRecipe {
-
-    private static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
-    private static final int TEXTURE_WIDTH = 188;
-    private static final int TEXTURE_HEIGHT = 148;
-    private static final int SLOT_SIZE = 16;
-    private static final int CENTER_X = (TEXTURE_WIDTH - SLOT_SIZE) / 2;
-    private static final int CENTER_Y = TEXTURE_HEIGHT / 2;
-    private static final int INPUT_RADIUS = 46;
+public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe {
 
     private final RecipeHolder<AltarRecipe> recipeHolder;
 
@@ -107,12 +98,12 @@ public class AltarEmiRecipe implements EmiRecipe {
 
     @Override
     public int getDisplayWidth() {
-        return TEXTURE_WIDTH - SLOT_SIZE;
+        return getWidth();
     }
 
     @Override
     public int getDisplayHeight() {
-        return TEXTURE_HEIGHT;
+        return getHeight();
     }
 
     @Override
@@ -130,32 +121,22 @@ public class AltarEmiRecipe implements EmiRecipe {
             TEXTURE_WIDTH,
             TEXTURE_HEIGHT
         );
+
         var recipe = recipeHolder.value();
-        var catalystSlot = new CatalystSlotWidget(EmiIngredient.of(recipe.catalyst()), CENTER_X - 8, CENTER_Y - 42);
-        widgets.add(catalystSlot);
-        createInputSlots(widgets, recipe);
-        createOutputSlots(widgets, recipe);
-    }
 
-    private void createInputSlots(WidgetHolder widgets, AltarRecipe recipe) {
+        createCatalystSlot((x, y, slot) ->
+            widgets.add(new CatalystSlotWidget(EmiIngredient.of(recipe.catalyst()), x, y)));
+
         var inputs = getInputs();
-        var inputSlots = inputs.size() - 1;
+        createInputSlots(
+            recipe, (x, y, slot) ->
+                widgets.add(new InvisibleSlotWidget(inputs.get(slot), x, y))
+        );
 
-        for (var i = 0; i < inputSlots; i++) {
-            var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
-            var y = CENTER_Y - 10 + (int) (Math.sin(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);
-            widgets.add(new InvisibleSlotWidget(inputs.get(i), x, y));
-        }
-    }
-
-    private void createOutputSlots(WidgetHolder widgets, AltarRecipe recipe) {
         var outputs = getOutputs();
-
-        for (var i = 0; i < outputs.size(); i++) {
-            var x = 2 + i * SLOT_SIZE;
-            var y = TEXTURE_HEIGHT - 18;
-
-            widgets.add(new InvisibleSlotWidget(outputs.get(i), x, y)).recipeContext(this);
-        }
+        createOutputSlots(
+            recipe, (x, y, slot) ->
+                widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
+        );
     }
 }
