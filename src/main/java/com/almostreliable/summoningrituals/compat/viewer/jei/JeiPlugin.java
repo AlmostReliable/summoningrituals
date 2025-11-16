@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.compat.viewer.jei;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientHelper;
+import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiHelper;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
@@ -53,7 +53,7 @@ public class JeiPlugin implements IModPlugin {
         registration.register(
             ENTITY_INGREDIENT,
             List.of(),
-            new EntityIngredientHelper(),
+            new EntityIngredientJeiHelper(),
             EntityIngredientJeiRenderer.BOOKMARK_RENDERER,
             EntityIngredient.CODEC
         );

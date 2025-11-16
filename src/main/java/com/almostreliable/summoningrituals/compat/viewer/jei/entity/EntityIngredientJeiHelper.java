@@ -11,7 +11,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 
 import org.jetbrains.annotations.Nullable;
 
-public class EntityIngredientHelper implements IIngredientHelper<EntityIngredient> {
+public class EntityIngredientJeiHelper implements IIngredientHelper<EntityIngredient> {
 
     @Override
     public IIngredientType<EntityIngredient> getIngredientType() {
