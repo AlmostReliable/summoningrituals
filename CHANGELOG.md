@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed startup crashing due to accessing a private method
 
 ## [3.2.0] - 2025-11-16
 
