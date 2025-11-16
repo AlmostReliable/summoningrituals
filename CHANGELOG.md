@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.2.1] - 2025-11-16
 
 - fixed startup crashing due to accessing a private method
 
@@ -46,6 +49,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.2.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.2.1
 [3.2.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.2.0
 [3.1.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.1.0
 [3.0.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.0.0
