@@ -1,10 +1,10 @@
 package com.almostreliable.summoningrituals.compat.viewer.emi;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.CatalystSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
-import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredient;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 

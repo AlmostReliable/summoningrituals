@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
+package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
@@ -46,25 +46,26 @@ public final class EntityIngredient {
         return entity.getDisplayName();
     }
 
-    public List<Component> getTooltip(boolean includeCustom, boolean advanced) {
+    @SuppressWarnings("BooleanParameter")
+    public List<Component> getTooltip(boolean customTooltip, boolean advanced) {
         var tooltip = new ArrayList<Component>();
         if (entity == null) return tooltip;
 
         tooltip.add(getDisplayName());
 
         var entityTooltip = entityInfo.tooltip();
-        if (includeCustom && !entityTooltip.isEmpty()) {
+        if (customTooltip && !entityTooltip.isEmpty()) {
             tooltip.addAll(entityTooltip);
         }
 
         if (advanced) {
-            var id = Component.literal(getResourceLocation().toString());
+            var id = Component.literal(getId().toString());
             tooltip.add(id.withStyle(ChatFormatting.DARK_GRAY));
         }
         return tooltip;
     }
 
-    public ResourceLocation getResourceLocation() {
+    public ResourceLocation getId() {
         return BuiltInRegistries.ENTITY_TYPE.getKey(entityInfo.entity().value());
     }
 

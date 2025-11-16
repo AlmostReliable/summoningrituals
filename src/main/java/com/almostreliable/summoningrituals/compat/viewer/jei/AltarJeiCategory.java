@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientRenderer;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
@@ -160,7 +160,7 @@ public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecip
                 var entityEgg = entityIngredient.getEgg();
 
                 builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                    .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientRenderer.INPUT_RENDERER)
+                    .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.INPUT_RENDERER)
                     .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
                 if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
             }
@@ -189,7 +189,7 @@ public class AltarJeiCategory implements IRecipeCategory<RecipeHolder<AltarRecip
             var entityEgg = entityIngredient.getEgg();
 
             builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientRenderer.OUTPUT_RENDERER)
+                .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.OUTPUT_RENDERER)
                 .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
             if (entityEgg != null) builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
         }

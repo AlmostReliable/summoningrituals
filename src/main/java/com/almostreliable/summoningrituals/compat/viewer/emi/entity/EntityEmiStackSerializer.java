@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.compat.viewer.emi.entity;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
-import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredient;
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;

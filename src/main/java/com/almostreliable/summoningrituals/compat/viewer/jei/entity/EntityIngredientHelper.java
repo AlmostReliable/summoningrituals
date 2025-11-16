@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 
+import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.JeiPlugin;
 
 import net.minecraft.resources.ResourceLocation;
@@ -25,12 +26,12 @@ public class EntityIngredientHelper implements IIngredientHelper<EntityIngredien
     @SuppressWarnings("removal")
     @Override
     public String getUniqueId(EntityIngredient entity, UidContext context) {
-        return entity.getResourceLocation().toString();
+        return entity.getId().toString();
     }
 
     @Override
     public ResourceLocation getResourceLocation(EntityIngredient entity) {
-        return entity.getResourceLocation();
+        return entity.getId();
     }
 
     @Override

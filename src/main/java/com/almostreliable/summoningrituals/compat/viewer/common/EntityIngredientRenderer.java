@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
+package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.MeasuringBufferSource;
@@ -7,26 +7,23 @@ import com.almostreliable.summoningrituals.client.MeasuringBufferSource.Measurin
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.item.TooltipFlag;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import mezz.jei.api.ingredients.IIngredientRenderer;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * A renderer to handle rendering entities with a similar size and proper offset to fit a slot
- * bounding box. The different instances have options to hide the rendering of the ingredient count,
- * as well as optional clipping to predefined slot bounds.
+ * bounding box. It supports options to hide the rendering of the count, as well as optional
+ * clipping to predefined slot bounds.
  * <p>
  * The renderer makes use of the {@link MeasuringBufferSource} to measure the entity vertices.
  * <p>
@@ -34,34 +31,24 @@ import java.util.Map;
  * <p>
  * Check the README license section for more information.
  */
-public final class EntityIngredientRenderer implements IIngredientRenderer<EntityIngredient> {
+public final class EntityIngredientRenderer {
 
-    public static final EntityIngredientRenderer BOOKMARK_RENDERER = new EntityIngredientRenderer(true, false);
-    public static final EntityIngredientRenderer INPUT_RENDERER = new EntityIngredientRenderer(false, true);
-    public static final EntityIngredientRenderer OUTPUT_RENDERER = new EntityIngredientRenderer(true, true);
+    private static final Map<ResourceLocation, MeasuringResult> MEASURING_RESULT_CACHE = new HashMap<>();
     private static final int TEXT_COLOR = 16_777_215;
     private static final int MEASURE_TICKS = 40;
     private static final int HALF_ROT = 180;
     private static final int SLOT_SIZE = 16;
 
-    private final Minecraft mc = Minecraft.getInstance();
-    private final Map<String, MeasuringResult> measuringResultCache = new HashMap<>();
-    private final boolean scissor;
-    private final boolean renderCount;
+    private EntityIngredientRenderer() {}
 
-    private EntityIngredientRenderer(boolean scissor, boolean renderCount) {
-        this.scissor = scissor;
-        this.renderCount = renderCount;
-    }
-
-    @Override
-    public void render(GuiGraphics guiGraphics, EntityIngredient entityIngredient) {
+    @SuppressWarnings("BooleanParameter")
+    public static void render(GuiGraphics guiGraphics, EntityIngredient entityIngredient, boolean scissor, boolean count) {
+        var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || !(entityIngredient.getEntity() instanceof LivingEntity entity)) {
             return;
         }
 
-        var entityId = entityIngredient.getResourceLocation().toString();
-        var measuringResult = measureEntity(entity, entityId);
+        var measuringResult = measureEntity(mc, entity, entityIngredient.getId());
         if (measuringResult == MeasuringResult.EMPTY) return;
 
         entity.tickCount = mc.player.tickCount;
@@ -69,21 +56,22 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
         var poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            renderEntity(guiGraphics, poseStack, entity, measuringResult);
+            renderEntity(mc, guiGraphics, entity, measuringResult, scissor);
         }
         poseStack.popPose();
 
-        if (!renderCount) return;
+        var entityCount = entityIngredient.getEntityInfo().count();
+        if (!count || entityCount <= 1) return;
         poseStack.pushPose();
         {
-            renderCount(guiGraphics, entityIngredient, poseStack);
+            renderCount(mc, guiGraphics, entityCount);
         }
         poseStack.popPose();
     }
 
     @SuppressWarnings("deprecation")
-    private MeasuringResult measureEntity(LivingEntity entity, String entityId) {
-        var cached = measuringResultCache.get(entityId);
+    private static MeasuringResult measureEntity(Minecraft mc, LivingEntity entity, ResourceLocation entityId) {
+        var cached = MEASURING_RESULT_CACHE.get(entityId);
         if (cached != null) return cached;
 
         var entityRenderer = mc.getEntityRenderDispatcher();
@@ -103,14 +91,15 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
             SummoningRituals.LOGGER.error("failed to measure entity: {}", entityId);
             return MeasuringResult.EMPTY;
         }
-        measuringResultCache.put(entityId, measuringResult);
+        MEASURING_RESULT_CACHE.put(entityId, measuringResult);
         return measuringResult;
     }
 
     @SuppressWarnings("deprecation")
-    private void renderEntity(
-        GuiGraphics guiGraphics, PoseStack poseStack, LivingEntity entity, MeasuringResult measuringResult
+    private static void renderEntity(
+        Minecraft mc, GuiGraphics guiGraphics, LivingEntity entity, MeasuringResult measuringResult, boolean scissor
     ) {
+        var poseStack = guiGraphics.pose();
         if (scissor) {
             // gui graphics scissor doesn't take pose stack into account, bruh
             var absolutePos = poseStack.last().pose().transformPosition(0, 0, 0, new Vector3f());
@@ -168,15 +157,8 @@ public final class EntityIngredientRenderer implements IIngredientRenderer<Entit
         if (scissor) guiGraphics.disableScissor();
     }
 
-    private void renderCount(GuiGraphics guiGraphics, EntityIngredient entityIngredient, PoseStack poseStack) {
-        var count = entityIngredient.getEntityInfo().count();
-        if (count <= 1) return;
-        poseStack.translate(10, 9, 200);
+    private static void renderCount(Minecraft mc, GuiGraphics guiGraphics, int count) {
+        guiGraphics.pose().translate(10, 9, 200);
         guiGraphics.drawString(mc.font, String.valueOf(count), 0, 0, TEXT_COLOR, true);
-    }
-
-    @Override
-    public List<Component> getTooltip(EntityIngredient entity, TooltipFlag tooltipFlag) {
-        return entity.getTooltip(renderCount, tooltipFlag.isAdvanced());
     }
 }

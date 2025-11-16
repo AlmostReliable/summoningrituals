@@ -9,7 +9,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 
 public class AltarEmiCategory extends EmiRecipeCategory {
 
-    public AltarEmiCategory() {
+    AltarEmiCategory() {
         super(Registration.ALTAR_RECIPE_TYPE.getId(), EmiPlugin.ALTAR_STACK);
     }
 
