@@ -98,7 +98,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
         var recipeCommands = recipeHolder.value().commands();
         if (recipeCommands.isPresent() &&
-            mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - SLOT_SIZE * 2 - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
+            mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
             tooltip.add(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
             tooltip.addAll(recipeCommands.get().getTooltip());
         }
