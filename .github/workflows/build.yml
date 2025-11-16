@@ -13,6 +13,7 @@ on:
       - "**.kts"
       - "**.properties"
       - "**/build.yml"
+      - "**/accesstransformer.cfg"
   pull_request:
     branches:
       - "1.21.1"
@@ -22,6 +23,7 @@ on:
       - "**.kts"
       - "**.properties"
       - "**/build.yml"
+      - "**/accesstransformer.cfg"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
