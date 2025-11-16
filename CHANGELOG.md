@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
   - measurements now span across 40 render ticks to track height changes in animations
   - bookmark and output renderers now use scissor mask to avoid clipping
   - fixed rotation of entities using an inverted model (ender dragon, bats, etc.)
+- renamed catalyst to initiator
 
 ## [3.1.0] - 2025-11-08
 

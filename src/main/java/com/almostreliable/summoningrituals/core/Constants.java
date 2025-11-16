@@ -4,7 +4,7 @@ public interface Constants {
 
     String ACTIVE = "active";
     String ALTAR = "altar";
-    String CATALYST = "catalyst";
+    String INITIATOR = "initiator";
     String COMMANDS = "commands";
     String CONDITIONS = "conditions";
     String COUNT = "count";

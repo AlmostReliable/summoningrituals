@@ -24,7 +24,7 @@ public class RecipeViewerAltarLayout {
         return TEXTURE_HEIGHT;
     }
 
-    protected void createCatalystSlot(SlotConsumer slotConsumer) {
+    protected void createInitiatorSlot(SlotConsumer slotConsumer) {
         var x = CENTER_X - SLOT_SIZE / 2;
         var y = CENTER_Y - SLOT_SIZE / 2 - 34;
         slotConsumer.accept(x, y, 0);

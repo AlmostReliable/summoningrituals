@@ -12,7 +12,7 @@ import java.util.Set;
 
 public final class RecipeMatchResult {
 
-    public static final RecipeMatchResult INVALID_CATALYST = new RecipeMatchResult(Set.of(), MatchIssue.CATALYST);
+    public static final RecipeMatchResult INVALID_INITIATOR = new RecipeMatchResult(Set.of(), MatchIssue.INITIATOR);
     public static final RecipeMatchResult MISSING_SACRIFICES = new RecipeMatchResult(Set.of(), MatchIssue.SACRIFICES);
     public static final RecipeMatchResult FAILED_CONDITIONS = new RecipeMatchResult(Set.of(), MatchIssue.CONDITIONS);
     public static final RecipeMatchResult MULTI_MATCH = new RecipeMatchResult(Set.of(), MatchIssue.MULTI);
@@ -54,7 +54,7 @@ public final class RecipeMatchResult {
     }
 
     public enum MatchIssue {
-        CATALYST(SummoningLang.INVALID_CATALYST),
+        INITIATOR(SummoningLang.INVALID_INITIATOR),
         SACRIFICES(SummoningLang.MISSING_SACRIFICES),
         CONDITIONS(SummoningLang.FAILED_CONDITIONS),
         MULTI(SummoningLang.MULTI_MATCH),

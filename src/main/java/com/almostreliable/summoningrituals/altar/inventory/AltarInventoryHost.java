@@ -16,7 +16,7 @@ public interface AltarInventoryHost {
      * Handles the insertion of an {@link ItemStack} into the altar inventory. This is called when interacting with the block
      * or from capabilities trying to push into the inventory.
      * <p>
-     * Checks whether a recipe is already in progress and blocks the insertion if so. Delegates to catalyst and
+     * Checks whether a recipe is already in progress and blocks the insertion if so. Delegates to initiator and
      * input insertion methods depending on the item being inserted.
      *
      * @param player   The player initiating the item insertion, or null if no player is associated e.g., on automation.

@@ -155,8 +155,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         }
 
         RecipeMatchResult matchResult = null;
-        if (AltarRecipe.isCatalyst(serverLevel.getRecipeManager(), stack.getItem())) {
-            matchResult = handleCatalystInsertion(serverLevel, player, stack, simulate);
+        if (AltarRecipe.isInitiator(serverLevel.getRecipeManager(), stack.getItem())) {
+            matchResult = handleInitiatorInsertion(serverLevel, player, stack, simulate);
             if (matchResult.getInteractionRemainder() != null) {
                 return matchResult.getInteractionRemainder();
             }
@@ -167,7 +167,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         }
 
         if (!simulate && matchResult != null && matchResult.hasIssue()) {
-            // if this is true, the item wasn't an input and the catalyst insertion failed
+            // if this is true, the item wasn't an input and the initiator insertion failed
             playOptionalPlayerSound(serverLevel, player, false, SoundEvents.CHAIN_BREAK);
             sendOptionalPlayerMessage(player, false, matchResult.getMatchIssue().getIssueMessage(), ChatFormatting.RED);
         }
@@ -175,11 +175,13 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return stack;
     }
 
-    private RecipeMatchResult handleCatalystInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+    private RecipeMatchResult handleInitiatorInsertion(
+        ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate
+    ) {
         var matchResult = getMatchingRecipes(level, player, stack);
         if (matchResult.hasIssue()) return matchResult;
 
-        if (!simulate) inventory.setCatalyst(stack.copyWithCount(1));
+        if (!simulate) inventory.setInitiator(stack.copyWithCount(1));
         var remainder = stack.copyWithCount(stack.getCount() - 1);
         remainder = remainder.isEmpty() ? ItemStack.EMPTY : remainder;
         matchResult.setInteractionRemainder(remainder);
@@ -217,8 +219,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     private RecipeMatchResult getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
         var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
-        recipeHolders.removeIf(h -> !h.value().catalyst().test(stack));
-        if (recipeHolders.isEmpty()) return RecipeMatchResult.INVALID_CATALYST;
+        recipeHolders.removeIf(h -> !h.value().initiator().test(stack));
+        if (recipeHolders.isEmpty()) return RecipeMatchResult.INVALID_INITIATOR;
 
         var matchingRecipes = new HashSet<RecipeInfoContainer>();
         for (var recipeHolder : recipeHolders) {

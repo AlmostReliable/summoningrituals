@@ -110,10 +110,10 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             .addItemLike(Registration.ALTAR_BLOCK);
 
         var recipe = recipeHolder.value();
-        createCatalystSlot((x, y, slot) ->
+        createInitiatorSlot((x, y, slot) ->
             builder.addInputSlot(x, y)
-                .addIngredients(recipe.catalyst())
-                .addRichTooltipCallback(AltarJeiCategory::constructCatalystTooltip));
+                .addIngredients(recipe.initiator())
+                .addRichTooltipCallback(AltarJeiCategory::constructInitiatorTooltip));
 
         createInputSlots(
             recipe, (x, y, slot) -> {
@@ -169,18 +169,18 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         );
     }
 
-    private static void constructCatalystTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {
+    private static void constructInitiatorTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {
         var tooltipLines = tooltip.getLines();
         var stackTooltip = tooltipLines.getFirst().left().orElse(null);
         if (stackTooltip == null) return;
 
-        var catalystComponent = SummoningLang.CATALYST.get()
+        var initiatorComponent = SummoningLang.INITIATOR.get()
             .append(": ")
             .withStyle(ChatFormatting.GOLD)
             .append(Component.literal(stackTooltip.getString()).withStyle(ChatFormatting.WHITE));
         tooltipLines.removeFirst();
         tooltipLines.addFirst(Either.left(SummoningLang.INSERT_LAST.get().withStyle(ChatFormatting.GRAY)));
-        tooltipLines.addFirst(Either.left(catalystComponent));
+        tooltipLines.addFirst(Either.left(initiatorComponent));
     }
 
     private static boolean mouseInSlot(double mouseX, double mouseY, int x, int y) {

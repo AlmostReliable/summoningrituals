@@ -38,15 +38,15 @@ import java.util.Set;
 import java.util.function.Function;
 
 public record AltarRecipe(
-    Ingredient catalyst, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
+    Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
     List<SizedIngredient> itemInputs, List<EntityInfo> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
     public static final int DEFAULT_TICKS = 40;
-    private static final Set<Item> CATALYSTS = new HashSet<>();
+    private static final Set<Item> INITIATORS = new HashSet<>();
     private static final Set<Item> INPUTS = new HashSet<>();
-    private static boolean CACHES_INITIALIZED = false;
+    private static boolean CACHES_INITIALIZED;
 
     @Override
     public boolean matches(RecipeInput inventory, Level level) {
@@ -144,9 +144,9 @@ public record AltarRecipe(
         );
     }
 
-    public static boolean isCatalyst(RecipeManager recipeManager, Item item) {
+    public static boolean isInitiator(RecipeManager recipeManager, Item item) {
         if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
-        return CATALYSTS.contains(item);
+        return INITIATORS.contains(item);
     }
 
     public static boolean isInput(RecipeManager recipeManager, Item item) {
@@ -159,8 +159,8 @@ public record AltarRecipe(
 
         for (var recipe : recipes) {
             var r = recipe.value();
-            for (var catalyst : r.catalyst.getItems()) {
-                CATALYSTS.add(catalyst.getItem());
+            for (var initiator : r.initiator.getItems()) {
+                INITIATORS.add(initiator.getItem());
             }
             for (var itemInput : r.itemInputs) {
                 for (var stack : itemInput.getItems()) {
@@ -173,7 +173,7 @@ public record AltarRecipe(
     }
 
     public static void clearCaches() {
-        CATALYSTS.clear();
+        INITIATORS.clear();
         INPUTS.clear();
         CACHES_INITIALIZED = false;
     }

@@ -30,8 +30,8 @@ import java.util.List;
 
 public interface AltarRecipeSchema {
 
-    RecipeKey<Ingredient> CATALYST = IngredientComponent.INGREDIENT
-        .key(Constants.CATALYST, ComponentRole.INPUT)
+    RecipeKey<Ingredient> INITIATOR = IngredientComponent.INGREDIENT
+        .key(Constants.INITIATOR, ComponentRole.INPUT)
         .noFunctions();
     RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.TYPE
         .instance()
@@ -89,7 +89,7 @@ public interface AltarRecipeSchema {
         .exclude();
 
     RecipeSchema SCHEMA = new RecipeSchema(
-        CATALYST,
+        INITIATOR,
         ITEM_OUTPUTS,
         ENTITY_OUTPUTS,
         COMMANDS,

@@ -35,13 +35,13 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     private final InternalInventory inventory;
     private final Stack<Tuple<ItemStack, Integer>> insertOrder;
 
-    private ItemStack catalyst;
+    private ItemStack initiator;
 
     public AltarInventory(AltarInventoryHost host) {
         this.host = host;
         this.inventory = new InternalInventory(Config.COMMON.inventorySize.get());
         this.insertOrder = new Stack<>();
-        this.catalyst = ItemStack.EMPTY;
+        this.initiator = ItemStack.EMPTY;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
         var compoundTag = new CompoundTag();
         compoundTag.put(Constants.INVENTORY, inventoryTag);
-        compoundTag.put(Constants.CATALYST, catalyst.saveOptional(registryAccess));
+        compoundTag.put(Constants.INITIATOR, initiator.saveOptional(registryAccess));
 
         return compoundTag;
     }
@@ -86,8 +86,8 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
             }
         }
 
-        var catalystTag = tag.getCompound(Constants.CATALYST);
-        catalyst = ItemStack.parseOptional(registryAccess, catalystTag);
+        var initiatorTag = tag.getCompound(Constants.INITIATOR);
+        initiator = ItemStack.parseOptional(registryAccess, initiatorTag);
     }
 
     @Override
@@ -97,21 +97,21 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
 
     @Override
     public int getSlotLimit(int slot) {
-        if (slot == getCatalystSlot()) return 1;
+        if (slot == getInitiatorSlot()) return 1;
         return Item.DEFAULT_MAX_STACK_SIZE;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        if (slot == getCatalystSlot()) return catalyst;
+        if (slot == getInitiatorSlot()) return initiator;
         return inventory.get(slot);
     }
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        if (slot == getCatalystSlot()) {
-            Preconditions.checkArgument(stack.getCount() == 1, "catalyst must be a single item");
-            catalyst = stack;
+        if (slot == getInitiatorSlot()) {
+            Preconditions.checkArgument(stack.getCount() == 1, "initiator must be a single item");
+            initiator = stack;
         } else {
             inventory.set(slot, stack);
         }
@@ -124,8 +124,8 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         var recipeManager = host.getRecipeManager();
         if (recipeManager == null) return false;
 
-        if (slot == getCatalystSlot()) {
-            return AltarRecipe.isCatalyst(recipeManager, stack.getItem());
+        if (slot == getInitiatorSlot()) {
+            return AltarRecipe.isInitiator(recipeManager, stack.getItem());
         }
 
         return AltarRecipe.isInput(recipeManager, stack.getItem());
@@ -230,9 +230,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     }
 
     public void removeLastInsertedItem() {
-        if (!catalyst.isEmpty()) {
-            host.spawnItemAboveAltar(catalyst);
-            catalyst = ItemStack.EMPTY;
+        if (!initiator.isEmpty()) {
+            host.spawnItemAboveAltar(initiator);
+            initiator = ItemStack.EMPTY;
             onContentsChanged();
             return;
         }
@@ -282,7 +282,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
             return false;
         }
 
-        catalyst = ItemStack.EMPTY;
+        initiator = ItemStack.EMPTY;
         rebuildInsertOrder();
         onContentsChanged();
         return true;
@@ -296,9 +296,9 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         inventory.clear();
         insertOrder.clear();
 
-        if (!catalyst.isEmpty()) {
-            dropItem(serverLevel, catalyst, blockPos);
-            catalyst = ItemStack.EMPTY;
+        if (!initiator.isEmpty()) {
+            dropItem(serverLevel, initiator, blockPos);
+            initiator = ItemStack.EMPTY;
         }
 
         onContentsChanged();
@@ -323,16 +323,16 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         }
     }
 
-    private int getCatalystSlot() {
+    private int getInitiatorSlot() {
         return inventory.slots();
     }
 
-    public ItemStack getCatalyst() {
-        return catalyst;
+    public ItemStack getInitiator() {
+        return initiator;
     }
 
-    public void setCatalyst(ItemStack catalyst) {
-        this.catalyst = catalyst;
+    public void setInitiator(ItemStack initiator) {
+        this.initiator = initiator;
         onContentsChanged();
     }
 

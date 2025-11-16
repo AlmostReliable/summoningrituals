@@ -26,14 +26,14 @@
   "hint.summoningrituals.insert_last": "Insert last to start the ritual.",
   "item.summoningrituals.altar": "block.summoningrituals.altar",
   "item.summoningrituals.indestructible_altar": "block.summoningrituals.indestructible_altar",
-  "label.summoningrituals.catalyst": "Catalyst",
   "label.summoningrituals.commands": "Commands",
   "label.summoningrituals.conditions": "Conditions",
+  "label.summoningrituals.initiator": "Initiator",
   "message.summoningrituals.failed_conditions": "Not all conditions were met for the ritual.",
   "message.summoningrituals.in_progress": "The ritual is already in progress.",
-  "message.summoningrituals.invalid_catalyst": "No recipes have been found for this catalyst.",
+  "message.summoningrituals.invalid_initiator": "No recipes have been found for this initiator.",
   "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found in the Altar.",
   "message.summoningrituals.missing_sacrifices": "Not all sacrifices were found for the ritual.",
-  "message.summoningrituals.multi_match": "More than one recipe found for this catalyst.",
+  "message.summoningrituals.multi_match": "More than one recipe found for this initiator.",
   "tab.summoningrituals.main": "Summoning Rituals"
 }

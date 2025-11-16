@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.viewer.emi;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
 import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
-import com.almostreliable.summoningrituals.compat.viewer.emi.widget.CatalystSlotWidget;
+import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InitiatorSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
 import com.almostreliable.summoningrituals.core.Registration;
@@ -59,7 +59,7 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             inputs.add(EntityEmiStack.input(entityIngredient));
         }
 
-        inputs.add(EmiIngredient.of(recipe.catalyst()));
+        inputs.add(EmiIngredient.of(recipe.initiator()));
 
         return inputs;
     }
@@ -136,8 +136,8 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
 
         var recipe = recipeHolder.value();
 
-        createCatalystSlot((x, y, slot) ->
-            widgets.add(new CatalystSlotWidget(EmiIngredient.of(recipe.catalyst()), x, y)));
+        createInitiatorSlot((x, y, slot) ->
+            widgets.add(new InitiatorSlotWidget(EmiIngredient.of(recipe.initiator()), x, y)));
 
         var inputs = getInputs();
         createInputSlots(

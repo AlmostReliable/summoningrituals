@@ -93,7 +93,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
         stack.translate(0, MAX_PROGRESS_HEIGHT * recipeProgressRatio, 0);
 
-        renderCatalyst(renderContext);
+        renderInitiator(renderContext);
         renderItemOrbit(renderContext, recipeProgress, recipeTime, playerToAltarDistance);
 
         if (recipeTime > 0 && recipeProgress >= recipeTime) {
@@ -101,9 +101,9 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         }
     }
 
-    private void renderCatalyst(RenderContext renderContext) {
-        var catalyst = renderContext.altar.getInventory().getCatalyst();
-        if (catalyst.isEmpty()) return;
+    private void renderInitiator(RenderContext renderContext) {
+        var initiator = renderContext.altar.getInventory().getInitiator();
+        if (initiator.isEmpty()) return;
 
         var stack = renderContext.stack;
         stack.pushPose();
@@ -111,7 +111,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
             stack.translate(0, invert(0.75f * renderContext.recipeProgressRatio), 0);
             stack.summoning$scale(0.75f);
             stack.mulPose(Axis.YN.rotationDegrees(renderContext.playerToAltarAngle));
-            renderContext.renderStatic(itemRenderer, catalyst);
+            renderContext.renderStatic(itemRenderer, initiator);
         }
         stack.popPose();
     }

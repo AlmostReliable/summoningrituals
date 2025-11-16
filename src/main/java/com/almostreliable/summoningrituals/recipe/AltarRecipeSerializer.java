@@ -27,7 +27,7 @@ import java.util.List;
 public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
 
     public static final MapCodec<AltarRecipe> CODEC = RecordCodecBuilder.<AltarRecipe> mapCodec(i -> i.group(
-        Ingredient.CODEC_NONEMPTY.fieldOf(Constants.CATALYST).forGetter(AltarRecipe::catalyst),
+        Ingredient.CODEC_NONEMPTY.fieldOf(Constants.INITIATOR).forGetter(AltarRecipe::initiator),
         ItemOutput.CODEC.listOf().optionalFieldOf(Constants.ITEM_OUTPUTS, List.of()).forGetter(AltarRecipe::itemOutputs),
         EntityOutput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_OUTPUTS, List.of()).forGetter(AltarRecipe::entityOutputs),
         CommandOutput.CODEC.optionalFieldOf(Constants.COMMANDS).forGetter(AltarRecipe::commands),
@@ -40,7 +40,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         Codec.INT.optionalFieldOf(Constants.TICKS, AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> STREAM_CODEC = CodecUtils.composite(
-        Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::catalyst,
+        Ingredient.CONTENTS_STREAM_CODEC, AltarRecipe::initiator,
         ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         ByteBufCodecs.optional(CommandOutput.STREAM_CODEC), AltarRecipe::commands,
@@ -53,8 +53,8 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
     );
 
     private static DataResult<AltarRecipe> validateRecipe(AltarRecipe recipe) {
-        if (recipe.catalyst().isEmpty()) {
-            return DataResult.error(() -> "catalyst is empty");
+        if (recipe.initiator().isEmpty()) {
+            return DataResult.error(() -> "initiator is empty");
         }
 
         if (recipe.itemInputs().isEmpty() && recipe.entityInputs().isEmpty()) {

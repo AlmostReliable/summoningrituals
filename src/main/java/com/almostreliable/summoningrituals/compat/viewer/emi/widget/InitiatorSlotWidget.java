@@ -13,9 +13,9 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CatalystSlotWidget extends InvisibleSlotWidget {
+public class InitiatorSlotWidget extends InvisibleSlotWidget {
 
-    public CatalystSlotWidget(EmiIngredient stack, int x, int y) {
+    public InitiatorSlotWidget(EmiIngredient stack, int x, int y) {
         super(stack, x, y);
     }
 
@@ -39,12 +39,12 @@ public class CatalystSlotWidget extends InvisibleSlotWidget {
             return true;
         });
 
-        var catalystComponent = SummoningLang.CATALYST.get()
+        var initiatorComponent = SummoningLang.INITIATOR.get()
             .append(": ")
             .withStyle(ChatFormatting.GOLD)
             .append(itemName.withStyle(ChatFormatting.WHITE));
 
-        list.add(EmiTooltipComponents.of(catalystComponent));
+        list.add(EmiTooltipComponents.of(initiatorComponent));
         list.add(EmiTooltipComponents.of(SummoningLang.INSERT_LAST.get().withStyle(ChatFormatting.GRAY)));
         tooltipLines.removeFirst();
         list.addAll(tooltipLines);
