@@ -35,6 +35,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
     private static final LangEntry HEIGHT = LangEntry.condition("height", "Height");
     private static final LangEntry LIGHT_LEVEL = LangEntry.condition("light_level", "Light Level");
+    private static final LangEntry SMOKED = LangEntry.condition("smoked", "Smoked");
     private static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
     private static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
 
@@ -65,6 +66,11 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         if (predicate.light().isPresent()) {
             var lightLevel = predicate.light().get();
             addLightLevelTooltip(tooltip, lightLevel.composite());
+        }
+        if (predicate.smokey().isPresent()) {
+            var smoked = predicate.smokey().get();
+            var value = (smoked ? YES : NO).get();
+            tooltip.add(conditionNameValueComponent(SMOKED.get(), value));
         }
         if (predicate.canSeeSky().isPresent()) {
             var openSky = predicate.canSeeSky().get();

@@ -55,7 +55,7 @@ public final class ConditionStreamCodecs {
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
         ByteBufCodecs.optional(new RawHolderSetStreamCodec<>(Registries.STRUCTURE)), LocationPredicate::structures,
         ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::smokey,
         ByteBufCodecs.optional(LIGHT_PREDICATE_STREAM_CODEC), LocationPredicate::light,
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),

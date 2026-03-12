@@ -48,6 +48,26 @@ public final class ConditionsBuilder {
         return this;
     }
 
+    public ConditionsBuilder minHeight(int min) {
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atLeast(min));
+        return this;
+    }
+
+    public ConditionsBuilder maxHeight(int max) {
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atMost(max));
+        return this;
+    }
+
+    public ConditionsBuilder height(int height) {
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.exactly(height));
+        return this;
+    }
+
+    public ConditionsBuilder height(int min, int max) {
+        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.between(min, max));
+        return this;
+    }
+
     public ConditionsBuilder minLightLevel(int min) {
         getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.atLeast(min)));
         return this;
@@ -68,23 +88,8 @@ public final class ConditionsBuilder {
         return this;
     }
 
-    public ConditionsBuilder minHeight(int min) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atLeast(min));
-        return this;
-    }
-
-    public ConditionsBuilder maxHeight(int max) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atMost(max));
-        return this;
-    }
-
-    public ConditionsBuilder height(int height) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.exactly(height));
-        return this;
-    }
-
-    public ConditionsBuilder height(int min, int max) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.between(min, max));
+    public ConditionsBuilder setSmoked(boolean smoked) {
+        getOrCreateLocationPredicate().setSmokey(smoked);
         return this;
     }
 
