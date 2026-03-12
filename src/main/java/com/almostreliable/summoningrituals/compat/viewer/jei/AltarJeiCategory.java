@@ -57,7 +57,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
     @Override
     public Component getTitle() {
-        return SummoningLang.ALTAR.get();
+        return Registration.ALTAR_BLOCK.get().getName();
     }
 
     @Nullable

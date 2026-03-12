@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.emi;
 
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.data.SummoningLang;
 
 import net.minecraft.network.chat.Component;
 
@@ -15,6 +14,6 @@ public class AltarEmiCategory extends EmiRecipeCategory {
 
     @Override
     public Component getName() {
-        return SummoningLang.ALTAR.get();
+        return Registration.ALTAR_BLOCK.get().getName();
     }
 }

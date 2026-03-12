@@ -22,10 +22,6 @@ public final class SummoningLang extends LanguageProvider {
 
     // @formatter:off
 
-    // blocks
-    public static final LangEntry ALTAR = LangEntry.block(Constants.ALTAR, "Summoning Altar");
-    public static final LangEntry INDESTRUCTIBLE_ALTAR = LangEntry.block(Constants.INDESTRUCTIBLE_ALTAR, "Indestructible Summoning Altar");
-    
     // messages
     public static final LangEntry IN_PROGRESS = LangEntry.message("in_progress", "The ritual is already in progress.");
     public static final LangEntry MISSING_INPUTS = LangEntry.message("missing_inputs", "Some of the required item inputs couldn't be found in the Altar.");
@@ -33,12 +29,12 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry MISSING_SACRIFICES = LangEntry.message("missing_sacrifices", "Not all sacrifices were found for the ritual.");
     public static final LangEntry FAILED_CONDITIONS = LangEntry.message("failed_conditions", "Not all conditions were met for the ritual.");
     public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this initiator.");
-    
+
     // labels
     public static final LangEntry INITIATOR = LangEntry.label(Constants.INITIATOR, "Initiator");
     public static final LangEntry CONDITIONS = LangEntry.label(Constants.CONDITIONS, "Conditions");
     public static final LangEntry COMMANDS = LangEntry.label(Constants.COMMANDS, "Commands");
-    
+
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert last to start the ritual.");
 
@@ -63,10 +59,6 @@ public final class SummoningLang extends LanguageProvider {
             var entry = new LangEntry(String.format("%s.%s.%s", prefix, ModConstants.MOD_ID, id), value);
             ENTRIES.add(entry);
             return entry;
-        }
-
-        private static LangEntry block(String id, String value) {
-            return of("block", id, value);
         }
 
         private static LangEntry message(String id, String value) {
