@@ -8,6 +8,7 @@ import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -45,6 +46,7 @@ public final class ConditionsBuilder {
     @Nullable
     private StatePropertiesPredicate.Builder blockStatePredicate;
 
+    // region LocationCheck
     public ConditionsBuilder biomes(HolderSet<Biome> biomes) {
         getOrCreateLocationPredicate().setBiomes(biomes);
         return this;
@@ -95,11 +97,6 @@ public final class ConditionsBuilder {
         return this;
     }
 
-    public ConditionsBuilder setWaterlogged(boolean waterlogged) {
-        getOrCreateBlockStateCondition().hasProperty(BlockStateProperties.WATERLOGGED, waterlogged);
-        return this;
-    }
-
     public ConditionsBuilder setSmoked(boolean smoked) {
         getOrCreateLocationPredicate().setSmokey(smoked);
         return this;
@@ -114,7 +111,21 @@ public final class ConditionsBuilder {
         getOrCreateLocationPredicate().setStructures(structures);
         return this;
     }
+    // endregion LocationCheck
 
+    // region BlockStateCheck
+    public ConditionsBuilder facing(Direction facing) {
+        getOrCreateBlockStateCondition().hasProperty(BlockStateProperties.HORIZONTAL_FACING, facing);
+        return this;
+    }
+
+    public ConditionsBuilder setWaterlogged(boolean waterlogged) {
+        getOrCreateBlockStateCondition().hasProperty(BlockStateProperties.WATERLOGGED, waterlogged);
+        return this;
+    }
+    // endregion BlockStateCheck
+
+    // region Custom Conditions
     public ConditionsBuilder minTime(int min) {
         conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.lowerBound(min)));
         return this;
@@ -145,6 +156,7 @@ public final class ConditionsBuilder {
         }
         return this;
     }
+    // endregion Custom Conditions
 
     @HideFromJS
     public List<LootItemCondition> build(Context ctx) {
