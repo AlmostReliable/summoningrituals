@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.recipe.condition;
 import com.almostreliable.summoningrituals.util.CodecUtils;
 import com.almostreliable.summoningrituals.util.RawHolderSetStreamCodec;
 
+import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +26,13 @@ public final class ConditionStreamCodecs {
         NumberProviders.CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, IntRange> INT_RANGE_STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(
         IntRange.CODEC);
+    public static final StreamCodec<FriendlyByteBuf, MinMaxBounds.Ints> INTS_BOUNDS_STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.optional(ByteBufCodecs.INT), MinMaxBounds.Ints::min,
+        ByteBufCodecs.optional(ByteBufCodecs.INT), MinMaxBounds.Ints::max,
+        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), MinMaxBounds.Ints::minSq,
+        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), MinMaxBounds.Ints::maxSq,
+        MinMaxBounds.Ints::new
+    );
     public static final StreamCodec<FriendlyByteBuf, MinMaxBounds.Doubles> DOUBLES_BOUNDS_STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::min,
         ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::max,
@@ -38,13 +46,17 @@ public final class ConditionStreamCodecs {
         DOUBLES_BOUNDS_STREAM_CODEC, LocationPredicate.PositionPredicate::z,
         LocationPredicate.PositionPredicate::new
     );
+    public static final StreamCodec<RegistryFriendlyByteBuf, LightPredicate> LIGHT_PREDICATE_STREAM_CODEC = StreamCodec.composite(
+        INTS_BOUNDS_STREAM_CODEC, LightPredicate::composite,
+        LightPredicate::new
+    );
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
         ByteBufCodecs.optional(POSITION_PREDICATE_STREAM_CODEC), LocationPredicate::position,
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
         ByteBufCodecs.optional(new RawHolderSetStreamCodec<>(Registries.STRUCTURE)), LocationPredicate::structures,
         ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        ByteBufCodecs.optional(LIGHT_PREDICATE_STREAM_CODEC), LocationPredicate::light,
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::canSeeSky,

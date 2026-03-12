@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added light level condition
 
 ## [3.2.1] - 2025-11-16
 

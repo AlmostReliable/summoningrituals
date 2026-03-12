@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.builder;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.WeatherCondition;
 
+import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.HolderSet;
@@ -29,7 +30,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-// TODO: implement more from the LocationPredicate (light, block below, water)
+// TODO: implement more from the LocationPredicate (block below, water)
 @SuppressWarnings("unused")
 public final class ConditionsBuilder {
 
@@ -44,6 +45,26 @@ public final class ConditionsBuilder {
 
     public ConditionsBuilder dimension(ResourceKey<Level> dimension) {
         getOrCreateLocationPredicate().setDimension(dimension);
+        return this;
+    }
+
+    public ConditionsBuilder minLightLevel(int min) {
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.atLeast(min)));
+        return this;
+    }
+
+    public ConditionsBuilder maxLightLevel(int max) {
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.atMost(max)));
+        return this;
+    }
+
+    public ConditionsBuilder lightLevel(int lightLevel) {
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.exactly(lightLevel)));
+        return this;
+    }
+
+    public ConditionsBuilder lightLevel(int min, int max) {
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.between(min, max)));
         return this;
     }
 

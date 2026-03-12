@@ -4,6 +4,7 @@
   "condition.summoningrituals.biomes": "Biomes",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Height",
+  "condition.summoningrituals.light_level": "Light Level",
   "condition.summoningrituals.maximum": "Maximum",
   "condition.summoningrituals.minimum": "Minimum",
   "condition.summoningrituals.no": "No",

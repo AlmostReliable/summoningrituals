@@ -17,6 +17,9 @@ import net.neoforged.fml.ModList;
 import com.google.common.base.CaseFormat;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
 public class LocationCondition implements ConditionHandler<LocationCheck> {
 
@@ -31,6 +34,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
     private static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
     private static final LangEntry HEIGHT = LangEntry.condition("height", "Height");
+    private static final LangEntry LIGHT_LEVEL = LangEntry.condition("light_level", "Light Level");
     private static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
     private static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
 
@@ -47,7 +51,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
 
         if (predicate.biomes().isPresent()) {
             tooltip.add(conditionNameComponent(BIOMES.get()));
-            getHolderSetTooltip(tooltip, predicate.biomes().get());
+            addHolderSetTooltip(tooltip, predicate.biomes().get());
         }
         if (predicate.dimension().isPresent()) {
             var dimension = predicate.dimension().get();
@@ -56,7 +60,11 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         if (predicate.position().isPresent()) {
             var position = predicate.position().get();
             var yPos = position.y();
-            getHeightTooltip(tooltip, yPos);
+            addHeightTooltip(tooltip, yPos);
+        }
+        if (predicate.light().isPresent()) {
+            var lightLevel = predicate.light().get();
+            addLightLevelTooltip(tooltip, lightLevel.composite());
         }
         if (predicate.canSeeSky().isPresent()) {
             var openSky = predicate.canSeeSky().get();
@@ -65,45 +73,31 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         }
         if (predicate.structures().isPresent()) {
             tooltip.add(conditionNameComponent(STRUCTURES.get()));
-            getHolderSetTooltip(tooltip, predicate.structures().get());
+            addHolderSetTooltip(tooltip, predicate.structures().get());
         }
     }
 
-    private void getHeightTooltip(List<Component> tooltip, MinMaxBounds.Doubles yPos) {
-        var min = yPos.min();
-        var max = yPos.max();
-
-        if (min.isPresent() && max.isPresent()) {
-            var minValue = min.get().intValue();
-            var maxValue = max.get().intValue();
-
-            if (minValue == maxValue) {
-                tooltip.add(conditionNameValueComponent(HEIGHT.get(), String.valueOf(minValue)));
-                return;
-            }
-
-            tooltip.add(conditionNameComponent(HEIGHT.get()));
-            tooltip.add(conditionNamedValueComponent(MINIMUM.get(), String.valueOf(minValue)));
-            tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
-
-            return;
-        }
-
-        if (min.isPresent()) {
-            var minValue = min.get().intValue();
-            var name = MINIMUM.get().append(" ").append(HEIGHT.get());
-            tooltip.add(conditionNameValueComponent(name, String.valueOf(minValue)));
-            return;
-        }
-
-        if (max.isPresent()) {
-            var maxValue = max.get().intValue();
-            var name = MAXIMUM.get().append(" ").append(HEIGHT.get());
-            tooltip.add(conditionNameValueComponent(name, String.valueOf(maxValue)));
-        }
+    private void addHeightTooltip(List<Component> tooltip, MinMaxBounds.Doubles yPos) {
+        addMinMaxBoundsTooltip(
+            tooltip,
+            yPos.min().map(Double::intValue),
+            yPos.max().map(Double::intValue),
+            HEIGHT.get(),
+            Objects::equals
+        );
     }
 
-    private void getHolderSetTooltip(List<Component> tooltip, HolderSet<?> holders) {
+    private void addLightLevelTooltip(List<Component> tooltip, MinMaxBounds.Ints lightLevel) {
+        addMinMaxBoundsTooltip(
+            tooltip,
+            lightLevel.min(),
+            lightLevel.max(),
+            LIGHT_LEVEL.get(),
+            Integer::equals
+        );
+    }
+
+    private void addHolderSetTooltip(List<Component> tooltip, HolderSet<?> holders) {
         if (holders instanceof RawHolderSet<?> rawHolderSet) {
             if (rawHolderSet.tag().isPresent()) {
                 var tag = rawHolderSet.tag().get();
@@ -156,5 +150,43 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         }
 
         return readableName;
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private <T> void addMinMaxBoundsTooltip(
+        List<Component> tooltip,
+        Optional<T> min,
+        Optional<T> max,
+        Component name,
+        BiPredicate<T, T> equalityCheck
+    ) {
+        if (min.isPresent() && max.isPresent()) {
+            var minValue = min.get();
+            var maxValue = max.get();
+
+            if (equalityCheck.test(minValue, maxValue)) {
+                tooltip.add(conditionNameValueComponent(name, String.valueOf(minValue)));
+                return;
+            }
+
+            tooltip.add(conditionNameComponent(name));
+            tooltip.add(conditionNamedValueComponent(MINIMUM.get(), String.valueOf(minValue)));
+            tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
+
+            return;
+        }
+
+        if (min.isPresent()) {
+            var minValue = min.get();
+            var minName = MINIMUM.get().append(" ").append(name);
+            tooltip.add(conditionNameValueComponent(minName, String.valueOf(minValue)));
+            return;
+        }
+
+        if (max.isPresent()) {
+            var maxValue = max.get();
+            var maxName = MAXIMUM.get().append(" ").append(name);
+            tooltip.add(conditionNameValueComponent(maxName, String.valueOf(maxValue)));
+        }
     }
 }
