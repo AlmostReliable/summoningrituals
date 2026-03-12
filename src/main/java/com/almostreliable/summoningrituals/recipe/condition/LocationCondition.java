@@ -3,6 +3,8 @@ package com.almostreliable.summoningrituals.recipe.condition;
 import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
 import com.almostreliable.summoningrituals.util.RawHolderSet;
 
+import net.minecraft.advancements.critereon.BlockPredicate;
+import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
@@ -37,6 +39,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private static final LangEntry SMOKED = LangEntry.condition("smoked", "Smoked");
     private static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
     private static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
+    private static final LangEntry BLOCK_BELOW = LangEntry.condition("block_below", "Block below");
 
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, LocationCheck> getStreamCodec() {
@@ -49,6 +52,14 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         if (opt.isEmpty()) return;
         var predicate = opt.get();
 
+        if (condition.offset().equals(BlockPos.ZERO)) {
+            getTooltipForAltar(tooltip, predicate);
+        } else if (condition.offset().equals(BlockPos.ZERO.below()) && predicate.block().isPresent()) {
+            getTooltipForBlockBelow(tooltip, predicate.block().get());
+        }
+    }
+
+    private void getTooltipForAltar(List<Component> tooltip, LocationPredicate predicate) {
         if (predicate.biomes().isPresent()) {
             tooltip.add(conditionNameComponent(BIOMES.get()));
             addHolderSetTooltip(tooltip, predicate.biomes().get());
@@ -80,6 +91,19 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             tooltip.add(conditionNameComponent(STRUCTURES.get()));
             addHolderSetTooltip(tooltip, predicate.structures().get());
         }
+    }
+
+    private void getTooltipForBlockBelow(List<Component> tooltip, BlockPredicate predicate) {
+        var blocksOpt = predicate.blocks();
+        if (blocksOpt.isEmpty()) return;
+
+        var blockName = blocksOpt.get().get(0).value().getName();
+        tooltip.add(conditionNameValueComponent(BLOCK_BELOW.get(), blockName));
+
+        var propertiesOpt = predicate.properties();
+        if (propertiesOpt.isEmpty()) return;
+        var properties = propertiesOpt.get().properties();
+        addBlockStateTooltip(tooltip, properties);
     }
 
     private void addHeightTooltip(List<Component> tooltip, MinMaxBounds.Doubles yPos) {

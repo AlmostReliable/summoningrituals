@@ -3,9 +3,12 @@ package com.almostreliable.summoningrituals.recipe.condition;
 import com.almostreliable.summoningrituals.util.CodecUtils;
 import com.almostreliable.summoningrituals.util.RawHolderSetStreamCodec;
 
+import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.NbtPredicate;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -50,6 +53,12 @@ public final class ConditionStreamCodecs {
         INTS_BOUNDS_STREAM_CODEC, LightPredicate::composite,
         LightPredicate::new
     );
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlockPredicate> BLOCK_PREDICATE_STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BLOCK)), BlockPredicate::blocks,
+        ByteBufCodecs.optional(StatePropertiesPredicate.STREAM_CODEC), BlockPredicate::properties,
+        ByteBufCodecs.optional(NbtPredicate.STREAM_CODEC), BlockPredicate::nbt,
+        BlockPredicate::new
+    );
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
         ByteBufCodecs.optional(POSITION_PREDICATE_STREAM_CODEC), LocationPredicate::position,
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
@@ -57,7 +66,7 @@ public final class ConditionStreamCodecs {
         ByteBufCodecs.optional(ResourceKey.streamCodec(Registries.DIMENSION)), LocationPredicate::dimension,
         ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::smokey,
         ByteBufCodecs.optional(LIGHT_PREDICATE_STREAM_CODEC), LocationPredicate::light,
-        CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
+        ByteBufCodecs.optional(BLOCK_PREDICATE_STREAM_CODEC), LocationPredicate::block,
         CodecUtils.emptyOptionalStreamCodec(), $ -> Optional.empty(),
         ByteBufCodecs.optional(ByteBufCodecs.BOOL), LocationPredicate::canSeeSky,
         LocationPredicate::new
