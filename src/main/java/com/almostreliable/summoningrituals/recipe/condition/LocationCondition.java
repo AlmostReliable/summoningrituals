@@ -24,8 +24,7 @@ import java.util.function.BiPredicate;
 public class LocationCondition implements ConditionHandler<LocationCheck> {
 
     public static final LocationCondition INSTANCE = new LocationCondition();
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, LocationCheck> STREAM_CODEC = StreamCodec.composite(
+    private static final StreamCodec<RegistryFriendlyByteBuf, LocationCheck> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.optional(ConditionStreamCodecs.LOCATION_PREDICATE_STREAM_CODEC), LocationCheck::predicate,
         BlockPos.STREAM_CODEC, LocationCheck::offset,
         LocationCheck::new

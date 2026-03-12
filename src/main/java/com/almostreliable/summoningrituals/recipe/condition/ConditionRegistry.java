@@ -17,6 +17,8 @@ public final class ConditionRegistry {
     private ConditionRegistry() {}
 
     public static void init() {
+        CONDITION_REGISTRY.put(LootItemConditions.ANY_OF, AnyOfCompositeCondition.INSTANCE);
+        CONDITION_REGISTRY.put(LootItemConditions.BLOCK_STATE_PROPERTY, BlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.LOCATION_CHECK, LocationCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.TIME_CHECK, TimeCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.WEATHER_CHECK, WeatherCondition.INSTANCE);

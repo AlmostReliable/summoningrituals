@@ -1,18 +1,22 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
+import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.WeatherCondition;
 
 import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.IntRange;
+import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
@@ -37,6 +41,8 @@ public final class ConditionsBuilder {
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
     private LocationPredicate.Builder locationPredicate;
+    @Nullable
+    private StatePropertiesPredicate.Builder blockStatePredicate;
 
     public ConditionsBuilder biomes(HolderSet<Biome> biomes) {
         getOrCreateLocationPredicate().setBiomes(biomes);
@@ -139,6 +145,14 @@ public final class ConditionsBuilder {
         if (locationPredicate != null) {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());
         }
+        if (blockStatePredicate != null) {
+            var altarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.ALTAR_BLOCK.get())
+                .setProperties(blockStatePredicate);
+            var indesAltarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.get())
+                .setProperties(blockStatePredicate);
+
+            conditions.add(AnyOfCondition.anyOf(altarStatePredicate, indesAltarStatePredicate).build());
+        }
 
         var duplicates = conditions.stream()
             .collect(Collectors.groupingBy(LootItemCondition::getClass, Collectors.counting()))
@@ -160,6 +174,13 @@ public final class ConditionsBuilder {
             locationPredicate = LocationPredicate.Builder.location();
         }
         return locationPredicate;
+    }
+
+    private StatePropertiesPredicate.Builder getOrCreateBlockStateCondition() {
+        if (blockStatePredicate == null) {
+            blockStatePredicate = StatePropertiesPredicate.Builder.properties();
+        }
+        return blockStatePredicate;
     }
 
     private void throwException(Context ctx, String message) throws KubeRuntimeException {
