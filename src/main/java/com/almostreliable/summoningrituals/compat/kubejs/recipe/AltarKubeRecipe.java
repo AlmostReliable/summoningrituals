@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
+import dev.latvian.mods.rhino.Context;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +52,8 @@ public class AltarKubeRecipe extends KubeRecipe {
         return commands(commands, tooltip, requiresPlayer);
     }
 
-    public AltarKubeRecipe conditions(Function<ConditionsBuilder, ConditionsBuilder> conditions) {
-        setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder(sourceLine)).build());
+    public AltarKubeRecipe conditions(Context ctx, Function<ConditionsBuilder, ConditionsBuilder> conditions) {
+        setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder()).build(ctx));
         return this;
     }
 

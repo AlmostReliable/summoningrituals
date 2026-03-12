@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import org.jetbrains.annotations.Nullable;
@@ -32,15 +33,9 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class ConditionsBuilder {
 
-    private final SourceLine sourceLine;
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
     private LocationPredicate.Builder locationPredicate;
-
-    @HideFromJS
-    public ConditionsBuilder(SourceLine sourceLine) {
-        this.sourceLine = sourceLine;
-    }
 
     public ConditionsBuilder biomes(HolderSet<Biome> biomes) {
         getOrCreateLocationPredicate().setBiomes(biomes);
@@ -102,19 +97,19 @@ public final class ConditionsBuilder {
         return this;
     }
 
-    public ConditionsBuilder weather(Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
+    public ConditionsBuilder weather(Context ctx, Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
         try {
             var builder = new WeatherCondition.Builder();
             var weatherCheck = weather.apply(builder).build();
             conditions.add(weatherCheck);
         } catch (IllegalArgumentException e) {
-            throwException(e.getMessage());
+            throwException(ctx, e.getMessage());
         }
         return this;
     }
 
     @HideFromJS
-    public List<LootItemCondition> build() {
+    public List<LootItemCondition> build(Context ctx) {
         if (locationPredicate != null) {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());
         }
@@ -128,7 +123,7 @@ public final class ConditionsBuilder {
             .toList();
 
         if (!duplicates.isEmpty()) {
-            throwException("only one condition of each type allowed, duplicates found: " + duplicates);
+            throwException(ctx, "only one condition of each type allowed, duplicates found: " + duplicates);
         }
 
         return conditions;
@@ -141,7 +136,7 @@ public final class ConditionsBuilder {
         return locationPredicate;
     }
 
-    private void throwException(String message) throws KubeRuntimeException {
-        throw new KubeRuntimeException(message).source(sourceLine);
+    private void throwException(Context ctx, String message) throws KubeRuntimeException {
+        throw new KubeRuntimeException(message).source(SourceLine.of(ctx));
     }
 }
