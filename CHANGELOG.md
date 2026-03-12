@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - added smoked condition
 - added waterlogged condition
 - fixed item and block names being untranslated
+- fixed recipe not rendering in recipe viewers if an entity can't be measured ([#35](https://github.com/AlmostReliable/summoningrituals/issues/35))
 
 ## [3.2.1] - 2025-11-16
 

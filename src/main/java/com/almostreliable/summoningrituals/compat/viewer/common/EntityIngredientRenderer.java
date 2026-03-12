@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.item.Items;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -50,7 +51,10 @@ public final class EntityIngredientRenderer {
         }
 
         var measuringResult = measureEntity(mc, entity, entityIngredient.getId());
-        if (measuringResult == MeasuringResult.EMPTY) return;
+        if (measuringResult == MeasuringResult.EMPTY) {
+            guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(), 0, 0);
+            return;
+        }
 
         entity.tickCount = mc.player.tickCount;
 
@@ -80,11 +84,15 @@ public final class EntityIngredientRenderer {
         var poseStack = new PoseStack();
 
         // measure for 40 render ticks because size can change with animation
-        for (var i = 0; i < MEASURE_TICKS; i++) {
-            var ticks = i;
-            RenderSystem.runAsFancy(() -> entityRenderer.render(
-                entity, 0, 0, 0, 0, ticks, poseStack, measuringBuffer, LightTexture.FULL_BRIGHT
-            ));
+        try {
+            for (var i = 0; i < MEASURE_TICKS; i++) {
+                var ticks = i;
+                RenderSystem.runAsFancy(() -> entityRenderer.render(
+                    entity, 0, 0, 0, 0, ticks, poseStack, measuringBuffer, LightTexture.FULL_BRIGHT
+                ));
+            }
+        } catch (Exception ignored) {
+            return MeasuringResult.EMPTY;
         }
 
         var measuringResult = measuringBuffer.getData();
