@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - added light level condition
 - added smoked condition
+- added waterlogged condition
 
 ## [3.2.1] - 2025-11-16
 

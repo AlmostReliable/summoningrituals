@@ -12,6 +12,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.IntRange;
 import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
@@ -34,7 +35,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-// TODO: implement more from the LocationPredicate (block below, water)
+// TODO: implement more from the LocationPredicate (block below)
 @SuppressWarnings("unused")
 public final class ConditionsBuilder {
 
@@ -91,6 +92,11 @@ public final class ConditionsBuilder {
 
     public ConditionsBuilder lightLevel(int min, int max) {
         getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.between(min, max)));
+        return this;
+    }
+
+    public ConditionsBuilder setWaterlogged(boolean waterlogged) {
+        getOrCreateBlockStateCondition().hasProperty(BlockStateProperties.WATERLOGGED, waterlogged);
         return this;
     }
 
