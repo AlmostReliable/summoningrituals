@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added German translation
 - added block below condition
 - added facing condition
 - added light level condition
