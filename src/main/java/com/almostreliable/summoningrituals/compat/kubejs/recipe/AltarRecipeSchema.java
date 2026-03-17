@@ -38,7 +38,7 @@ public interface AltarRecipeSchema {
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_OUTPUTS, ComponentRole.OUTPUT)
-        .functionNames(List.of("itemOutputs"))
+        .functionNames(List.of("itemOutputs", "itemOutput", "outputs", "output"))
         .optional(List.of())
         .exclude();
     RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.TYPE
@@ -46,7 +46,7 @@ public interface AltarRecipeSchema {
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_OUTPUTS, ComponentRole.OUTPUT)
-        .functionNames(List.of("entityOutputs"))
+        .functionNames(List.of("entityOutputs", "entityOutput", "mobOutputs", "mobOutput"))
         .optional(List.of())
         .exclude();
     RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.TYPE
@@ -59,7 +59,7 @@ public interface AltarRecipeSchema {
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_INPUTS, ComponentRole.INPUT)
-        .functionNames(List.of("itemInputs"))
+        .functionNames(List.of("itemInputs", "itemInput", "inputs", "input"))
         .optional(List.of())
         .exclude();
     RecipeKey<List<EntityInput>> ENTITY_INPUTS = EntityInputComponent.TYPE
@@ -67,16 +67,17 @@ public interface AltarRecipeSchema {
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_INPUTS, ComponentRole.INPUT)
-        .functionNames(List.of("entityInputs"))
+        .functionNames(List.of("entityInputs", "entityInput", "mobInputs", "mobInput"))
         .optional(List.of())
         .exclude();
     RecipeKey<BlockPos> ZONE = BlockPosComponent.TYPE
         .key(Constants.ZONE, ComponentRole.OTHER)
-        .functionNames(List.of("entityInputZone", "inputZone", "sacrificeZone", "entityZone"))
+        .functionNames(List.of("entityInputZone", "mobInputZone", "inputZone", "sacrificeZone", "entityZone", "mobZone", "zone"))
         .optional(AltarRecipe.DEFAULT_ZONE)
         .exclude();
     RecipeKey<Integer> TICKS = NumberComponent.INT
         .key(Constants.TICKS, ComponentRole.OTHER)
+        .functionNames(List.of("ticks", "time", "duration"))
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
     RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.TYPE
