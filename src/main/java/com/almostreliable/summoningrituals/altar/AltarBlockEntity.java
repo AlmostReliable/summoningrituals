@@ -98,7 +98,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (currentRecipeInfo == null) return;
 
         if (recipeProgress >= recipeTime) {
-            var recipe = currentRecipeInfo.recipe();
+            var recipe = currentRecipeInfo.getRecipe();
             if (inventory.consumeRecipeInputs(level, recipe)) {
                 recipe.invokeCommands(level, invokingPlayer);
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, recipe.itemOutputs());
@@ -195,14 +195,14 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return matchResult;
         }
 
-        for (var entityInput : recipeInfo.inputEntities()) {
+        for (var entityInput : recipeInfo.getInputEntities()) {
             entityInput.addTag(SACRIFICE_TAG);
             entityInput.kill();
         }
 
         currentRecipeInfo = recipeInfo;
         invokingPlayer = player;
-        recipeTime = recipeInfo.recipe().ticks();
+        recipeTime = recipeInfo.getRecipe().ticks();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         sendAltarRecipeSyncUpdate(level);
 
@@ -240,7 +240,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         var lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
 
         matchingRecipes.removeIf(recipeInfo -> {
-            var recipe = recipeInfo.recipe();
+            var recipe = recipeInfo.getRecipe();
             return !recipe.startConditions().stream().allMatch(condition -> condition.test(lootContext));
         });
         if (matchingRecipes.isEmpty()) return RecipeMatchResult.FAILED_CONDITIONS;

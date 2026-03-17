@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - added option to add custom data validators to entity inputs to manually check NBT
+- fixed recipe info container properties not being exposed as beans in events
 
 ## [3.3.0] - 2026-03-12
 

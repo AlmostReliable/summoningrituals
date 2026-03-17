@@ -9,11 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 public record RecipeInfoContainer(
-    ResourceLocation recipeId,
-    AltarRecipe recipe,
-    Collection<Entity> inputEntities,
-    Collection<ItemEntity> outputItems,
-    Collection<Entity> outputEntities
+    ResourceLocation getRecipeId,
+    AltarRecipe getRecipe,
+    Collection<Entity> getInputEntities,
+    Collection<ItemEntity> getOutputItems,
+    Collection<Entity> getOutputEntities
 ) {
 
     public static RecipeInfoContainer inputInfo(RecipeHolder<AltarRecipe> recipe, Collection<Entity> inputEntities) {
@@ -23,11 +23,11 @@ public record RecipeInfoContainer(
     public static RecipeInfoContainer outputInfo(
         RecipeInfoContainer inputInfo, Collection<ItemEntity> outputItems, Collection<Entity> outputEntities
     ) {
-        return new RecipeInfoContainer(inputInfo.recipeId, inputInfo.recipe, inputInfo.inputEntities, outputItems, outputEntities);
+        return new RecipeInfoContainer(inputInfo.getRecipeId, inputInfo.getRecipe, inputInfo.getInputEntities, outputItems, outputEntities);
     }
 
     @Override
     public int hashCode() {
-        return recipeId.hashCode();
+        return getRecipeId.hashCode();
     }
 }
