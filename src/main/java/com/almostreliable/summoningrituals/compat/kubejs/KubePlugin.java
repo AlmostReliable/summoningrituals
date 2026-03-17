@@ -14,6 +14,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOu
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import dev.latvian.mods.kubejs.event.EventGroup;
@@ -46,6 +47,7 @@ public class KubePlugin implements KubeJSPlugin {
         if (!registry.type().isServer()) return;
         registry.add("SummoningItem", SummoningItemBinding.class);
         registry.add("SummoningEntity", SummoningEntityBinding.class);
+        registry.add("SummoningTime", TimeCondition.TimeType.class);
     }
 
     @Override

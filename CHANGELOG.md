@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - added option to add custom data validators to entity inputs to manually check NBT
 - added aliases to recipe components
+- added `SummoningTime` binding to use pre-defined time values as conditions
 - fixed recipe info container properties not being exposed as beans in events
 
 ## [3.3.0] - 2026-03-12
