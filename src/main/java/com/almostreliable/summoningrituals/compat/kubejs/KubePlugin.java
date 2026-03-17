@@ -8,7 +8,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
-import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInfoComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
@@ -52,7 +52,7 @@ public class KubePlugin implements KubeJSPlugin {
     public void registerRecipeComponents(RecipeComponentTypeRegistry registry) {
         registry.register(BlockPosComponent.TYPE);
         registry.register(CommandOutputComponent.TYPE);
-        registry.register(EntityInfoComponent.TYPE);
+        registry.register(EntityInputComponent.TYPE);
         registry.register(EntityOutputComponent.TYPE);
         registry.register(ItemOutputComponent.TYPE);
         registry.register(LootItemConditionComponent.TYPE);

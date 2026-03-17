@@ -2,9 +2,10 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
-import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityTypeWrapper;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.EntityInput;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -15,39 +16,44 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public record EntityInfoComponent(RecipeComponentType<?> type) implements RecipeComponent<EntityInfo> {
+public record EntityInputComponent(RecipeComponentType<?> type) implements RecipeComponent<EntityInput> {
 
-    public static final RecipeComponentType<EntityInfo> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("entity_info"),
-        EntityInfoComponent::new
+    public static final RecipeComponentType<EntityInput> TYPE = RecipeComponentType.unit(
+        SummoningRituals.getRL("entity_input"),
+        EntityInputComponent::new
     );
 
     @Override
-    public Codec<EntityInfo> codec() {
-        return EntityInfo.CODEC;
+    public Codec<EntityInput> codec() {
+        return EntityInput.CODEC;
     }
 
     @Override
     public TypeInfo typeInfo() {
-        return TypeInfo.of(EntityInfo.class)
-            .or(TypeInfo.of(SummoningEntityBuilder.class))
+        return TypeInfo.of(EntityInput.class)
+            .or(TypeInfo.of(EntityInfo.class))
+            .or(TypeInfo.of(SummoningEntityInputBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(SizedEntityTypeWrapper.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
     }
 
     @Override
-    public EntityInfo wrap(RecipeScriptContext cx, Object from) {
-        if (from instanceof SummoningEntityBuilder builder) {
-            return builder.build();
+    public EntityInput wrap(RecipeScriptContext cx, Object from) {
+        if (from instanceof SummoningEntityInputBuilder builder) {
+            return builder.buildInput();
+        }
+
+        if (from instanceof EntityInfo info) {
+            return new EntityInput(info);
         }
 
         return SizedEntityTypeWrapper.wrap(
             this,
             cx,
             from,
-            EntityInfo.class,
-            (entity, count) -> SummoningEntityBinding.input(entity, count).build()
+            EntityInput.class,
+            (entity, count) -> SummoningEntityBinding.input(entity, count).buildInput()
         );
     }
 }

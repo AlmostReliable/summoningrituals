@@ -8,6 +8,7 @@ import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +40,7 @@ import java.util.function.Function;
 
 public record AltarRecipe(
     Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
-    List<SizedIngredient> itemInputs, List<EntityInfo> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    List<SizedIngredient> itemInputs, List<EntityInput> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
@@ -103,16 +104,20 @@ public record AltarRecipe(
     }
 
     @Nullable
-    public List<Entity> getSacrifices(BlockPos pos, Function<AABB, List<Entity>> entityCollector) {
+    public List<Entity> getSacrifices(BlockPos pos, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
         if (entityInputs.isEmpty()) return List.of();
 
         var region = constructRegion(pos);
         var entities = entityCollector.apply(region);
         var sacrifices = new ArrayList<Entity>();
 
-        for (var input : entityInputs) {
-            var requiredCount = input.count();
-            var matchingEntities = entities.stream().filter(input).toList();
+        for (var i = 0; i < entityInputs.size(); i++) {
+            var entityInput = entityInputs.get(i);
+            var requiredCount = entityInput.entityInfo().count();
+            var inputIndex = i;
+            var matchingEntities = entities.stream()
+                .filter(e -> entityInput.test(recipeId, inputIndex, e))
+                .toList();
 
             if (matchingEntities.size() < requiredCount) return null;
 

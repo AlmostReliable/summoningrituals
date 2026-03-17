@@ -32,7 +32,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         EntityOutput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_OUTPUTS, List.of()).forGetter(AltarRecipe::entityOutputs),
         CommandOutput.CODEC.optionalFieldOf(Constants.COMMANDS).forGetter(AltarRecipe::commands),
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(AltarRecipe::itemInputs),
-        EntityInfo.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
+        EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
         LootItemCondition.DIRECT_CODEC.listOf()
             .optionalFieldOf(Constants.CONDITIONS, List.of())
             .forGetter(AltarRecipe::startConditions),
@@ -45,7 +45,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         ByteBufCodecs.optional(CommandOutput.STREAM_CODEC), AltarRecipe::commands,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
-        EntityInfo.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
+        EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
         ConditionStreamCodecs.CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
         BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,

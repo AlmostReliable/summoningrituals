@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.mixin;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.EntityInput;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -26,6 +27,7 @@ public abstract class RecipeManagerMixin {
         Map<ResourceLocation, JsonElement> recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci
     ) {
         AltarRecipe.clearCaches();
+        EntityInput.DATA_VALIDATORS.clear();
     }
 
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))

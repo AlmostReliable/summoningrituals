@@ -55,7 +55,7 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             inputs.add(EmiIngredient.of(itemInput.ingredient(), itemInput.count()));
         }
         for (var entityInput : recipe.entityInputs()) {
-            var entityIngredient = new EntityIngredient(entityInput);
+            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
             inputs.add(EntityEmiStack.input(entityIngredient));
         }
 
@@ -87,7 +87,7 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
         var catalysts = new ArrayList<EmiIngredient>();
 
         for (var entityInput : recipe.entityInputs()) {
-            var entityIngredient = new EntityIngredient(entityInput);
+            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
             var egg = entityIngredient.getEgg();
             if (egg == null) continue;
             catalysts.add(EmiStack.of(egg));

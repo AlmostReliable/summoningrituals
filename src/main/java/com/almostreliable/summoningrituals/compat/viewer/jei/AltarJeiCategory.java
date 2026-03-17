@@ -131,7 +131,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 } else {
                     // entity inputs
                     var entityInput = recipe.entityInputs().get(slot - itemInputs.size());
-                    var entityIngredient = new EntityIngredient(entityInput);
+                    var entityIngredient = new EntityIngredient(entityInput.entityInfo());
                     var entityEgg = entityIngredient.getEgg();
 
                     builder.addSlot(RecipeIngredientRole.INPUT, x, y)

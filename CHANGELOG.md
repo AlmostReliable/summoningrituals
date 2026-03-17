@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added option to add custom data validators to entity inputs to manually check NBT
 
 ## [3.3.0] - 2026-03-12
 
