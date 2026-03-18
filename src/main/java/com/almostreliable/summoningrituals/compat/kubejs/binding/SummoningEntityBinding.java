@@ -2,13 +2,14 @@ package com.almostreliable.summoningrituals.compat.kubejs.binding;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityOutputBuilder;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 
 public interface SummoningEntityBinding {
 
-    static SummoningEntityInputBuilder input(Holder<EntityType<?>> entity) {
+    static SummoningEntityInputBuilder input(EntityInfo entity) {
         return new SummoningEntityInputBuilder(entity);
     }
 
@@ -16,7 +17,7 @@ public interface SummoningEntityBinding {
         return new SummoningEntityInputBuilder(entity, count);
     }
 
-    static SummoningEntityOutputBuilder output(Holder<EntityType<?>> entity) {
+    static SummoningEntityOutputBuilder output(EntityInfo entity) {
         return new SummoningEntityOutputBuilder(entity);
     }
 

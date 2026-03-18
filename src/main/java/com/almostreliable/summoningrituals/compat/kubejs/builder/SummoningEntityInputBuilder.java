@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.EntityInput;
 
 import net.minecraft.core.Holder;
@@ -23,6 +24,10 @@ public class SummoningEntityInputBuilder extends SummoningEntityBuilder {
 
     public SummoningEntityInputBuilder(Holder<EntityType<?>> entity, int count) {
         super(entity, count);
+    }
+
+    public SummoningEntityInputBuilder(EntityInfo entity) {
+        super(entity);
     }
 
     public SummoningEntityBuilder validator(Predicate<Entity> validator) {

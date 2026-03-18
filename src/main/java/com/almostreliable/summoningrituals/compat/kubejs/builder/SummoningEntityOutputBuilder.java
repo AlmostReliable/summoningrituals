@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,10 @@ public class SummoningEntityOutputBuilder extends SummoningEntityBuilder {
 
     public SummoningEntityOutputBuilder(Holder<EntityType<?>> entity, int count) {
         super(entity, count);
+    }
+
+    public SummoningEntityOutputBuilder(EntityInfo entity) {
+        super(entity);
     }
 
     public SummoningEntityBuilder offset(BlockPos offset) {

@@ -13,7 +13,9 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.Entity
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
+import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
@@ -63,6 +65,7 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void registerTypeWrappers(TypeWrapperRegistry registry) {
         registry.register(CommandOutput.class, CommandOutputTypeWrapper.INSTANCE);
+        registry.register(EntityInfo.class, EntityInfoTypeWrapper.INSTANCE);
     }
 
     @Override

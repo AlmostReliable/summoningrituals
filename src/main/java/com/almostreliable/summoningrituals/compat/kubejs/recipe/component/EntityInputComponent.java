@@ -3,7 +3,8 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
-import com.almostreliable.summoningrituals.compat.kubejs.wrapper.SizedEntityTypeWrapper;
+import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityComponentTypeWrapper;
+import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.EntityInput;
 
@@ -33,7 +34,7 @@ public record EntityInputComponent(RecipeComponentType<?> type) implements Recip
         return TypeInfo.of(EntityInput.class)
             .or(TypeInfo.of(EntityInfo.class))
             .or(TypeInfo.of(SummoningEntityInputBuilder.class))
-            .or(TypeInfo.of(Holder.class).withParams(SizedEntityTypeWrapper.ENTITY_TYPE_INFO))
+            .or(TypeInfo.of(Holder.class).withParams(EntityInfoTypeWrapper.ENTITY_TYPE_INFO))
             .or(TypeInfo.of(ResourceLocation.class))
             .or(TypeInfo.STRING);
     }
@@ -48,12 +49,12 @@ public record EntityInputComponent(RecipeComponentType<?> type) implements Recip
             return new EntityInput(info);
         }
 
-        return SizedEntityTypeWrapper.wrap(
+        return EntityComponentTypeWrapper.wrap(
             this,
             cx,
             from,
             EntityInput.class,
-            (entity, count) -> SummoningEntityBinding.input(entity, count).buildInput()
+            entity -> SummoningEntityBinding.input(entity).buildInput()
         );
     }
 }

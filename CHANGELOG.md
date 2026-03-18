@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added type wrapper for `EntityInfo` to allow for easier entity definition syntax in bindings
 
 ## [3.4.0] - 2026-03-17
 

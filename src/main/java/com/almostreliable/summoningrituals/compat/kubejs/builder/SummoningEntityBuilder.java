@@ -32,6 +32,10 @@ public class SummoningEntityBuilder {
         this.count = count;
     }
 
+    public SummoningEntityBuilder(EntityInfo entity) {
+        this(entity.entity(), entity.count());
+    }
+
     public SummoningEntityBuilder data(CompoundTag data) {
         this.data = data;
         return this;
