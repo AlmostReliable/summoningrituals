@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.wrapper;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
+import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.kubejs.util.ListJS;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
@@ -18,6 +19,10 @@ public final class CommandOutputTypeWrapper implements TypeWrapperFactory<Comman
 
     @Override
     public CommandOutput wrap(Context cx, Object from, TypeInfo target) {
+        if (from instanceof CommandOutput o) {
+            return o;
+        }
+
         var list = ListJS.of(from);
         if (list != null && !list.isEmpty()) {
             var result = new ArrayList<String>();
@@ -33,7 +38,7 @@ public final class CommandOutputTypeWrapper implements TypeWrapperFactory<Comman
             return new CommandOutput(normalizeCommand(s));
         }
 
-        throw new KubeRuntimeException("invalid command output: " + from);
+        throw new KubeRuntimeException("invalid command output: " + from).source(SourceLine.of(cx));
     }
 
     public static String normalizeCommand(String command) {
