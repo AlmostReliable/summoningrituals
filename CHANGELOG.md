@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - fixed item names being untranslated
+- moved lang entries to central file
 
 ## [3.4.1] - 2026-03-18
 

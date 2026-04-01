@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.data;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
@@ -38,6 +39,30 @@ public final class SummoningLang extends LanguageProvider {
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert last to start the ritual.");
 
+    // conditions
+    public static final LangEntry ALTAR_PROPERTIES = LangEntry.condition("altar_properties", "Altar Properties");
+    public static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
+    public static final LangEntry BLOCK_BELOW = LangEntry.condition("block_below", "Block below");
+    public static final LangEntry CLEAR = LangEntry.condition("weather_clear", "Clear");
+    public static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
+    public static final LangEntry HEIGHT = LangEntry.condition("height", "Height");
+    public static final LangEntry LIGHT_LEVEL = LangEntry.condition("light_level", "Light Level");
+    public static final LangEntry MAXIMUM = LangEntry.condition("maximum", "Maximum");
+    public static final LangEntry MINIMUM = LangEntry.condition("minimum", "Minimum");
+    public static final LangEntry NO = LangEntry.condition("no", "No");
+    public static final LangEntry NOT_THUNDERING = LangEntry.condition("weather_not_thundering", "Not Thundering");
+    public static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
+    public static final LangEntry RAINING = LangEntry.condition("weather_raining", "Raining");
+    public static final LangEntry SMOKED = LangEntry.condition("smoked", "Smoked");
+    public static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
+    public static final LangEntry THUNDERING = LangEntry.condition("weather_thundering", "Thundering");
+    public static final LangEntry TIME = LangEntry.condition("time", "Time");
+    public static final LangEntry WEATHER = LangEntry.condition("weather", "Weather");
+    public static final LangEntry YES = LangEntry.condition("yes", "Yes");
+
+    // enums
+    public static final Map<TimeCondition.TimeType, LangEntry> TIME_TYPES = LangEntry.enumValues("condition", "time", TimeCondition.TimeType.values());
+
     // @formatter:on
 
     SummoningLang(PackOutput output) {
@@ -73,12 +98,12 @@ public final class SummoningLang extends LanguageProvider {
             return of("hint", id, value);
         }
 
-        public static LangEntry condition(String id, String value) {
+        private static LangEntry condition(String id, String value) {
             return of("condition", id, value);
         }
 
         @SafeVarargs
-        public static <T extends Enum<?>> Map<T, LangEntry> enumValues(String prefix, String idPrefix, T... enumValues) {
+        private static <T extends Enum<?>> Map<T, LangEntry> enumValues(String prefix, String idPrefix, T... enumValues) {
             var enumEntries = new HashMap<T, LangEntry>();
 
             for (var enumValue : enumValues) {

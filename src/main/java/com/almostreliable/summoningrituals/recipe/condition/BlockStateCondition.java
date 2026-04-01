@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.registries.Registries;
@@ -22,8 +22,6 @@ public class BlockStateCondition implements ConditionHandler<LootItemBlockStateP
         LootItemBlockStatePropertyCondition::new
     );
 
-    private static final LangEntry ALTAR_PROPERTIES = LangEntry.condition("altar_properties", "Altar Properties");
-
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, LootItemBlockStatePropertyCondition> getStreamCodec() {
         return STREAM_CODEC;
@@ -40,7 +38,7 @@ public class BlockStateCondition implements ConditionHandler<LootItemBlockStateP
         addBlockStateTooltip(propertyTooltips, properties);
 
         if (propertyTooltips.isEmpty()) return;
-        tooltip.add(conditionNameComponent(ALTAR_PROPERTIES.get()));
+        tooltip.add(conditionNameComponent(SummoningLang.ALTAR_PROPERTIES.get()));
         tooltip.addAll(propertyTooltips);
     }
 }

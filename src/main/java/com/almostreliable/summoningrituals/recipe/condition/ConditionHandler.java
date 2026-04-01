@@ -1,7 +1,5 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,11 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConditionHandler<T extends LootItemCondition> {
-
-    LangEntry YES = LangEntry.condition("yes", "Yes");
-    LangEntry NO = LangEntry.condition("no", "No");
-    LangEntry MINIMUM = LangEntry.condition("minimum", "Minimum");
-    LangEntry MAXIMUM = LangEntry.condition("maximum", "Maximum");
 
     StreamCodec<RegistryFriendlyByteBuf, T> getStreamCodec();
 

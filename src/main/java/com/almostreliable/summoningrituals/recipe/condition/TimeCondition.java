@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -13,7 +13,6 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class TimeCondition implements ConditionHandler<TimeCheck> {
 
@@ -23,9 +22,6 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
         ConditionStreamCodecs.INT_RANGE_STREAM_CODEC, TimeCheck::value,
         TimeCheck::new
     );
-
-    private static final LangEntry TIME = LangEntry.condition("time", "Time");
-    private static final Map<TimeType, LangEntry> TIME_TYPES = LangEntry.enumValues("condition", "time", TimeType.values());
 
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, TimeCheck> getStreamCodec() {
@@ -40,14 +36,14 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
 
         if (min instanceof ConstantValue(var minConstant) && max == null) {
             var minValue = (int) minConstant;
-            var name = MINIMUM.get().append(" ").append(TIME.get());
+            var name = SummoningLang.MINIMUM.get().append(" ").append(SummoningLang.TIME.get());
             tooltip.add(conditionNameValueComponent(name, String.valueOf(minValue)));
             return;
         }
 
         if (max instanceof ConstantValue(var maxConstant) && min == null) {
             var maxValue = (int) maxConstant;
-            var name = MAXIMUM.get().append(" ").append(TIME.get());
+            var name = SummoningLang.MAXIMUM.get().append(" ").append(SummoningLang.TIME.get());
             tooltip.add(conditionNameValueComponent(name, String.valueOf(maxValue)));
             return;
         }
@@ -61,13 +57,13 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
 
         var timeType = TimeType.of(minValue, maxValue);
         if (timeType != null) {
-            tooltip.add(conditionNameValueComponent(TIME.get(), TIME_TYPES.get(timeType).get()));
+            tooltip.add(conditionNameValueComponent(SummoningLang.TIME.get(), SummoningLang.TIME_TYPES.get(timeType).get()));
             return;
         }
 
-        tooltip.add(conditionNameComponent(TIME.get()));
-        tooltip.add(conditionNamedValueComponent(MINIMUM.get(), minValue));
-        tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), maxValue));
+        tooltip.add(conditionNameComponent(SummoningLang.TIME.get()));
+        tooltip.add(conditionNamedValueComponent(SummoningLang.MINIMUM.get(), minValue));
+        tooltip.add(conditionNamedValueComponent(SummoningLang.MAXIMUM.get(), maxValue));
     }
 
     public enum TimeType {

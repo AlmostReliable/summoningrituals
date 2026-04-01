@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.util.RawHolderSet;
 
 import net.minecraft.advancements.critereon.BlockPredicate;
@@ -32,15 +32,6 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         LocationCheck::new
     );
 
-    private static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
-    private static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
-    private static final LangEntry HEIGHT = LangEntry.condition("height", "Height");
-    private static final LangEntry LIGHT_LEVEL = LangEntry.condition("light_level", "Light Level");
-    private static final LangEntry SMOKED = LangEntry.condition("smoked", "Smoked");
-    private static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
-    private static final LangEntry STRUCTURES = LangEntry.condition("structures", "Structures");
-    private static final LangEntry BLOCK_BELOW = LangEntry.condition("block_below", "Block below");
-
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, LocationCheck> getStreamCodec() {
         return STREAM_CODEC;
@@ -61,12 +52,12 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
 
     private void getTooltipForAltar(List<Component> tooltip, LocationPredicate predicate) {
         if (predicate.biomes().isPresent()) {
-            tooltip.add(conditionNameComponent(BIOMES.get()));
+            tooltip.add(conditionNameComponent(SummoningLang.BIOMES.get()));
             addHolderSetTooltip(tooltip, predicate.biomes().get());
         }
         if (predicate.dimension().isPresent()) {
             var dimension = predicate.dimension().get();
-            tooltip.add(conditionNameValueComponent(DIMENSION.get(), getReadableId(dimension.location())));
+            tooltip.add(conditionNameValueComponent(SummoningLang.DIMENSION.get(), getReadableId(dimension.location())));
         }
         if (predicate.position().isPresent()) {
             var position = predicate.position().get();
@@ -79,16 +70,16 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         }
         if (predicate.smokey().isPresent()) {
             var smoked = predicate.smokey().get();
-            var value = (smoked ? YES : NO).get();
-            tooltip.add(conditionNameValueComponent(SMOKED.get(), value));
+            var value = (smoked ? SummoningLang.YES : SummoningLang.NO).get();
+            tooltip.add(conditionNameValueComponent(SummoningLang.SMOKED.get(), value));
         }
         if (predicate.canSeeSky().isPresent()) {
             var openSky = predicate.canSeeSky().get();
-            var value = (openSky ? YES : NO).get();
-            tooltip.add(conditionNameValueComponent(OPEN_SKY.get(), value));
+            var value = (openSky ? SummoningLang.YES : SummoningLang.NO).get();
+            tooltip.add(conditionNameValueComponent(SummoningLang.OPEN_SKY.get(), value));
         }
         if (predicate.structures().isPresent()) {
-            tooltip.add(conditionNameComponent(STRUCTURES.get()));
+            tooltip.add(conditionNameComponent(SummoningLang.STRUCTURES.get()));
             addHolderSetTooltip(tooltip, predicate.structures().get());
         }
     }
@@ -98,7 +89,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         if (blocksOpt.isEmpty()) return;
 
         var blockName = blocksOpt.get().get(0).value().getName();
-        tooltip.add(conditionNameValueComponent(BLOCK_BELOW.get(), blockName));
+        tooltip.add(conditionNameValueComponent(SummoningLang.BLOCK_BELOW.get(), blockName));
 
         var propertiesOpt = predicate.properties();
         if (propertiesOpt.isEmpty()) return;
@@ -111,7 +102,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             tooltip,
             yPos.min().map(Double::intValue),
             yPos.max().map(Double::intValue),
-            HEIGHT.get(),
+            SummoningLang.HEIGHT.get(),
             Objects::equals
         );
     }
@@ -121,7 +112,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             tooltip,
             lightLevel.min(),
             lightLevel.max(),
-            LIGHT_LEVEL.get(),
+            SummoningLang.LIGHT_LEVEL.get(),
             Integer::equals
         );
     }
@@ -199,22 +190,22 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             }
 
             tooltip.add(conditionNameComponent(name));
-            tooltip.add(conditionNamedValueComponent(MINIMUM.get(), String.valueOf(minValue)));
-            tooltip.add(conditionNamedValueComponent(MAXIMUM.get(), String.valueOf(maxValue)));
+            tooltip.add(conditionNamedValueComponent(SummoningLang.MINIMUM.get(), String.valueOf(minValue)));
+            tooltip.add(conditionNamedValueComponent(SummoningLang.MAXIMUM.get(), String.valueOf(maxValue)));
 
             return;
         }
 
         if (min.isPresent()) {
             var minValue = min.get();
-            var minName = MINIMUM.get().append(" ").append(name);
+            var minName = SummoningLang.MINIMUM.get().append(" ").append(name);
             tooltip.add(conditionNameValueComponent(minName, String.valueOf(minValue)));
             return;
         }
 
         if (max.isPresent()) {
             var maxValue = max.get();
-            var maxName = MAXIMUM.get().append(" ").append(name);
+            var maxName = SummoningLang.MAXIMUM.get().append(" ").append(name);
             tooltip.add(conditionNameValueComponent(maxName, String.valueOf(maxValue)));
         }
     }
