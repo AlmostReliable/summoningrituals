@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
+import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +22,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -43,6 +46,7 @@ public final class Registration {
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ModConstants.MOD_ID);
+    private static final DeferredRegister<LootItemConditionType> LOOT_CONDITIONS = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, ModConstants.MOD_ID);
 
     // blocks
     public static final DeferredBlock<AltarBlock> ALTAR_BLOCK = registerBlock(Constants.ALTAR, "Summoning Altar", AltarBlock::new, p -> p.strength(2.5f));
@@ -50,6 +54,20 @@ public final class Registration {
 
     // block entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY = registerBlockEntity(ALTAR_BLOCK.getId(), AltarBlockEntity::new, ALTAR_BLOCK, INDESTRUCTIBLE_ALTAR_BLOCK);
+
+    // recipes
+    public static final DeferredHolder<RecipeType<?>, RecipeType<AltarRecipe>> ALTAR_RECIPE_TYPE = RECIPE_TYPES.register(
+        Constants.ALTAR, () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return Constants.ALTAR;
+            }
+        }
+    );
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(Constants.ALTAR, AltarRecipeSerializer::new);
+
+    // conditions
+    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register("moon_phase", () -> new LootItemConditionType(MoonPhaseCheck.CODEC));
 
     // creative tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register(
@@ -63,19 +81,6 @@ public final class Registration {
 
     // @formatter:on
 
-    public static final DeferredHolder<RecipeType<?>, RecipeType<AltarRecipe>> ALTAR_RECIPE_TYPE = RECIPE_TYPES.register(
-        Constants.ALTAR, () -> new RecipeType<>() {
-            @Override
-            public String toString() {
-                return Constants.ALTAR;
-            }
-        }
-    );
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(
-        Constants.ALTAR,
-        AltarRecipeSerializer::new
-    );
-
     private Registration() {}
 
     public static void init(IEventBus eventBus) {
@@ -85,13 +90,19 @@ public final class Registration {
         BLOCK_ENTITIES.register(eventBus);
         RECIPE_TYPES.register(eventBus);
         RECIPE_SERIALIZERS.register(eventBus);
-        ConditionRegistry.init();
+        LOOT_CONDITIONS.register(eventBus);
 
+        eventBus.addListener(Registration::onCommonSetup);
         eventBus.addListener(Registration::registerCapabilities);
     }
 
     private static Collection<ItemStack> getKnownItems() {
         return ITEMS.getEntries().stream().map(e -> e.value().getDefaultInstance()).toList();
+    }
+
+    private static void onCommonSetup(FMLCommonSetupEvent event) {
+        // delay condition registry until custom loot conditions are registered
+        ConditionRegistry.init();
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {

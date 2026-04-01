@@ -3,13 +3,14 @@ package com.almostreliable.summoningrituals.data;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
+import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry LIGHT_LEVEL = LangEntry.condition("light_level", "Light Level");
     public static final LangEntry MAXIMUM = LangEntry.condition("maximum", "Maximum");
     public static final LangEntry MINIMUM = LangEntry.condition("minimum", "Minimum");
+    public static final LangEntry MOON_PHASE = LangEntry.condition("moon_phase", "Moon Phase");
     public static final LangEntry NO = LangEntry.condition("no", "No");
     public static final LangEntry NOT_THUNDERING = LangEntry.condition("weather_not_thundering", "Not Thundering");
     public static final LangEntry OPEN_SKY = LangEntry.condition("open_sky", "Open Sky");
@@ -61,6 +63,7 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry YES = LangEntry.condition("yes", "Yes");
 
     // enums
+    public static final Map<MoonPhaseCheck.MoonPhase, LangEntry> MOON_PHASES = LangEntry.enumValues("condition", "moon_phases", MoonPhaseCheck.MoonPhase.values());
     public static final Map<TimeCondition.TimeType, LangEntry> TIME_TYPES = LangEntry.enumValues("condition", "time", TimeCondition.TimeType.values());
 
     // @formatter:on
@@ -107,8 +110,9 @@ public final class SummoningLang extends LanguageProvider {
             var enumEntries = new HashMap<T, LangEntry>();
 
             for (var enumValue : enumValues) {
-                var id = enumValue.name().toLowerCase(Locale.ROOT);
-                var value = StringUtils.capitalize(id);
+                var id = enumValue.name().toLowerCase(Locale.ROOT).replace("_", " ");
+                //noinspection deprecation
+                var value = WordUtils.capitalizeFully(id);
                 enumEntries.put(enumValue, of(prefix, idPrefix + "_" + id, value));
             }
 

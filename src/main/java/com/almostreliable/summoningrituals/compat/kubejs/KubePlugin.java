@@ -17,6 +17,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeW
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
+import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import dev.latvian.mods.kubejs.event.EventGroup;
@@ -49,6 +50,7 @@ public class KubePlugin implements KubeJSPlugin {
         if (!registry.type().isServer()) return;
         registry.add("SummoningItem", SummoningItemBinding.class);
         registry.add("SummoningEntity", SummoningEntityBinding.class);
+        registry.add("SummoningMoonPhase", MoonPhaseCheck.MoonPhase.class);
         registry.add("SummoningTime", TimeCondition.TimeType.class);
     }
 

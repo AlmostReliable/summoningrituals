@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
+import com.almostreliable.summoningrituals.core.Registration;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
@@ -20,6 +22,7 @@ public final class ConditionRegistry {
         CONDITION_REGISTRY.put(LootItemConditions.ANY_OF, AnyOfCompositeCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.BLOCK_STATE_PROPERTY, BlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.LOCATION_CHECK, LocationCondition.INSTANCE);
+        CONDITION_REGISTRY.put(Registration.MOON_PHASE_CONDITION.get(), MoonPhaseCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.TIME_CHECK, TimeCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.WEATHER_CHECK, WeatherCondition.INSTANCE);
     }

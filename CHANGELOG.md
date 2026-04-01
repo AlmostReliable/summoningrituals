@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added moon phase condition ([#26](https://github.com/AlmostReliable/summoningrituals/issues/26))
 - fixed item names being untranslated
 - moved lang entries to central file
 
