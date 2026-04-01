@@ -110,9 +110,9 @@ public final class SummoningLang extends LanguageProvider {
             var enumEntries = new HashMap<T, LangEntry>();
 
             for (var enumValue : enumValues) {
-                var id = enumValue.name().toLowerCase(Locale.ROOT).replace("_", " ");
+                var id = enumValue.name().toLowerCase(Locale.ROOT);
                 //noinspection deprecation
-                var value = WordUtils.capitalizeFully(id);
+                var value = WordUtils.capitalizeFully(id.replace("_", " "));
                 enumEntries.put(enumValue, of(prefix, idPrefix + "_" + id, value));
             }
 
