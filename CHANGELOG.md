@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.5.0] - 2026-04-01
 
 - added moon phase condition ([#26](https://github.com/AlmostReliable/summoningrituals/issues/26))
 - fixed item names being untranslated
@@ -75,6 +78,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.5.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.5.0
 [3.4.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.4.1
 [3.4.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.4.0
 [3.3.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.3.0
