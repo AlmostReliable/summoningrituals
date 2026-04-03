@@ -24,12 +24,12 @@ public interface ConditionHandler<T extends LootItemCondition> {
     }
 
     default MutableComponent conditionNamedValueComponent(Component name, Object value) {
-        return Component.literal("> ").append(name).append(": ").withStyle(ChatFormatting.GRAY)
+        return Component.literal(" > ").append(name).append(": ").withStyle(ChatFormatting.GRAY)
             .append(Component.literal(value.toString()).withStyle(ChatFormatting.AQUA));
     }
 
     default MutableComponent conditionValueComponent(Object value) {
-        return Component.literal("> ").withStyle(ChatFormatting.GRAY)
+        return Component.literal(" > ").withStyle(ChatFormatting.GRAY)
             .append(Component.literal(value.toString()).withStyle(ChatFormatting.AQUA));
     }
 
