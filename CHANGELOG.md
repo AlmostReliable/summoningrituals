@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- removed block below condition in favor of block pattern condition
 
 ## [3.5.0] - 2026-04-01
 

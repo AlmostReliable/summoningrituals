@@ -5,18 +5,15 @@ import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.WeatherCondition;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
-import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.advancements.critereon.LightPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.IntRange;
@@ -26,7 +23,6 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePrope
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
-import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.rhino.Context;
@@ -36,8 +32,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public final class ConditionsBuilder {
@@ -45,8 +43,6 @@ public final class ConditionsBuilder {
     private final List<LootItemCondition> conditions = new ArrayList<>();
     @Nullable
     private LocationPredicate.Builder locationPredicate;
-    @Nullable
-    private LocationPredicate.Builder belowLocationPredicate;
     @Nullable
     private StatePropertiesPredicate.Builder blockStatePredicate;
 
@@ -117,29 +113,6 @@ public final class ConditionsBuilder {
     }
     // endregion LocationCheck
 
-    // region Block below LocationCheck
-    public ConditionsBuilder blockBelow(Context ctx, Block block, JsonObject blockState) {
-        var definition = block.getStateDefinition();
-        var propertyBuilder = StatePropertiesPredicate.Builder.properties();
-
-        for (var entry : blockState.entrySet()) {
-            var property = definition.getProperty(entry.getKey());
-            if (property == null) {
-                throwException(ctx, "unknown block property: " + entry.getKey());
-            }
-            propertyBuilder.hasProperty(property, entry.getValue().getAsString());
-        }
-
-        getOrCreateBelowLocationPredicate().setBlock(BlockPredicate.Builder.block().of(block).setProperties(propertyBuilder));
-        return this;
-    }
-
-    public ConditionsBuilder blockBelow(Block block) {
-        getOrCreateBelowLocationPredicate().setBlock(BlockPredicate.Builder.block().of(block));
-        return this;
-    }
-    // endregion Block below LocationCheck
-
     // region BlockStateCheck
     public ConditionsBuilder facing(Direction facing) {
         getOrCreateBlockStateCondition().hasProperty(BlockStateProperties.HORIZONTAL_FACING, facing);
@@ -195,16 +168,26 @@ public final class ConditionsBuilder {
         if (locationPredicate != null) {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());
         }
-        if (belowLocationPredicate != null) {
-            conditions.add(LocationCheck.checkLocation(getOrCreateBelowLocationPredicate(), BlockPos.ZERO.below()).build());
-        }
         if (blockStatePredicate != null) {
             var altarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.ALTAR_BLOCK.get())
                 .setProperties(blockStatePredicate);
             var indesAltarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.get())
                 .setProperties(blockStatePredicate);
 
+            // TODO: replace with custom loot condition that supports a tag instead of AnyOf
             conditions.add(AnyOfCondition.anyOf(altarStatePredicate, indesAltarStatePredicate).build());
+        }
+
+        var duplicates = conditions.stream()
+            .collect(Collectors.groupingBy(LootItemCondition::getClass, Collectors.counting()))
+            .entrySet().stream()
+            .filter(e -> e.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .map(Class::getSimpleName)
+            .toList();
+
+        if (!duplicates.isEmpty()) {
+            throwException(ctx, "only one condition of each type allowed, duplicates found: " + duplicates);
         }
 
         return conditions;
@@ -215,13 +198,6 @@ public final class ConditionsBuilder {
             locationPredicate = LocationPredicate.Builder.location();
         }
         return locationPredicate;
-    }
-
-    private LocationPredicate.Builder getOrCreateBelowLocationPredicate() {
-        if (belowLocationPredicate == null) {
-            belowLocationPredicate = LocationPredicate.Builder.location();
-        }
-        return belowLocationPredicate;
     }
 
     private StatePropertiesPredicate.Builder getOrCreateBlockStateCondition() {
