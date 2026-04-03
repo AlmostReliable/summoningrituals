@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * Utility class to sync {@link HolderSet}s via {@link RawHolderSetStreamCodec}s if their backing
+ * registry is not synchronized, e.g. structures.
+ */
 @SuppressWarnings("OptionalContainsCollection")
 public record RawHolderSet<T>(
     Optional<List<ResourceLocation>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
