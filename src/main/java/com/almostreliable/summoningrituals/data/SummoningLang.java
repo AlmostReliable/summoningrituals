@@ -31,6 +31,8 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry MISSING_SACRIFICES = LangEntry.message("missing_sacrifices", "Not all sacrifices were found for the ritual.");
     public static final LangEntry FAILED_CONDITIONS = LangEntry.message("failed_conditions", "Not all conditions were met for the ritual.");
     public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this initiator.");
+    public static final LangEntry PREVIEW_NO_ALTAR = LangEntry.message("preview_no_altar", "No Altar found in range to display the preview for.");
+    public static final LangEntry PREVIEW_SUCCESS = LangEntry.message("preview_success", "Previewing block pattern on nearest Altar.");
 
     // labels
     public static final LangEntry INITIATOR = LangEntry.label(Constants.INITIATOR, "Initiator");
@@ -39,10 +41,12 @@ public final class SummoningLang extends LanguageProvider {
 
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert last to start the ritual.");
+    public static final LangEntry PREVIEW_CLICK = LangEntry.hint("preview_click", "Click to show preview in the world.");
 
     // conditions
     public static final LangEntry ALTAR_PROPERTIES = LangEntry.condition("altar_properties", "Altar Properties");
     public static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
+    public static final LangEntry BLOCK_PATTERN = LangEntry.condition("block_pattern", "Block Pattern required");
     public static final LangEntry CLEAR = LangEntry.condition("weather_clear", "Clear");
     public static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
     public static final LangEntry HEIGHT = LangEntry.condition("height", "Height");

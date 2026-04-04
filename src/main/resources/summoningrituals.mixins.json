@@ -6,11 +6,6 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "client": [
-    "PoseStackMixin"
-  ],
-  "mixins": [
-    "RecipeManagerMixin",
-    "ServerPlayerGameModeMixin"
-  ]
+  "client": ["PoseStackMixin"],
+  "mixins": ["RecipeManagerMixin", "ServerPlayerGameModeMixin"]
 }

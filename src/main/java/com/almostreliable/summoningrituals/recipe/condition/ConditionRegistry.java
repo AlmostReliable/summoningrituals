@@ -20,6 +20,7 @@ public final class ConditionRegistry {
 
     public static void init() {
         CONDITION_REGISTRY.put(LootItemConditions.ANY_OF, AnyOfCompositeCondition.INSTANCE);
+        CONDITION_REGISTRY.put(Registration.BLOCK_PATTERN_CONDITION.get(), BlockPatternCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.BLOCK_STATE_PROPERTY, BlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.LOCATION_CHECK, LocationCondition.INSTANCE);
         CONDITION_REGISTRY.put(Registration.MOON_PHASE_CONDITION.get(), MoonPhaseCondition.INSTANCE);

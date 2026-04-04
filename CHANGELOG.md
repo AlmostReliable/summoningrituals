@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - added small indent to condition values in condition display
+- added block pattern condition with in-world preview
 - removed block below condition in favor of block pattern condition
 
 ## [3.5.0] - 2026-04-01

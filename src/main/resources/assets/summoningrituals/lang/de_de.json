@@ -3,6 +3,7 @@
   "block.summoningrituals.indestructible_altar": "Unzerstörbarer Beschwörungsaltar",
   "condition.summoningrituals.altar_properties": "Altar-Eigenschaften",
   "condition.summoningrituals.biomes": "Biome",
+  "condition.summoningrituals.block_pattern": "Blockmuster benötigt",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Höhe",
   "condition.summoningrituals.light_level": "Lichtstärke",
@@ -35,6 +36,7 @@
   "condition.summoningrituals.weather_raining": "Regnerisch",
   "condition.summoningrituals.weather_thundering": "Stürmisch",
   "condition.summoningrituals.yes": "Ja",
+  "hint.summoningrituals.preview_click": "Klicken zur Vorschau des Blockmusters.",
   "hint.summoningrituals.insert_last": "Als letztes einfügen, um Ritual zu starten.",
   "item.summoningrituals.altar": "Beschwörungsaltar",
   "item.summoningrituals.indestructible_altar": "Unzerstörbarer Beschwörungsaltar",
@@ -47,5 +49,7 @@
   "message.summoningrituals.missing_inputs": "Einige der benötigten Items konnten nicht im Altar gefunden werden.",
   "message.summoningrituals.missing_sacrifices": "Nicht alle Opfer wurden für das Ritual gefunden.",
   "message.summoningrituals.multi_match": "Für diesen Initiator wurden mehr als ein Rezept gefunden.",
+  "message.summoningrituals.preview_no_altar": "Kein Altar in Reichweite für Vorschau gefunden.",
+  "message.summoningrituals.preview_success": "Vorschau des Blockmusters beim nächsten Altar.",
   "tab.summoningrituals.main": "Beschwörungsrituale"
 }

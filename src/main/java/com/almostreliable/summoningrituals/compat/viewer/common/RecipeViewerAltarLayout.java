@@ -1,20 +1,30 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.client.render.PatternPreviewRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class RecipeViewerAltarLayout {
 
     public static final int SLOT_SIZE = 16;
     protected static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
     protected static final int TEXTURE_WIDTH = 172;
-    protected static final int TEXTURE_HEIGHT = 148;
+    public static final int TEXTURE_HEIGHT = 148;
     protected static final int CENTER_X = TEXTURE_WIDTH / 2;
     protected static final int CENTER_Y = TEXTURE_HEIGHT / 2;
     private static final int INPUT_RADIUS = 46;
+
+    @Nullable
+    protected CachedBlockPattern cachedBlockPattern;
 
     public int getWidth() {
         return TEXTURE_WIDTH;
@@ -22,6 +32,28 @@ public class RecipeViewerAltarLayout {
 
     public int getHeight() {
         return TEXTURE_HEIGHT;
+    }
+
+    protected void cacheBlockPatternCondition(ResourceLocation recipeId, List<LootItemCondition> recipeConditions) {
+        var found = false;
+        for (var recipeCondition : recipeConditions) {
+            if (!(recipeCondition instanceof BlockPatternCheck patternCheck)) {
+                continue;
+            }
+
+            cachedBlockPattern = new CachedBlockPattern(recipeId, patternCheck);
+            found = true;
+            break;
+        }
+
+        if (!found) {
+            cachedBlockPattern = CachedBlockPattern.NONE;
+        }
+    }
+
+    public void onPreviewButtonClicked() {
+        if (cachedBlockPattern == null || cachedBlockPattern == CachedBlockPattern.NONE) return;
+        PatternPreviewRenderer.scheduleTask(cachedBlockPattern.blockPattern);
     }
 
     protected void createInitiatorSlot(SlotConsumer slotConsumer) {
@@ -58,5 +90,13 @@ public class RecipeViewerAltarLayout {
     public interface SlotConsumer {
 
         void accept(int x, int y, int slot);
+    }
+
+    protected record CachedBlockPattern(ResourceLocation recipeId, BlockPatternCheck blockPattern) {
+
+        public static final CachedBlockPattern NONE = new CachedBlockPattern(
+            ResourceLocation.parse("none"),
+            new BlockPatternCheck(List.of())
+        );
     }
 }

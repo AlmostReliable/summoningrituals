@@ -46,10 +46,16 @@ public final class Config {
     public static final class ClientConfig {
 
         public final ModConfigSpec.IntValue renderDistance;
+        public final ModConfigSpec.IntValue patternPreviewSearchRadius;
+        public final ModConfigSpec.IntValue patternPreviewTicks;
 
         private ClientConfig(ModConfigSpec.Builder builder) {
             renderDistance = builder.comment("The maximum distance at which an Altar will render its inventory contents.")
                 .defineInRange("render_distance", 32, 1, 128);
+            patternPreviewSearchRadius = builder.comment("The maximum distance to search for an Altar when previewing the block pattern.")
+                .defineInRange("pattern_preview_search_radius", 16, 1, 64);
+            patternPreviewTicks = builder.comment("The number of ticks to display the block pattern preview for.")
+                .defineInRange("pattern_preview_ticks", 400, 10, 1200);
         }
     }
 }

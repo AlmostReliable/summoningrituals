@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,9 @@ import java.util.List;
  * and a custom tooltip without functionality for clicking or hovering.
  */
 public class StackWidget extends InvisibleSlotWidget {
+
+    @Nullable
+    private Runnable onClick;
 
     public StackWidget(EmiIngredient stack, int x, int y) {
         super(stack, x, y);
@@ -35,11 +40,20 @@ public class StackWidget extends InvisibleSlotWidget {
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int button) {
+        if (onClick != null) {
+            onClick.run();
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return false;
+    }
+
+    public StackWidget appendClickHandler(Runnable onClick) {
+        this.onClick = onClick;
+        return this;
     }
 }

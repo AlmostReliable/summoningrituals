@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.client;
+package com.almostreliable.summoningrituals.client.render;
 
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Config;

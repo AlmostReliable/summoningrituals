@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.builder;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.WeatherCondition;
+import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
 import net.minecraft.advancements.critereon.LightPredicate;
@@ -126,6 +127,12 @@ public final class ConditionsBuilder {
     // endregion BlockStateCheck
 
     // region Custom Conditions
+    public ConditionsBuilder blockPattern(Context ctx, Function<BlockPatternBuilder, BlockPatternBuilder> blockPattern) {
+        var pattern = blockPattern.apply(new BlockPatternBuilder()).build(ctx);
+        conditions.add(new BlockPatternCheck(pattern));
+        return this;
+    }
+
     public ConditionsBuilder moonPhase(MoonPhaseCheck.MoonPhase phase) {
         conditions.add(new MoonPhaseCheck(phase));
         return this;

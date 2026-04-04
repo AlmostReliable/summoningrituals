@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
+import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
 import net.minecraft.core.registries.Registries;
@@ -68,6 +69,7 @@ public final class Registration {
 
     // conditions
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register("moon_phase", () -> new LootItemConditionType(MoonPhaseCheck.CODEC));
+    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> BLOCK_PATTERN_CONDITION = LOOT_CONDITIONS.register("block_pattern", () -> new LootItemConditionType(BlockPatternCheck.CODEC));
 
     // creative tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register(

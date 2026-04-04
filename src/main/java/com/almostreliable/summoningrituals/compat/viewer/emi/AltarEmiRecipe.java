@@ -12,6 +12,7 @@ import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -151,14 +152,28 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
                 widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
         );
 
-        if (!recipe.startConditions().isEmpty()) {
-            var slot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2));
-            slot.appendTooltip(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
+        var recipeConditions = recipe.startConditions();
+        if (!recipeConditions.isEmpty()) {
+            var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2))
+                .appendTooltip(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
 
-            for (var condition : recipe.startConditions()) {
+            var recipeId = recipeHolder.id();
+            if (cachedBlockPattern == null || !cachedBlockPattern.recipeId().equals(recipeId)) {
+                cacheBlockPatternCondition(recipeId, recipeConditions);
+            }
+
+            if (cachedBlockPattern != CachedBlockPattern.NONE) {
+                widgets.add(new StackWidget(EmiStack.of(Items.JIGSAW), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5))
+                    .appendClickHandler(this::onPreviewButtonClicked)
+                    .appendTooltip(SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD))
+                    .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
+                    .appendTooltip(() -> ClientTooltipComponent.create(cachedBlockPattern.blockPattern().getTooltipComponent()));
+            }
+
+            for (var condition : recipeConditions) {
                 var conditionTooltips = ConditionRegistry.getTooltip(condition);
                 for (var conditionTooltip : conditionTooltips) {
-                    slot.appendTooltip(conditionTooltip);
+                    conditionSlot.appendTooltip(conditionTooltip);
                 }
             }
         }

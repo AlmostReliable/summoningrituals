@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.client;
+package com.almostreliable.summoningrituals.client.util;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

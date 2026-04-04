@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.client.MeasuringBufferSource;
-import com.almostreliable.summoningrituals.client.MeasuringBufferSource.MeasuringResult;
+import com.almostreliable.summoningrituals.client.util.MeasuringBufferSource;
+import com.almostreliable.summoningrituals.client.util.MeasuringBufferSource.MeasuringResult;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

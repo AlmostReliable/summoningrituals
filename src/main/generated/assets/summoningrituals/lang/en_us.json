@@ -3,6 +3,7 @@
   "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "condition.summoningrituals.altar_properties": "Altar Properties",
   "condition.summoningrituals.biomes": "Biomes",
+  "condition.summoningrituals.block_pattern": "Block Pattern required",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Height",
   "condition.summoningrituals.light_level": "Light Level",
@@ -36,6 +37,7 @@
   "condition.summoningrituals.weather_thundering": "Thundering",
   "condition.summoningrituals.yes": "Yes",
   "hint.summoningrituals.insert_last": "Insert last to start the ritual.",
+  "hint.summoningrituals.preview_click": "Click to show preview in the world.",
   "item.summoningrituals.altar": "Summoning Altar",
   "item.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "label.summoningrituals.commands": "Commands",
@@ -47,5 +49,7 @@
   "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found in the Altar.",
   "message.summoningrituals.missing_sacrifices": "Not all sacrifices were found for the ritual.",
   "message.summoningrituals.multi_match": "More than one recipe found for this initiator.",
+  "message.summoningrituals.preview_no_altar": "No Altar found in range to display the preview for.",
+  "message.summoningrituals.preview_success": "Previewing block pattern on nearest Altar.",
   "tab.summoningrituals.main": "Summoning Rituals"
 }
