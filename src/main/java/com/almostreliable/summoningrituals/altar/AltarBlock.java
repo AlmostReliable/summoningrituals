@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.altar.base.TickableEntityBlock;
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Constants;
 
 import net.minecraft.core.BlockPos;
@@ -138,6 +139,8 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!Config.CLIENT.candleParticles.getAsBoolean()) return;
+
         var facing = state.getValue(FACING);
         var active = state.getValue(ACTIVE);
 

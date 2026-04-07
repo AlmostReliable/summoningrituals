@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added client config option to disable candle particle rendering (useful for custom models)
 
 ## [3.6.0] - 2026-04-04
 
