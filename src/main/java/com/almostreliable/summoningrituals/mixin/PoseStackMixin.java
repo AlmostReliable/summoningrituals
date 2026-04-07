@@ -12,6 +12,14 @@ public abstract class PoseStackMixin implements PoseStackExtension {
     @Shadow
     public abstract void scale(float x, float y, float z);
 
+    @Shadow
+    public abstract void translate(float x, float y, float z);
+
+    @Override
+    public void summoning$translate(float translate) {
+        translate(translate, translate, translate);
+    }
+
     @Override
     public void summoning$scale(float scale) {
         scale(scale, scale, scale);

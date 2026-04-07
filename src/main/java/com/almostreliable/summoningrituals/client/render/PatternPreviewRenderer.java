@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -34,6 +35,7 @@ public class PatternPreviewRenderer {
     public static final PatternPreviewRenderer INSTANCE = new PatternPreviewRenderer();
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
+    private static final int TAG_CYCLE_TICKS = 20;
 
     @Nullable
     private Task task;
@@ -60,27 +62,23 @@ public class PatternPreviewRenderer {
         try {
             AlphaBufferSource.INSTANCE.renderWithAlpha(
                 PREVIEW_ALPHA, alphaBuffer -> {
-                    var cycleStep = age / 20;
+                    var cycleStep = age / TAG_CYCLE_TICKS;
 
                     for (var entry : task.pattern) {
                         var blockStates = entry.blocks();
                         if (blockStates.isEmpty()) continue;
 
-                        var offset = entry.offset();
-                        var worldPos = task.altarPos.offset(offset);
+                        var worldPos = task.altarPos.offset(entry.offset());
+                        var translation = Vec3.atLowerCornerOf(worldPos).subtract(cameraPos);
                         var blockState = blockStates.get((int) (cycleStep % blockStates.size()));
 
                         poseStack.pushPose();
                         {
-                            poseStack.translate(
-                                worldPos.getX() - cameraPos.x,
-                                worldPos.getY() - cameraPos.y,
-                                worldPos.getZ() - cameraPos.z
-                            );
+                            poseStack.translate(translation.x, translation.y, translation.z);
 
-                            poseStack.translate(0.5, 0.5, 0.5);
-                            poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
-                            poseStack.translate(-0.5, -0.5, -0.5);
+                            poseStack.summoning$translate(0.5f);
+                            poseStack.summoning$scale(SCALE_FACTOR);
+                            poseStack.summoning$translate(-0.5f);
 
                             //noinspection DataFlowIssue
                             blockRenderer.renderSingleBlock(
@@ -110,7 +108,7 @@ public class PatternPreviewRenderer {
         var level = mc.level;
         if (player == null || level == null) return;
 
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
         player.closeContainer();
 
         var playerPos = player.position();
