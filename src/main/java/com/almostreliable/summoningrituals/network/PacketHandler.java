@@ -27,7 +27,11 @@ public final class PacketHandler {
             AltarInventorySyncPacket.STREAM_CODEC,
             wrapHandler(AltarInventorySyncPacket::handle)
         );
-        registrar.playToClient(AltarRecipeSyncPacket.TYPE, AltarRecipeSyncPacket.STREAM_CODEC, wrapHandler(AltarRecipeSyncPacket::handle));
+        registrar.playToClient(
+            AltarRecipeSyncPacket.TYPE,
+            AltarRecipeSyncPacket.STREAM_CODEC,
+            wrapHandler(AltarRecipeSyncPacket::handle)
+        );
     }
 
     private static <T extends CustomPacketPayload> IPayloadHandler<T> wrapHandler(IPayloadHandler<T> handler) {

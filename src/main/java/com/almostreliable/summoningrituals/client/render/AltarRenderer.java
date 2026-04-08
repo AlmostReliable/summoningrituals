@@ -9,61 +9,74 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@SuppressWarnings("WeakerAccess") // exposed for custom KubeJS renderers
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
-    private static final float HALF = .5f;
-    private static final float HALF_CIRCLE = 180f;
-    private static final float FULL_CIRCLE = 360f;
-    private static final float ALTAR_RENDER_HEIGHT = 0.8f;
+    public static final Map<ResourceLocation, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
+    public static final float HALF = .5f;
+    public static final float HALF_CIRCLE = 180f;
+    public static final float FULL_CIRCLE = 360f;
+    public static final float ALTAR_RENDER_HEIGHT = 0.8f;
     private static final int MAX_ITEM_HEIGHT = 2;
     private static final int MAX_RESET = 60;
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float ITEM_OFFSET = 1.5f;
 
     private final ItemRenderer itemRenderer;
-    private final int altarRenderDistance;
 
     private float resetTimer;
     private float oldCircleOffset;
 
     public AltarRenderer(Context context) {
         itemRenderer = context.getItemRenderer();
-        altarRenderDistance = Config.CLIENT.renderDistance.get();
     }
 
     @Override
     public void render(
-        AltarBlockEntity altar, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight,
-        int packedOverlay
+        AltarBlockEntity altar, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay
     ) {
         var player = Minecraft.getInstance().player;
         var level = altar.getLevel();
 
-        if (player == null || level == null || !altar.getBlockPos().closerThan(player.blockPosition(), altarRenderDistance)) {
+        if (player == null || level == null ||
+            !altar.getBlockPos().closerThan(player.blockPosition(), Config.CLIENT.renderDistance.getAsInt())) {
             return;
         }
 
-        stack.pushPose();
-        {
-            stack.translate(HALF, ALTAR_RENDER_HEIGHT, HALF);
-            stack.summoning$scale(HALF);
-            renderInventoryContents(stack, buffer, altar, player, level, partialTick, packedOverlay);
+        CustomRitualRenderer customRenderer = null;
+        var recipeInfo = altar.getCurrentRecipeInfo();
+        if (recipeInfo != null) {
+            customRenderer = CUSTOM_RENDERERS.get(recipeInfo.getRecipeId());
         }
-        stack.popPose();
+        var renderContext = createRenderContext(poseStack, buffer, altar, player, level, partialTick, packedOverlay);
+
+        renderContext.pushPose();
+        {
+            if (customRenderer != null) {
+                customRenderer.render(this, recipeInfo.getRecipe(), renderContext);
+            } else {
+                renderContext.translate(HALF, ALTAR_RENDER_HEIGHT, HALF);
+                renderContext.scale(HALF);
+                renderInventoryContents(renderContext);
+            }
+        }
+        renderContext.popPose();
     }
 
-    private void renderInventoryContents(
-        PoseStack stack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level,
-        float partialTick, int packedOverlay
+    private AltarRenderContext createRenderContext(
+        PoseStack poseStack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level, float partialTick,
+        int packedOverlay
     ) {
         var altarPos = altar.getBlockPos();
         var altarCenterPos = Vec3.atCenterOf(altarPos);
@@ -79,67 +92,72 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
         var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
 
-        var renderContext = new RenderContext(
-            altar,
+        return new AltarRenderContext(
             level,
-            stack,
+            player,
+            altar,
+            playerToAltarDistance,
+            playerToAltarAngle,
+            recipeProgress,
+            recipeTime,
+            recipeProgressRatio,
+            poseStack,
             buffer,
             lightAbove,
             packedOverlay,
-            partialTick,
-            playerToAltarAngle,
-            recipeProgressRatio
+            partialTick
         );
+    }
 
-        stack.translate(0, MAX_PROGRESS_HEIGHT * recipeProgressRatio, 0);
+    private void renderInventoryContents(AltarRenderContext renderContext) {
+        renderContext.translate(0, MAX_PROGRESS_HEIGHT * renderContext.getRecipeProgressRatio(), 0);
 
         renderInitiator(renderContext);
-        renderItemOrbit(renderContext, recipeProgress, recipeTime, playerToAltarDistance);
+        renderItemOrbit(renderContext);
 
-        if (recipeTime > 0 && recipeProgress >= recipeTime) {
+        if (renderContext.shouldReset()) {
             resetTimer = MAX_RESET;
         }
     }
 
-    private void renderInitiator(RenderContext renderContext) {
-        var initiator = renderContext.altar.getInventory().getInitiator();
+    public void renderInitiator(AltarRenderContext renderContext) {
+        var initiator = renderContext.getInitiator();
         if (initiator.isEmpty()) return;
 
-        var stack = renderContext.stack;
-        stack.pushPose();
+        renderContext.pushPose();
         {
-            stack.translate(0, invert(0.75f * renderContext.recipeProgressRatio), 0);
-            stack.summoning$scale(0.75f);
-            stack.mulPose(Axis.YN.rotationDegrees(renderContext.playerToAltarAngle));
-            renderContext.renderStatic(itemRenderer, initiator);
+            renderContext.translate(0, invert(0.75f * renderContext.getRecipeProgressRatio()), 0);
+            renderContext.scale(0.75f);
+            renderContext.mulPose(Axis.YN.rotationDegrees(renderContext.getPlayerToAltarAngle()));
+            renderContext.renderItem(itemRenderer, initiator);
         }
-        stack.popPose();
+        renderContext.popPose();
     }
 
-    private void renderItemOrbit(RenderContext renderContext, float recipeProgress, float recipeTime, float playerToAltarDistance) {
-        var inputs = renderContext.altar.getInventory().getDisplayItems();
+    public void renderItemOrbit(AltarRenderContext renderContext) {
+        var inputs = renderContext.getInputs();
         if (inputs.isEmpty()) return;
 
-        var axisRotation = clampRotation(renderContext.level.getGameTime());
-        var scale = invert(renderContext.recipeProgressRatio);
+        var axisRotation = clampRotation(renderContext.getLevel().getGameTime());
+        var recipeProgress = renderContext.getRecipeProgress();
+        var scale = invert(renderContext.getRecipeProgressRatio());
         if (recipeProgress == 0 && resetTimer > 0) {
             scale = invert(ratio(resetTimer, MAX_RESET, 0f));
-            resetTimer = Math.max(0, resetTimer - renderContext.partialTick);
+            resetTimer = Math.max(0, resetTimer - renderContext.getPartialTick());
         }
 
-        var stack = renderContext.stack;
-        stack.summoning$scale(scale);
+        renderContext.scale(scale);
 
         for (var i = 0; i < inputs.size(); i++) {
-            stack.pushPose();
+            renderContext.pushPose();
             {
                 var itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
 
                 float circleOffset;
                 if (recipeProgress > 0) {
-                    circleOffset = ratio(recipeProgress, recipeTime, 1f) * FULL_CIRCLE * 3f + oldCircleOffset;
+                    circleOffset = ratio(recipeProgress, renderContext.getRecipeTime(), 1f) * FULL_CIRCLE * 3f + oldCircleOffset;
                 } else {
-                    circleOffset = renderContext.playerToAltarAngle;
+                    circleOffset = renderContext.getPlayerToAltarAngle();
                     oldCircleOffset = circleOffset;
                 }
 
@@ -147,59 +165,33 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
                 var newHeight = (rotationDiff / HALF_CIRCLE) * MAX_ITEM_HEIGHT;
 
-                var playerOffset = Math.max(1f - playerToAltarDistance / 8f, 0f);
+                var playerOffset = Math.max(1f - renderContext.getPlayerToAltarDistance() / 8f, 0f);
                 newHeight *= playerOffset;
 
-                stack.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + axisRotation)));
-                stack.translate(0, newHeight, -ITEM_OFFSET);
+                renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + axisRotation)));
+                renderContext.translate(0, newHeight, -ITEM_OFFSET);
 
-                renderContext.renderStatic(itemRenderer, inputs.get(i));
+                renderContext.renderItem(itemRenderer, inputs.get(i));
             }
-            stack.popPose();
+            renderContext.popPose();
         }
     }
 
-    /**
-     * Clamps the given rotation degree to a value between 0 (inclusive) and 360 (exclusive)
-     * by calculating the absolute value of the degree and performing a modulus operation.
-     *
-     * @param degree The rotation degree to clamp.
-     * @return The clamped rotation degree, ensuring it remains within the range [0, 360).
-     */
-    private static float clampRotation(float degree) {
+    public static float clampRotation(float degree) {
         return Math.abs(degree) % FULL_CIRCLE;
     }
 
-    /**
-     * Inverts the given value.
-     *
-     * @param value The value to invert.
-     * @return The inverted value.
-     */
-    private static float invert(float value) {
+    public static float invert(float value) {
         return 1 - value;
     }
 
-    /**
-     * Calculates the ratio of {@code current} to {@code max}.
-     * If {@code max} is 0, returns the specified {@code fallback} value instead to avoid division by zero.
-     *
-     * @param current  The current value to be divided.
-     * @param max      The maximum value that acts as the divisor.
-     * @param fallback The fallback value to return if {@code max} is 0.
-     * @return The ratio of {@code current} to {@code max}, or {@code fallback} if {@code max} is 0.
-     */
-    private static float ratio(float current, float max, float fallback) {
+    public static float ratio(float current, float max, float fallback) {
         return max == 0f ? fallback : current / max;
     }
 
-    private record RenderContext(
-        AltarBlockEntity altar, Level level, PoseStack stack, MultiBufferSource buffer, int lightAbove, int packedOverlay,
-        float partialTick, float playerToAltarAngle, float recipeProgressRatio
-    ) {
-
-        private void renderStatic(ItemRenderer itemRenderer, ItemStack item) {
-            itemRenderer.renderStatic(item, ItemDisplayContext.FIXED, lightAbove, packedOverlay, stack, buffer, level, 0);
-        }
+    // exposed for KubeJS
+    @SuppressWarnings("unused")
+    private ItemRenderer getItemRenderer() {
+        return itemRenderer;
     }
 }

@@ -1,23 +1,30 @@
 package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
+import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record AltarRecipeSyncPacket(BlockPos altarPos, int recipeProgress, int recipeTime) implements CustomPacketPayload {
+import java.util.Optional;
+
+public record AltarRecipeSyncPacket(
+    BlockPos altarPos, Optional<RecipeInfoContainer> recipeInfo, int recipeProgress, int recipeTime
+) implements CustomPacketPayload {
 
     static final Type<AltarRecipeSyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_recipe_sync"));
 
-    static final StreamCodec<FriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
+    static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         AltarRecipeSyncPacket::altarPos,
+        ByteBufCodecs.optional(RecipeInfoContainer.STREAM_CODEC),
+        AltarRecipeSyncPacket::recipeInfo,
         ByteBufCodecs.VAR_INT,
         AltarRecipeSyncPacket::recipeProgress,
         ByteBufCodecs.VAR_INT,
@@ -34,9 +41,16 @@ public record AltarRecipeSyncPacket(BlockPos altarPos, int recipeProgress, int r
         var level = Minecraft.getInstance().level;
         if (level == null) return;
 
-        level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get()).ifPresent(altar -> {
+        var blockEntity = level.getBlockEntity(packet.altarPos);
+        if (blockEntity instanceof AltarBlockEntity altar) {
             altar.setRecipeProgress(packet.recipeProgress);
-            altar.setRecipeTime(packet.recipeTime);
-        });
+            var recipeTime = packet.recipeTime;
+            altar.setRecipeTime(recipeTime);
+            if (recipeTime > 0) {
+                packet.recipeInfo.ifPresent(altar::setCurrentRecipeInfo);
+            } else {
+                altar.setCurrentRecipeInfo(null);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.compat.kubejs;
+package com.almostreliable.summoningrituals.compat.kubejs.event;
 
 import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
 

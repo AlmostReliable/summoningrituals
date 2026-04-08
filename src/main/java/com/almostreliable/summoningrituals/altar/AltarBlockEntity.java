@@ -119,7 +119,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         }
 
         recipeProgress++;
-        sendAltarRecipeSyncUpdate(level);
+        syncAltarRecipeProgress(level);
     }
 
     @Override
@@ -204,7 +204,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         invokingPlayer = player;
         recipeTime = recipeInfo.getRecipe().ticks();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
-        sendAltarRecipeSyncUpdate(level);
+        syncAltarRecipeStart(level);
 
         return matchResult;
     }
@@ -266,11 +266,23 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         recipeProgress = 0;
         recipeTime = 0;
         changeActivityState(false, level);
-        sendAltarRecipeSyncUpdate(level);
+        syncAltarRecipeProgress(level);
     }
 
-    private void sendAltarRecipeSyncUpdate(ServerLevel level) {
-        PacketHandler.sendToTrackingChunk(level, worldPosition, new AltarRecipeSyncPacket(worldPosition, recipeProgress, recipeTime));
+    private void syncAltarRecipeStart(ServerLevel level) {
+        PacketHandler.sendToTrackingChunk(
+            level,
+            worldPosition,
+            new AltarRecipeSyncPacket(worldPosition, Optional.ofNullable(currentRecipeInfo), recipeProgress, recipeTime)
+        );
+    }
+
+    private void syncAltarRecipeProgress(ServerLevel level) {
+        PacketHandler.sendToTrackingChunk(
+            level,
+            worldPosition,
+            new AltarRecipeSyncPacket(worldPosition, Optional.empty(), recipeProgress, recipeTime)
+        );
     }
 
     private void changeActivityState(boolean state, ServerLevel level) {
@@ -297,6 +309,15 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     public AltarInventory getInventory() {
         return inventory;
+    }
+
+    @Nullable
+    public RecipeInfoContainer getCurrentRecipeInfo() {
+        return currentRecipeInfo;
+    }
+
+    public void setCurrentRecipeInfo(@Nullable RecipeInfoContainer currentRecipeInfo) {
+        this.currentRecipeInfo = currentRecipeInfo;
     }
 
     public int getRecipeProgress() {

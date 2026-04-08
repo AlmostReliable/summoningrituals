@@ -1,9 +1,10 @@
 package com.almostreliable.summoningrituals.compat.kubejs;
 
-import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntityBinding;
 import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBinding;
+import com.almostreliable.summoningrituals.compat.kubejs.event.KubeEvents;
+import com.almostreliable.summoningrituals.compat.kubejs.event.SummoningKubeEvent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
@@ -20,9 +21,7 @@ import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
-import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
-import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentTypeRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeFactoryRegistry;
@@ -35,14 +34,14 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void init() {
         AltarBlockEntity.SUMMONING_START.register((level, pos, recipeInfo, player) ->
-            Events.SUMMONING_START.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
+            KubeEvents.SUMMONING_START.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
         AltarBlockEntity.SUMMONING_COMPLETE.register((level, pos, recipeInfo, player) ->
-            Events.SUMMONING_COMPLETE.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
+            KubeEvents.SUMMONING_COMPLETE.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
     }
 
     @Override
     public void registerEvents(EventGroupRegistry registry) {
-        registry.register(Events.GROUP);
+        registry.register(KubeEvents.GROUP);
     }
 
     @Override
@@ -78,12 +77,5 @@ public class KubePlugin implements KubeJSPlugin {
     @Override
     public void registerRecipeSchemas(RecipeSchemaRegistry registry) {
         registry.register(Registration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
-    }
-
-    public interface Events {
-
-        EventGroup GROUP = EventGroup.of(ModConstants.MOD_NAME.replace(" ", ""));
-        EventHandler SUMMONING_START = GROUP.server("start", () -> SummoningKubeEvent.class).hasResult();
-        EventHandler SUMMONING_COMPLETE = GROUP.server("complete", () -> SummoningKubeEvent.class);
     }
 }

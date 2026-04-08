@@ -1,5 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -15,6 +17,13 @@ public record RecipeInfoContainer(
     Collection<ItemEntity> getOutputItems,
     Collection<Entity> getOutputEntities
 ) {
+
+    // only used to sync recipe info to custom renderers
+    public static final StreamCodec<RegistryFriendlyByteBuf, RecipeInfoContainer> STREAM_CODEC = StreamCodec.composite(
+        ResourceLocation.STREAM_CODEC, RecipeInfoContainer::getRecipeId,
+        AltarRecipeSerializer.STREAM_CODEC, RecipeInfoContainer::getRecipe,
+        (recipeId, recipe) -> new RecipeInfoContainer(recipeId, recipe, List.of(), List.of(), List.of())
+    );
 
     public static RecipeInfoContainer inputInfo(RecipeHolder<AltarRecipe> recipe, Collection<Entity> inputEntities) {
         return new RecipeInfoContainer(recipe.id(), recipe.value(), inputEntities, List.of(), List.of());
