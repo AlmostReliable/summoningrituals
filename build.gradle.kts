@@ -8,10 +8,6 @@ almostgradle.setup {
     dataGen = "src/main/generated"
 }
 
-neoForge {
-    interfaceInjectionData.from("src/main/resources/interfaces.json")
-}
-
 repositories {
     // KubeJS
     maven("https://maven.latvian.dev/releases")

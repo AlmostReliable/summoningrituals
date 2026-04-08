@@ -76,9 +76,9 @@ public class PatternPreviewRenderer {
                         {
                             poseStack.translate(translation.x, translation.y, translation.z);
 
-                            poseStack.summoning$translate(0.5f);
-                            poseStack.summoning$scale(SCALE_FACTOR);
-                            poseStack.summoning$translate(-0.5f);
+                            poseStack.translate(0.5, 0.5, 0.5);
+                            poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+                            poseStack.translate(-0.5, -0.5, -0.5);
 
                             //noinspection DataFlowIssue
                             blockRenderer.renderSingleBlock(
