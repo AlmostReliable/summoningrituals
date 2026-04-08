@@ -52,6 +52,8 @@ public record AltarRecipe(
 
     @Override
     public boolean matches(RecipeInput inventory, Level level) {
+        if (itemInputs.isEmpty()) return true;
+
         var matchedItems = new Ingredient[inventory.size()];
         var matchedIngredients = new ArrayList<Ingredient>();
 
