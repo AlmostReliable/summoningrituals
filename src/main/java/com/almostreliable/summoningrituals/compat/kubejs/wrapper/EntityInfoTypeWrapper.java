@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.kubejs.wrapper;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

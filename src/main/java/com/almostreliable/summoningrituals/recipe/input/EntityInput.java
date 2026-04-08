@@ -1,6 +1,7 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.input;
 
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

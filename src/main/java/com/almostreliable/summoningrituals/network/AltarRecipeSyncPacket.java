@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
-import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfoContainer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

@@ -13,8 +13,8 @@ import com.almostreliable.summoningrituals.network.AltarInventorySyncPacket;
 import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
-import com.almostreliable.summoningrituals.recipe.RecipeMatchResult;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfoContainer;
+import com.almostreliable.summoningrituals.recipe.container.RecipeMatchResult;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

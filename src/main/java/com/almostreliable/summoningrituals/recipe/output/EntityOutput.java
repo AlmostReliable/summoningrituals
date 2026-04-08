@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

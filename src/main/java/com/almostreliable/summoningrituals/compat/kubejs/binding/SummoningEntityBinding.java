@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.binding;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityOutputBuilder;
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;

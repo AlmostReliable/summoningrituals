@@ -16,9 +16,9 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootIt
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;

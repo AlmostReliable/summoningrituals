@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.container;
 
 import com.almostreliable.summoningrituals.data.SummoningLang;
 

@@ -1,4 +1,7 @@
-package com.almostreliable.summoningrituals.recipe;
+package com.almostreliable.summoningrituals.recipe.container;
+
+import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

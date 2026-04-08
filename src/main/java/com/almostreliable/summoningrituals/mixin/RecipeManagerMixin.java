@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.mixin;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;

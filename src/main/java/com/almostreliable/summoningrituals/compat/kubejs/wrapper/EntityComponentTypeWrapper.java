@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.wrapper;
 
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import dev.latvian.mods.kubejs.error.InvalidRecipeComponentValueException;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;

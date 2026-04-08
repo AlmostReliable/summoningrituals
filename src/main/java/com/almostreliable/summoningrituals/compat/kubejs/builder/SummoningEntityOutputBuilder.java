@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
 import net.minecraft.core.BlockPos;

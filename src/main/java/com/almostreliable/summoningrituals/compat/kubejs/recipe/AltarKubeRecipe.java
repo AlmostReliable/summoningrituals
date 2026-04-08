@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import net.minecraft.network.chat.Component;

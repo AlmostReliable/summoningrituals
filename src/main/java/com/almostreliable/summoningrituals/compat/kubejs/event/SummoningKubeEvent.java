@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.event;
 
-import com.almostreliable.summoningrituals.recipe.RecipeInfoContainer;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfoContainer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

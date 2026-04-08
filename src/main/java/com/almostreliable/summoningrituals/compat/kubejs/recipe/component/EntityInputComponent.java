@@ -5,8 +5,8 @@ import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningEntity
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityComponentTypeWrapper;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
-import com.almostreliable.summoningrituals.recipe.EntityInfo;
-import com.almostreliable.summoningrituals.recipe.EntityInput;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
