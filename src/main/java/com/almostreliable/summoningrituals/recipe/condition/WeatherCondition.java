@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class WeatherCondition implements ConditionHandler<WeatherCheck> {
 
     public static final WeatherCondition INSTANCE = new WeatherCondition();
