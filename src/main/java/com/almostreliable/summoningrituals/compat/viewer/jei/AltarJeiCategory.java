@@ -152,8 +152,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     var itemInput = itemInputs.get(slot);
                     var itemStacks = new ArrayList<ItemStack>();
                     for (var stack : itemInput.ingredient().getItems()) {
-                        stack.setCount(itemInput.count());
-                        itemStacks.add(stack);
+                        itemStacks.add(stack.copyWithCount(itemInput.count()));
                     }
 
                     builder.addInputSlot(x, y).addItemStacks(itemStacks);
