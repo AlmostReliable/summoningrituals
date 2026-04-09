@@ -20,6 +20,11 @@ public class BlockPatternCondition implements ConditionHandler<BlockPatternCheck
 
     @Override
     public void getTooltip(List<Component> tooltip, BlockPatternCheck condition) {
-        tooltip.add(Component.literal("- ").append(SummoningLang.BLOCK_PATTERN.get()));
+        var nameOpt = condition.getName();
+        if (nameOpt.isPresent()) {
+            tooltip.add(conditionNameValueComponent(SummoningLang.BLOCK_PATTERN.get(), nameOpt.get().getString()));
+        } else {
+            tooltip.add(Component.literal("- ").append(SummoningLang.BLOCK_PATTERN.get()));
+        }
     }
 }

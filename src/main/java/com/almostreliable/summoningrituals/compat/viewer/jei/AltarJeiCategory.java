@@ -112,7 +112,15 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
             if (cachedBlockPattern != null && cachedBlockPattern != CachedBlockPattern.NONE &&
                 mouseInSlot(mouseX, mouseY, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
-                tooltip.add(SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD));
+                var patternTooltip = SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD);
+                var patternName = cachedBlockPattern.blockPattern().getName();
+                if (patternName.isPresent()) {
+                    patternTooltip = patternTooltip.append(Component.literal(": ")
+                        .withStyle(ChatFormatting.GOLD)
+                        .append(patternName.get()));
+                }
+
+                tooltip.add(patternTooltip);
                 tooltip.add(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY));
                 tooltip.add(cachedBlockPattern.blockPattern().getTooltipComponent());
             }

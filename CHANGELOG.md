@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - added feedback message for wrong blocks in patterns
 - added feedback message and early preview cancellation if the pattern is complete
 - added new config options to customize the block pattern preview duration
+- added option to add a custom name to the block pattern condition
 - fixed log spam when a custom ritual renderer is erroring
 - fixed NPE when using entity inputs and fake entity inputs with custom validators
 - changed pattern preview icon from Jigsaw to Structure Block

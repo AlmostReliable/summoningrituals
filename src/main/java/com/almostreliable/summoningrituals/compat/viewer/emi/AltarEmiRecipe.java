@@ -13,6 +13,7 @@ import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -169,9 +170,16 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             }
 
             if (cachedBlockPattern != CachedBlockPattern.NONE) {
+                var patternTooltip = SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD);
+                var patternName = cachedBlockPattern.blockPattern().getName();
+                if (patternName.isPresent()) {
+                    patternTooltip = patternTooltip.append(Component.literal(": ")
+                        .withStyle(ChatFormatting.GOLD)
+                        .append(patternName.get()));
+                }
                 widgets.add(new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5))
                     .appendClickHandler(this::onPreviewButtonClicked)
-                    .appendTooltip(SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD))
+                    .appendTooltip(patternTooltip)
                     .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
                     .appendTooltip(() -> ClientTooltipComponent.create(cachedBlockPattern.blockPattern().getTooltipComponent()));
             }

@@ -12,6 +12,7 @@ import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -130,6 +131,12 @@ public final class ConditionsBuilder {
     public ConditionsBuilder blockPattern(Context ctx, Function<BlockPatternBuilder, BlockPatternBuilder> blockPattern) {
         var pattern = blockPattern.apply(new BlockPatternBuilder()).build(ctx);
         conditions.add(new BlockPatternCheck(pattern));
+        return this;
+    }
+
+    public ConditionsBuilder blockPattern(Context ctx, Component name, Function<BlockPatternBuilder, BlockPatternBuilder> blockPattern) {
+        var pattern = blockPattern.apply(new BlockPatternBuilder()).build(ctx);
+        conditions.add(new BlockPatternCheck(pattern, Optional.of(name)));
         return this;
     }
 

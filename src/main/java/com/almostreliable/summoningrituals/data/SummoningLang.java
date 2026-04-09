@@ -47,7 +47,7 @@ public final class SummoningLang extends LanguageProvider {
     // conditions
     public static final LangEntry ALTAR_PROPERTIES = LangEntry.condition("altar_properties", "Altar Properties");
     public static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
-    public static final LangEntry BLOCK_PATTERN = LangEntry.condition("block_pattern", "Block Pattern required");
+    public static final LangEntry BLOCK_PATTERN = LangEntry.condition("block_pattern", "Block Pattern");
     public static final LangEntry CLEAR = LangEntry.condition("weather_clear", "Clear");
     public static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
     public static final LangEntry HEIGHT = LangEntry.condition("height", "Height");

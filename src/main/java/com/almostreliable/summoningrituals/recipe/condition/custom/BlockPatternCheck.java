@@ -9,6 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
@@ -36,19 +38,27 @@ import java.util.Set;
 public final class BlockPatternCheck implements LootItemCondition {
 
     public static final MapCodec<BlockPatternCheck> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        Codec.list(PatternEntry.CODEC).fieldOf("pattern").forGetter(BlockPatternCheck::getPattern)
+        Codec.list(PatternEntry.CODEC).fieldOf("pattern").forGetter(BlockPatternCheck::getPattern),
+        ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(BlockPatternCheck::getName)
     ).apply(i, BlockPatternCheck::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockPatternCheck> STREAM_CODEC = StreamCodec.composite(
         PatternEntry.STREAM_CODEC.apply(ByteBufCodecs.list()), BlockPatternCheck::getPattern,
+        ComponentSerialization.OPTIONAL_STREAM_CODEC, BlockPatternCheck::getName,
         BlockPatternCheck::new
     );
 
     private final List<PatternEntry> pattern;
+    private final Optional<Component> name;
     private @Nullable List<ClientPatternEntry> renderPatternCache;
     private @Nullable PatternPreviewTooltipComponent.Data tooltipComponentCache;
 
-    public BlockPatternCheck(List<PatternEntry> pattern) {
+    public BlockPatternCheck(List<PatternEntry> pattern, Optional<Component> name) {
         this.pattern = pattern;
+        this.name = name;
+    }
+
+    public BlockPatternCheck(List<PatternEntry> pattern) {
+        this(pattern, Optional.empty());
     }
 
     @Override
@@ -79,6 +89,10 @@ public final class BlockPatternCheck implements LootItemCondition {
 
     public List<PatternEntry> getPattern() {
         return pattern;
+    }
+
+    public Optional<Component> getName() {
+        return name;
     }
 
     public List<ClientPatternEntry> getRenderPattern() {

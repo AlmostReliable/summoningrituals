@@ -3,7 +3,7 @@
   "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "condition.summoningrituals.altar_properties": "Altar Properties",
   "condition.summoningrituals.biomes": "Biomes",
-  "condition.summoningrituals.block_pattern": "Block Pattern required",
+  "condition.summoningrituals.block_pattern": "Block Pattern",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Height",
   "condition.summoningrituals.light_level": "Light Level",
