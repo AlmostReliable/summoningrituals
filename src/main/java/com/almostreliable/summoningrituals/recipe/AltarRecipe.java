@@ -143,12 +143,14 @@ public record AltarRecipe(
         commands.get().invoke(level, player);
     }
 
-    private AABB constructRegion(BlockPos pos) {
+    // exposed for KubeJS debugging
+    @SuppressWarnings("WeakerAccess")
+    public AABB constructRegion(BlockPos pos) {
         var startBounds = pos.offset(zone.multiply(-1));
         var endBounds = pos.offset(zone);
         return new AABB(
-            new Vec3(startBounds.getX(), startBounds.getY(), startBounds.getZ()),
-            new Vec3(endBounds.getX(), endBounds.getY(), endBounds.getZ())
+            Vec3.atLowerCornerOf(startBounds),
+            Vec3.atLowerCornerOf(endBounds)
         );
     }
 
