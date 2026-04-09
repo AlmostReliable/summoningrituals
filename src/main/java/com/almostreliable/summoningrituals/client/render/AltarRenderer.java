@@ -68,6 +68,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
                 try {
                     customRenderer.render(this, recipeInfo.getRecipe(), renderContext);
                 } catch (Exception e) {
+                    CUSTOM_RENDERERS.remove(recipeInfo.getRecipeId());
                     SummoningRituals.LOGGER.error("failed to render custom ritual: {}", recipeInfo.getRecipeId(), e);
                 }
             } else {
