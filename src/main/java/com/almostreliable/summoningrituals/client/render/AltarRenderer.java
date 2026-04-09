@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.client.render;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Config;
 
@@ -64,7 +65,11 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         renderContext.pushPose();
         {
             if (customRenderer != null) {
-                customRenderer.render(this, recipeInfo.getRecipe(), renderContext);
+                try {
+                    customRenderer.render(this, recipeInfo.getRecipe(), renderContext);
+                } catch (Exception e) {
+                    SummoningRituals.LOGGER.error("failed to render custom ritual: {}", recipeInfo.getRecipeId(), e);
+                }
             } else {
                 renderContext.translate(HALF, ALTAR_RENDER_HEIGHT, HALF);
                 renderContext.scale(HALF);
@@ -86,8 +91,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
         var playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);
 
-        float recipeProgress = altar.getRecipeProgress();
-        float recipeTime = altar.getRecipeTime();
+        var recipeProgress = altar.getRecipeProgress();
+        var recipeTime = altar.getRecipeTime();
         var recipeProgressRatio = ratio(recipeProgress, recipeTime, 0f);
 
         var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
@@ -191,7 +196,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     // exposed for KubeJS
     @SuppressWarnings("unused")
-    private ItemRenderer getItemRenderer() {
+    public ItemRenderer getItemRenderer() {
         return itemRenderer;
     }
 }

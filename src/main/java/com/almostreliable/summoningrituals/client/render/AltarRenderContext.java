@@ -20,11 +20,11 @@ public record AltarRenderContext(
     AltarBlockEntity getAltar,
     float getPlayerToAltarDistance,
     float getPlayerToAltarAngle,
-    float getRecipeProgress,
-    float getRecipeTime,
+    int getRecipeProgress,
+    int getRecipeTime,
     float getRecipeProgressRatio,
     PoseStack getPoseStack,
-    MultiBufferSource getRenderBuffer,
+    MultiBufferSource getBufferSource,
     int getLightAbove,
     int getPackedOverlay,
     float getPartialTick
@@ -73,7 +73,7 @@ public record AltarRenderContext(
             getLightAbove,
             getPackedOverlay,
             getPoseStack,
-            getRenderBuffer,
+            getBufferSource,
             getLevel,
             0
         );
