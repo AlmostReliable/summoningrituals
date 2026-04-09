@@ -12,6 +12,7 @@ public interface Constants {
     String ENTITY = "entity";
     String ENTITY_INPUTS = "entity_inputs";
     String ENTITY_OUTPUTS = "entity_outputs";
+    String FAKE_ENTITY_INPUTS = "fake_entity_inputs";
     String INDESTRUCTIBLE_ALTAR = "indestructible_altar";
     String INSERT_ORDER = "insert_order";
     String INVENTORY = "inventory";

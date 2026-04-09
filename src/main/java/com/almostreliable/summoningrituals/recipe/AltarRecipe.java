@@ -1,7 +1,9 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.input.BaseEntityInput;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
@@ -38,10 +40,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 public record AltarRecipe(
     Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
-    List<SizedIngredient> itemInputs, List<EntityInput> entityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    List<SizedIngredient> itemInputs, List<EntityInput> entityInputs, List<FakeEntityInput> fakeEntityInputs,
+    List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
@@ -108,23 +112,42 @@ public record AltarRecipe(
 
     @Nullable
     public List<Entity> getSacrifices(BlockPos pos, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
-        if (entityInputs.isEmpty()) return List.of();
+        if (entityInputs.isEmpty() && fakeEntityInputs.isEmpty()) return List.of();
 
         var region = constructRegion(pos);
-        var entities = entityCollector.apply(region);
+        var remainingEntities = new ArrayList<>(entityCollector.apply(region));
+
+        var entityInputSacrifices = consumeSacrifices(recipeId, entityInputs, e -> e.entityInfo().count(), remainingEntities);
+        if (entityInputSacrifices == null) return null;
+        var sacrifices = new ArrayList<>(entityInputSacrifices);
+
+        var fakeEntityInputSacrifices = consumeSacrifices(recipeId, fakeEntityInputs, FakeEntityInput::count, remainingEntities);
+        if (fakeEntityInputSacrifices == null) return null;
+        sacrifices.addAll(fakeEntityInputSacrifices);
+
+        return sacrifices;
+    }
+
+    @Nullable
+    private static <T extends BaseEntityInput> List<Entity> consumeSacrifices(
+        ResourceLocation recipeId, List<T> inputs, ToIntFunction<T> countSupplier, List<Entity> entities
+    ) {
         var sacrifices = new ArrayList<Entity>();
 
-        for (var i = 0; i < entityInputs.size(); i++) {
-            var entityInput = entityInputs.get(i);
-            var requiredCount = entityInput.entityInfo().count();
+        for (var i = 0; i < inputs.size(); i++) {
+            var input = inputs.get(i);
+            var requiredCount = countSupplier.applyAsInt(input);
             var inputIndex = i;
-            var matchingEntities = entities.stream()
-                .filter(e -> entityInput.test(recipeId, inputIndex, e))
+
+            var matches = entities.stream()
+                .filter(e -> input.test(recipeId, inputIndex, e))
+                .limit(requiredCount)
                 .toList();
 
-            if (matchingEntities.size() < requiredCount) return null;
+            if (matches.size() < requiredCount) return null;
 
-            sacrifices.addAll(matchingEntities.subList(0, requiredCount));
+            sacrifices.addAll(matches);
+            entities.removeAll(matches);
         }
 
         return sacrifices;

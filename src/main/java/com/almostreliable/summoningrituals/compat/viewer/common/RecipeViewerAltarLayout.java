@@ -65,7 +65,8 @@ public class RecipeViewerAltarLayout {
     protected void createInputSlots(AltarRecipe recipe, SlotConsumer slotConsumer) {
         var itemInputs = recipe.itemInputs();
         var entityInputs = recipe.entityInputs();
-        var inputSlots = itemInputs.size() + entityInputs.size();
+        var fakeEntityInputs = recipe.fakeEntityInputs();
+        var inputSlots = itemInputs.size() + entityInputs.size() + fakeEntityInputs.size();
 
         for (var i = 0; i < inputSlots; i++) {
             var x = CENTER_X + (int) (Math.cos(i * 2 * Math.PI / inputSlots) * INPUT_RADIUS) - (SLOT_SIZE / 2);

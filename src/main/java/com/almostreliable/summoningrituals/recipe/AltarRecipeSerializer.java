@@ -4,6 +4,7 @@ import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
@@ -34,6 +35,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         CommandOutput.CODEC.optionalFieldOf(Constants.COMMANDS).forGetter(AltarRecipe::commands),
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(AltarRecipe::itemInputs),
         EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
+        FakeEntityInput.CODEC.listOf().optionalFieldOf(Constants.FAKE_ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::fakeEntityInputs),
         LootItemCondition.DIRECT_CODEC.listOf()
             .optionalFieldOf(Constants.CONDITIONS, List.of())
             .forGetter(AltarRecipe::startConditions),
@@ -47,6 +49,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ByteBufCodecs.optional(CommandOutput.STREAM_CODEC), AltarRecipe::commands,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
         EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
+        FakeEntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::fakeEntityInputs,
         ConditionStreamCodecs.CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::startConditions,
         BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
@@ -58,7 +61,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "initiator is empty");
         }
 
-        if (recipe.itemInputs().isEmpty() && recipe.entityInputs().isEmpty()) {
+        if (recipe.itemInputs().isEmpty() && recipe.entityInputs().isEmpty() && recipe.fakeEntityInputs().isEmpty()) {
             return DataResult.error(() -> "no item or entity inputs");
         }
 

@@ -11,6 +11,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockP
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.FakeEntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
@@ -58,6 +59,7 @@ public class KubePlugin implements KubeJSPlugin {
         registry.register(BlockPosComponent.TYPE);
         registry.register(CommandOutputComponent.TYPE);
         registry.register(EntityInputComponent.TYPE);
+        registry.register(FakeEntityInputComponent.TYPE);
         registry.register(EntityOutputComponent.TYPE);
         registry.register(ItemOutputComponent.TYPE);
         registry.register(LootItemConditionComponent.TYPE);

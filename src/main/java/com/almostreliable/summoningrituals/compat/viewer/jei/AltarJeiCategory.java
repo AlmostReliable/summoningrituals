@@ -147,6 +147,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         createInputSlots(
             recipe, (x, y, slot) -> {
                 var itemInputs = recipe.itemInputs();
+                var entityInputs = recipe.entityInputs();
                 if (slot < itemInputs.size()) {
                     // item inputs
                     var itemInput = itemInputs.get(slot);
@@ -156,9 +157,9 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     }
 
                     builder.addInputSlot(x, y).addItemStacks(itemStacks);
-                } else {
+                } else if (slot - itemInputs.size() < entityInputs.size()) {
                     // entity inputs
-                    var entityInput = recipe.entityInputs().get(slot - itemInputs.size());
+                    var entityInput = entityInputs.get(slot - itemInputs.size());
                     var entityIngredient = new EntityIngredient(entityInput.entityInfo());
                     var entityEgg = entityIngredient.getEgg();
 
@@ -168,6 +169,10 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
                     if (entityEgg == null) return;
                     builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
+                } else {
+                    // fake entity inputs
+                    var fakeEntityInput = recipe.fakeEntityInputs().get(slot - itemInputs.size() - entityInputs.size());
+                    builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(fakeEntityInput.displayItem());
                 }
             }
         );

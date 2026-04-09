@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.input.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.BaseEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import net.minecraft.network.chat.Component;
@@ -29,10 +29,8 @@ public class AltarKubeRecipe extends KubeRecipe {
         var entityInputs = getValue(AltarRecipeSchema.ENTITY_INPUTS);
         if (entityInputs != null) {
             for (var i = 0; i < entityInputs.size(); i++) {
-                var entityInput = entityInputs.get(i);
-                var validator = entityInput.validator();
-                if (validator == null) continue;
-                EntityInput.DATA_VALIDATORS.put(getOrCreateId(), i, validator);
+                var predicate = entityInputs.get(i).predicate();
+                BaseEntityInput.DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
             }
         }
 

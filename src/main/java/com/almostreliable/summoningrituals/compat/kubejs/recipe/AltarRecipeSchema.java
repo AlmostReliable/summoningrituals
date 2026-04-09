@@ -4,11 +4,13 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockP
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityOutputComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.FakeEntityInputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
+import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
@@ -70,6 +72,14 @@ public interface AltarRecipeSchema {
         .functionNames(List.of("entityInputs", "entityInput", "mobInputs", "mobInput"))
         .optional(List.of())
         .exclude();
+    RecipeKey<List<FakeEntityInput>> FAKE_ENTITY_INPUTS = FakeEntityInputComponent.TYPE
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
+        .key(Constants.FAKE_ENTITY_INPUTS, ComponentRole.INPUT)
+        .functionNames(List.of("fakeEntityInputs", "fakeEntityInput", "fakeMobInputs", "fakeMobInput"))
+        .optional(List.of())
+        .exclude();
     RecipeKey<BlockPos> ZONE = BlockPosComponent.TYPE
         .key(Constants.ZONE, ComponentRole.OTHER)
         .functionNames(List.of("entityInputZone", "mobInputZone", "inputZone", "sacrificeZone", "entityZone", "mobZone", "zone"))
@@ -96,6 +106,7 @@ public interface AltarRecipeSchema {
         COMMANDS,
         ITEM_INPUTS,
         ENTITY_INPUTS,
+        FAKE_ENTITY_INPUTS,
         ZONE,
         TICKS,
         CONDITIONS

@@ -59,6 +59,9 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             var entityIngredient = new EntityIngredient(entityInput.entityInfo());
             inputs.add(EntityEmiStack.input(entityIngredient));
         }
+        for (var fakeEntityInput : recipe.fakeEntityInputs()) {
+            inputs.add(EmiStack.of(fakeEntityInput.displayItem()));
+        }
 
         inputs.add(EmiIngredient.of(recipe.initiator()));
 
