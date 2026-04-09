@@ -48,17 +48,28 @@ public final class Config {
         public final ModConfigSpec.IntValue renderDistance;
         public final ModConfigSpec.BooleanValue candleParticles;
         public final ModConfigSpec.IntValue patternPreviewSearchRadius;
-        public final ModConfigSpec.IntValue patternPreviewTicks;
+        public final ModConfigSpec.IntValue patternPreviewTicksPerBlock;
+        public final ModConfigSpec.IntValue patternPreviewTicksMin;
+        public final ModConfigSpec.IntValue patternPreviewTicksMax;
 
         private ClientConfig(ModConfigSpec.Builder builder) {
+            builder.push("general");
             renderDistance = builder.comment("The maximum distance at which an Altar will render its inventory contents.")
                 .defineInRange("render_distance", 32, 1, 128);
             candleParticles = builder.comment("Whether to render the fire particles on candles on Altars.")
                 .define("candle_particles", true);
+            builder.pop();
+
+            builder.push("preview");
             patternPreviewSearchRadius = builder.comment("The maximum distance to search for an Altar when previewing the block pattern.")
                 .defineInRange("pattern_preview_search_radius", 16, 1, 64);
-            patternPreviewTicks = builder.comment("The number of ticks to display the block pattern preview for.")
-                .defineInRange("pattern_preview_ticks", 400, 10, 1200);
+            patternPreviewTicksPerBlock = builder.comment("The number of ticks per block to display the block pattern preview for.")
+                .defineInRange("pattern_preview_ticks_per_block", 60, 1, 100);
+            patternPreviewTicksMin = builder.comment("The minimum number of ticks to preview the block pattern for.")
+                .defineInRange("pattern_preview_ticks_min", 200, 10, 1200);
+            patternPreviewTicksMax = builder.comment("The maximum number of ticks to preview the block pattern for.")
+                .defineInRange("pattern_preview_ticks_max", 1200, 10, 6000);
+            builder.pop();
         }
     }
 }
