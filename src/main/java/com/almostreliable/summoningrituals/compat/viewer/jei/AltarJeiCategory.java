@@ -50,7 +50,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
-        patternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.JIGSAW.getDefaultInstance());
+        patternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
         commandsIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.COMMAND_BLOCK.getDefaultInstance());
     }
 

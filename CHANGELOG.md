@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - added feedback message and early preview cancellation if the pattern is complete
 - added new config options to customize the block pattern preview duration
 - fixed log spam when a custom ritual renderer is erroring
+- changed pattern preview icon from Jigsaw to Structure Block
 
 ## [3.7.1] - 2026-04-09
 

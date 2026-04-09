@@ -169,7 +169,7 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             }
 
             if (cachedBlockPattern != CachedBlockPattern.NONE) {
-                widgets.add(new StackWidget(EmiStack.of(Items.JIGSAW), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5))
+                widgets.add(new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5))
                     .appendClickHandler(this::onPreviewButtonClicked)
                     .appendTooltip(SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD))
                     .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
