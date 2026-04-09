@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public interface SummoningEntityBinding {
@@ -23,7 +24,11 @@ public interface SummoningEntityBinding {
     }
 
     static FakeEntityInput fakeInput(ItemStack displayItem, int count, Predicate<Entity> predicate) {
-        return new FakeEntityInput(displayItem, count, predicate);
+        return new FakeEntityInput(displayItem, Optional.of(count), predicate);
+    }
+
+    static FakeEntityInput fakeInput(ItemStack displayItem, Predicate<Entity> predicate) {
+        return new FakeEntityInput(displayItem, Optional.empty(), predicate);
     }
 
     static SummoningEntityOutputBuilder output(EntityInfo entity) {

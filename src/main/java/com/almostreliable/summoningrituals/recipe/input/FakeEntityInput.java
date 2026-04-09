@@ -11,22 +11,24 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
-public record FakeEntityInput(ItemStack displayItem, int count, Predicate<Entity> predicate) implements BaseEntityInput {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public record FakeEntityInput(ItemStack displayItem, Optional<Integer> count, Predicate<Entity> predicate) implements BaseEntityInput {
 
     public static final Codec<FakeEntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
         ItemStack.STRICT_CODEC.fieldOf(Constants.ITEM).forGetter(FakeEntityInput::displayItem),
-        Codec.INT.fieldOf(Constants.COUNT).forGetter(FakeEntityInput::count)
+        Codec.INT.optionalFieldOf(Constants.COUNT).forGetter(FakeEntityInput::count)
     ).apply(i, FakeEntityInput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, FakeEntityInput> STREAM_CODEC = StreamCodec.composite(
         ItemStack.STREAM_CODEC, FakeEntityInput::displayItem,
-        ByteBufCodecs.INT, FakeEntityInput::count,
+        ByteBufCodecs.optional(ByteBufCodecs.INT), FakeEntityInput::count,
         FakeEntityInput::new
     );
 
     // only used for the client; on the server, a fake entity must have a validator
-    private FakeEntityInput(ItemStack displayItem, int count) {
+    private FakeEntityInput(ItemStack displayItem, Optional<Integer> count) {
         this(displayItem, count, $ -> true);
     }
 }

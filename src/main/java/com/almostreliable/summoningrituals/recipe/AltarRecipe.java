@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
 
 public record AltarRecipe(
     Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
@@ -117,7 +116,7 @@ public record AltarRecipe(
         var region = constructRegion(pos);
         var remainingEntities = new ArrayList<>(entityCollector.apply(region));
 
-        var entityInputSacrifices = consumeSacrifices(recipeId, entityInputs, e -> e.entityInfo().count(), remainingEntities);
+        var entityInputSacrifices = consumeSacrifices(recipeId, entityInputs, e -> Optional.of(e.entityInfo().count()), remainingEntities);
         if (entityInputSacrifices == null) return null;
         var sacrifices = new ArrayList<>(entityInputSacrifices);
 
@@ -130,21 +129,21 @@ public record AltarRecipe(
 
     @Nullable
     private static <T extends BaseEntityInput> List<Entity> consumeSacrifices(
-        ResourceLocation recipeId, List<T> inputs, ToIntFunction<T> countSupplier, List<Entity> entities
+        ResourceLocation recipeId, List<T> inputs, Function<T, Optional<Integer>> countSupplier, List<Entity> entities
     ) {
         var sacrifices = new ArrayList<Entity>();
 
         for (var i = 0; i < inputs.size(); i++) {
             var input = inputs.get(i);
-            var requiredCount = countSupplier.applyAsInt(input);
+            var requiredCount = countSupplier.apply(input);
             var inputIndex = i;
 
-            var matches = entities.stream()
-                .filter(e -> input.test(recipeId, inputIndex, e))
-                .limit(requiredCount)
+            var matchStream = entities.stream()
+                .filter(e -> input.test(recipeId, inputIndex, e));
+            var matches = (requiredCount.isPresent() ? matchStream.limit(requiredCount.get()) : matchStream)
                 .toList();
 
-            if (matches.size() < requiredCount) return null;
+            if (requiredCount.isPresent() && matches.size() < requiredCount.get()) return null;
 
             sacrifices.addAll(matches);
             entities.removeAll(matches);
