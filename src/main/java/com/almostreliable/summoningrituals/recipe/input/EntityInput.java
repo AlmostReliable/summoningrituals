@@ -30,6 +30,6 @@ public record EntityInput(EntityInfo entityInfo, Predicate<Entity> predicate) im
     @Override
     public boolean test(ResourceLocation recipeId, Integer inputIndex, Entity entity) {
         return entity.isAlive() && entityInfo.entity().value().equals(entity.getType()) &&
-            BaseEntityInput.super.test(recipeId, inputIndex, entity);
+            test(DATA_VALIDATORS, recipeId, inputIndex, entity);
     }
 }

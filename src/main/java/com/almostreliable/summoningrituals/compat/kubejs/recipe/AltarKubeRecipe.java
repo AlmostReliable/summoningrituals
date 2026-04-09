@@ -30,7 +30,19 @@ public class AltarKubeRecipe extends KubeRecipe {
         if (entityInputs != null) {
             for (var i = 0; i < entityInputs.size(); i++) {
                 var predicate = entityInputs.get(i).predicate();
+                //noinspection ConstantValue
+                if (predicate == null) continue;
                 BaseEntityInput.DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
+            }
+        }
+
+        var fakeEntityInputs = getValue(AltarRecipeSchema.FAKE_ENTITY_INPUTS);
+        if (fakeEntityInputs != null) {
+            for (var i = 0; i < fakeEntityInputs.size(); i++) {
+                var predicate = fakeEntityInputs.get(i).predicate();
+                //noinspection ConstantValue
+                if (predicate == null) continue;
+                BaseEntityInput.FAKE_DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
             }
         }
 

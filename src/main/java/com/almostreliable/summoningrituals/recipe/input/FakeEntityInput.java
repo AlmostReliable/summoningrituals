@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.core.Constants;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
@@ -30,5 +31,10 @@ public record FakeEntityInput(ItemStack displayItem, Optional<Integer> count, Pr
     // only used for the client; on the server, a fake entity must have a validator
     private FakeEntityInput(ItemStack displayItem, Optional<Integer> count) {
         this(displayItem, count, $ -> true);
+    }
+
+    @Override
+    public boolean test(ResourceLocation resourceLocation, Integer integer, Entity entity) {
+        return test(FAKE_DATA_VALIDATORS, resourceLocation, integer, entity);
     }
 }

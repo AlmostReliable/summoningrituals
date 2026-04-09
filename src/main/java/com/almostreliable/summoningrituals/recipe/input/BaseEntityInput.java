@@ -12,10 +12,11 @@ import java.util.function.Predicate;
 public interface BaseEntityInput extends TriPredicate<ResourceLocation, Integer, Entity> {
 
     Table<ResourceLocation, Integer, Predicate<Entity>> DATA_VALIDATORS = HashBasedTable.create();
+    Table<ResourceLocation, Integer, Predicate<Entity>> FAKE_DATA_VALIDATORS = HashBasedTable.create();
 
-    @Override
-    default boolean test(ResourceLocation recipeId, Integer inputIndex, Entity entity) {
-        var predicate = DATA_VALIDATORS.get(recipeId, inputIndex);
+    default boolean test(
+        Table<ResourceLocation, Integer, Predicate<Entity>> validators, ResourceLocation recipeId, Integer inputIndex, Entity entity) {
+        var predicate = validators.get(recipeId, inputIndex);
         return predicate == null || predicate.test(entity);
     }
 }

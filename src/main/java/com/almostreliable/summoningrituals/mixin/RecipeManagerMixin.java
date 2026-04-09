@@ -28,6 +28,7 @@ public abstract class RecipeManagerMixin {
     ) {
         AltarRecipe.clearCaches();
         EntityInput.DATA_VALIDATORS.clear();
+        EntityInput.FAKE_DATA_VALIDATORS.clear();
     }
 
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
