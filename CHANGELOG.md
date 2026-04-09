@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed fake entity inputs not supporting wildcard counts
 
 ## [3.7.0] - 2026-04-09
 
