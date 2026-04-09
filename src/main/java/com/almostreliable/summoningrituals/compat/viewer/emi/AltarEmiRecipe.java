@@ -81,6 +81,9 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
             outputs.add(EntityEmiStack.output(entityIngredient));
         }
+        for (var displayOutput : recipe.displayOutputs()) {
+            outputs.add(EmiStack.of(displayOutput));
+        }
 
         return outputs;
     }

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - added client config option to disable candle particle rendering (useful for custom models)
 - added support for registering custom ritual renderers
 - added support for adding fake entity inputs with custom predicates
+- added support for adding display outputs if the outputs are handled by events
 - fixed input item stacks being modified in the JEI recipe category
 
 ## [3.6.0] - 2026-04-04

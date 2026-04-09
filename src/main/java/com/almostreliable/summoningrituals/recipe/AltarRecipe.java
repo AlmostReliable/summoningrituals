@@ -44,8 +44,8 @@ import java.util.function.ToIntFunction;
 
 public record AltarRecipe(
     Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
-    List<SizedIngredient> itemInputs, List<EntityInput> entityInputs, List<FakeEntityInput> fakeEntityInputs,
-    List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    List<ItemStack> displayOutputs, List<SizedIngredient> itemInputs, List<EntityInput> entityInputs,
+    List<FakeEntityInput> fakeEntityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);

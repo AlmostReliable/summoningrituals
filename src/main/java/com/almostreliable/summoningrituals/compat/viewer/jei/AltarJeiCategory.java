@@ -181,12 +181,13 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             recipe, (x, y, slot) -> {
                 // item outputs
                 var itemOutputs = recipe.itemOutputs();
+                var entityOutputs = recipe.entityOutputs();
                 if (slot < itemOutputs.size()) {
+                    // item outputs
                     var stack = itemOutputs.get(slot).item();
                     builder.addOutputSlot(x, y).addItemStack(stack);
-                } else {
+                } else if (slot - itemOutputs.size() < entityOutputs.size()) {
                     // entity outputs
-                    var entityOutputs = recipe.entityOutputs();
                     var entityOutput = entityOutputs.get(slot - itemOutputs.size()).entityInfo();
                     var entityIngredient = new EntityIngredient(entityOutput);
                     var entityEgg = entityIngredient.getEgg();
@@ -197,6 +198,11 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
                     if (entityEgg == null) return;
                     builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
+                } else {
+                    // display outputs
+                    var displayOutputs = recipe.displayOutputs();
+                    var displayOutput = displayOutputs.get(slot - itemOutputs.size() - entityOutputs.size());
+                    builder.addOutputSlot(x, y).addItemStack(displayOutput);
                 }
             }
         );

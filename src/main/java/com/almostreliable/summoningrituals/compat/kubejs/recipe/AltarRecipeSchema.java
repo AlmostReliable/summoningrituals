@@ -16,6 +16,7 @@ import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
@@ -23,6 +24,7 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.component.ComponentRole;
 import dev.latvian.mods.kubejs.recipe.component.IngredientComponent;
+import dev.latvian.mods.kubejs.recipe.component.ItemStackComponent;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.component.SizedIngredientComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
@@ -55,6 +57,14 @@ public interface AltarRecipeSchema {
         .key(Constants.COMMANDS, ComponentRole.OUTPUT)
         .noFunctions()
         .optional(CommandOutput.EMPTY)
+        .exclude();
+    RecipeKey<List<ItemStack>> DISPLAY_OUTPUTS = ItemStackComponent.ITEM_STACK
+        .instance()
+        .asList()
+        .withBounds(IntBounds.OPTIONAL)
+        .key(Constants.DISPLAY_OUTPUTS, ComponentRole.OUTPUT)
+        .functionNames(List.of("displayOutputs", "displayOutput"))
+        .optional(List.of())
         .exclude();
     RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT
         .instance()
@@ -104,6 +114,7 @@ public interface AltarRecipeSchema {
         ITEM_OUTPUTS,
         ENTITY_OUTPUTS,
         COMMANDS,
+        DISPLAY_OUTPUTS,
         ITEM_INPUTS,
         ENTITY_INPUTS,
         FAKE_ENTITY_INPUTS,

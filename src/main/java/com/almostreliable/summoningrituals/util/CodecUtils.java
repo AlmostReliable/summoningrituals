@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.util;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
-import com.mojang.datafixers.util.Function10;
+import com.mojang.datafixers.util.Function11;
 import com.mojang.datafixers.util.Function9;
 
 import java.util.Optional;
@@ -64,7 +64,7 @@ public final class CodecUtils {
         };
     }
 
-    public static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, TX> StreamCodec<B, C> composite(
+    public static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB> StreamCodec<B, C> composite(
         StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
         StreamCodec<? super B, T2> codec2,
@@ -83,9 +83,11 @@ public final class CodecUtils {
         Function<C, T8> getter8,
         StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        StreamCodec<? super B, TX> codecX,
-        Function<C, TX> getterX,
-        Function10<T1, T2, T3, T4, T5, T6, T7, T8, T9, TX, C> factory
+        StreamCodec<? super B, TA> codecA,
+        Function<C, TA> getterA,
+        StreamCodec<? super B, TB> codecB,
+        Function<C, TB> getterB,
+        Function11<T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, C> factory
     ) {
         return new StreamCodec<>() {
             @Override
@@ -99,8 +101,9 @@ public final class CodecUtils {
                 var t7 = codec7.decode(buffer);
                 var t8 = codec8.decode(buffer);
                 var t9 = codec9.decode(buffer);
-                var tX = codecX.decode(buffer);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, tX);
+                var tA = codecA.decode(buffer);
+                var tB = codecB.decode(buffer);
+                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB);
             }
 
             @Override
@@ -114,7 +117,8 @@ public final class CodecUtils {
                 codec7.encode(buffer, getter7.apply(value));
                 codec8.encode(buffer, getter8.apply(value));
                 codec9.encode(buffer, getter9.apply(value));
-                codecX.encode(buffer, getterX.apply(value));
+                codecA.encode(buffer, getterA.apply(value));
+                codecB.encode(buffer, getterB.apply(value));
             }
         };
     }

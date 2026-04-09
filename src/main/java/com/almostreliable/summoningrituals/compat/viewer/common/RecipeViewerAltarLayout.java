@@ -78,7 +78,8 @@ public class RecipeViewerAltarLayout {
     protected void createOutputSlots(AltarRecipe recipe, SlotConsumer slotConsumer) {
         var itemOutputs = recipe.itemOutputs();
         var entityOutputs = recipe.entityOutputs();
-        var outputSlots = itemOutputs.size() + entityOutputs.size();
+        var displayOutputs = recipe.displayOutputs();
+        var outputSlots = itemOutputs.size() + entityOutputs.size() + displayOutputs.size();
 
         for (var i = 0; i < outputSlots; i++) {
             var x = 2 + i * SLOT_SIZE;

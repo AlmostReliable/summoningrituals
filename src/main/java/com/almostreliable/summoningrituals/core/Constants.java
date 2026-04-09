@@ -9,6 +9,7 @@ public interface Constants {
     String CONDITIONS = "conditions";
     String COUNT = "count";
     String DATA = "data";
+    String DISPLAY_OUTPUTS = "display_outputs";
     String ENTITY = "entity";
     String ENTITY_INPUTS = "entity_inputs";
     String ENTITY_OUTPUTS = "entity_outputs";

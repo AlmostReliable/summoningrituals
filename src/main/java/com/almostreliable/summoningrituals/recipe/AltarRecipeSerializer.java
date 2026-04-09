@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -33,6 +34,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ItemOutput.CODEC.listOf().optionalFieldOf(Constants.ITEM_OUTPUTS, List.of()).forGetter(AltarRecipe::itemOutputs),
         EntityOutput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_OUTPUTS, List.of()).forGetter(AltarRecipe::entityOutputs),
         CommandOutput.CODEC.optionalFieldOf(Constants.COMMANDS).forGetter(AltarRecipe::commands),
+        ItemStack.STRICT_CODEC.listOf().optionalFieldOf(Constants.DISPLAY_OUTPUTS, List.of()).forGetter(AltarRecipe::displayOutputs),
         SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(AltarRecipe::itemInputs),
         EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::entityInputs),
         FakeEntityInput.CODEC.listOf().optionalFieldOf(Constants.FAKE_ENTITY_INPUTS, List.of()).forGetter(AltarRecipe::fakeEntityInputs),
@@ -47,6 +49,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ItemOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemOutputs,
         EntityOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityOutputs,
         ByteBufCodecs.optional(CommandOutput.STREAM_CODEC), AltarRecipe::commands,
+        ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::displayOutputs,
         SizedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::itemInputs,
         EntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::entityInputs,
         FakeEntityInput.STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::fakeEntityInputs,
@@ -69,7 +72,8 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
             return DataResult.error(() -> "too many inputs, max is " + Config.COMMON.inventorySize.get());
         }
 
-        if (recipe.itemOutputs().isEmpty() && recipe.entityOutputs().isEmpty() && recipe.commands().isEmpty()) {
+        if (recipe.itemOutputs().isEmpty() && recipe.entityOutputs().isEmpty() && recipe.commands().isEmpty() &&
+            recipe.displayOutputs().isEmpty()) {
             return DataResult.error(() -> "no item, entity or command outputs");
         }
 

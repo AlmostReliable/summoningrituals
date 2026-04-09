@@ -64,8 +64,6 @@ public final class SummoningRituals {
 
 // TODO:
 //  - add dummy output items, add dummy input items (only used for recipe usages)
-//  - add display output that is used if the recipe has no outputs and all logic is done in events (so the serializer doesn't complain)
-//  - offset, spread and zone display
 //  - add client event to modify condition tooltip, maybe move all tooltip modification there
 //  - maybe find a way to cache block state properties when creating client block states in BlockPatternCheck
 //  - add block highlights for correct and incorrect blocks in the block pattern
