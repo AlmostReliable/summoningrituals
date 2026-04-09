@@ -49,7 +49,8 @@
   "message.summoningrituals.missing_inputs": "Some of the required item inputs couldn't be found in the Altar.",
   "message.summoningrituals.missing_sacrifices": "Not all sacrifices were found for the ritual.",
   "message.summoningrituals.multi_match": "More than one recipe found for this initiator.",
+  "message.summoningrituals.preview_in_progress": "Previewing block pattern on nearest Altar.",
   "message.summoningrituals.preview_no_altar": "No Altar found in range to display the preview for.",
-  "message.summoningrituals.preview_success": "Previewing block pattern on nearest Altar.",
+  "message.summoningrituals.preview_success": "The block pattern is complete!",
   "tab.summoningrituals.main": "Summoning Rituals"
 }

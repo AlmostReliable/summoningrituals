@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added block pattern xray highlights for incorrect blocks
+- added feedback message for wrong blocks in patterns
+- added feedback message and early preview cancellation if the pattern is complete
 - fixed log spam when a custom ritual renderer is erroring
 
 ## [3.7.1] - 2026-04-09

@@ -32,7 +32,8 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry FAILED_CONDITIONS = LangEntry.message("failed_conditions", "Not all conditions were met for the ritual.");
     public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this initiator.");
     public static final LangEntry PREVIEW_NO_ALTAR = LangEntry.message("preview_no_altar", "No Altar found in range to display the preview for.");
-    public static final LangEntry PREVIEW_SUCCESS = LangEntry.message("preview_success", "Previewing block pattern on nearest Altar.");
+    public static final LangEntry PREVIEW_IN_PROGRESS = LangEntry.message("preview_in_progress", "Previewing block pattern on nearest Altar.");
+    public static final LangEntry PREVIEW_SUCCESS = LangEntry.message("preview_success", "The block pattern is complete!");
 
     // labels
     public static final LangEntry INITIATOR = LangEntry.label(Constants.INITIATOR, "Initiator");

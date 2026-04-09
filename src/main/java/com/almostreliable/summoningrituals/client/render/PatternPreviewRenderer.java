@@ -11,24 +11,32 @@ import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternC
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.OptionalDouble;
 
 public class PatternPreviewRenderer {
 
@@ -53,52 +61,89 @@ public class PatternPreviewRenderer {
             return;
         }
 
-        var blockRenderer = mc.getBlockRenderer();
-        var cameraPos = camera.getPosition();
-
-        RenderSystem.disableCull();
-        ModelBlockRenderer.enableCaching();
-
         try {
-            AlphaBufferSource.INSTANCE.renderWithAlpha(
-                PREVIEW_ALPHA, alphaBuffer -> {
-                    var cycleStep = age / TAG_CYCLE_TICKS;
-
-                    for (var entry : task.pattern) {
-                        var blockStates = entry.blocks();
-                        if (blockStates.isEmpty()) continue;
-
-                        var worldPos = task.altarPos.offset(entry.offset());
-                        var translation = Vec3.atLowerCornerOf(worldPos).subtract(cameraPos);
-                        var blockState = blockStates.get((int) (cycleStep % blockStates.size()));
-
-                        poseStack.pushPose();
-                        {
-                            poseStack.translate(translation.x, translation.y, translation.z);
-
-                            poseStack.translate(0.5, 0.5, 0.5);
-                            poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
-                            poseStack.translate(-0.5, -0.5, -0.5);
-
-                            //noinspection DataFlowIssue
-                            blockRenderer.renderSingleBlock(
-                                blockState,
-                                poseStack,
-                                alphaBuffer,
-                                LightTexture.FULL_BRIGHT,
-                                OverlayTexture.NO_OVERLAY,
-                                ModelData.EMPTY,
-                                null
-                            );
-                        }
-                        poseStack.popPose();
-                    }
-                }
-            );
+            RenderSystem.disableCull();
+            ModelBlockRenderer.enableCaching();
+            var alphaBuffer = AlphaBufferSource.INSTANCE;
+            alphaBuffer.setAlpha(PREVIEW_ALPHA);
+            renderBlocks(mc, poseStack, camera, alphaBuffer, age / TAG_CYCLE_TICKS);
+            alphaBuffer.endBatch();
         } finally {
             RenderSystem.enableCull();
             ModelBlockRenderer.clearCache();
         }
+    }
+
+    private void renderBlocks(Minecraft mc, PoseStack poseStack, Camera camera, AlphaBufferSource alphaBuffer, long cycleStep) {
+        assert mc.level != null;
+        assert task != null;
+
+        var correctBlocks = 0;
+
+        for (var entry : task.pattern) {
+            var blockStates = entry.blocks();
+            if (blockStates.isEmpty()) continue;
+
+            var worldPos = task.altarPos.offset(entry.offset());
+            var blockState = mc.level.getBlockState(worldPos);
+            if (!isWrongBlock(blockState, blockStates)) {
+                correctBlocks++;
+                continue;
+            }
+
+            WrongBlockHighlightRenderer.renderWrongBlockOutline(
+                poseStack,
+                camera,
+                mc.renderBuffers().bufferSource(),
+                worldPos
+            );
+
+            var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.getPosition());
+            var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
+
+            poseStack.pushPose();
+            {
+                poseStack.translate(translation.x, translation.y, translation.z);
+
+                poseStack.translate(0.5, 0.5, 0.5);
+                poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+                poseStack.translate(-0.5, -0.5, -0.5);
+
+                //noinspection DataFlowIssue
+                mc.getBlockRenderer().renderSingleBlock(
+                    blockStateToRender,
+                    poseStack,
+                    alphaBuffer,
+                    LightTexture.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY,
+                    null
+                );
+            }
+            poseStack.popPose();
+        }
+
+        updatePlayerFeedback(mc, task.pattern.size(), correctBlocks);
+    }
+
+    private void updatePlayerFeedback(Minecraft mc, int totalBlocks, int correctBlocks) {
+        var player = mc.player;
+        if (player == null) return;
+
+        if (correctBlocks == totalBlocks) {
+            var message = SummoningLang.PREVIEW_SUCCESS.get().withStyle(ChatFormatting.DARK_GREEN);
+            player.displayClientMessage(message, true);
+            task = null;
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1));
+            return;
+        }
+
+        var message = SummoningLang.PREVIEW_IN_PROGRESS.get()
+            .append(" (" + correctBlocks)
+            .append("/")
+            .append(totalBlocks + ")")
+            .withStyle(ChatFormatting.YELLOW);
+        player.displayClientMessage(message, true);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -130,11 +175,54 @@ public class PatternPreviewRenderer {
             return;
         }
 
-        player.displayClientMessage(SummoningLang.PREVIEW_SUCCESS.get().withStyle(ChatFormatting.DARK_GREEN), true);
-        INSTANCE.task = new Task(level.getGameTime(), altarPos, blockPatternCheck.getRenderPattern());
+        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPatternCheck.getRenderPattern());
+    }
+
+    private static boolean isWrongBlock(BlockState blockState, List<BlockState> validBlockStates) {
+        if (blockState.isAir()) return true;
+
+        for (var expectedState : validBlockStates) {
+            if (blockState.is(expectedState.getBlock())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
-    private record Task(long createdAt, BlockPos altarPos, List<ClientPatternEntry> pattern) {}
+    private record Task(long createdAt, Level level, BlockPos altarPos, List<ClientPatternEntry> pattern) {}
+
+    private static final class WrongBlockHighlightRenderer {
+
+        private static final RenderType XRAY_LINES = RenderType.create(
+            "summoningrituals_xray_lines",
+            DefaultVertexFormat.POSITION_COLOR_NORMAL,
+            VertexFormat.Mode.LINES,
+            1536,
+            false,
+            false,
+            RenderType.CompositeState.builder()
+                .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
+                .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.of(2.0)))
+                .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                .setCullState(RenderStateShard.NO_CULL)
+                .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                .createCompositeState(false)
+        );
+
+        private static void renderWrongBlockOutline(PoseStack poseStack, Camera camera, MultiBufferSource buffer, BlockPos pos) {
+            var cam = camera.getPosition();
+            var box = new AABB(pos).inflate(0.002); // avoid z-fighting
+
+            poseStack.pushPose();
+            poseStack.translate(-cam.x, -cam.y, -cam.z);
+            {
+                LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(XRAY_LINES), box, 1, 0, 0, 1);
+            }
+            poseStack.popPose();
+        }
+    }
 }

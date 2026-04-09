@@ -38,7 +38,7 @@ public final class SummoningRitualsClient {
     }
 
     private static void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) return;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
         PatternPreviewRenderer.INSTANCE.render(event.getPoseStack(), event.getCamera());
     }
 }

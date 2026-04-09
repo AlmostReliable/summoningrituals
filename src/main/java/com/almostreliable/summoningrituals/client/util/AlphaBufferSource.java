@@ -11,7 +11,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 public final class AlphaBufferSource extends MultiBufferSource.BufferSource {
 
@@ -41,11 +40,14 @@ public final class AlphaBufferSource extends MultiBufferSource.BufferSource {
         super(defaultBufferBuilder, new Object2ObjectLinkedOpenHashMap<>());
     }
 
-    public void renderWithAlpha(float alpha, Consumer<AlphaBufferSource> consumer) {
+    public void setAlpha(float alpha) {
         this.alpha = alpha;
-        consumer.accept(this);
-        endBatch();
-        this.alpha = 1f;
+    }
+
+    @Override
+    public void endBatch() {
+        super.endBatch();
+        alpha = 1f;
     }
 
     private void onShaderSetup() {

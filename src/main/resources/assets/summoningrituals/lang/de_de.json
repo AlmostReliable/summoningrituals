@@ -49,7 +49,8 @@
   "message.summoningrituals.missing_inputs": "Einige der benötigten Items konnten nicht im Altar gefunden werden.",
   "message.summoningrituals.missing_sacrifices": "Nicht alle Opfer wurden für das Ritual gefunden.",
   "message.summoningrituals.multi_match": "Für diesen Initiator wurden mehr als ein Rezept gefunden.",
+  "message.summoningrituals.preview_in_progress": "Vorschau des Blockmusters beim nächsten Altar.",
   "message.summoningrituals.preview_no_altar": "Kein Altar in Reichweite für Vorschau gefunden.",
-  "message.summoningrituals.preview_success": "Vorschau des Blockmusters beim nächsten Altar.",
+  "message.summoningrituals.preview_success": "Das Blockmuster ist vollständig!",
   "tab.summoningrituals.main": "Beschwörungsrituale"
 }
