@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- replaced internal AnyOf loot condition with a proper custom condition to check for Altar properties
 
 ## [3.8.0] - 2026-04-09
 

@@ -19,9 +19,8 @@ public final class ConditionRegistry {
     private ConditionRegistry() {}
 
     public static void init() {
-        CONDITION_REGISTRY.put(LootItemConditions.ANY_OF, AnyOfCompositeCondition.INSTANCE);
+        CONDITION_REGISTRY.put(Registration.ALTAR_TAG_BLOCK_STATE_CONDITION.get(), AltarTagBlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(Registration.BLOCK_PATTERN_CONDITION.get(), BlockPatternCondition.INSTANCE);
-        CONDITION_REGISTRY.put(LootItemConditions.BLOCK_STATE_PROPERTY, BlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.LOCATION_CHECK, LocationCondition.INSTANCE);
         CONDITION_REGISTRY.put(Registration.MOON_PHASE_CONDITION.get(), MoonPhaseCondition.INSTANCE);
         CONDITION_REGISTRY.put(LootItemConditions.TIME_CHECK, TimeCondition.INSTANCE);

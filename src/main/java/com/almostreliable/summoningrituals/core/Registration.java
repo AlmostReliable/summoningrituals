@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
+import com.almostreliable.summoningrituals.recipe.condition.custom.AltarTagBlockStateCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
@@ -68,8 +69,9 @@ public final class Registration {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(Constants.ALTAR, AltarRecipeSerializer::new);
 
     // conditions
-    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register("moon_phase", () -> new LootItemConditionType(MoonPhaseCheck.CODEC));
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> BLOCK_PATTERN_CONDITION = LOOT_CONDITIONS.register("block_pattern", () -> new LootItemConditionType(BlockPatternCheck.CODEC));
+    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> ALTAR_TAG_BLOCK_STATE_CONDITION = LOOT_CONDITIONS.register("block_tag_block_state", () -> new LootItemConditionType(AltarTagBlockStateCheck.CODEC));
+    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register("moon_phase", () -> new LootItemConditionType(MoonPhaseCheck.CODEC));
 
     // creative tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register(

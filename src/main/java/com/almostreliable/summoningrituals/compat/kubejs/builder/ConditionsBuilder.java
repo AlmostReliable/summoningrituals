@@ -1,8 +1,8 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
-import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.WeatherCondition;
+import com.almostreliable.summoningrituals.recipe.condition.custom.AltarTagBlockStateCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
 
@@ -19,9 +19,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.IntRange;
-import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
@@ -183,13 +181,7 @@ public final class ConditionsBuilder {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());
         }
         if (blockStatePredicate != null) {
-            var altarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.ALTAR_BLOCK.get())
-                .setProperties(blockStatePredicate);
-            var indesAltarStatePredicate = LootItemBlockStatePropertyCondition.hasBlockStateProperties(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.get())
-                .setProperties(blockStatePredicate);
-
-            // TODO: replace with custom loot condition that supports a tag instead of AnyOf
-            conditions.add(AnyOfCondition.anyOf(altarStatePredicate, indesAltarStatePredicate).build());
+            blockStatePredicate.build().ifPresent(p -> conditions.add(new AltarTagBlockStateCheck(p)));
         }
 
         var duplicates = conditions.stream()
