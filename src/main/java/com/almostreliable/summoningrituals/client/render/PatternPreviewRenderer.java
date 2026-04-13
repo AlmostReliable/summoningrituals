@@ -64,7 +64,7 @@ public class PatternPreviewRenderer {
             Config.CLIENT.patternPreviewTicksMax.getAsInt()
         );
         if (age >= maxAge) {
-            task = null;
+            clear();
             return;
         }
 
@@ -140,8 +140,8 @@ public class PatternPreviewRenderer {
         if (correctBlocks == totalBlocks) {
             var message = SummoningLang.PREVIEW_SUCCESS.get().withStyle(ChatFormatting.DARK_GREEN);
             player.displayClientMessage(message, true);
-            task = null;
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1));
+            clear();
             return;
         }
 
@@ -183,6 +183,10 @@ public class PatternPreviewRenderer {
         }
 
         INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPatternCheck.getRenderPattern());
+    }
+
+    public static void clear() {
+        INSTANCE.task = null;
     }
 
     private static boolean isWrongBlock(BlockState blockState, List<BlockState> validBlockStates) {

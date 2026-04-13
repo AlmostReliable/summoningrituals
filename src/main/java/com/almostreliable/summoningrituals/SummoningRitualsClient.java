@@ -14,6 +14,7 @@ import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 @Mod(value = ModConstants.MOD_ID, dist = Dist.CLIENT)
 public final class SummoningRitualsClient {
@@ -23,6 +24,7 @@ public final class SummoningRitualsClient {
         eventBus.addListener(SummoningRitualsClient::registerTooltipRenderers);
         eventBus.addListener(SummoningRitualsClient::registerClientReloadListeners);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onRenderLevelStage);
+        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onLevelUnload);
     }
 
     private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -40,5 +42,9 @@ public final class SummoningRitualsClient {
     private static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
         PatternPreviewRenderer.INSTANCE.render(event.getPoseStack(), event.getCamera());
+    }
+
+    private static void onLevelUnload(LevelEvent.Unload event) {
+        PatternPreviewRenderer.clear();
     }
 }
