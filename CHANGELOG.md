@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.9.0] - 2026-04-13
 
 - added utility method to recipe and recipe container to expose block pattern condition
 - added optional query id to block pattern entries
@@ -114,6 +117,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.9.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.9.0
 [3.8.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.8.0
 [3.7.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.7.1
 [3.7.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.7.0
