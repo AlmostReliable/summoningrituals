@@ -23,6 +23,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,12 +39,15 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalDouble;
 
 public class PatternPreviewRenderer {
 
     public static final PatternPreviewRenderer INSTANCE = new PatternPreviewRenderer();
+    private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
     private static final int TAG_CYCLE_TICKS = 20;
@@ -116,21 +122,48 @@ public class PatternPreviewRenderer {
                 poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
                 poseStack.translate(-0.5, -0.5, -0.5);
 
-                //noinspection DataFlowIssue
-                mc.getBlockRenderer().renderSingleBlock(
-                    blockStateToRender,
-                    poseStack,
-                    alphaBuffer,
-                    LightTexture.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY,
-                    ModelData.EMPTY,
-                    null
-                );
+                renderBlock(mc, poseStack, alphaBuffer, worldPos, blockStateToRender);
             }
             poseStack.popPose();
         }
 
         updatePlayerFeedback(mc, task.pattern.size(), correctBlocks);
+    }
+
+    private static void renderBlock(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BlockState blockState) {
+        if (blockState.getRenderShape() == RenderShape.ENTITYBLOCK_ANIMATED &&
+            blockState.getBlock() instanceof BaseEntityBlock entityBlock) {
+            renderBlockEntity(mc, poseStack, alphaBuffer, pos, entityBlock, blockState);
+            return;
+        }
+
+        //noinspection DataFlowIssue
+        mc.getBlockRenderer().renderSingleBlock(
+            blockState,
+            poseStack,
+            alphaBuffer,
+            LightTexture.FULL_BRIGHT,
+            OverlayTexture.NO_OVERLAY,
+            ModelData.EMPTY,
+            null
+        );
+    }
+
+    private static void renderBlockEntity(
+        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BaseEntityBlock entityBlock, BlockState blockState
+    ) {
+        assert mc.level != null;
+
+        var blockEntity = BLOCK_ENTITY_CACHE.get(blockState);
+        if (blockEntity == null) {
+            blockEntity = entityBlock.newBlockEntity(pos, blockState);
+            BLOCK_ENTITY_CACHE.put(blockState, blockEntity);
+            if (blockEntity == null) return;
+            blockEntity.setLevel(mc.level);
+        }
+
+        mc.getBlockEntityRenderDispatcher()
+            .renderItem(blockEntity, poseStack, alphaBuffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
     }
 
     private void updatePlayerFeedback(Minecraft mc, int totalBlocks, int correctBlocks) {
@@ -187,6 +220,7 @@ public class PatternPreviewRenderer {
 
     public static void clear() {
         INSTANCE.task = null;
+        BLOCK_ENTITY_CACHE.clear();
     }
 
     private static boolean isWrongBlock(BlockState blockState, List<BlockState> validBlockStates) {
