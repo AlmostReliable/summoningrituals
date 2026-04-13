@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added utility method to recipe and recipe container to expose block pattern condition
 - replaced internal AnyOf loot condition with a proper custom condition to check for Altar properties
 
 ## [3.8.0] - 2026-04-09

@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.recipe.container;
 
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
+import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -9,6 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,5 +44,10 @@ public record RecipeInfoContainer(
     @Override
     public int hashCode() {
         return getRecipeId.hashCode();
+    }
+
+    @Nullable
+    public BlockPatternCheck getBlockPatternCondition() {
+        return getRecipe.getBlockPatternCondition();
     }
 }

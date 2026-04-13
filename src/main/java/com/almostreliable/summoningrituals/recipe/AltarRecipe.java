@@ -1,6 +1,7 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.input.BaseEntityInput;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
@@ -174,6 +175,15 @@ public record AltarRecipe(
             Vec3.atLowerCornerOf(startBounds),
             Vec3.atLowerCornerOf(endBounds)
         );
+    }
+
+    @Nullable
+    public BlockPatternCheck getBlockPatternCondition() {
+        return startConditions.stream()
+            .filter(c -> c instanceof BlockPatternCheck)
+            .map(c -> (BlockPatternCheck) c)
+            .findFirst()
+            .orElse(null);
     }
 
     public static boolean isInitiator(RecipeManager recipeManager, Item item) {
