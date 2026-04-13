@@ -76,13 +76,14 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     ) {
         background.draw(guiGraphics);
 
-        var recipeConditions = recipeHolder.value().startConditions();
+        var recipe = recipeHolder.value();
+        var recipeConditions = recipe.startConditions();
         if (!recipeConditions.isEmpty()) {
             conditionIcon.draw(guiGraphics, 2, 2);
 
             var recipeId = recipeHolder.id();
             if (cachedBlockPattern == null || !cachedBlockPattern.recipeId().equals(recipeId)) {
-                cacheBlockPatternCondition(recipeId, recipeConditions);
+                cacheBlockPatternCondition(recipeId, recipe);
             }
 
             if (cachedBlockPattern != CachedBlockPattern.NONE) {
@@ -90,7 +91,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             }
         }
 
-        var recipeCommands = recipeHolder.value().commands();
+        var recipeCommands = recipe.commands();
         if (recipeCommands.isPresent()) {
             commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }

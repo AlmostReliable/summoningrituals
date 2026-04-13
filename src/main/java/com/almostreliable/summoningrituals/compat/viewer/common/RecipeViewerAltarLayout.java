@@ -7,7 +7,6 @@ import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -34,21 +33,13 @@ public class RecipeViewerAltarLayout {
         return TEXTURE_HEIGHT;
     }
 
-    protected void cacheBlockPatternCondition(ResourceLocation recipeId, List<LootItemCondition> recipeConditions) {
-        var found = false;
-        for (var recipeCondition : recipeConditions) {
-            if (!(recipeCondition instanceof BlockPatternCheck patternCheck)) {
-                continue;
-            }
-
-            cachedBlockPattern = new CachedBlockPattern(recipeId, patternCheck);
-            found = true;
-            break;
-        }
-
-        if (!found) {
+    protected void cacheBlockPatternCondition(ResourceLocation recipeId, AltarRecipe recipe) {
+        var blockPatternCondition = recipe.getBlockPatternCondition();
+        if (blockPatternCondition == null) {
             cachedBlockPattern = CachedBlockPattern.NONE;
+            return;
         }
+        cachedBlockPattern = new CachedBlockPattern(recipeId, blockPatternCondition);
     }
 
     public void onPreviewButtonClicked() {

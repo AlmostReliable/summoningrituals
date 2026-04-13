@@ -166,7 +166,7 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
 
             var recipeId = recipeHolder.id();
             if (cachedBlockPattern == null || !cachedBlockPattern.recipeId().equals(recipeId)) {
-                cacheBlockPatternCondition(recipeId, recipeConditions);
+                cacheBlockPatternCondition(recipeId, recipe);
             }
 
             if (cachedBlockPattern != CachedBlockPattern.NONE) {
