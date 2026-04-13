@@ -30,10 +30,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public final class BlockPatternCheck implements LootItemCondition {
 
@@ -106,7 +109,7 @@ public final class BlockPatternCheck implements LootItemCondition {
             result.add(new ClientPatternEntry(blockStates, entry.offset));
         }
 
-        renderPatternCache = result;
+        renderPatternCache = Collections.unmodifiableList(result);
         return result;
     }
 
@@ -133,23 +136,48 @@ public final class BlockPatternCheck implements LootItemCondition {
         return tooltipComponentCache;
     }
 
-    public record PatternEntry(BlockPos offset, BlockPredicate blockPredicate) {
+    public Collection<PatternEntry> queryEntries(String query) {
+        return pattern.stream().filter(e -> e.test(query)).toList();
+    }
 
-        public static final Codec<PatternEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
+    public static final class PatternEntry implements Predicate<String> {
+
+        private static final Codec<PatternEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
             BlockPos.CODEC.fieldOf("offset").forGetter(PatternEntry::offset),
-            BlockPredicate.CODEC.fieldOf("block_predicate").forGetter(PatternEntry::blockPredicate)
+            BlockPredicate.CODEC.fieldOf("block_predicate").forGetter(PatternEntry::blockPredicate),
+            Codec.STRING.optionalFieldOf("query_id").forGetter(PatternEntry::getQueryId)
         ).apply(i, PatternEntry::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, PatternEntry> STREAM_CODEC = StreamCodec.composite(
+        private static final StreamCodec<RegistryFriendlyByteBuf, PatternEntry> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, PatternEntry::offset,
             BlockPredicate.STREAM_CODEC, PatternEntry::blockPredicate,
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8), PatternEntry::getQueryId,
             PatternEntry::new
         );
 
-        public List<BlockState> resolveBlockStates() {
+        private final BlockPos offset;
+        private final BlockPredicate blockPredicate;
+        private final Optional<String> queryId;
+        private @Nullable List<BlockState> cachedBlockStates;
+
+        public PatternEntry(BlockPos offset, BlockPredicate blockPredicate, Optional<String> queryId) {
+            this.offset = offset;
+            this.blockPredicate = blockPredicate;
+            this.queryId = queryId;
+        }
+
+        private List<BlockState> resolveBlockStates() {
+            if (cachedBlockStates != null) {
+                return cachedBlockStates;
+            }
+
             var blockStates = new ArrayList<BlockState>();
 
             var blockHolderSetOpt = blockPredicate.blocks();
-            if (blockHolderSetOpt.isEmpty()) return blockStates;
+            if (blockHolderSetOpt.isEmpty()) {
+                cachedBlockStates = List.of();
+                return blockStates;
+            }
+
             var blockHolderSet = blockHolderSetOpt.get();
             var propertyPredicateOpt = blockPredicate.properties();
 
@@ -165,6 +193,7 @@ public final class BlockPatternCheck implements LootItemCondition {
                     }
                 });
 
+            cachedBlockStates = Collections.unmodifiableList(blockStates);
             return blockStates;
         }
 
@@ -214,6 +243,23 @@ public final class BlockPatternCheck implements LootItemCondition {
             if (value == null) return blockState;
             var optional = property.getValue(value);
             return optional.map(v -> blockState.setValue(property, v)).orElse(blockState);
+        }
+
+        public BlockPos offset() {
+            return offset;
+        }
+
+        private BlockPredicate blockPredicate() {
+            return blockPredicate;
+        }
+
+        private Optional<String> getQueryId() {
+            return queryId;
+        }
+
+        @Override
+        public boolean test(String s) {
+            return queryId.isPresent() && queryId.get().equals(s);
         }
     }
 
