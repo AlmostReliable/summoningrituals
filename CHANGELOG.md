@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - added utility method to recipe and recipe container to expose block pattern condition
 - added optional query id to block pattern entries
 - added block pattern preview rendering support for block entities using the `ENTITYBLOCK_ANIMATED` render type
+- added early block pattern preview cancellation when the Altar is destroyed or on reload
 - fixed block pattern preview task leaking memory when player leaves the world while it's still running
 - fixed block pattern preview not working on the indestructible Altar
 - replaced internal AnyOf loot condition with a proper custom condition to check for Altar properties

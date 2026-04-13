@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.event;
 
 import com.almostreliable.summoningrituals.client.render.AltarRenderer;
 import com.almostreliable.summoningrituals.client.render.CustomRitualRenderer;
+import com.almostreliable.summoningrituals.client.render.PatternPreviewRenderer;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -29,6 +30,7 @@ public final class RitualRendererRegistryEvent implements KubeEvent {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             AltarRenderer.CUSTOM_RENDERERS.clear();
+            PatternPreviewRenderer.clear();
             if (KubeEvents.RITUAL_RENDERER_REGISTRY.hasListeners()) {
                 var event = new RitualRendererRegistryEvent();
                 KubeEvents.RITUAL_RENDERER_REGISTRY.post(event);

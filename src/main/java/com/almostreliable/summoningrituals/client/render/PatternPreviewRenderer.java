@@ -62,6 +62,12 @@ public class PatternPreviewRenderer {
         var level = mc.level;
         if (level == null) return;
 
+        var altarState = level.getBlockState(task.altarPos);
+        if (!altarState.is(SummoningTags.ALTARS)) {
+            clear();
+            return;
+        }
+
         var age = level.getGameTime() - task.createdAt;
         var ticksPerBlock = task.pattern.size() * Config.CLIENT.patternPreviewTicksPerBlock.getAsInt();
         var maxAge = Mth.clamp(
