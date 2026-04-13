@@ -61,12 +61,3 @@ public final class SummoningRituals {
         }
     }
 }
-
-// TODO:
-//  - add dummy output items, add dummy input items (only used for recipe usages) - can be a client event
-//  - add client event to modify condition tooltip, maybe move all tooltip modification there
-//  - maybe find a way to cache block state properties when creating client block states in BlockPatternCheck
-//  - maybe add rendering for the block palette in the recipe viewer too
-//  - integrations
-//    - JADE
-//    - GuideME

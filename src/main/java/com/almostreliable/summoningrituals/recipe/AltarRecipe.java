@@ -218,5 +218,7 @@ public record AltarRecipe(
         INITIATORS.clear();
         INPUTS.clear();
         CACHES_INITIALIZED = false;
+        EntityInput.DATA_VALIDATORS.clear();
+        EntityInput.FAKE_DATA_VALIDATORS.clear();
     }
 }
