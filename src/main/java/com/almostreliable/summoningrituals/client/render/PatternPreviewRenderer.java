@@ -3,8 +3,8 @@ package com.almostreliable.summoningrituals.client.render;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.util.AlphaBufferSource;
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
+import com.almostreliable.summoningrituals.data.SummoningTags;
 import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck.ClientPatternEntry;
 
@@ -201,7 +201,7 @@ public class PatternPreviewRenderer {
         var searchArea = AABB.ofSize(playerPos, searchRadius, searchRadius, searchRadius);
         var altarSearchEntries = BlockPos.betweenClosedStream(searchArea)
             .map(pos -> new AltarSearchEntry(pos.immutable(), level.getBlockState(pos)))
-            .filter(entry -> level.getBlockState(entry.pos).is(Registration.ALTAR_BLOCK))
+            .filter(entry -> level.getBlockState(entry.pos).is(SummoningTags.ALTARS))
             .sorted(Comparator.comparingDouble(entry -> entry.pos.distToCenterSqr(playerPos)))
             .toList();
         var altarPos = altarSearchEntries.stream()
