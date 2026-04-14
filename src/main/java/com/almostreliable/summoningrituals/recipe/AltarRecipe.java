@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+// TODO: add system that prints exact failed condition in game chat
 public record AltarRecipe(
     Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
     List<ItemStack> displayOutputs, List<SizedIngredient> itemInputs, List<EntityInput> entityInputs,

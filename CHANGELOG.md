@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- changed the component column count in block pattern tooltip from 4 to 8
 
 ## [3.9.0] - 2026-04-13
 

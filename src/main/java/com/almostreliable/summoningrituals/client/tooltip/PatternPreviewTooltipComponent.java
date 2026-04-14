@@ -12,7 +12,7 @@ public class PatternPreviewTooltipComponent implements ClientTooltipComponent {
 
     private static final int CELL_SIZE = 18;
     private static final int PADDING = 2;
-    private static final int COLUMNS = 4;
+    private static final int COLUMNS = 8;
 
     private final List<ItemStack> stacks;
 
