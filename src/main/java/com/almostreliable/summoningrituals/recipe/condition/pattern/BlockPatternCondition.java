@@ -184,9 +184,9 @@ public final class BlockPatternCondition {
 
     private Rotation getCounterRotation(Rotation rotation) {
         return switch (rotation) {
-            case NONE -> Rotation.CLOCKWISE_180;
+            case NONE -> Rotation.NONE;
             case CLOCKWISE_90 -> Rotation.COUNTERCLOCKWISE_90;
-            case CLOCKWISE_180 -> Rotation.NONE;
+            case CLOCKWISE_180 -> Rotation.CLOCKWISE_180;
             case COUNTERCLOCKWISE_90 -> Rotation.CLOCKWISE_90;
         };
     }
