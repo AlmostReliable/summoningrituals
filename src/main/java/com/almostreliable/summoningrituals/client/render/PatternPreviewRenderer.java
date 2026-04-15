@@ -2,11 +2,11 @@ package com.almostreliable.summoningrituals.client.render;
 
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.util.AlphaBufferSource;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.data.SummoningTags;
-import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
-import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck.ClientPatternEntry;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
@@ -60,7 +60,13 @@ public class PatternPreviewRenderer {
 
         var mc = Minecraft.getInstance();
         var level = mc.level;
-        if (level == null) return;
+        var player = mc.player;
+        if (level == null || player == null) return;
+
+        if (task.altarPos.distSqr(player.blockPosition()) > Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + 5, 2)) {
+            clear();
+            return;
+        }
 
         var altarState = level.getBlockState(task.altarPos);
         if (!altarState.is(SummoningTags.ALTARS)) {
@@ -69,7 +75,7 @@ public class PatternPreviewRenderer {
         }
 
         var age = level.getGameTime() - task.createdAt;
-        var ticksPerBlock = task.pattern.size() * Config.CLIENT.patternPreviewTicksPerBlock.getAsInt();
+        var ticksPerBlock = task.patternEntries.size() * Config.CLIENT.patternPreviewTicksPerBlock.getAsInt();
         var maxAge = Mth.clamp(
             ticksPerBlock,
             Config.CLIENT.patternPreviewTicksMin.getAsInt(),
@@ -99,11 +105,11 @@ public class PatternPreviewRenderer {
 
         var correctBlocks = 0;
 
-        for (var entry : task.pattern) {
-            var blockStates = entry.blocks();
+        for (var entry : task.patternEntries.entrySet()) {
+            var blockStates = entry.getValue();
             if (blockStates.isEmpty()) continue;
 
-            var worldPos = task.altarPos.offset(entry.offset());
+            var worldPos = task.altarPos.offset(entry.getKey());
             var blockState = mc.level.getBlockState(worldPos);
             if (!isWrongBlock(blockState, blockStates)) {
                 correctBlocks++;
@@ -133,7 +139,7 @@ public class PatternPreviewRenderer {
             poseStack.popPose();
         }
 
-        updatePlayerFeedback(mc, task.pattern.size(), correctBlocks);
+        updatePlayerFeedback(mc, task.patternEntries.size(), correctBlocks);
     }
 
     private static void renderBlock(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BlockState blockState) {
@@ -193,7 +199,7 @@ public class PatternPreviewRenderer {
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static void scheduleTask(BlockPatternCheck blockPatternCheck) {
+    public static void scheduleTask(BlockPatternCondition blockPatternCheck) {
         var mc = Minecraft.getInstance();
         var player = mc.player;
         var level = mc.level;
@@ -210,18 +216,18 @@ public class PatternPreviewRenderer {
             .filter(entry -> level.getBlockState(entry.pos).is(SummoningTags.ALTARS))
             .sorted(Comparator.comparingDouble(entry -> entry.pos.distToCenterSqr(playerPos)))
             .toList();
-        var altarPos = altarSearchEntries.stream()
+        var altarEntry = altarSearchEntries.stream()
             .filter(entry -> !entry.state.getValue(AltarBlock.ACTIVE))
-            .map(AltarSearchEntry::pos)
             .findFirst()
-            .orElseGet(() -> altarSearchEntries.isEmpty() ? null : altarSearchEntries.getFirst().pos);
+            .orElseGet(() -> altarSearchEntries.isEmpty() ? null : altarSearchEntries.getFirst());
 
-        if (altarPos == null) {
+        if (altarEntry == null) {
             player.displayClientMessage(SummoningLang.PREVIEW_NO_ALTAR.get().withStyle(ChatFormatting.RED), true);
             return;
         }
 
-        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPatternCheck.getRenderPattern());
+        var altarFacing = altarEntry.state.getValue(AltarBlock.FACING);
+        INSTANCE.task = new Task(level.getGameTime(), level, altarEntry.pos, blockPatternCheck.getPreviewEntries(altarFacing));
     }
 
     public static void clear() {
@@ -243,7 +249,7 @@ public class PatternPreviewRenderer {
 
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
-    private record Task(long createdAt, Level level, BlockPos altarPos, List<ClientPatternEntry> pattern) {}
+    private record Task(long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries) {}
 
     private static final class WrongBlockHighlightRenderer {
 

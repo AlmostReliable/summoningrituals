@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.ReturnsSelf;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -23,11 +24,13 @@ public class ItemOutputBuilder {
         this.item = item;
     }
 
+    @ReturnsSelf
     public ItemOutputBuilder offset(BlockPos offset) {
         this.offset = offset;
         return this;
     }
 
+    @ReturnsSelf
     public ItemOutputBuilder spread(BlockPos spread) {
         this.spread = spread;
         return this;

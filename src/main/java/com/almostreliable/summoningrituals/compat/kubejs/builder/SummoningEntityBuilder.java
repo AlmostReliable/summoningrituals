@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.ReturnsSelf;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -36,11 +37,13 @@ public class SummoningEntityBuilder {
         this(entity.entity(), entity.count());
     }
 
+    @ReturnsSelf
     public SummoningEntityBuilder data(CompoundTag data) {
         this.data = data;
         return this;
     }
 
+    @ReturnsSelf
     public SummoningEntityBuilder tooltip(List<Component> tooltip) {
         this.tooltip.addAll(tooltip);
         return this;

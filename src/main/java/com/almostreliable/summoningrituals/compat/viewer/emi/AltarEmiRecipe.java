@@ -13,7 +13,6 @@ import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -51,16 +50,17 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
     @Override
     public List<EmiIngredient> getInputs() {
         var recipe = recipeHolder.value();
+        var recipeInputs = recipe.inputs();
         var inputs = new ArrayList<EmiIngredient>();
 
-        for (var itemInput : recipe.itemInputs()) {
+        for (var itemInput : recipeInputs.itemInputs()) {
             inputs.add(EmiIngredient.of(itemInput.ingredient(), itemInput.count()));
         }
-        for (var entityInput : recipe.entityInputs()) {
+        for (var entityInput : recipeInputs.entityInputs()) {
             var entityIngredient = new EntityIngredient(entityInput.entityInfo());
             inputs.add(EntityEmiStack.input(entityIngredient));
         }
-        for (var fakeEntityInput : recipe.fakeEntityInputs()) {
+        for (var fakeEntityInput : recipeInputs.fakeEntityInputs()) {
             inputs.add(EmiStack.of(fakeEntityInput.displayItem()));
         }
 
@@ -72,17 +72,17 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
     @Override
     public List<EmiStack> getOutputs() {
         var recipe = recipeHolder.value();
-        var itemOutputs = recipe.itemOutputs();
+        var recipeOutputs = recipe.outputs();
         var outputs = new ArrayList<EmiStack>();
 
-        for (var itemOutput : itemOutputs) {
+        for (var itemOutput : recipeOutputs.itemOutputs()) {
             outputs.add(EmiStack.of(itemOutput.item()));
         }
-        for (var entityOutput : recipe.entityOutputs()) {
+        for (var entityOutput : recipeOutputs.entityOutputs()) {
             var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
             outputs.add(EntityEmiStack.output(entityIngredient));
         }
-        for (var displayOutput : recipe.displayOutputs()) {
+        for (var displayOutput : recipeOutputs.displayOutputs()) {
             outputs.add(EmiStack.of(displayOutput));
         }
 
@@ -92,15 +92,17 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
     @Override
     public List<EmiIngredient> getCatalysts() {
         var recipe = recipeHolder.value();
+        var recipeInputs = recipe.inputs();
+        var recipeOutputs = recipe.outputs();
         var catalysts = new ArrayList<EmiIngredient>();
 
-        for (var entityInput : recipe.entityInputs()) {
+        for (var entityInput : recipeInputs.entityInputs()) {
             var entityIngredient = new EntityIngredient(entityInput.entityInfo());
             var egg = entityIngredient.getEgg();
             if (egg == null) continue;
             catalysts.add(EmiStack.of(egg));
         }
-        for (var entityOutput : recipe.entityOutputs()) {
+        for (var entityOutput : recipeOutputs.entityOutputs()) {
             var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
             var egg = entityIngredient.getEgg();
             if (egg == null) continue;
@@ -159,29 +161,43 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
                 widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
         );
 
-        var recipeConditions = recipe.startConditions();
-        if (!recipeConditions.isEmpty()) {
+        var commandOutput = recipe.outputs().commandOutput();
+        if (commandOutput.isPresent()) {
+            var slot = widgets.add(new StackWidget(
+                EmiStack.of(Items.COMMAND_BLOCK),
+                TEXTURE_WIDTH - SLOT_SIZE - 2,
+                TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5
+            )).appendTooltip(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
+
+            for (var commandTooltip : commandOutput.get().getTooltip()) {
+                slot.appendTooltip(commandTooltip);
+            }
+        }
+
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isPresent()) {
+            var pattern = blockPattern.get();
+            var widget = new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
+                .appendClickHandler(() -> onPreviewButtonClicked(recipe))
+                .appendTooltip(pattern.getNameTooltip());
+
+            pattern.getTooltip().forEach(widget::appendTooltip);
+
+            widget
+                .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
+                .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
+
+            widgets.add(widget);
+        }
+
+        var recipeConditions = recipe.conditions();
+        if (!recipeConditions.isEmpty() || blockPattern.isPresent()) {
             var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2))
                 .appendTooltip(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
 
-            var recipeId = recipeHolder.id();
-            if (cachedBlockPattern == null || !cachedBlockPattern.recipeId().equals(recipeId)) {
-                cacheBlockPatternCondition(recipeId, recipe);
-            }
-
-            if (cachedBlockPattern != CachedBlockPattern.NONE) {
-                var patternTooltip = SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD);
-                var patternName = cachedBlockPattern.blockPattern().getName();
-                if (patternName.isPresent()) {
-                    patternTooltip = patternTooltip.append(Component.literal(": ")
-                        .withStyle(ChatFormatting.GOLD)
-                        .append(patternName.get()));
-                }
-                widgets.add(new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5))
-                    .appendClickHandler(this::onPreviewButtonClicked)
-                    .appendTooltip(patternTooltip)
-                    .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
-                    .appendTooltip(() -> ClientTooltipComponent.create(cachedBlockPattern.blockPattern().getTooltipComponent()));
+            if (blockPattern.isPresent()) {
+                var patternTooltip = blockPattern.get().getConditionTooltip();
+                conditionSlot.appendTooltip(patternTooltip);
             }
 
             for (var condition : recipeConditions) {
@@ -189,19 +205,6 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
                 for (var conditionTooltip : conditionTooltips) {
                     conditionSlot.appendTooltip(conditionTooltip);
                 }
-            }
-        }
-
-        if (recipe.commands().isPresent()) {
-            var slot = widgets.add(new StackWidget(
-                EmiStack.of(Items.COMMAND_BLOCK),
-                TEXTURE_WIDTH - SLOT_SIZE - 2,
-                TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5
-            ));
-            slot.appendTooltip(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
-
-            for (var commandTooltip : recipe.commands().get().getTooltip()) {
-                slot.appendTooltip(commandTooltip);
             }
         }
     }

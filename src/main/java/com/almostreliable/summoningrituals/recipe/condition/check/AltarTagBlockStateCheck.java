@@ -1,5 +1,6 @@
-package com.almostreliable.summoningrituals.recipe.condition.custom;
+package com.almostreliable.summoningrituals.recipe.condition.check;
 
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningTags;
 
@@ -17,7 +18,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 public record AltarTagBlockStateCheck(StatePropertiesPredicate properties) implements LootItemCondition {
 
     public static final MapCodec<AltarTagBlockStateCheck> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        StatePropertiesPredicate.CODEC.fieldOf("properties").forGetter(AltarTagBlockStateCheck::properties)
+        StatePropertiesPredicate.CODEC.fieldOf(Constants.PROPERTIES).forGetter(AltarTagBlockStateCheck::properties)
     ).apply(i, AltarTagBlockStateCheck::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, AltarTagBlockStateCheck> STREAM_CODEC = StreamCodec.composite(
         StatePropertiesPredicate.STREAM_CODEC, AltarTagBlockStateCheck::properties,

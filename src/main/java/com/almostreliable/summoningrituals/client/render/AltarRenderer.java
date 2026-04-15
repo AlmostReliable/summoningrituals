@@ -58,7 +58,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         CustomRitualRenderer customRenderer = null;
         var recipeInfo = altar.getCurrentRecipeInfo();
         if (recipeInfo != null) {
-            customRenderer = CUSTOM_RENDERERS.get(recipeInfo.getRecipeId());
+            customRenderer = CUSTOM_RENDERERS.get(recipeInfo.recipeId());
         }
         var renderContext = createRenderContext(poseStack, buffer, altar, player, level, partialTick, packedOverlay);
 
@@ -66,10 +66,10 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         {
             if (customRenderer != null) {
                 try {
-                    customRenderer.render(this, recipeInfo.getRecipe(), renderContext);
+                    customRenderer.render(this, recipeInfo.recipe(), renderContext);
                 } catch (Exception e) {
-                    CUSTOM_RENDERERS.remove(recipeInfo.getRecipeId());
-                    SummoningRituals.LOGGER.error("failed to render custom ritual: {}", recipeInfo.getRecipeId(), e);
+                    CUSTOM_RENDERERS.remove(recipeInfo.recipeId());
+                    SummoningRituals.LOGGER.error("failed to render custom ritual: {}", recipeInfo.recipeId(), e);
                 }
             } else {
                 renderContext.translate(HALF, ALTAR_RENDER_HEIGHT, HALF);

@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.ReturnsSelf;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,11 +33,13 @@ public class SummoningEntityOutputBuilder extends SummoningEntityBuilder {
         super(entity);
     }
 
+    @ReturnsSelf
     public SummoningEntityBuilder offset(BlockPos offset) {
         this.offset = offset;
         return this;
     }
 
+    @ReturnsSelf
     public SummoningEntityBuilder spread(BlockPos spread) {
         this.spread = spread;
         return this;

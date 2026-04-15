@@ -13,8 +13,9 @@ import com.almostreliable.summoningrituals.network.AltarInventorySyncPacket;
 import com.almostreliable.summoningrituals.network.AltarRecipeSyncPacket;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.container.RecipeInfoContainer;
-import com.almostreliable.summoningrituals.recipe.container.RecipeMatchResult;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfo;
+import com.almostreliable.summoningrituals.recipe.container.RecipeMatch;
+import com.almostreliable.summoningrituals.recipe.container.RecipeOutputs;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -51,7 +52,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
     public static final String SACRIFICE_TAG = SummoningRituals.getRL("marker").toString();
-    public static final LootContextParamSet LOOT_CONTEXT_PARAM_SET = new LootContextParamSet.Builder()
+    private static final LootContextParamSet LOOT_CONTEXT_PARAM_SET = new LootContextParamSet.Builder()
         .required(LootContextParams.BLOCK_STATE)
         .required(LootContextParams.BLOCK_ENTITY)
         .required(LootContextParams.ORIGIN)
@@ -60,7 +61,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private final AltarInventory inventory;
 
     @Nullable
-    private RecipeInfoContainer currentRecipeInfo;
+    private RecipeInfo currentRecipeInfo;
     @Nullable
     private ServerPlayer invokingPlayer;
     private int recipeProgress;
@@ -98,12 +99,12 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (currentRecipeInfo == null) return;
 
         if (recipeProgress >= recipeTime) {
-            var recipe = currentRecipeInfo.getRecipe();
+            var recipe = currentRecipeInfo.recipe();
             if (inventory.consumeRecipeInputs(level, recipe)) {
                 recipe.invokeCommands(level, invokingPlayer);
-                var itemOutputs = recipe.spawnOutputs(level, worldPosition, recipe.itemOutputs());
-                var entityOutputs = recipe.spawnOutputs(level, worldPosition, recipe.entityOutputs());
-                var recipeInfo = RecipeInfoContainer.outputInfo(currentRecipeInfo, itemOutputs, entityOutputs);
+                var itemOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::itemOutputs);
+                var entityOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::entityOutputs);
+                var recipeInfo = RecipeInfo.outputInfo(currentRecipeInfo, itemOutputs, entityOutputs);
                 SUMMONING_COMPLETE.invoke(level, worldPosition, recipeInfo, invokingPlayer);
                 playOptionalPlayerSound(level, invokingPlayer, false, SoundEvents.EXPERIENCE_ORB_PICKUP);
             } else {
@@ -150,11 +151,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (!(level instanceof ServerLevel serverLevel)) return stack;
 
         if (currentRecipeInfo != null) {
-            sendOptionalPlayerMessage(player, simulate, SummoningLang.IN_PROGRESS, ChatFormatting.RED);
+            sendOptionalPlayerMessage(player, simulate, SummoningLang.IN_PROGRESS, ChatFormatting.YELLOW);
             return stack;
         }
 
-        RecipeMatchResult matchResult = null;
+        RecipeMatch matchResult = null;
         if (AltarRecipe.isInitiator(serverLevel.getRecipeManager(), stack.getItem())) {
             matchResult = handleInitiatorInsertion(serverLevel, player, stack, simulate);
             if (matchResult.getInteractionRemainder() != null) {
@@ -175,38 +176,38 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return stack;
     }
 
-    private RecipeMatchResult handleInitiatorInsertion(
+    private RecipeMatch handleInitiatorInsertion(
         ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate
     ) {
-        var matchResult = getMatchingRecipes(level, player, stack);
-        if (matchResult.hasIssue()) return matchResult;
+        var recipeMatch = getMatchingRecipes(level, player, stack);
+        if (recipeMatch.hasIssue()) return recipeMatch;
 
         if (!simulate) inventory.setInitiator(stack.copyWithCount(1));
         var remainder = stack.copyWithCount(stack.getCount() - 1);
         remainder = remainder.isEmpty() ? ItemStack.EMPTY : remainder;
-        matchResult.setInteractionRemainder(remainder);
+        recipeMatch.setInteractionRemainder(remainder);
 
-        if (simulate) return matchResult;
+        if (simulate) return recipeMatch;
 
-        var recipeInfo = matchResult.getMatchingRecipe();
+        var recipeInfo = recipeMatch.getRecipeInfo();
         if (!SUMMONING_START.invoke(level, worldPosition, recipeInfo, player)) {
             reset(level);
             removeLastInsertedItem();
-            return matchResult;
+            return recipeMatch;
         }
 
-        for (var entityInput : recipeInfo.getInputEntities()) {
+        for (var entityInput : recipeInfo.inputEntities()) {
             entityInput.addTag(SACRIFICE_TAG);
             entityInput.kill();
         }
 
         currentRecipeInfo = recipeInfo;
         invokingPlayer = player;
-        recipeTime = recipeInfo.getRecipe().ticks();
+        recipeTime = recipeInfo.recipe().ticks();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         syncAltarRecipeStart(level);
 
-        return matchResult;
+        return recipeMatch;
     }
 
     private ItemStack handleInputInsertion(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
@@ -217,20 +218,10 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return remaining;
     }
 
-    private RecipeMatchResult getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
+    private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
         var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
         recipeHolders.removeIf(h -> !h.value().initiator().test(stack));
-        if (recipeHolders.isEmpty()) return RecipeMatchResult.INVALID_INITIATOR;
-
-        var matchingRecipes = new HashSet<RecipeInfoContainer>();
-        for (var recipeHolder : recipeHolders) {
-            var recipeId = recipeHolder.id();
-            var recipe = recipeHolder.value();
-            var entityInputs = recipe.getSacrifices(worldPosition, recipeId, region -> level.getEntities(player, region));
-            if (entityInputs == null) continue;
-            matchingRecipes.add(RecipeInfoContainer.inputInfo(recipeHolder, entityInputs));
-        }
-        if (matchingRecipes.isEmpty()) return RecipeMatchResult.MISSING_SACRIFICES;
+        if (recipeHolders.isEmpty()) return RecipeMatch.INVALID_INITIATOR;
 
         var lootParams = new LootParams.Builder(level)
             .withParameter(LootContextParams.BLOCK_STATE, getBlockState())
@@ -239,15 +230,42 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             .create(LOOT_CONTEXT_PARAM_SET);
         var lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
 
+        var matchingRecipes = new HashSet<RecipeInfo>();
+        for (var recipeHolder : recipeHolders) {
+            var recipeId = recipeHolder.id();
+            var recipe = recipeHolder.value();
+            var entityInputs = recipe.getSacrifices(worldPosition, recipeId, region -> level.getEntities(player, region));
+            if (entityInputs == null) continue;
+
+            var recipeInfo = RecipeInfo.inputInfo(recipeHolder, entityInputs);
+
+            var optBlockPattern = recipe.optBlockPattern();
+            if (optBlockPattern.isPresent()) {
+                var blockPattern = optBlockPattern.get();
+                var blockPatternMatch = blockPattern.test(lootContext);
+                recipeInfo = RecipeInfo.blockPatternInfo(recipeInfo, blockPatternMatch);
+            }
+
+            matchingRecipes.add(recipeInfo);
+        }
+        if (matchingRecipes.isEmpty()) return RecipeMatch.MISSING_SACRIFICES;
+
         matchingRecipes.removeIf(recipeInfo -> {
-            var recipe = recipeInfo.getRecipe();
-            return !recipe.startConditions().stream().allMatch(condition -> condition.test(lootContext));
+            var recipe = recipeInfo.recipe();
+            var blockPattern = recipe.blockPattern();
+            return blockPattern.filter(p -> !p.test(lootContext)).isPresent();
         });
-        if (matchingRecipes.isEmpty()) return RecipeMatchResult.FAILED_CONDITIONS;
+        if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;
 
-        if (matchingRecipes.size() > 1) return RecipeMatchResult.MULTI_MATCH;
+        matchingRecipes.removeIf(recipeInfo -> {
+            var recipe = recipeInfo.recipe();
+            return !recipe.conditions().stream().allMatch(condition -> condition.test(lootContext));
+        });
+        if (matchingRecipes.isEmpty()) return RecipeMatch.FAILED_CONDITIONS;
 
-        return RecipeMatchResult.of(matchingRecipes);
+        if (matchingRecipes.size() > 1) return RecipeMatch.MULTI_MATCH;
+
+        return RecipeMatch.of(matchingRecipes);
     }
 
     private void sendOptionalPlayerMessage(@Nullable ServerPlayer player, boolean simulate, LangEntry langEntry, ChatFormatting color) {
@@ -312,11 +330,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Nullable
-    public RecipeInfoContainer getCurrentRecipeInfo() {
+    public RecipeInfo getCurrentRecipeInfo() {
         return currentRecipeInfo;
     }
 
-    public void setCurrentRecipeInfo(@Nullable RecipeInfoContainer currentRecipeInfo) {
+    public void setCurrentRecipeInfo(@Nullable RecipeInfo currentRecipeInfo) {
         this.currentRecipeInfo = currentRecipeInfo;
     }
 

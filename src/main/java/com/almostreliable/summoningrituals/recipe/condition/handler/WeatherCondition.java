@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.condition;
+package com.almostreliable.summoningrituals.recipe.condition.handler;
 
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;

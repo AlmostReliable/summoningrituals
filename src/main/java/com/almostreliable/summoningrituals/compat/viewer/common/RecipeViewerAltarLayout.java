@@ -4,13 +4,8 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.render.PatternPreviewRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
 
 import net.minecraft.resources.ResourceLocation;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class RecipeViewerAltarLayout {
 
@@ -22,9 +17,6 @@ public class RecipeViewerAltarLayout {
     protected static final int CENTER_Y = TEXTURE_HEIGHT / 2;
     private static final int INPUT_RADIUS = 46;
 
-    @Nullable
-    protected CachedBlockPattern cachedBlockPattern;
-
     public int getWidth() {
         return TEXTURE_WIDTH;
     }
@@ -33,18 +25,10 @@ public class RecipeViewerAltarLayout {
         return TEXTURE_HEIGHT;
     }
 
-    protected void cacheBlockPatternCondition(ResourceLocation recipeId, AltarRecipe recipe) {
-        var blockPatternCondition = recipe.getBlockPatternCondition();
-        if (blockPatternCondition == null) {
-            cachedBlockPattern = CachedBlockPattern.NONE;
-            return;
-        }
-        cachedBlockPattern = new CachedBlockPattern(recipeId, blockPatternCondition);
-    }
-
-    public void onPreviewButtonClicked() {
-        if (cachedBlockPattern == null || cachedBlockPattern == CachedBlockPattern.NONE) return;
-        PatternPreviewRenderer.scheduleTask(cachedBlockPattern.blockPattern);
+    public void onPreviewButtonClicked(AltarRecipe recipe) {
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isEmpty()) return;
+        PatternPreviewRenderer.scheduleTask(blockPattern.get());
     }
 
     protected void createInitiatorSlot(SlotConsumer slotConsumer) {
@@ -54,9 +38,10 @@ public class RecipeViewerAltarLayout {
     }
 
     protected void createInputSlots(AltarRecipe recipe, SlotConsumer slotConsumer) {
-        var itemInputs = recipe.itemInputs();
-        var entityInputs = recipe.entityInputs();
-        var fakeEntityInputs = recipe.fakeEntityInputs();
+        var inputs = recipe.inputs();
+        var itemInputs = inputs.itemInputs();
+        var entityInputs = inputs.entityInputs();
+        var fakeEntityInputs = inputs.fakeEntityInputs();
         var inputSlots = itemInputs.size() + entityInputs.size() + fakeEntityInputs.size();
 
         for (var i = 0; i < inputSlots; i++) {
@@ -67,9 +52,10 @@ public class RecipeViewerAltarLayout {
     }
 
     protected void createOutputSlots(AltarRecipe recipe, SlotConsumer slotConsumer) {
-        var itemOutputs = recipe.itemOutputs();
-        var entityOutputs = recipe.entityOutputs();
-        var displayOutputs = recipe.displayOutputs();
+        var outputs = recipe.outputs();
+        var itemOutputs = outputs.itemOutputs();
+        var entityOutputs = outputs.entityOutputs();
+        var displayOutputs = outputs.displayOutputs();
         var outputSlots = itemOutputs.size() + entityOutputs.size() + displayOutputs.size();
 
         for (var i = 0; i < outputSlots; i++) {
@@ -83,13 +69,5 @@ public class RecipeViewerAltarLayout {
     public interface SlotConsumer {
 
         void accept(int x, int y, int slot);
-    }
-
-    protected record CachedBlockPattern(ResourceLocation recipeId, BlockPatternCheck blockPattern) {
-
-        public static final CachedBlockPattern NONE = new CachedBlockPattern(
-            ResourceLocation.parse("none"),
-            new BlockPatternCheck(List.of())
-        );
     }
 }

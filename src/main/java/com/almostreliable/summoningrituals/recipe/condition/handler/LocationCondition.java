@@ -1,6 +1,7 @@
-package com.almostreliable.summoningrituals.recipe.condition;
+package com.almostreliable.summoningrituals.recipe.condition.handler;
 
 import com.almostreliable.summoningrituals.data.SummoningLang;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.util.RawHolderSet;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;

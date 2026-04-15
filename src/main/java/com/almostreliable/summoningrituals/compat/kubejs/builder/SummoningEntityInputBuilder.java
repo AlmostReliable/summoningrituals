@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.ReturnsSelf;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,7 @@ public class SummoningEntityInputBuilder extends SummoningEntityBuilder {
         super(entity);
     }
 
+    @ReturnsSelf
     public SummoningEntityBuilder validator(Predicate<Entity> validator) {
         this.validator = validator;
         return this;

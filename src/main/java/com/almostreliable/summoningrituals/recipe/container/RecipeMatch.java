@@ -10,25 +10,25 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public final class RecipeMatchResult {
+public final class RecipeMatch {
 
-    public static final RecipeMatchResult INVALID_INITIATOR = new RecipeMatchResult(Set.of(), MatchIssue.INITIATOR);
-    public static final RecipeMatchResult MISSING_SACRIFICES = new RecipeMatchResult(Set.of(), MatchIssue.SACRIFICES);
-    public static final RecipeMatchResult FAILED_CONDITIONS = new RecipeMatchResult(Set.of(), MatchIssue.CONDITIONS);
-    public static final RecipeMatchResult MULTI_MATCH = new RecipeMatchResult(Set.of(), MatchIssue.MULTI);
+    public static final RecipeMatch INVALID_INITIATOR = new RecipeMatch(Set.of(), MatchIssue.INITIATOR);
+    public static final RecipeMatch MISSING_SACRIFICES = new RecipeMatch(Set.of(), MatchIssue.SACRIFICES);
+    public static final RecipeMatch WRONG_PATTERN = new RecipeMatch(Set.of(), MatchIssue.PATTERN);
+    public static final RecipeMatch FAILED_CONDITIONS = new RecipeMatch(Set.of(), MatchIssue.CONDITIONS);
+    public static final RecipeMatch MULTI_MATCH = new RecipeMatch(Set.of(), MatchIssue.MULTI);
 
-    private final Set<RecipeInfoContainer> matchingRecipes;
+    private final Set<RecipeInfo> matchingRecipes;
     private final MatchIssue matchIssue;
-    @Nullable
-    private ItemStack interactionRemainder;
+    private @Nullable ItemStack interactionRemainder;
 
-    private RecipeMatchResult(Set<RecipeInfoContainer> matchingRecipes, MatchIssue matchIssue) {
+    private RecipeMatch(Set<RecipeInfo> matchingRecipes, MatchIssue matchIssue) {
         this.matchingRecipes = matchingRecipes;
         this.matchIssue = matchIssue;
     }
 
-    public static RecipeMatchResult of(Set<RecipeInfoContainer> matchingRecipes) {
-        return new RecipeMatchResult(matchingRecipes, MatchIssue.NONE);
+    public static RecipeMatch of(Set<RecipeInfo> matchingRecipes) {
+        return new RecipeMatch(matchingRecipes, MatchIssue.NONE);
     }
 
     public boolean hasIssue() {
@@ -43,13 +43,12 @@ public final class RecipeMatchResult {
         this.interactionRemainder = interactionRemainder;
     }
 
-    @Nullable
-    public ItemStack getInteractionRemainder() {
+    public @Nullable ItemStack getInteractionRemainder() {
         return interactionRemainder;
     }
 
-    public RecipeInfoContainer getMatchingRecipe() {
-        Preconditions.checkState(matchingRecipes.size() == 1, "More than one matching recipe");
+    public RecipeInfo getRecipeInfo() {
+        Preconditions.checkState(matchingRecipes.size() == 1, "more than one matching recipe");
         return matchingRecipes.iterator().next();
     }
 
@@ -57,18 +56,18 @@ public final class RecipeMatchResult {
         INITIATOR(SummoningLang.INVALID_INITIATOR),
         SACRIFICES(SummoningLang.MISSING_SACRIFICES),
         CONDITIONS(SummoningLang.FAILED_CONDITIONS),
+        PATTERN(SummoningLang.WRONG_PATTERN),
         MULTI(SummoningLang.MULTI_MATCH),
         NONE(null);
 
-        @Nullable
-        private final SummoningLang.LangEntry langEntry;
+        private final @Nullable SummoningLang.LangEntry langEntry;
 
         MatchIssue(@Nullable SummoningLang.LangEntry langEntry) {
             this.langEntry = langEntry;
         }
 
         public SummoningLang.LangEntry getIssueMessage() {
-            Preconditions.checkNotNull(langEntry, "Issue has no message");
+            Preconditions.checkNotNull(langEntry, "issue has no message");
             return langEntry;
         }
     }

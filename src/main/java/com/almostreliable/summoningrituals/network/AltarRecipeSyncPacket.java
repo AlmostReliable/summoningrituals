@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
-import com.almostreliable.summoningrituals.recipe.container.RecipeInfoContainer;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -15,7 +15,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import java.util.Optional;
 
 public record AltarRecipeSyncPacket(
-    BlockPos altarPos, Optional<RecipeInfoContainer> recipeInfo, int recipeProgress, int recipeTime
+    BlockPos altarPos, Optional<RecipeInfo> recipeInfo, int recipeProgress, int recipeTime
 ) implements CustomPacketPayload {
 
     static final Type<AltarRecipeSyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_recipe_sync"));
@@ -23,7 +23,7 @@ public record AltarRecipeSyncPacket(
     static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         AltarRecipeSyncPacket::altarPos,
-        ByteBufCodecs.optional(RecipeInfoContainer.STREAM_CODEC),
+        ByteBufCodecs.optional(RecipeInfo.STREAM_CODEC),
         AltarRecipeSyncPacket::recipeInfo,
         ByteBufCodecs.VAR_INT,
         AltarRecipeSyncPacket::recipeProgress,

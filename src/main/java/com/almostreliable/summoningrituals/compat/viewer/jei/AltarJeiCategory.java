@@ -41,7 +41,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable conditionIcon;
-    private final IDrawable patternIcon;
+    private final IDrawable blockPatternIcon;
     private final IDrawable commandsIcon;
 
     AltarJeiCategory(IGuiHelper guiHelper) {
@@ -50,7 +50,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             .build();
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
-        patternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
+        blockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
         commandsIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.COMMAND_BLOCK.getDefaultInstance());
     }
 
@@ -75,25 +75,21 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY
     ) {
         background.draw(guiGraphics);
-
         var recipe = recipeHolder.value();
-        var recipeConditions = recipe.startConditions();
-        if (!recipeConditions.isEmpty()) {
-            conditionIcon.draw(guiGraphics, 2, 2);
 
-            var recipeId = recipeHolder.id();
-            if (cachedBlockPattern == null || !cachedBlockPattern.recipeId().equals(recipeId)) {
-                cacheBlockPatternCondition(recipeId, recipe);
-            }
-
-            if (cachedBlockPattern != CachedBlockPattern.NONE) {
-                patternIcon.draw(guiGraphics, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
-            }
+        var commandOutput = recipe.outputs().commandOutput();
+        if (commandOutput.isPresent()) {
+            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
 
-        var recipeCommands = recipe.commands();
-        if (recipeCommands.isPresent()) {
-            commandsIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isPresent()) {
+            blockPatternIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE - 2);
+        }
+
+        var recipeConditions = recipe.conditions();
+        if (!recipeConditions.isEmpty() || blockPattern.isPresent()) {
+            conditionIcon.draw(guiGraphics, 2, 2);
         }
     }
 
@@ -101,45 +97,37 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     public void getTooltip(
         ITooltipBuilder tooltip, RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY
     ) {
-        var recipeConditions = recipeHolder.value().startConditions();
-        if (!recipeConditions.isEmpty()) {
-            if (mouseInSlot(mouseX, mouseY, 2, 2)) {
-                tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
-                for (var condition : recipeConditions) {
-                    tooltip.addAll(ConditionRegistry.getTooltip(condition));
-                }
-                return;
-            }
+        var recipe = recipeHolder.value();
 
-            if (cachedBlockPattern != null && cachedBlockPattern != CachedBlockPattern.NONE &&
-                mouseInSlot(mouseX, mouseY, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
-                var patternTooltip = SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD);
-                var patternName = cachedBlockPattern.blockPattern().getName();
-                if (patternName.isPresent()) {
-                    patternTooltip = patternTooltip.append(Component.literal(": ")
-                        .withStyle(ChatFormatting.GOLD)
-                        .append(patternName.get()));
-                }
-
-                tooltip.add(patternTooltip);
-                tooltip.add(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY));
-                tooltip.add(cachedBlockPattern.blockPattern().getTooltipComponent());
-            }
+        var commandOutput = recipe.outputs().commandOutput();
+        if (commandOutput.isPresent() && mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
+            tooltip.add(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
+            tooltip.addAll(commandOutput.get().getTooltip());
         }
 
-        var recipeCommands = recipeHolder.value().commands();
-        if (recipeCommands.isPresent() &&
-            mouseInSlot(mouseX, mouseY, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
-            tooltip.add(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
-            tooltip.addAll(recipeCommands.get().getTooltip());
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isPresent() && mouseInSlot(mouseX, mouseY, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
+            var pattern = blockPattern.get();
+            tooltip.add(pattern.getNameTooltip());
+            tooltip.addAll(pattern.getTooltip());
+            tooltip.add(pattern.getTooltipComponent());
+        }
+
+        var recipeConditions = recipe.conditions();
+        if ((!recipeConditions.isEmpty() || blockPattern.isPresent()) && mouseInSlot(mouseX, mouseY, 2, 2)) {
+            tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
+            blockPattern.ifPresent(p -> tooltip.add(p.getConditionTooltip()));
+            for (var condition : recipeConditions) {
+                tooltip.addAll(ConditionRegistry.getTooltip(condition));
+            }
         }
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AltarRecipe> recipe, IFocusGroup focuses) {
-        if (cachedBlockPattern != CachedBlockPattern.NONE) {
-            builder.addGuiEventListener(new JeiPatternClickListener(this));
-        }
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
+        var recipe = recipeHolder.value();
+        if (recipe.blockPattern().isEmpty()) return;
+        builder.addGuiEventListener(new JeiPatternClickListener(this, recipe));
     }
 
     @Override
@@ -155,8 +143,9 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
         createInputSlots(
             recipe, (x, y, slot) -> {
-                var itemInputs = recipe.itemInputs();
-                var entityInputs = recipe.entityInputs();
+                var inputs = recipe.inputs();
+                var itemInputs = inputs.itemInputs();
+                var entityInputs = inputs.entityInputs();
                 if (slot < itemInputs.size()) {
                     // item inputs
                     var itemInput = itemInputs.get(slot);
@@ -180,7 +169,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
                 } else {
                     // fake entity inputs
-                    var fakeEntityInput = recipe.fakeEntityInputs().get(slot - itemInputs.size() - entityInputs.size());
+                    var fakeEntityInput = inputs.fakeEntityInputs().get(slot - itemInputs.size() - entityInputs.size());
                     builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(fakeEntityInput.displayItem());
                 }
             }
@@ -188,9 +177,9 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
         createOutputSlots(
             recipe, (x, y, slot) -> {
-                // item outputs
-                var itemOutputs = recipe.itemOutputs();
-                var entityOutputs = recipe.entityOutputs();
+                var outputs = recipe.outputs();
+                var itemOutputs = outputs.itemOutputs();
+                var entityOutputs = outputs.entityOutputs();
                 if (slot < itemOutputs.size()) {
                     // item outputs
                     var stack = itemOutputs.get(slot).item();
@@ -209,7 +198,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
                 } else {
                     // display outputs
-                    var displayOutputs = recipe.displayOutputs();
+                    var displayOutputs = outputs.displayOutputs();
                     var displayOutput = displayOutputs.get(slot - itemOutputs.size() - entityOutputs.size());
                     builder.addOutputSlot(x, y).addItemStack(displayOutput);
                 }

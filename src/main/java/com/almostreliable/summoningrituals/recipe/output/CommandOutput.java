@@ -24,7 +24,7 @@ public record CommandOutput(List<String> commands, List<Component> tooltip, bool
 
     public static final Codec<CommandOutput> CODEC = RecordCodecBuilder.create(i -> i.group(
         Codec.STRING.listOf().fieldOf(Constants.COMMANDS).forGetter(CommandOutput::commands),
-        ComponentSerialization.CODEC.listOf().fieldOf(Constants.TOOLTIP).forGetter(CommandOutput::tooltip),
+        ComponentSerialization.CODEC.listOf().optionalFieldOf(Constants.TOOLTIP, List.of()).forGetter(CommandOutput::tooltip),
         Codec.BOOL.optionalFieldOf(Constants.REQUIRES_PLAYER, true).forGetter(CommandOutput::requiresPlayer)
     ).apply(i, CommandOutput::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, CommandOutput> STREAM_CODEC = StreamCodec.composite(

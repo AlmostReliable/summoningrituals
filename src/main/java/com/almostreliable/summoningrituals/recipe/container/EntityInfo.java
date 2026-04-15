@@ -24,9 +24,9 @@ public record EntityInfo(Holder<EntityType<?>> entity, int count, Optional<Compo
 
     public static final Codec<EntityInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
         BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(EntityInfo::entity),
-        Codec.INT.fieldOf(Constants.COUNT).forGetter(EntityInfo::count),
+        Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(EntityInfo::count),
         CompoundTag.CODEC.optionalFieldOf(Constants.DATA).forGetter(EntityInfo::data),
-        ComponentSerialization.CODEC.listOf().fieldOf(Constants.TOOLTIP).forGetter(EntityInfo::tooltip)
+        ComponentSerialization.CODEC.listOf().optionalFieldOf(Constants.TOOLTIP, List.of()).forGetter(EntityInfo::tooltip)
     ).apply(i, EntityInfo::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityInfo> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), EntityInfo::entity,

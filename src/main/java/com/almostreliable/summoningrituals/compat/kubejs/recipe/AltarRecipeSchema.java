@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPatternConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
@@ -9,6 +10,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOu
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
@@ -90,6 +92,16 @@ public interface AltarRecipeSchema {
         .functionNames(List.of("fakeEntityInputs", "fakeEntityInput", "fakeMobInputs", "fakeMobInput"))
         .optional(List.of())
         .exclude();
+    RecipeKey<BlockPatternCondition> BLOCK_PATTERN = BlockPatternConditionComponent.TYPE
+        .key(Constants.BLOCK_PATTERN, ComponentRole.OTHER)
+        .noFunctions()
+        .defaultOptional()
+        .exclude();
+    RecipeKey<BlockPatternCondition> OPT_BLOCK_PATTERN = BlockPatternConditionComponent.TYPE
+        .key(Constants.OPT_BLOCK_PATTERN, ComponentRole.OTHER)
+        .noFunctions()
+        .defaultOptional()
+        .exclude();
     RecipeKey<BlockPos> ZONE = BlockPosComponent.TYPE
         .key(Constants.ZONE, ComponentRole.OTHER)
         .functionNames(List.of("entityInputZone", "mobInputZone", "inputZone", "sacrificeZone", "entityZone", "mobZone", "zone"))
@@ -118,6 +130,8 @@ public interface AltarRecipeSchema {
         ITEM_INPUTS,
         ENTITY_INPUTS,
         FAKE_ENTITY_INPUTS,
+        BLOCK_PATTERN,
+        OPT_BLOCK_PATTERN,
         ZONE,
         TICKS,
         CONDITIONS

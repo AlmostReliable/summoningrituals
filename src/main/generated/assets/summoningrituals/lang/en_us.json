@@ -3,7 +3,6 @@
   "block.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
   "condition.summoningrituals.altar_properties": "Altar Properties",
   "condition.summoningrituals.biomes": "Biomes",
-  "condition.summoningrituals.block_pattern": "Block Pattern",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Height",
   "condition.summoningrituals.light_level": "Light Level",
@@ -40,6 +39,7 @@
   "hint.summoningrituals.preview_click": "Click to show preview in the world.",
   "item.summoningrituals.altar": "Summoning Altar",
   "item.summoningrituals.indestructible_altar": "Indestructible Summoning Altar",
+  "label.summoningrituals.block_pattern": "Block Pattern",
   "label.summoningrituals.commands": "Commands",
   "label.summoningrituals.conditions": "Conditions",
   "label.summoningrituals.initiator": "Initiator",
@@ -52,5 +52,6 @@
   "message.summoningrituals.preview_in_progress": "Previewing block pattern on nearest Altar.",
   "message.summoningrituals.preview_no_altar": "No Altar found in range to display the preview for.",
   "message.summoningrituals.preview_success": "The block pattern is complete!",
+  "message.summoningrituals.wrong_pattern": "The block pattern around the Altar is not correct.",
   "tab.summoningrituals.main": "Summoning Rituals"
 }

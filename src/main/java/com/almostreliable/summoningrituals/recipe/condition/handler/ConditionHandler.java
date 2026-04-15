@@ -1,4 +1,4 @@
-package com.almostreliable.summoningrituals.recipe.condition;
+package com.almostreliable.summoningrituals.recipe.condition.handler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;

@@ -1,5 +1,6 @@
-package com.almostreliable.summoningrituals.recipe.condition.custom;
+package com.almostreliable.summoningrituals.recipe.condition.check;
 
+import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -17,7 +18,7 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
 
     private static final MoonPhase[] PHASES = MoonPhase.values();
     public static final MapCodec<MoonPhaseCheck> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        Codec.INT.fieldOf("phase").forGetter(check -> check.phase.ordinal())
+        Codec.INT.fieldOf(Constants.MOON_PHASE).forGetter(check -> check.phase.ordinal())
     ).apply(i, phase -> new MoonPhaseCheck(PHASES[phase])));
     public static final StreamCodec<RegistryFriendlyByteBuf, MoonPhaseCheck> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT, check -> check.phase.ordinal(),

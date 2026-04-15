@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 
+import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
@@ -66,24 +67,24 @@ public class AltarKubeRecipe extends KubeRecipe {
         return this;
     }
 
-    public AltarKubeRecipe command(CommandOutput commands) {
-        return commands(commands);
-    }
-
-    public AltarKubeRecipe command(List<String> commands, List<Component> tooltip) {
-        return commands(commands, tooltip);
-    }
-
-    public AltarKubeRecipe command(List<String> commands, List<Component> tooltip, boolean requiresPlayer) {
-        return commands(commands, tooltip, requiresPlayer);
-    }
-
     public AltarKubeRecipe conditions(Context ctx, Function<ConditionsBuilder, ConditionsBuilder> conditions) {
         setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder()).build(ctx));
         return this;
     }
 
-    public static List<String> normalizeCommandList(List<String> commands) {
+    public AltarKubeRecipe blockPattern(Context ctx, Function<BlockPatternConditionBuilder, BlockPatternConditionBuilder> blockPattern) {
+        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(ctx);
+        setValue(AltarRecipeSchema.BLOCK_PATTERN, pattern);
+        return this;
+    }
+
+    public AltarKubeRecipe optBlockPattern(Context ctx, Function<BlockPatternConditionBuilder, BlockPatternConditionBuilder> blockPattern) {
+        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(ctx);
+        setValue(AltarRecipeSchema.OPT_BLOCK_PATTERN, pattern);
+        return this;
+    }
+
+    private static List<String> normalizeCommandList(List<String> commands) {
         var result = new ArrayList<String>();
         for (var command : commands) {
             result.add(CommandOutputTypeWrapper.normalizeCommand(command));

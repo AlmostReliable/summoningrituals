@@ -3,7 +3,6 @@
   "block.summoningrituals.indestructible_altar": "Unzerstörbarer Beschwörungsaltar",
   "condition.summoningrituals.altar_properties": "Altar-Eigenschaften",
   "condition.summoningrituals.biomes": "Biome",
-  "condition.summoningrituals.block_pattern": "Blockmuster",
   "condition.summoningrituals.dimension": "Dimension",
   "condition.summoningrituals.height": "Höhe",
   "condition.summoningrituals.light_level": "Lichtstärke",
@@ -40,6 +39,7 @@
   "hint.summoningrituals.insert_last": "Als letztes einfügen, um Ritual zu starten.",
   "item.summoningrituals.altar": "Beschwörungsaltar",
   "item.summoningrituals.indestructible_altar": "Unzerstörbarer Beschwörungsaltar",
+  "label.summoningrituals.block_pattern": "Blockmuster",
   "label.summoningrituals.commands": "Befehle",
   "label.summoningrituals.conditions": "Bedingungen",
   "label.summoningrituals.initiator": "Initiator",
@@ -52,5 +52,6 @@
   "message.summoningrituals.preview_in_progress": "Vorschau des Blockmusters beim nächsten Altar.",
   "message.summoningrituals.preview_no_altar": "Kein Altar in Reichweite für Vorschau gefunden.",
   "message.summoningrituals.preview_success": "Das Blockmuster ist vollständig!",
+  "message.summoningrituals.wrong_pattern": "Das Blockmuster um den Altar ist nicht korrekt.",
   "tab.summoningrituals.main": "Beschwörungsrituale"
 }

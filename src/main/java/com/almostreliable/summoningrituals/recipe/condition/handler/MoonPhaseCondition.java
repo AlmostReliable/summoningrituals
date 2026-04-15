@@ -1,7 +1,7 @@
-package com.almostreliable.summoningrituals.recipe.condition;
+package com.almostreliable.summoningrituals.recipe.condition.handler;
 
 import com.almostreliable.summoningrituals.data.SummoningLang;
-import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

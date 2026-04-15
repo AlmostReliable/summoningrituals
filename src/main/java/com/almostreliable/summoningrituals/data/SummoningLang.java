@@ -2,8 +2,8 @@ package com.almostreliable.summoningrituals.data;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
-import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
@@ -29,6 +29,7 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry MISSING_INPUTS = LangEntry.message("missing_inputs", "Some of the required item inputs couldn't be found in the Altar.");
     public static final LangEntry INVALID_INITIATOR = LangEntry.message("invalid_initiator", "No recipes have been found for this initiator.");
     public static final LangEntry MISSING_SACRIFICES = LangEntry.message("missing_sacrifices", "Not all sacrifices were found for the ritual.");
+    public static final LangEntry WRONG_PATTERN = LangEntry.message("wrong_pattern", "The block pattern around the Altar is not correct.");
     public static final LangEntry FAILED_CONDITIONS = LangEntry.message("failed_conditions", "Not all conditions were met for the ritual.");
     public static final LangEntry MULTI_MATCH = LangEntry.message("multi_match", "More than one recipe found for this initiator.");
     public static final LangEntry PREVIEW_NO_ALTAR = LangEntry.message("preview_no_altar", "No Altar found in range to display the preview for.");
@@ -39,6 +40,7 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry INITIATOR = LangEntry.label(Constants.INITIATOR, "Initiator");
     public static final LangEntry CONDITIONS = LangEntry.label(Constants.CONDITIONS, "Conditions");
     public static final LangEntry COMMANDS = LangEntry.label(Constants.COMMANDS, "Commands");
+    public static final LangEntry BLOCK_PATTERN = LangEntry.label(Constants.BLOCK_PATTERN, "Block Pattern");
 
     // hints
     public static final LangEntry INSERT_LAST = LangEntry.hint("insert_last", "Insert last to start the ritual.");
@@ -47,7 +49,6 @@ public final class SummoningLang extends LanguageProvider {
     // conditions
     public static final LangEntry ALTAR_PROPERTIES = LangEntry.condition("altar_properties", "Altar Properties");
     public static final LangEntry BIOMES = LangEntry.condition("biomes", "Biomes");
-    public static final LangEntry BLOCK_PATTERN = LangEntry.condition("block_pattern", "Block Pattern");
     public static final LangEntry CLEAR = LangEntry.condition("weather_clear", "Clear");
     public static final LangEntry DIMENSION = LangEntry.condition("dimension", "Dimension");
     public static final LangEntry HEIGHT = LangEntry.condition("height", "Height");

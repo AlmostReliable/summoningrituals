@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.event.KubeEvents;
 import com.almostreliable.summoningrituals.compat.kubejs.event.SummoningKubeEvent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarKubeRecipe;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.AltarRecipeSchema;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPatternConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.BlockPosComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.CommandOutputComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.EntityInputComponent;
@@ -17,8 +18,8 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootIt
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.condition.TimeCondition;
-import com.almostreliable.summoningrituals.recipe.condition.custom.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
@@ -56,6 +57,7 @@ public class KubePlugin implements KubeJSPlugin {
 
     @Override
     public void registerRecipeComponents(RecipeComponentTypeRegistry registry) {
+        registry.register(BlockPatternConditionComponent.TYPE);
         registry.register(BlockPosComponent.TYPE);
         registry.register(CommandOutputComponent.TYPE);
         registry.register(EntityInputComponent.TYPE);

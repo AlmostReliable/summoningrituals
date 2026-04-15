@@ -258,7 +258,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         var toRemoveTotal = 0;
         var removedTotal = 0;
 
-        for (var input : recipe.itemInputs()) {
+        for (var input : recipe.inputs().itemInputs()) {
             toRemoveTotal += input.count();
             var alreadyRemoved = 0;
 

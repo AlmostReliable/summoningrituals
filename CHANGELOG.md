@@ -4,7 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+Note: This release reworks the block pattern condition. It's no longer part of the main condition system. Refer to the wiki for an updated syntax.
+
+- added rotation awareness to the block pattern condition
+- added option to add optional tooltip lines to the block pattern condition
+- added block pattern preview cancellation when player is too far away from the Altar
+- added a dedicated failure message if the block pattern is not correct when starting the ritual
+- improved type info for KubeJS builder methods returning the same instance
+- moved recipe inputs and outputs to container classes for better maintainability
 - changed the component column count in block pattern tooltip from 4 to 8
+- changed inner key of moon phase condition from `phase` to `moon_phase`
+- changed some recipe component key to optionals, so they can be omitted from the JSON
+- decoupled the block pattern condition from the loot condition system
 
 ## [3.9.0] - 2026-04-13
 

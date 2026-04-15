@@ -1,13 +1,10 @@
 package com.almostreliable.summoningrituals.recipe;
 
 import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.condition.custom.BlockPatternCheck;
-import com.almostreliable.summoningrituals.recipe.input.BaseEntityInput;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInputs;
+import com.almostreliable.summoningrituals.recipe.container.RecipeOutputs;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
-import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
-import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
-import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
-import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
 
 import net.minecraft.core.BlockPos;
@@ -28,15 +25,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,19 +40,20 @@ import java.util.function.Function;
 
 // TODO: add system that prints exact failed condition in game chat
 public record AltarRecipe(
-    Ingredient initiator, List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commands,
-    List<ItemStack> displayOutputs, List<SizedIngredient> itemInputs, List<EntityInput> entityInputs,
-    List<FakeEntityInput> fakeEntityInputs, List<LootItemCondition> startConditions, BlockPos zone, int ticks
+    Ingredient initiator, RecipeOutputs outputs, RecipeInputs inputs, List<LootItemCondition> conditions,
+    Optional<BlockPatternCondition> blockPattern, Optional<BlockPatternCondition> optBlockPattern,
+    BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
     public static final BlockPos DEFAULT_ZONE = new BlockPos(3, 2, 3);
     public static final int DEFAULT_TICKS = 40;
-    private static final Set<Item> INITIATORS = new HashSet<>();
-    private static final Set<Item> INPUTS = new HashSet<>();
+    private static final Set<Item> INITIATORS = Sets.newIdentityHashSet();
+    private static final Set<Item> INPUTS = Sets.newIdentityHashSet();
     private static boolean CACHES_INITIALIZED;
 
     @Override
     public boolean matches(RecipeInput inventory, Level level) {
+        var itemInputs = inputs.itemInputs();
         if (itemInputs.isEmpty()) return true;
 
         var matchedItems = new Ingredient[inventory.size()];
@@ -82,6 +79,49 @@ public record AltarRecipe(
     }
 
     @Override
+    public RecipeSerializer<?> getSerializer() {
+        return Registration.ALTAR_RECIPE_SERIALIZER.get();
+    }
+
+    @Override
+    public RecipeType<?> getType() {
+        return Registration.ALTAR_RECIPE_TYPE.get();
+    }
+
+    @Nullable
+    public List<Entity> getSacrifices(BlockPos pos, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
+        var zoneRegion = constructRegion(pos);
+        return inputs.getSacrifices(zoneRegion, recipeId, entityCollector);
+    }
+
+    // exposed for KubeJS
+    public AABB constructRegion(BlockPos pos) {
+        var startBounds = pos.offset(zone.multiply(-1));
+        var endBounds = pos.offset(zone);
+        return new AABB(
+            Vec3.atLowerCornerOf(startBounds),
+            Vec3.atLowerCornerOf(endBounds)
+        );
+    }
+
+    public <E extends Entity, T extends RecipeOutput<E>> Collection<E> spawnOutputs(
+        ServerLevel level, BlockPos origin, Function<RecipeOutputs, List<T>> factory
+    ) {
+        var result = new ArrayList<E>();
+        for (var output : factory.apply(outputs)) {
+            result.addAll(output.spawn(level, origin));
+        }
+        return ImmutableList.copyOf(result);
+    }
+
+    public void invokeCommands(ServerLevel level, @Nullable ServerPlayer player) {
+        var commandOutput = outputs.commandOutput();
+        if (commandOutput.isEmpty()) return;
+        commandOutput.get().invoke(level, player);
+    }
+
+    //<editor-fold defaultstate="collapsed" desc="Default recipe stuff">
+    @Override
     public ItemStack assemble(RecipeInput inventory, HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
@@ -100,93 +140,9 @@ public record AltarRecipe(
     public boolean isSpecial() {
         return true;
     }
+    //</editor-fold>
 
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return Registration.ALTAR_RECIPE_SERIALIZER.get();
-    }
-
-    @Override
-    public RecipeType<?> getType() {
-        return Registration.ALTAR_RECIPE_TYPE.get();
-    }
-
-    @Nullable
-    public List<Entity> getSacrifices(BlockPos pos, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
-        if (entityInputs.isEmpty() && fakeEntityInputs.isEmpty()) return List.of();
-
-        var region = constructRegion(pos);
-        var remainingEntities = new ArrayList<>(entityCollector.apply(region));
-
-        var entityInputSacrifices = consumeSacrifices(recipeId, entityInputs, e -> Optional.of(e.entityInfo().count()), remainingEntities);
-        if (entityInputSacrifices == null) return null;
-        var sacrifices = new ArrayList<>(entityInputSacrifices);
-
-        var fakeEntityInputSacrifices = consumeSacrifices(recipeId, fakeEntityInputs, FakeEntityInput::count, remainingEntities);
-        if (fakeEntityInputSacrifices == null) return null;
-        sacrifices.addAll(fakeEntityInputSacrifices);
-
-        return sacrifices;
-    }
-
-    @Nullable
-    private static <T extends BaseEntityInput> List<Entity> consumeSacrifices(
-        ResourceLocation recipeId, List<T> inputs, Function<T, Optional<Integer>> countSupplier, List<Entity> entities
-    ) {
-        var sacrifices = new ArrayList<Entity>();
-
-        for (var i = 0; i < inputs.size(); i++) {
-            var input = inputs.get(i);
-            var requiredCount = countSupplier.apply(input);
-            var inputIndex = i;
-
-            var matchStream = entities.stream()
-                .filter(e -> input.test(recipeId, inputIndex, e));
-            var matches = (requiredCount.isPresent() ? matchStream.limit(requiredCount.get()) : matchStream)
-                .toList();
-
-            if (requiredCount.isPresent() && matches.size() < requiredCount.get()) return null;
-
-            sacrifices.addAll(matches);
-            entities.removeAll(matches);
-        }
-
-        return sacrifices;
-    }
-
-    public <E extends Entity, T extends RecipeOutput<E>> Collection<E> spawnOutputs(ServerLevel level, BlockPos origin, List<T> outputs) {
-        var result = new ArrayList<E>();
-        for (var output : outputs) {
-            result.addAll(output.spawn(level, origin));
-        }
-        return ImmutableList.copyOf(result);
-    }
-
-    public void invokeCommands(ServerLevel level, @Nullable ServerPlayer player) {
-        if (commands.isEmpty()) return;
-        commands.get().invoke(level, player);
-    }
-
-    // exposed for KubeJS debugging
-    @SuppressWarnings("WeakerAccess")
-    public AABB constructRegion(BlockPos pos) {
-        var startBounds = pos.offset(zone.multiply(-1));
-        var endBounds = pos.offset(zone);
-        return new AABB(
-            Vec3.atLowerCornerOf(startBounds),
-            Vec3.atLowerCornerOf(endBounds)
-        );
-    }
-
-    @Nullable
-    public BlockPatternCheck getBlockPatternCondition() {
-        return startConditions.stream()
-            .filter(c -> c instanceof BlockPatternCheck)
-            .map(c -> (BlockPatternCheck) c)
-            .findFirst()
-            .orElse(null);
-    }
-
+    //<editor-fold defaultstate="collapsed" desc="Caching">
     public static boolean isInitiator(RecipeManager recipeManager, Item item) {
         if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
         return INITIATORS.contains(item);
@@ -205,7 +161,7 @@ public record AltarRecipe(
             for (var initiator : r.initiator.getItems()) {
                 INITIATORS.add(initiator.getItem());
             }
-            for (var itemInput : r.itemInputs) {
+            for (var itemInput : r.inputs.itemInputs()) {
                 for (var stack : itemInput.getItems()) {
                     INPUTS.add(stack.getItem());
                 }
@@ -222,4 +178,5 @@ public record AltarRecipe(
         EntityInput.DATA_VALIDATORS.clear();
         EntityInput.FAKE_DATA_VALIDATORS.clear();
     }
+    //</editor-fold>
 }
