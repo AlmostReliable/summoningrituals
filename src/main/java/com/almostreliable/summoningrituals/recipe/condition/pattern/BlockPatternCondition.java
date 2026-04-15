@@ -111,7 +111,8 @@ public final class BlockPatternCondition {
         return failedPositions;
     }
 
-    private List<PatternEntry> getEntries() {
+    // exposed for KubeJS
+    public List<PatternEntry> getEntries() {
         return entries;
     }
 
