@@ -242,7 +242,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var optBlockPattern = recipe.optBlockPattern();
             if (optBlockPattern.isPresent()) {
                 var blockPattern = optBlockPattern.get();
-                var blockPatternMatch = blockPattern.test(lootContext);
+                var blockPatternMatch = blockPattern.test(lootContext, false);
                 recipeInfo = RecipeInfo.blockPatternInfo(recipeInfo, blockPatternMatch);
             }
 
@@ -252,16 +252,17 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
         matchingRecipes.removeIf(recipeInfo -> {
             var recipe = recipeInfo.recipe();
-            var blockPattern = recipe.blockPattern();
-            return blockPattern.filter(p -> !p.test(lootContext)).isPresent();
-        });
-        if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;
-
-        matchingRecipes.removeIf(recipeInfo -> {
-            var recipe = recipeInfo.recipe();
             return !recipe.conditions().stream().allMatch(condition -> condition.test(lootContext));
         });
         if (matchingRecipes.isEmpty()) return RecipeMatch.FAILED_CONDITIONS;
+
+        matchingRecipes.removeIf(recipeInfo -> {
+            var recipe = recipeInfo.recipe();
+            var blockPattern = recipe.blockPattern();
+            var recipes = matchingRecipes.size();
+            return blockPattern.filter(p -> !p.test(lootContext, recipes == 1)).isPresent();
+        });
+        if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;
 
         if (matchingRecipes.size() > 1) return RecipeMatch.MULTI_MATCH;
 

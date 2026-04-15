@@ -19,7 +19,6 @@ public record AltarRecipeSyncPacket(
 ) implements CustomPacketPayload {
 
     static final Type<AltarRecipeSyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_recipe_sync"));
-
     static final StreamCodec<RegistryFriendlyByteBuf, AltarRecipeSyncPacket> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         AltarRecipeSyncPacket::altarPos,
@@ -37,7 +36,7 @@ public record AltarRecipeSyncPacket(
         return TYPE;
     }
 
-    public static void handle(AltarRecipeSyncPacket packet, IPayloadContext ignoredCtx) {
+    static void handle(AltarRecipeSyncPacket packet, IPayloadContext ignoredCtx) {
         var level = Minecraft.getInstance().level;
         if (level == null) return;
 

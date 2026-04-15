@@ -32,6 +32,11 @@ public final class PacketHandler {
             AltarRecipeSyncPacket.STREAM_CODEC,
             wrapHandler(AltarRecipeSyncPacket::handle)
         );
+        registrar.playToClient(
+            HighlightPositionsPacket.TYPE,
+            HighlightPositionsPacket.STREAM_CODEC,
+            wrapHandler(HighlightPositionsPacket::handle)
+        );
     }
 
     private static <T extends CustomPacketPayload> IPayloadHandler<T> wrapHandler(IPayloadHandler<T> handler) {
@@ -40,5 +45,9 @@ public final class PacketHandler {
 
     public static void sendToTrackingChunk(ServerLevel level, BlockPos pos, CustomPacketPayload packet) {
         PacketDistributor.sendToPlayersTrackingChunk(level, level.getChunkAt(pos).getPos(), packet);
+    }
+
+    public static void sendToNearbyPlayers(ServerLevel level, BlockPos pos, int radius, CustomPacketPayload packet) {
+        PacketDistributor.sendToPlayersNear(level, null, pos.getX(), pos.getY(), pos.getZ(), radius, packet);
     }
 }

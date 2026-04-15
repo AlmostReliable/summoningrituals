@@ -15,7 +15,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryData) implements CustomPacketPayload {
 
     static final Type<AltarInventorySyncPacket> TYPE = new Type<>(SummoningRituals.getRL("altar_inventory_sync"));
-
     static final StreamCodec<FriendlyByteBuf, AltarInventorySyncPacket> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         AltarInventorySyncPacket::altarPos,
@@ -29,7 +28,7 @@ public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryD
         return TYPE;
     }
 
-    public static void handle(AltarInventorySyncPacket packet, IPayloadContext ignoredCtx) {
+    static void handle(AltarInventorySyncPacket packet, IPayloadContext ignoredCtx) {
         var level = Minecraft.getInstance().level;
         if (level == null) return;
 

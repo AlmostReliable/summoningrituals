@@ -2,8 +2,11 @@ package com.almostreliable.summoningrituals.recipe.condition.pattern;
 
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.data.SummoningLang;
+import com.almostreliable.summoningrituals.network.HighlightPositionsPacket;
+import com.almostreliable.summoningrituals.network.PacketHandler;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -60,14 +63,14 @@ public final class BlockPatternCondition {
         this.tooltip = tooltip;
     }
 
-    // TODO: highlight the block that fails
-    public boolean test(LootContext lootContext) {
+    public boolean test(LootContext lootContext, boolean drawHighlights) {
         var level = lootContext.getLevel();
         var altarPos = BlockPos.containing(lootContext.getParam(LootContextParams.ORIGIN));
         var altarState = lootContext.getParam(LootContextParams.BLOCK_STATE);
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         var rotation = getRotation(altarFacing);
 
+        var failedPositions = new ArrayList<BlockPos>();
         for (var entry : entries) {
             var blockPos = altarPos.offset(entry.offset.rotate(rotation));
             var blockState = level.getBlockState(blockPos);
@@ -83,8 +86,19 @@ public final class BlockPatternCondition {
             }
 
             if (!entry.predicate.test(blockState)) {
-                return false;
+                failedPositions.add(blockPos);
             }
+        }
+
+        if (!failedPositions.isEmpty()) {
+            if (!drawHighlights) return false;
+            PacketHandler.sendToNearbyPlayers(
+                level,
+                altarPos,
+                BlockPatternConditionBuilder.MAX_PATTERN_RADIUS,
+                new HighlightPositionsPacket(failedPositions)
+            );
+            return false;
         }
 
         return true;

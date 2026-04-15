@@ -11,11 +11,7 @@ import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPattern
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -32,9 +28,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +36,6 @@ import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 
 public class PatternPreviewRenderer {
 
@@ -116,12 +109,7 @@ public class PatternPreviewRenderer {
                 continue;
             }
 
-            WrongBlockHighlightRenderer.renderWrongBlockOutline(
-                poseStack,
-                camera,
-                mc.renderBuffers().bufferSource(),
-                worldPos
-            );
+            BlockHighlightRenderer.renderOutline(worldPos);
 
             var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.getPosition());
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
@@ -250,36 +238,4 @@ public class PatternPreviewRenderer {
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
     private record Task(long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries) {}
-
-    private static final class WrongBlockHighlightRenderer {
-
-        private static final RenderType XRAY_LINES = RenderType.create(
-            "summoningrituals_xray_lines",
-            DefaultVertexFormat.POSITION_COLOR_NORMAL,
-            VertexFormat.Mode.LINES,
-            1536,
-            false,
-            false,
-            RenderType.CompositeState.builder()
-                .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
-                .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.of(2.0)))
-                .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                .setCullState(RenderStateShard.NO_CULL)
-                .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                .createCompositeState(false)
-        );
-
-        private static void renderWrongBlockOutline(PoseStack poseStack, Camera camera, MultiBufferSource buffer, BlockPos pos) {
-            var cam = camera.getPosition();
-            var box = new AABB(pos).inflate(0.002); // avoid z-fighting
-
-            poseStack.pushPose();
-            poseStack.translate(-cam.x, -cam.y, -cam.z);
-            {
-                LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(XRAY_LINES), box, 1, 0, 0, 1);
-            }
-            poseStack.popPose();
-        }
-    }
 }
