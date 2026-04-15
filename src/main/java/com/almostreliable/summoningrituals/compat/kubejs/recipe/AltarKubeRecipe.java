@@ -9,8 +9,10 @@ import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
 import net.minecraft.network.chat.Component;
 
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
+import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.rhino.Context;
 
 import java.util.ArrayList;
@@ -79,6 +81,10 @@ public class AltarKubeRecipe extends KubeRecipe {
     }
 
     public AltarKubeRecipe optBlockPattern(Context ctx, Function<BlockPatternConditionBuilder, BlockPatternConditionBuilder> blockPattern) {
+        if (getValue(AltarRecipeSchema.BLOCK_PATTERN) == null) {
+            throw new KubeRuntimeException("cannot set optional block pattern without a main block pattern").source(SourceLine.of(ctx));
+        }
+
         var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(ctx);
         setValue(AltarRecipeSchema.OPT_BLOCK_PATTERN, pattern);
         return this;
