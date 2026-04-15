@@ -99,7 +99,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (currentRecipeInfo == null) return;
 
         if (recipeProgress >= recipeTime) {
-            var recipe = currentRecipeInfo.recipe();
+            var recipe = currentRecipeInfo.getRecipe();
             if (inventory.consumeRecipeInputs(level, recipe)) {
                 recipe.invokeCommands(level, invokingPlayer);
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::itemOutputs);
@@ -196,14 +196,14 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return recipeMatch;
         }
 
-        for (var entityInput : recipeInfo.inputEntities()) {
+        for (var entityInput : recipeInfo.getInputEntities()) {
             entityInput.addTag(SACRIFICE_TAG);
             entityInput.kill();
         }
 
         currentRecipeInfo = recipeInfo;
         invokingPlayer = player;
-        recipeTime = recipeInfo.recipe().ticks();
+        recipeTime = recipeInfo.getRecipe().ticks();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         syncAltarRecipeStart(level);
 
@@ -251,13 +251,13 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (matchingRecipes.isEmpty()) return RecipeMatch.MISSING_SACRIFICES;
 
         matchingRecipes.removeIf(recipeInfo -> {
-            var recipe = recipeInfo.recipe();
+            var recipe = recipeInfo.getRecipe();
             return !recipe.conditions().stream().allMatch(condition -> condition.test(lootContext));
         });
         if (matchingRecipes.isEmpty()) return RecipeMatch.FAILED_CONDITIONS;
 
         matchingRecipes.removeIf(recipeInfo -> {
-            var recipe = recipeInfo.recipe();
+            var recipe = recipeInfo.getRecipe();
             var blockPattern = recipe.blockPattern();
             var recipes = matchingRecipes.size();
             return blockPattern.filter(p -> !p.test(lootContext, recipes == 1)).isPresent();

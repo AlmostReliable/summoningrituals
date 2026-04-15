@@ -14,14 +14,14 @@ import java.util.Collection;
 import java.util.List;
 
 public record RecipeInfo(
-    ResourceLocation recipeId, AltarRecipe recipe, Collection<Entity> inputEntities, boolean blockPatternExtensionMatched,
-    Collection<ItemEntity> outputItems, Collection<Entity> outputEntities
+    ResourceLocation getRecipeId, AltarRecipe getRecipe, Collection<Entity> getInputEntities, boolean isBlockPatternExtensionMatched,
+    Collection<ItemEntity> getOutputItems, Collection<Entity> getOutputEntities
 ) {
 
     // only used to sync recipe info to custom renderers
     public static final StreamCodec<RegistryFriendlyByteBuf, RecipeInfo> STREAM_CODEC = StreamCodec.composite(
-        ResourceLocation.STREAM_CODEC, RecipeInfo::recipeId,
-        AltarRecipeSerializer.STREAM_CODEC, RecipeInfo::recipe,
+        ResourceLocation.STREAM_CODEC, RecipeInfo::getRecipeId,
+        AltarRecipeSerializer.STREAM_CODEC, RecipeInfo::getRecipe,
         (recipeId, recipe) -> new RecipeInfo(recipeId, recipe, List.of(), false, List.of(), List.of())
     );
 
@@ -31,9 +31,9 @@ public record RecipeInfo(
 
     public static RecipeInfo blockPatternInfo(RecipeInfo inputInfo, boolean blockPatternExtensionMatched) {
         return new RecipeInfo(
-            inputInfo.recipeId,
-            inputInfo.recipe,
-            inputInfo.inputEntities,
+            inputInfo.getRecipeId,
+            inputInfo.getRecipe,
+            inputInfo.getInputEntities,
             blockPatternExtensionMatched,
             List.of(),
             List.of()
@@ -43,18 +43,18 @@ public record RecipeInfo(
     public static RecipeInfo outputInfo(
         RecipeInfo blockPatternInfo, Collection<ItemEntity> outputItems, Collection<Entity> outputEntities) {
         return new RecipeInfo(
-            blockPatternInfo.recipeId, blockPatternInfo.recipe, blockPatternInfo.inputEntities,
-            blockPatternInfo.blockPatternExtensionMatched, outputItems, outputEntities
+            blockPatternInfo.getRecipeId, blockPatternInfo.getRecipe, blockPatternInfo.getInputEntities,
+            blockPatternInfo.isBlockPatternExtensionMatched, outputItems, outputEntities
         );
     }
 
     @Override
     public int hashCode() {
-        return recipeId.hashCode();
+        return getRecipeId.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof RecipeInfo recipeInfo && recipeId.equals(recipeInfo.recipeId);
+        return obj instanceof RecipeInfo recipeInfo && getRecipeId.equals(recipeInfo.getRecipeId);
     }
 }
