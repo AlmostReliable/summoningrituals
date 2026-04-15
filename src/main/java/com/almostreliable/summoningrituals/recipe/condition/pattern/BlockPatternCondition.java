@@ -18,6 +18,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -68,6 +69,22 @@ public final class BlockPatternCondition {
         var level = lootContext.getLevel();
         var altarPos = BlockPos.containing(lootContext.getParam(LootContextParams.ORIGIN));
         var altarState = lootContext.getParam(LootContextParams.BLOCK_STATE);
+        var failedPositions = test(level, altarPos, altarState);
+
+        if (!failedPositions.isEmpty() && drawHighlights) {
+            PacketHandler.sendToNearbyPlayers(
+                level,
+                altarPos,
+                BlockPatternConditionBuilder.MAX_PATTERN_RADIUS,
+                new HighlightPositionsPacket(failedPositions)
+            );
+            return false;
+        }
+
+        return failedPositions.isEmpty();
+    }
+
+    public List<BlockPos> test(Level level, BlockPos altarPos, BlockState altarState) {
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         var rotation = getRotation(altarFacing);
 
@@ -91,18 +108,7 @@ public final class BlockPatternCondition {
             }
         }
 
-        if (!failedPositions.isEmpty()) {
-            if (!drawHighlights) return false;
-            PacketHandler.sendToNearbyPlayers(
-                level,
-                altarPos,
-                BlockPatternConditionBuilder.MAX_PATTERN_RADIUS,
-                new HighlightPositionsPacket(failedPositions)
-            );
-            return false;
-        }
-
-        return true;
+        return failedPositions;
     }
 
     private List<PatternEntry> getEntries() {

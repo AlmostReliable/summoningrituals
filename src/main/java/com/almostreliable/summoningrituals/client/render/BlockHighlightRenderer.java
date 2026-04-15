@@ -43,11 +43,11 @@ public final class BlockHighlightRenderer {
 
     private BlockHighlightRenderer() {}
 
-    public static void scheduleTask(long gameTime, Iterable<BlockPos> positions) {
+    public static void highlightPositions(long gameTime, Iterable<BlockPos> positions) {
         INSTANCE.tasks.add(new Task(gameTime, HIGHLIGHT_DURATION, positions));
     }
 
-    public static void renderOutline(BlockPos pos) {
+    public static void highlightPositionOnce(BlockPos pos) {
         INSTANCE.tasks.add(new Task(0, 0, List.of(pos)));
     }
 

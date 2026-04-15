@@ -32,10 +32,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class BlockPatternRenderer {
 
@@ -96,20 +98,34 @@ public class BlockPatternRenderer {
         assert mc.level != null;
         assert task != null;
 
-        var correctBlocks = 0;
+        var checkBlockState = Config.CLIENT.previewBlockStateAware.getAsBoolean();
+        //noinspection ComplexTypesVar
+        List<BlockPos> invalidBlocks = new ArrayList<>();
+        if (checkBlockState) {
+            invalidBlocks = task.blockPredicate.get();
+        }
 
+        var correctBlocks = 0;
         for (var entry : task.patternEntries.entrySet()) {
             var blockStates = entry.getValue();
             if (blockStates.isEmpty()) continue;
 
             var worldPos = task.altarPos.offset(entry.getKey());
             var blockState = mc.level.getBlockState(worldPos);
-            if (!isWrongBlock(blockState, blockStates)) {
-                correctBlocks++;
-                continue;
+
+            if (checkBlockState) {
+                if (!invalidBlocks.contains(worldPos)) {
+                    correctBlocks++;
+                    continue;
+                }
+            } else {
+                if (!isWrongBlock(blockState, blockStates)) {
+                    correctBlocks++;
+                    continue;
+                }
             }
 
-            BlockHighlightRenderer.renderOutline(worldPos);
+            BlockHighlightRenderer.highlightPositionOnce(worldPos);
 
             var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.getPosition());
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
@@ -187,7 +203,7 @@ public class BlockPatternRenderer {
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static void scheduleTask(BlockPatternCondition blockPatternCheck) {
+    public static void scheduleTask(BlockPatternCondition blockPattern) {
         var mc = Minecraft.getInstance();
         var player = mc.player;
         var level = mc.level;
@@ -214,8 +230,11 @@ public class BlockPatternRenderer {
             return;
         }
 
-        var altarFacing = altarEntry.state.getValue(AltarBlock.FACING);
-        INSTANCE.task = new Task(level.getGameTime(), level, altarEntry.pos, blockPatternCheck.getPreviewEntries(altarFacing));
+        var altarPos = altarEntry.pos;
+        var altarState = altarEntry.state;
+        var altarFacing = altarState.getValue(AltarBlock.FACING);
+        Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
+        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getPreviewEntries(altarFacing), blockPredicate);
     }
 
     public static void clear() {
@@ -227,11 +246,7 @@ public class BlockPatternRenderer {
         if (blockState.isAir()) return true;
 
         for (var expectedState : validBlockStates) {
-            if (Config.CLIENT.previewBlockStateAware.getAsBoolean()) {
-                if (expectedState == blockState) return false;
-            } else {
-                if (blockState.is(expectedState.getBlock())) return false;
-            }
+            if (blockState.is(expectedState.getBlock())) return false;
         }
 
         return true;
@@ -239,5 +254,8 @@ public class BlockPatternRenderer {
 
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
-    private record Task(long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries) {}
+    private record Task(
+        long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,
+        Supplier<List<BlockPos>> blockPredicate
+    ) {}
 }

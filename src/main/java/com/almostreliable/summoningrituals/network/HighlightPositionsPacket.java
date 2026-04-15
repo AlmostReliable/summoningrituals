@@ -31,6 +31,6 @@ public record HighlightPositionsPacket(List<BlockPos> positions) implements Cust
         if (level == null) return;
 
         var gameTime = level.getGameTime();
-        BlockHighlightRenderer.scheduleTask(gameTime, packet.positions);
+        BlockHighlightRenderer.highlightPositions(gameTime, packet.positions);
     }
 }
