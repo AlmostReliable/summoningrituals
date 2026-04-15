@@ -68,11 +68,11 @@ public class BlockPatternRenderer {
         }
 
         var age = level.getGameTime() - task.createdAt;
-        var ticksPerBlock = task.patternEntries.size() * Config.CLIENT.patternPreviewTicksPerBlock.getAsInt();
+        var ticksPerBlock = task.patternEntries.size() * Config.CLIENT.previewTicksPerBlock.getAsInt();
         var maxAge = Mth.clamp(
             ticksPerBlock,
-            Config.CLIENT.patternPreviewTicksMin.getAsInt(),
-            Config.CLIENT.patternPreviewTicksMax.getAsInt()
+            Config.CLIENT.previewTicksMin.getAsInt(),
+            Config.CLIENT.previewTicksMax.getAsInt()
         );
         if (age >= maxAge) {
             clear();
@@ -197,7 +197,7 @@ public class BlockPatternRenderer {
         player.closeContainer();
 
         var playerPos = player.position();
-        var searchRadius = Config.CLIENT.patternPreviewSearchRadius.getAsInt();
+        var searchRadius = Config.CLIENT.altarSearchRadius.getAsInt();
         var searchArea = AABB.ofSize(playerPos, searchRadius, searchRadius, searchRadius);
         var altarSearchEntries = BlockPos.betweenClosedStream(searchArea)
             .map(pos -> new AltarSearchEntry(pos.immutable(), level.getBlockState(pos)))
@@ -227,8 +227,10 @@ public class BlockPatternRenderer {
         if (blockState.isAir()) return true;
 
         for (var expectedState : validBlockStates) {
-            if (blockState.is(expectedState.getBlock())) {
-                return false;
+            if (Config.CLIENT.previewBlockStateAware.getAsBoolean()) {
+                if (expectedState == blockState) return false;
+            } else {
+                if (blockState.is(expectedState.getBlock())) return false;
             }
         }
 

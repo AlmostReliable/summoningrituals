@@ -51,7 +51,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var level = altar.getLevel();
 
         if (player == null || level == null ||
-            !altar.getBlockPos().closerThan(player.blockPosition(), Config.CLIENT.renderDistance.getAsInt())) {
+            !altar.getBlockPos().closerThan(player.blockPosition(), Config.CLIENT.inventoryRenderDistance.getAsInt())) {
             return;
         }
 

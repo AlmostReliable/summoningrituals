@@ -45,30 +45,36 @@ public final class Config {
 
     public static final class ClientConfig {
 
-        public final ModConfigSpec.IntValue renderDistance;
+        public final ModConfigSpec.IntValue inventoryRenderDistance;
         public final ModConfigSpec.BooleanValue candleParticles;
-        public final ModConfigSpec.IntValue patternPreviewSearchRadius;
-        public final ModConfigSpec.IntValue patternPreviewTicksPerBlock;
-        public final ModConfigSpec.IntValue patternPreviewTicksMin;
-        public final ModConfigSpec.IntValue patternPreviewTicksMax;
+        public final ModConfigSpec.IntValue altarSearchRadius;
+        public final ModConfigSpec.IntValue previewTicksPerBlock;
+        public final ModConfigSpec.IntValue previewTicksMin;
+        public final ModConfigSpec.IntValue previewTicksMax;
+        public final ModConfigSpec.BooleanValue previewBlockStateAware;
 
         private ClientConfig(ModConfigSpec.Builder builder) {
             builder.push("general");
-            renderDistance = builder.comment("The maximum distance at which an Altar will render its inventory contents.")
-                .defineInRange("render_distance", 32, 1, 128);
+            inventoryRenderDistance = builder.comment("The maximum distance at which an Altar will render its inventory contents.")
+                .defineInRange("inventory_render_distance", 32, 1, 128);
             candleParticles = builder.comment("Whether to render the fire particles on candles on Altars.")
                 .define("candle_particles", true);
             builder.pop();
 
             builder.push("preview");
-            patternPreviewSearchRadius = builder.comment("The maximum distance to search for an Altar when previewing the block pattern.")
-                .defineInRange("pattern_preview_search_radius", 16, 1, 64);
-            patternPreviewTicksPerBlock = builder.comment("The number of ticks per block to display the block pattern preview for.")
-                .defineInRange("pattern_preview_ticks_per_block", 60, 1, 100);
-            patternPreviewTicksMin = builder.comment("The minimum number of ticks to preview the block pattern for.")
-                .defineInRange("pattern_preview_ticks_min", 200, 10, 1200);
-            patternPreviewTicksMax = builder.comment("The maximum number of ticks to preview the block pattern for.")
-                .defineInRange("pattern_preview_ticks_max", 1200, 10, 6000);
+            altarSearchRadius = builder.comment("The maximum distance to search for an Altar when previewing the block pattern.")
+                .defineInRange("altar_search_radius", 16, 1, 64);
+            previewTicksPerBlock = builder.comment("The number of ticks per block to display the block pattern preview for.")
+                .defineInRange("preview_ticks_per_block", 60, 1, 100);
+            previewTicksMin = builder.comment("The minimum number of ticks to preview the block pattern for.")
+                .defineInRange("preview_ticks_min", 200, 10, 1200);
+            previewTicksMax = builder.comment("The maximum number of ticks to preview the block pattern for.")
+                .defineInRange("preview_ticks_max", 1200, 10, 6000);
+            previewBlockStateAware = builder.comment(
+                    "Whether the preview should check for exact matches of block states rather than for the correct block only.",
+                    "The recipe starting logic will always check for the whole block state."
+                )
+                .define("preview_block_state_aware", false);
             builder.pop();
         }
     }
