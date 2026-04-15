@@ -44,7 +44,7 @@ public final class BlockPatternCondition {
     public static final Codec<BlockPatternCondition> CODEC = RecordCodecBuilder.create(i -> i.group(
         Codec.list(PatternEntry.CODEC).fieldOf(Constants.ENTRIES).forGetter(BlockPatternCondition::getEntries),
         ComponentSerialization.CODEC.optionalFieldOf(Constants.NAME).forGetter(BlockPatternCondition::getName),
-        ComponentSerialization.CODEC.listOf().fieldOf(Constants.TOOLTIP).forGetter(BlockPatternCondition::getTooltip)
+        ComponentSerialization.CODEC.listOf().optionalFieldOf(Constants.TOOLTIP, List.of()).forGetter(BlockPatternCondition::getTooltip)
     ).apply(i, BlockPatternCondition::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockPatternCondition> STREAM_CODEC = StreamCodec.composite(
         PatternEntry.STREAM_CODEC.apply(ByteBufCodecs.list()), BlockPatternCondition::getEntries,
