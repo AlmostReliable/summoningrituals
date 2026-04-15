@@ -1,20 +1,22 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei.widget;
 
 import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
-import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 
 import mezz.jei.api.gui.inputs.IJeiGuiEventListener;
 
+import java.util.Optional;
+
 public class JeiPatternClickListener implements IJeiGuiEventListener {
 
     private final RecipeViewerAltarLayout layout;
-    private final AltarRecipe recipe;
+    private final Optional<BlockPatternCondition> blockPattern;
 
-    public JeiPatternClickListener(RecipeViewerAltarLayout layout, AltarRecipe recipe) {
+    public JeiPatternClickListener(RecipeViewerAltarLayout layout, Optional<BlockPatternCondition> blockPattern) {
         this.layout = layout;
-        this.recipe = recipe;
+        this.blockPattern = blockPattern;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class JeiPatternClickListener implements IJeiGuiEventListener {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        layout.onPreviewButtonClicked(recipe);
+        layout.onPreviewButtonClicked(blockPattern);
         return true;
     }
 }

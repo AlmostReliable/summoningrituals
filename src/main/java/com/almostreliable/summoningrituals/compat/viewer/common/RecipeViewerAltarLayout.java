@@ -4,8 +4,11 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Optional;
 
 public class RecipeViewerAltarLayout {
 
@@ -25,8 +28,7 @@ public class RecipeViewerAltarLayout {
         return TEXTURE_HEIGHT;
     }
 
-    public void onPreviewButtonClicked(AltarRecipe recipe) {
-        var blockPattern = recipe.blockPattern();
+    public void onPreviewButtonClicked(Optional<BlockPatternCondition> blockPattern) {
         if (blockPattern.isEmpty()) return;
         BlockPatternRenderer.scheduleTask(blockPattern.get());
     }

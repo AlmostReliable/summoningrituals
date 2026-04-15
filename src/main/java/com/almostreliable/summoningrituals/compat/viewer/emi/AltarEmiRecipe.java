@@ -178,7 +178,23 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
         if (blockPattern.isPresent()) {
             var pattern = blockPattern.get();
             var widget = new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
-                .appendClickHandler(() -> onPreviewButtonClicked(recipe))
+                .appendClickHandler(() -> onPreviewButtonClicked(blockPattern))
+                .appendTooltip(pattern.getNameTooltip());
+
+            pattern.getTooltip().forEach(widget::appendTooltip);
+
+            widget
+                .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
+                .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
+
+            widgets.add(widget);
+        }
+
+        var optBlockPattern = recipe.optBlockPattern();
+        if (optBlockPattern.isPresent()) {
+            var pattern = optBlockPattern.get();
+            var widget = new StackWidget(EmiStack.of(Items.JIGSAW), 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
+                .appendClickHandler(() -> onPreviewButtonClicked(optBlockPattern))
                 .appendTooltip(pattern.getNameTooltip());
 
             pattern.getTooltip().forEach(widget::appendTooltip);

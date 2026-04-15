@@ -42,6 +42,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     private final IDrawable icon;
     private final IDrawable conditionIcon;
     private final IDrawable blockPatternIcon;
+    private final IDrawable optBlockPatternIcon;
     private final IDrawable commandsIcon;
 
     AltarJeiCategory(IGuiHelper guiHelper) {
@@ -51,6 +52,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
         blockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
+        optBlockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.JIGSAW.getDefaultInstance());
         commandsIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.COMMAND_BLOCK.getDefaultInstance());
     }
 
@@ -84,7 +86,12 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
         var blockPattern = recipe.blockPattern();
         if (blockPattern.isPresent()) {
-            blockPatternIcon.draw(guiGraphics, TEXTURE_WIDTH - SLOT_SIZE - 2, TEXTURE_HEIGHT - SLOT_SIZE - 2);
+            blockPatternIcon.draw(guiGraphics, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
+        }
+
+        var optBlockPattern = recipe.optBlockPattern();
+        if (optBlockPattern.isPresent()) {
+            optBlockPatternIcon.draw(guiGraphics, 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
 
         var recipeConditions = recipe.conditions();
@@ -113,6 +120,14 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             tooltip.add(pattern.getTooltipComponent());
         }
 
+        var optBlockPattern = recipe.optBlockPattern();
+        if (optBlockPattern.isPresent() && mouseInSlot(mouseX, mouseY, 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
+            var pattern = optBlockPattern.get();
+            tooltip.add(pattern.getNameTooltip());
+            tooltip.addAll(pattern.getTooltip());
+            tooltip.add(pattern.getTooltipComponent());
+        }
+
         var recipeConditions = recipe.conditions();
         if ((!recipeConditions.isEmpty() || blockPattern.isPresent()) && mouseInSlot(mouseX, mouseY, 2, 2)) {
             tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
@@ -127,7 +142,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
         var recipe = recipeHolder.value();
         if (recipe.blockPattern().isEmpty()) return;
-        builder.addGuiEventListener(new JeiPatternClickListener(this, recipe));
+        builder.addGuiEventListener(new JeiPatternClickListener(this, recipe.blockPattern()));
     }
 
     @Override
