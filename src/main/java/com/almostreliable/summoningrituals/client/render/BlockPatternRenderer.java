@@ -37,9 +37,9 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PatternPreviewRenderer {
+public class BlockPatternRenderer {
 
-    public static final PatternPreviewRenderer INSTANCE = new PatternPreviewRenderer();
+    public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
     private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.client.render.PatternPreviewRenderer;
+import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
@@ -28,7 +28,7 @@ public class RecipeViewerAltarLayout {
     public void onPreviewButtonClicked(AltarRecipe recipe) {
         var blockPattern = recipe.blockPattern();
         if (blockPattern.isEmpty()) return;
-        PatternPreviewRenderer.scheduleTask(blockPattern.get());
+        BlockPatternRenderer.scheduleTask(blockPattern.get());
     }
 
     protected void createInitiatorSlot(SlotConsumer slotConsumer) {

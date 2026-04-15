@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.client.render.AltarRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
-import com.almostreliable.summoningrituals.client.render.PatternPreviewRenderer;
+import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.event.RitualRendererRegistryEvent;
 import com.almostreliable.summoningrituals.core.Registration;
@@ -44,12 +44,12 @@ public final class SummoningRitualsClient {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
         var poseStack = event.getPoseStack();
         var camera = event.getCamera();
-        PatternPreviewRenderer.INSTANCE.render(poseStack, camera);
+        BlockPatternRenderer.INSTANCE.render(poseStack, camera);
         BlockHighlightRenderer.INSTANCE.render(poseStack, camera);
     }
 
     private static void onLevelUnload(LevelEvent.Unload event) {
-        PatternPreviewRenderer.clear();
+        BlockPatternRenderer.clear();
         BlockHighlightRenderer.clear();
     }
 }
