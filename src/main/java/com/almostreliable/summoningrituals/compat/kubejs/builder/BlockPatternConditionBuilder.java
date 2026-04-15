@@ -51,8 +51,8 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, String queryId) {
-        return addBlockEntry(ctx, offset, block, null, queryId);
+    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, String query) {
+        return addBlockEntry(ctx, offset, block, null, query);
     }
 
     @ReturnsSelf
@@ -61,8 +61,8 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, JsonObject blockState, String queryId) {
-        return addBlockEntry(ctx, offset, block, blockState, queryId);
+    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, JsonObject blockState, String query) {
+        return addBlockEntry(ctx, offset, block, blockState, query);
     }
 
     @ReturnsSelf
@@ -71,8 +71,8 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, String queryId) {
-        return addTagEntry(ctx, offset, blockTag, null, queryId);
+    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, String query) {
+        return addTagEntry(ctx, offset, blockTag, null, query);
     }
 
     @ReturnsSelf
@@ -81,27 +81,27 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, JsonObject blockState, String queryId) {
-        return addTagEntry(ctx, offset, blockTag, blockState, queryId);
+    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, JsonObject blockState, String query) {
+        return addTagEntry(ctx, offset, blockTag, blockState, query);
     }
 
     private BlockPatternConditionBuilder addBlockEntry(
-        Context ctx, BlockPos offset, Block block, @Nullable JsonObject blockState, @Nullable String queryId
+        Context ctx, BlockPos offset, Block block, @Nullable JsonObject blockState, @Nullable String query
     ) {
         var predicateBuilder = ResolvableBlockPredicate.builder(block);
-        return addEntry(ctx, offset, predicateBuilder, blockState, queryId);
+        return addEntry(ctx, offset, predicateBuilder, blockState, query);
     }
 
     private BlockPatternConditionBuilder addTagEntry(
-        Context ctx, BlockPos offset, TagKey<Block> blockTag, @Nullable JsonObject blockState, @Nullable String queryId
+        Context ctx, BlockPos offset, TagKey<Block> blockTag, @Nullable JsonObject blockState, @Nullable String query
     ) {
         var predicateBuilder = ResolvableBlockPredicate.builder(blockTag);
-        return addEntry(ctx, offset, predicateBuilder, blockState, queryId);
+        return addEntry(ctx, offset, predicateBuilder, blockState, query);
     }
 
     private BlockPatternConditionBuilder addEntry(
         Context ctx, BlockPos offset, ResolvableBlockPredicate.Builder predicateBuilder,
-        @Nullable JsonObject blockState, @Nullable String queryId
+        @Nullable JsonObject blockState, @Nullable String query
     ) {
         if (Math.abs(offset.getX()) > MAX_PATTERN_RADIUS || Math.abs(offset.getY()) > MAX_PATTERN_RADIUS ||
             Math.abs(offset.getZ()) > MAX_PATTERN_RADIUS) {
@@ -116,7 +116,7 @@ public class BlockPatternConditionBuilder {
             }
         }
 
-        var patternEntry = new PatternEntry(offset, predicateBuilder.build(), Optional.ofNullable(queryId));
+        var patternEntry = new PatternEntry(offset, predicateBuilder.build(), Optional.ofNullable(query));
         if (entries.contains(patternEntry)) {
             throwException(ctx, "position '" + offset + "' already defined in pattern");
         }
