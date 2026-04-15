@@ -31,7 +31,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         RecipeInputs.MAP_CODEC.forGetter(AltarRecipe::inputs),
         LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf(Constants.CONDITIONS, List.of()).forGetter(AltarRecipe::conditions),
         BlockPatternCondition.CODEC.optionalFieldOf(Constants.BLOCK_PATTERN).forGetter(AltarRecipe::blockPattern),
-        BlockPatternCondition.CODEC.optionalFieldOf(Constants.OPT_BLOCK_PATTERN).forGetter(AltarRecipe::optBlockPattern),
+        BlockPatternCondition.CODEC.optionalFieldOf(Constants.BLOCK_PATTERN_EXTENSION).forGetter(AltarRecipe::blockPatternExtension),
         BlockPos.CODEC.optionalFieldOf(Constants.ZONE, AltarRecipe.DEFAULT_ZONE).forGetter(AltarRecipe::zone),
         Codec.INT.optionalFieldOf(Constants.TICKS, AltarRecipe.DEFAULT_TICKS).forGetter(AltarRecipe::ticks)
     ).apply(i, AltarRecipe::new)).validate(AltarRecipeSerializer::validateRecipe);
@@ -41,7 +41,7 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         RecipeInputs.STREAM_CODEC, AltarRecipe::inputs,
         ConditionStreamCodecs.CONDITION_STREAM_CODEC.apply(ByteBufCodecs.list()), AltarRecipe::conditions,
         ByteBufCodecs.optional(BlockPatternCondition.STREAM_CODEC), AltarRecipe::blockPattern,
-        ByteBufCodecs.optional(BlockPatternCondition.STREAM_CODEC), AltarRecipe::optBlockPattern,
+        ByteBufCodecs.optional(BlockPatternCondition.STREAM_CODEC), AltarRecipe::blockPatternExtension,
         BlockPos.STREAM_CODEC, AltarRecipe::zone,
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new

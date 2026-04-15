@@ -80,13 +80,14 @@ public class AltarKubeRecipe extends KubeRecipe {
         return this;
     }
 
-    public AltarKubeRecipe optBlockPattern(Context ctx, Function<BlockPatternConditionBuilder, BlockPatternConditionBuilder> blockPattern) {
+    public AltarKubeRecipe blockPatternExtension(
+        Context ctx, Function<BlockPatternConditionBuilder, BlockPatternConditionBuilder> blockPattern) {
         if (getValue(AltarRecipeSchema.BLOCK_PATTERN) == null) {
-            throw new KubeRuntimeException("cannot set optional block pattern without a main block pattern").source(SourceLine.of(ctx));
+            throw new KubeRuntimeException("cannot set block pattern extension without a main block pattern").source(SourceLine.of(ctx));
         }
 
         var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(ctx);
-        setValue(AltarRecipeSchema.OPT_BLOCK_PATTERN, pattern);
+        setValue(AltarRecipeSchema.BLOCK_PATTERN_EXTENSION, pattern);
         return this;
     }
 

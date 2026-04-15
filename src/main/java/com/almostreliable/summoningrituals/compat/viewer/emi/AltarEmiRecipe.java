@@ -8,12 +8,15 @@ import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlo
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
+import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
+import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -27,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe {
 
@@ -175,36 +179,14 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
         }
 
         var blockPattern = recipe.blockPattern();
-        if (blockPattern.isPresent()) {
-            var pattern = blockPattern.get();
-            var widget = new StackWidget(EmiStack.of(Items.STRUCTURE_BLOCK), 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
-                .appendClickHandler(() -> onPreviewButtonClicked(blockPattern))
-                .appendTooltip(pattern.getNameTooltip());
-
-            pattern.getTooltip().forEach(widget::appendTooltip);
-
-            widget
-                .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
-                .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
-
-            widgets.add(widget);
-        }
-
-        var optBlockPattern = recipe.optBlockPattern();
-        if (optBlockPattern.isPresent()) {
-            var pattern = optBlockPattern.get();
-            var widget = new StackWidget(EmiStack.of(Items.JIGSAW), 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
-                .appendClickHandler(() -> onPreviewButtonClicked(optBlockPattern))
-                .appendTooltip(pattern.getNameTooltip());
-
-            pattern.getTooltip().forEach(widget::appendTooltip);
-
-            widget
-                .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
-                .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
-
-            widgets.add(widget);
-        }
+        addBlockPatternWidget(widgets, blockPattern, 2, Items.STRUCTURE_BLOCK, SummoningLang.BLOCK_PATTERN);
+        addBlockPatternWidget(
+            widgets,
+            recipe.blockPatternExtension(),
+            2 + SLOT_SIZE,
+            Items.JIGSAW,
+            SummoningLang.BLOCK_PATTERN_EXTENSION
+        );
 
         var recipeConditions = recipe.conditions();
         if (!recipeConditions.isEmpty() || blockPattern.isPresent()) {
@@ -223,5 +205,24 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
                 }
             }
         }
+    }
+
+    private void addBlockPatternWidget(
+        WidgetHolder widgets, Optional<BlockPatternCondition> blockPattern, int x, Item icon, LangEntry nameTooltip) {
+        if (blockPattern.isEmpty()) return;
+
+        var widget = new StackWidget(EmiStack.of(icon), x, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
+            .appendClickHandler(() -> onPreviewButtonClicked(blockPattern));
+
+        var pattern = blockPattern.get();
+        var patternTooltip = nameTooltip.get().withStyle(ChatFormatting.GOLD);
+        widget.appendTooltip(pattern.appendNameTooltip(patternTooltip));
+        pattern.getTooltip().forEach(widget::appendTooltip);
+
+        widget
+            .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
+            .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
+
+        widgets.add(widget);
     }
 }

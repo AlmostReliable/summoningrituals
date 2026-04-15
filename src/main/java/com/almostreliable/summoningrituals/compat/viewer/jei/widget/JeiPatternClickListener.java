@@ -13,16 +13,18 @@ public class JeiPatternClickListener implements IJeiGuiEventListener {
 
     private final RecipeViewerAltarLayout layout;
     private final Optional<BlockPatternCondition> blockPattern;
+    private final int x;
 
-    public JeiPatternClickListener(RecipeViewerAltarLayout layout, Optional<BlockPatternCondition> blockPattern) {
+    public JeiPatternClickListener(RecipeViewerAltarLayout layout, Optional<BlockPatternCondition> blockPattern, int x) {
         this.layout = layout;
         this.blockPattern = blockPattern;
+        this.x = x;
     }
 
     @Override
     public ScreenRectangle getArea() {
         return new ScreenRectangle(
-            2,
+            x,
             RecipeViewerAltarLayout.TEXTURE_HEIGHT - RecipeViewerAltarLayout.SLOT_SIZE * 2 - 5,
             RecipeViewerAltarLayout.SLOT_SIZE,
             RecipeViewerAltarLayout.SLOT_SIZE

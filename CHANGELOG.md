@@ -11,6 +11,7 @@ Note: This release reworks the block pattern condition. It's no longer part of t
 - added block pattern preview cancellation when player is too far away from the Altar
 - added a dedicated failure message if the block pattern is not correct when starting the ritual
 - added highlights for wrong blocks when trying to start a ritual
+- added option to add an optional block pattern extension that can be used to modify logic on additional blocks not required for the ritual to work
 - add config option to make block pattern preview checks block state aware
 - improved type info for KubeJS builder methods returning the same instance
 - moved recipe inputs and outputs to container classes for better maintainability

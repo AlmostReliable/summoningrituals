@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
@@ -153,10 +154,9 @@ public final class BlockPatternCondition {
         return patternTooltip;
     }
 
-    public Component getNameTooltip() {
-        var patternTooltip = SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD);
-        name.ifPresent(component -> patternTooltip.append(": ").withStyle(ChatFormatting.GOLD).append(component));
-        return patternTooltip;
+    public Component appendNameTooltip(MutableComponent component) {
+        name.ifPresent(n -> component.append(": ").withStyle(ChatFormatting.GOLD).append(n));
+        return component;
     }
 
     public PatternPreviewTooltipComponent.Data getTooltipComponent() {

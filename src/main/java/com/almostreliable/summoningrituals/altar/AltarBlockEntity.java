@@ -239,9 +239,9 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
             var recipeInfo = RecipeInfo.inputInfo(recipeHolder, entityInputs);
 
-            var optBlockPattern = recipe.optBlockPattern();
-            if (optBlockPattern.isPresent()) {
-                var blockPattern = optBlockPattern.get();
+            var blockPatternExtension = recipe.blockPatternExtension();
+            if (blockPatternExtension.isPresent()) {
+                var blockPattern = blockPatternExtension.get();
                 var blockPatternMatch = blockPattern.test(lootContext, false);
                 recipeInfo = RecipeInfo.blockPatternInfo(recipeInfo, blockPatternMatch);
             }

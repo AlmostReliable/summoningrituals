@@ -7,6 +7,7 @@ public interface Constants {
     String ALTAR = "altar";
     String BLOCKS = "blocks";
     String BLOCK_PATTERN = "block_pattern";
+    String BLOCK_PATTERN_EXTENSION = "block_pattern_extension";
     String BLOCK_TAG_BLOCK_STATE = "block_tag_block_state";
     String COMMANDS = "commands";
     String CONDITIONS = "conditions";
@@ -29,7 +30,6 @@ public interface Constants {
     String MOON_PHASE = "moon_phase";
     String NAME = "name";
     String OFFSET = "offset";
-    String OPT_BLOCK_PATTERN = "opt_block_pattern";
     String PROPERTIES = "properties";
     String RECIPE_VIEWER = "recipe_viewer";
     String REQUIRES_PLAYER = "requires_player";

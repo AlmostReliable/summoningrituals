@@ -97,8 +97,8 @@ public interface AltarRecipeSchema {
         .noFunctions()
         .defaultOptional()
         .exclude();
-    RecipeKey<BlockPatternCondition> OPT_BLOCK_PATTERN = BlockPatternConditionComponent.TYPE
-        .key(Constants.OPT_BLOCK_PATTERN, ComponentRole.OTHER)
+    RecipeKey<BlockPatternCondition> BLOCK_PATTERN_EXTENSION = BlockPatternConditionComponent.TYPE
+        .key(Constants.BLOCK_PATTERN_EXTENSION, ComponentRole.OTHER)
         .noFunctions()
         .defaultOptional()
         .exclude();
@@ -131,7 +131,7 @@ public interface AltarRecipeSchema {
         ENTITY_INPUTS,
         FAKE_ENTITY_INPUTS,
         BLOCK_PATTERN,
-        OPT_BLOCK_PATTERN,
+        BLOCK_PATTERN_EXTENSION,
         ZONE,
         TICKS,
         CONDITIONS

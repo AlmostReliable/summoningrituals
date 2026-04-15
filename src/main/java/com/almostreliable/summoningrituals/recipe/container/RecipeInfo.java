@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 public record RecipeInfo(
-    ResourceLocation recipeId, AltarRecipe recipe, Collection<Entity> inputEntities, boolean optBlockPatternMatch,
+    ResourceLocation recipeId, AltarRecipe recipe, Collection<Entity> inputEntities, boolean blockPatternExtensionMatched,
     Collection<ItemEntity> outputItems, Collection<Entity> outputEntities
 ) {
 
@@ -29,12 +29,12 @@ public record RecipeInfo(
         return new RecipeInfo(recipe.id(), recipe.value(), inputEntities, false, List.of(), List.of());
     }
 
-    public static RecipeInfo blockPatternInfo(RecipeInfo inputInfo, boolean optBlockPatternMatch) {
+    public static RecipeInfo blockPatternInfo(RecipeInfo inputInfo, boolean blockPatternExtensionMatched) {
         return new RecipeInfo(
             inputInfo.recipeId,
             inputInfo.recipe,
             inputInfo.inputEntities,
-            optBlockPatternMatch,
+            blockPatternExtensionMatched,
             List.of(),
             List.of()
         );
@@ -44,7 +44,7 @@ public record RecipeInfo(
         RecipeInfo blockPatternInfo, Collection<ItemEntity> outputItems, Collection<Entity> outputEntities) {
         return new RecipeInfo(
             blockPatternInfo.recipeId, blockPatternInfo.recipe, blockPatternInfo.inputEntities,
-            blockPatternInfo.optBlockPatternMatch, outputItems, outputEntities
+            blockPatternInfo.blockPatternExtensionMatched, outputItems, outputEntities
         );
     }
 

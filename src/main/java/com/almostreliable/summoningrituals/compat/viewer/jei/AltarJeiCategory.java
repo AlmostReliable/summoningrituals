@@ -42,7 +42,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     private final IDrawable icon;
     private final IDrawable conditionIcon;
     private final IDrawable blockPatternIcon;
-    private final IDrawable optBlockPatternIcon;
+    private final IDrawable blockPatternExtensionIcon;
     private final IDrawable commandsIcon;
 
     AltarJeiCategory(IGuiHelper guiHelper) {
@@ -52,7 +52,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
         blockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
-        optBlockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.JIGSAW.getDefaultInstance());
+        blockPatternExtensionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.JIGSAW.getDefaultInstance());
         commandsIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.COMMAND_BLOCK.getDefaultInstance());
     }
 
@@ -89,9 +89,9 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             blockPatternIcon.draw(guiGraphics, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
 
-        var optBlockPattern = recipe.optBlockPattern();
-        if (optBlockPattern.isPresent()) {
-            optBlockPatternIcon.draw(guiGraphics, 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
+        var blockPatternExtension = recipe.blockPatternExtension();
+        if (blockPatternExtension.isPresent()) {
+            blockPatternExtensionIcon.draw(guiGraphics, 2 + SLOT_SIZE, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
 
         var recipeConditions = recipe.conditions();
@@ -115,16 +115,18 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         var blockPattern = recipe.blockPattern();
         if (blockPattern.isPresent() && mouseInSlot(mouseX, mouseY, 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
             var pattern = blockPattern.get();
-            tooltip.add(pattern.getNameTooltip());
+            tooltip.add(pattern.appendNameTooltip(SummoningLang.BLOCK_PATTERN.get().withStyle(ChatFormatting.GOLD)));
             tooltip.addAll(pattern.getTooltip());
+            tooltip.add(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY));
             tooltip.add(pattern.getTooltipComponent());
         }
 
-        var optBlockPattern = recipe.optBlockPattern();
-        if (optBlockPattern.isPresent() && mouseInSlot(mouseX, mouseY, 2 + SLOT_SIZE + 2, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
-            var pattern = optBlockPattern.get();
-            tooltip.add(pattern.getNameTooltip());
+        var blockPatternExtension = recipe.blockPatternExtension();
+        if (blockPatternExtension.isPresent() && mouseInSlot(mouseX, mouseY, 2 + SLOT_SIZE, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)) {
+            var pattern = blockPatternExtension.get();
+            tooltip.add(pattern.appendNameTooltip(SummoningLang.BLOCK_PATTERN_EXTENSION.get().withStyle(ChatFormatting.GOLD)));
             tooltip.addAll(pattern.getTooltip());
+            tooltip.add(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY));
             tooltip.add(pattern.getTooltipComponent());
         }
 
@@ -141,8 +143,12 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
         var recipe = recipeHolder.value();
-        if (recipe.blockPattern().isEmpty()) return;
-        builder.addGuiEventListener(new JeiPatternClickListener(this, recipe.blockPattern()));
+        if (recipe.blockPattern().isPresent()) {
+            builder.addGuiEventListener(new JeiPatternClickListener(this, recipe.blockPattern(), 2));
+        }
+        if (recipe.blockPatternExtension().isPresent()) {
+            builder.addGuiEventListener(new JeiPatternClickListener(this, recipe.blockPatternExtension(), 2 + SLOT_SIZE));
+        }
     }
 
     @Override

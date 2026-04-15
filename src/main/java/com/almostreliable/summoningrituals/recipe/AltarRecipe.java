@@ -41,7 +41,7 @@ import java.util.function.Function;
 // TODO: add system that prints exact failed condition in game chat
 public record AltarRecipe(
     Ingredient initiator, RecipeOutputs outputs, RecipeInputs inputs, List<LootItemCondition> conditions,
-    Optional<BlockPatternCondition> blockPattern, Optional<BlockPatternCondition> optBlockPattern,
+    Optional<BlockPatternCondition> blockPattern, Optional<BlockPatternCondition> blockPatternExtension,
     BlockPos zone, int ticks
 ) implements Recipe<RecipeInput> {
 
