@@ -51,17 +51,17 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, String query) {
-        return addBlockEntry(ctx, offset, block, null, query);
-    }
-
-    @ReturnsSelf
     public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, JsonObject blockState) {
         return addBlockEntry(ctx, offset, block, blockState, null);
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder block(Context ctx, BlockPos offset, Block block, JsonObject blockState, String query) {
+    public BlockPatternConditionBuilder queryableBlock(Context ctx, BlockPos offset, Block block, String query) {
+        return addBlockEntry(ctx, offset, block, null, query);
+    }
+
+    @ReturnsSelf
+    public BlockPatternConditionBuilder queryableBlock(Context ctx, BlockPos offset, Block block, JsonObject blockState, String query) {
         return addBlockEntry(ctx, offset, block, blockState, query);
     }
 
@@ -71,17 +71,19 @@ public class BlockPatternConditionBuilder {
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, String query) {
-        return addTagEntry(ctx, offset, blockTag, null, query);
-    }
-
-    @ReturnsSelf
     public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, JsonObject blockState) {
         return addTagEntry(ctx, offset, blockTag, blockState, null);
     }
 
     @ReturnsSelf
-    public BlockPatternConditionBuilder tag(Context ctx, BlockPos offset, TagKey<Block> blockTag, JsonObject blockState, String query) {
+    public BlockPatternConditionBuilder queryableTag(Context ctx, BlockPos offset, TagKey<Block> blockTag, String query) {
+        return addTagEntry(ctx, offset, blockTag, null, query);
+    }
+
+    @ReturnsSelf
+    public BlockPatternConditionBuilder queryableTag(
+        Context ctx, BlockPos offset, TagKey<Block> blockTag, JsonObject blockState, String query
+    ) {
         return addTagEntry(ctx, offset, blockTag, blockState, query);
     }
 
