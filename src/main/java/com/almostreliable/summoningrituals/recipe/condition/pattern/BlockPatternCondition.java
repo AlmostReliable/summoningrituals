@@ -42,12 +42,12 @@ import java.util.function.Predicate;
 public final class BlockPatternCondition {
 
     public static final Codec<BlockPatternCondition> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Codec.list(PatternEntry.CODEC).fieldOf(Constants.ENTRIES).forGetter(BlockPatternCondition::getEntries),
+        Codec.list(PatternEntry.CODEC).fieldOf(Constants.ENTRIES).forGetter(BlockPatternCondition::getRawEntries),
         ComponentSerialization.CODEC.optionalFieldOf(Constants.NAME).forGetter(BlockPatternCondition::getName),
         ComponentSerialization.CODEC.listOf().optionalFieldOf(Constants.TOOLTIP, List.of()).forGetter(BlockPatternCondition::getTooltip)
     ).apply(i, BlockPatternCondition::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockPatternCondition> STREAM_CODEC = StreamCodec.composite(
-        PatternEntry.STREAM_CODEC.apply(ByteBufCodecs.list()), BlockPatternCondition::getEntries,
+        PatternEntry.STREAM_CODEC.apply(ByteBufCodecs.list()), BlockPatternCondition::getRawEntries,
         ComponentSerialization.OPTIONAL_STREAM_CODEC, BlockPatternCondition::getName,
         ComponentSerialization.STREAM_CODEC.apply(ByteBufCodecs.list()), BlockPatternCondition::getTooltip,
         BlockPatternCondition::new
@@ -111,11 +111,6 @@ public final class BlockPatternCondition {
         return failedPositions;
     }
 
-    // exposed for KubeJS
-    public List<PatternEntry> getEntries() {
-        return entries;
-    }
-
     public Optional<Component> getName() {
         return name;
     }
@@ -124,11 +119,24 @@ public final class BlockPatternCondition {
         return tooltip;
     }
 
-    public Map<BlockPos, List<BlockState>> getPreviewEntries(Direction altarFacing) {
+    public List<PatternEntry> getRawEntries() {
+        return entries;
+    }
+
+    public Map<BlockPos, List<BlockState>> getTransformedEntries(Direction altarFacing) {
+        return getTransformedEntries(altarFacing, null);
+    }
+
+    public Collection<BlockPos> queryOffsets(Direction altarFacing, String query) {
+        return getTransformedEntries(altarFacing, query).keySet();
+    }
+
+    private Map<BlockPos, List<BlockState>> getTransformedEntries(Direction altarFacing, @Nullable String query) {
         var rotation = getRotation(altarFacing);
         var result = new HashMap<BlockPos, List<BlockState>>();
 
         for (var entry : entries) {
+            if (query != null && !entry.test(query)) continue;
             var offset = entry.offset.rotate(rotation);
             var blockStates = entry.predicate.getBlockStates();
 
@@ -186,10 +194,6 @@ public final class BlockPatternCondition {
 
         tooltipComponentCache = new PatternPreviewTooltipComponent.Data(stacks);
         return tooltipComponentCache;
-    }
-
-    public Collection<PatternEntry> queryEntries(String query) {
-        return entries.stream().filter(e -> e.test(query)).toList();
     }
 
     private Rotation getRotation(Direction altarFacing) {
