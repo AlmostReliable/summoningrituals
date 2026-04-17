@@ -234,7 +234,7 @@ public class BlockPatternRenderer {
         var altarState = altarEntry.state;
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
-        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getPreviewEntries(altarFacing), blockPredicate);
+        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getTransformedEntries(altarFacing), blockPredicate);
     }
 
     public static void clear() {

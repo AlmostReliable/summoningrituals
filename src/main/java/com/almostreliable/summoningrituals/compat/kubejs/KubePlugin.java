@@ -35,10 +35,10 @@ public class KubePlugin implements KubeJSPlugin {
 
     @Override
     public void init() {
-        AltarBlockEntity.SUMMONING_START.register((level, pos, recipeInfo, player) ->
-            KubeEvents.SUMMONING_START.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
-        AltarBlockEntity.SUMMONING_COMPLETE.register((level, pos, recipeInfo, player) ->
-            KubeEvents.SUMMONING_COMPLETE.post(new SummoningKubeEvent(level, pos, recipeInfo, player)).interruptFalse());
+        AltarBlockEntity.SUMMONING_START.register((altar, recipeInfo, player) ->
+            KubeEvents.SUMMONING_START.post(new SummoningKubeEvent(altar, recipeInfo, player)).interruptFalse());
+        AltarBlockEntity.SUMMONING_COMPLETE.register((altar, recipeInfo, player) ->
+            KubeEvents.SUMMONING_COMPLETE.post(new SummoningKubeEvent(altar, recipeInfo, player)).interruptFalse());
     }
 
     @Override

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added Altar block entity property to summoning KubeJS events
 - fixed functions with query strings in block pattern builders not being callable
 - changed function names of query string functions to be prefixed with `queryable`
 

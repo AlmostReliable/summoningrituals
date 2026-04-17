@@ -105,7 +105,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::itemOutputs);
                 var entityOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::entityOutputs);
                 var recipeInfo = RecipeInfo.outputInfo(currentRecipeInfo, itemOutputs, entityOutputs);
-                SUMMONING_COMPLETE.invoke(level, worldPosition, recipeInfo, invokingPlayer);
+                SUMMONING_COMPLETE.invoke(this, recipeInfo, invokingPlayer);
                 playOptionalPlayerSound(level, invokingPlayer, false, SoundEvents.EXPERIENCE_ORB_PICKUP);
             } else {
                 sendOptionalPlayerMessage(invokingPlayer, false, SummoningLang.MISSING_INPUTS, ChatFormatting.RED);
@@ -190,7 +190,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (simulate) return recipeMatch;
 
         var recipeInfo = recipeMatch.getRecipeInfo();
-        if (!SUMMONING_START.invoke(level, worldPosition, recipeInfo, player)) {
+        if (!SUMMONING_START.invoke(this, recipeInfo, player)) {
             reset(level);
             removeLastInsertedItem();
             return recipeMatch;
