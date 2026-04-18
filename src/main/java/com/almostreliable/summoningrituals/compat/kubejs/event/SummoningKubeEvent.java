@@ -41,6 +41,10 @@ public final class SummoningKubeEvent implements KubeEvent {
         return level;
     }
 
+    public BlockPos getPos() {
+        return getAltar.getBlockPos();
+    }
+
     public AltarBlockEntity getAltar() {
         return getAltar;
     }

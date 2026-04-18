@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added utility method for obtaining the position in summoning KubeJS events
 - fixed level property not being accessible in summoning KubeJS events
 
 ## [3.11.0] - 2026-04-17
