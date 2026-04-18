@@ -37,7 +37,7 @@ public final class SummoningKubeEvent implements KubeEvent {
         this.getPlayer = getPlayer;
     }
 
-    private ServerLevel getLevel() {
+    public ServerLevel getLevel() {
         return level;
     }
 
