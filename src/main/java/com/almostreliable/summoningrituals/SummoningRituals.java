@@ -13,7 +13,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ public final class SummoningRituals {
         Config.init(modContainer);
         eventBus.addListener(DataGeneration::init);
         NeoForge.EVENT_BUS.addListener(SummoningRituals::onEntityDeathLoot);
+        NeoForge.EVENT_BUS.addListener(SummoningRituals::onRightClickBlock);
     }
 
     public static ResourceLocation getRL(String key) {
@@ -58,6 +61,13 @@ public final class SummoningRituals {
                 0.05
             );
             event.setCanceled(true);
+        }
+    }
+
+    private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getItemStack().is(Registration.PATTERN_GENERATOR_ITEM)) {
+            // prevent pattern generator from opening menus
+            event.setUseBlock(TriState.FALSE);
         }
     }
 }

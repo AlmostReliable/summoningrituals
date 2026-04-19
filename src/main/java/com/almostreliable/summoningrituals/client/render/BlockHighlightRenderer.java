@@ -13,6 +13,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -39,24 +41,34 @@ public final class BlockHighlightRenderer {
     );
     private static final int HIGHLIGHT_DURATION = 100;
 
-    private final Deque<Task> tasks = new ArrayDeque<>();
+    private final Deque<WrongBlockTask> wrongBlockTasks = new ArrayDeque<>();
+    private @Nullable AreaTask areaTask;
 
     private BlockHighlightRenderer() {}
 
-    public static void highlightPositions(long gameTime, Iterable<BlockPos> positions) {
-        INSTANCE.tasks.add(new Task(gameTime, HIGHLIGHT_DURATION, positions));
+    public static void highlightWrongPositions(long gameTime, Iterable<BlockPos> positions) {
+        INSTANCE.wrongBlockTasks.add(new WrongBlockTask(gameTime, positions));
     }
 
-    public static void highlightPositionOnce(BlockPos pos) {
-        INSTANCE.tasks.add(new Task(0, 0, List.of(pos)));
+    public static void highlightWrongPositionOnce(BlockPos pos) {
+        INSTANCE.wrongBlockTasks.add(new WrongBlockTask(0, List.of(pos)));
+    }
+
+    public static void highlightArea(long gameTime, AABB area) {
+        INSTANCE.areaTask = new AreaTask(gameTime, area);
+    }
+
+    public static void clearAreaTask() {
+        INSTANCE.areaTask = null;
     }
 
     public static void clear() {
-        INSTANCE.tasks.clear();
+        INSTANCE.wrongBlockTasks.clear();
+        INSTANCE.areaTask = null;
     }
 
     public void render(PoseStack poseStack, Camera camera) {
-        if (tasks.isEmpty()) return;
+        if (wrongBlockTasks.isEmpty() && areaTask == null) return;
 
         var mc = Minecraft.getInstance();
         var level = mc.level;
@@ -65,36 +77,47 @@ public final class BlockHighlightRenderer {
         var gameTime = level.getGameTime();
         var bufferSource = mc.renderBuffers().bufferSource();
 
-        var it = tasks.iterator();
+        if (areaTask != null) {
+            renderOutline(poseStack, camera, bufferSource, areaTask.area, 0, 1, 1);
+
+            if (gameTime - areaTask.createdAt > HIGHLIGHT_DURATION) {
+                areaTask = null;
+            }
+        }
+
+        var it = wrongBlockTasks.iterator();
         while (it.hasNext()) {
             var task = it.next();
 
-            if (task.duration != 0 && gameTime - task.createdAt > task.duration) {
+            if (task.createdAt != 0 && gameTime - task.createdAt > HIGHLIGHT_DURATION) {
                 it.remove();
                 continue;
             }
 
             for (var pos : task.positions) {
-                renderOutline(poseStack, camera, bufferSource, pos);
+                renderOutline(poseStack, camera, bufferSource, new AABB(pos), 1, 0, 0);
             }
 
-            if (task.duration == 0) {
+            if (task.createdAt == 0) {
                 it.remove();
             }
         }
     }
 
-    private void renderOutline(PoseStack poseStack, Camera camera, MultiBufferSource buffer, BlockPos pos) {
+    private void renderOutline(
+        PoseStack poseStack, Camera camera, MultiBufferSource buffer, AABB area, float red, float green, float blue) {
         var cameraPos = camera.getPosition();
-        var blockBox = new AABB(pos).inflate(0.002); // avoid z-fighting
+        var inflatedArea = area.inflate(0.002); // avoid z-fighting
 
         poseStack.pushPose();
         poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         {
-            LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(XRAY_LINES), blockBox, 1, 0, 0, 1);
+            LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(XRAY_LINES), inflatedArea, red, green, blue, 1);
         }
         poseStack.popPose();
     }
 
-    private record Task(long createdAt, int duration, Iterable<BlockPos> positions) {}
+    private record WrongBlockTask(long createdAt, Iterable<BlockPos> positions) {}
+
+    private record AreaTask(long createdAt, AABB area) {}
 }

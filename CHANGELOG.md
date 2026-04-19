@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added Pattern Generator dev item to automatically generate patterns from block selections
+- added Portuguese localization ([#36](https://github.com/AlmostReliable/summoningrituals/pull/36))
 
 ## [3.11.1] - 2026-04-18
 

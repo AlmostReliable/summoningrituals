@@ -5,8 +5,10 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.core.Registration;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -31,6 +33,10 @@ class SummoningModels extends BlockStateProvider {
 
         altarBlockStateAndModel(indestructibleAltarBlock, altarBlockModelPath);
         itemModels().withExistingParent(indestructibleAltarBlock.getId().toString(), altarBlockModelPath);
+
+        var patternGeneratorId = Registration.PATTERN_GENERATOR_ITEM.getId();
+        var bambooId = BuiltInRegistries.ITEM.getKey(Items.BAMBOO);
+        itemModels().withExistingParent(patternGeneratorId.getPath(), bambooId);
     }
 
     private void altarBlockStateAndModel(DeferredBlock<?> block, ResourceLocation modelPath) {
