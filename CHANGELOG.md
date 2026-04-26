@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.12.1] - 2026-04-26
 
 - fixed exception when trying to find suitable recipe when interacting with the Altar ([ATM10#543](https://github.com/AllTheMods/All-the-Mons/issues/543))
 
@@ -155,6 +158,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.12.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.12.1
 [3.12.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.12.0
 [3.11.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.11.1
 [3.11.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.11.0
