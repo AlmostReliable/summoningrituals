@@ -41,6 +41,8 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.IItemHandler;
 
+import com.google.common.collect.Lists;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -219,7 +221,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
-        var recipeHolders = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
+        var altarRecipes = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
+        var recipeHolders = Lists.newArrayList(altarRecipes); // create mutable copy
         recipeHolders.removeIf(h -> !h.value().initiator().test(stack));
         if (recipeHolders.isEmpty()) return RecipeMatch.INVALID_INITIATOR;
 

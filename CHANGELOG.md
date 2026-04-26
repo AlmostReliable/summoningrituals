@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed exception when trying to find suitable recipe when interacting with the Altar ([ATM10#543](https://github.com/AllTheMods/All-the-Mons/issues/543))
 
 ## [3.12.0] - 2026-04-19
 
