@@ -2,6 +2,9 @@ package com.almostreliable.summoningrituals.compat.kubejs.event;
 
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
+import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
+import com.almostreliable.summoningrituals.network.HighlightPositionsPacket;
+import com.almostreliable.summoningrituals.network.PacketHandler;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition.PatternEntry;
 import com.almostreliable.summoningrituals.recipe.container.RecipeInfo;
@@ -97,5 +100,26 @@ public final class SummoningKubeEvent implements KubeEvent {
     private @Nullable Collection<BlockPos> queryBlockPattern(Optional<BlockPatternCondition> blockPattern, String query) {
         return blockPattern.map(p -> p.queryOffsets(getAltarFacing(), query))
             .orElse(null);
+    }
+
+    public void highlightPositions(BlockPos... positions) {
+        PacketHandler.sendToNearbyPlayers(
+            level,
+            getPos(),
+            BlockPatternConditionBuilder.MAX_PATTERN_RADIUS,
+            new HighlightPositionsPacket(List.of(positions))
+        );
+    }
+
+    public void highlightOffsets(BlockPos... offsets) {
+        var positions = new BlockPos[offsets.length];
+        var rotation = BlockPatternCondition.getRotation(getAltarFacing());
+        for (var i = 0; i < offsets.length; i++) {
+            var offset = offsets[i];
+            var rotated = offset.rotate(rotation);
+            positions[i] = getPos().offset(rotated);
+        }
+
+        highlightPositions(positions);
     }
 }

@@ -196,7 +196,7 @@ public final class BlockPatternCondition {
         return tooltipComponentCache;
     }
 
-    private Rotation getRotation(Direction altarFacing) {
+    public static Rotation getRotation(Direction altarFacing) {
         var rotationStep = switch (altarFacing) {
             case NORTH -> 0;
             case EAST -> 1;
@@ -207,7 +207,7 @@ public final class BlockPatternCondition {
         return ROTATION_VALUES[rotationStep];
     }
 
-    private Rotation getCounterRotation(Rotation rotation) {
+    private static Rotation getCounterRotation(Rotation rotation) {
         return switch (rotation) {
             case NONE -> Rotation.NONE;
             case CLOCKWISE_90 -> Rotation.COUNTERCLOCKWISE_90;

@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- added event methods to highlight absolute block positions and rotation-aware offsets
 
 ## [3.12.1] - 2026-04-26
 
