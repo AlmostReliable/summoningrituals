@@ -10,7 +10,8 @@ public interface KubeEvents {
     EventGroup GROUP = EventGroup.of(ModConstants.MOD_NAME.replace(" ", ""));
 
     // client
-    EventHandler RITUAL_RENDERER_REGISTRY = GROUP.client("ritualRendererRegistration", () -> RitualRendererRegistryEvent.class);
+    EventHandler RITUAL_RENDERER_REGISTRY = GROUP.client("ritualRendererRegistration", () -> RitualRendererRegistryKubeEvent.class);
+    EventHandler MODIFY_CONDITIONS_TOOLTIP = GROUP.client("modifyConditionsTooltip", () -> ModifyConditionsTooltipEvent.class);
 
     // server
     EventHandler SUMMONING_START = GROUP.server("start", () -> SummoningKubeEvent.class).hasResult();

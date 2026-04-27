@@ -2,12 +2,21 @@ package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
+import com.almostreliable.summoningrituals.compat.kubejs.event.KubeEvents;
+import com.almostreliable.summoningrituals.compat.kubejs.event.ModifyConditionsTooltipEvent;
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RecipeViewerAltarLayout {
@@ -31,6 +40,27 @@ public class RecipeViewerAltarLayout {
     public void onPreviewButtonClicked(Optional<BlockPatternCondition> blockPattern) {
         if (blockPattern.isEmpty()) return;
         BlockPatternRenderer.scheduleTask(blockPattern.get());
+    }
+
+    public List<Component> getConditionTooltip(RecipeHolder<AltarRecipe> recipeHolder) {
+        var tooltip = new ArrayList<Component>();
+        tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
+
+        var recipeId = recipeHolder.id();
+        var recipe = recipeHolder.value();
+        var conditions = recipe.conditions();
+        var blockPattern = recipe.blockPattern();
+
+        blockPattern.ifPresent(p -> tooltip.add(p.getConditionTooltip()));
+
+        for (var condition : conditions) {
+            tooltip.addAll(ConditionRegistry.getTooltip(condition));
+        }
+
+        if (KubeEvents.MODIFY_CONDITIONS_TOOLTIP.hasListeners()) {
+            KubeEvents.MODIFY_CONDITIONS_TOOLTIP.post(new ModifyConditionsTooltipEvent(recipeId, recipe, tooltip));
+        }
+        return tooltip;
     }
 
     protected void createInitiatorSlot(SlotConsumer slotConsumer) {

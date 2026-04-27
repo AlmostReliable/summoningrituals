@@ -7,7 +7,6 @@ import com.almostreliable.summoningrituals.compat.viewer.jei.widget.JeiPatternCl
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -94,8 +93,8 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             blockPatternExtensionIcon.draw(guiGraphics, 2 + SLOT_SIZE, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5);
         }
 
-        var recipeConditions = recipe.conditions();
-        if (!recipeConditions.isEmpty() || blockPattern.isPresent()) {
+        var conditionTooltip = getConditionTooltip(recipeHolder);
+        if (conditionTooltip.size() > 1) {
             conditionIcon.draw(guiGraphics, 2, 2);
         }
     }
@@ -130,13 +129,9 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
             tooltip.add(pattern.getTooltipComponent());
         }
 
-        var recipeConditions = recipe.conditions();
-        if ((!recipeConditions.isEmpty() || blockPattern.isPresent()) && mouseInSlot(mouseX, mouseY, 2, 2)) {
-            tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
-            blockPattern.ifPresent(p -> tooltip.add(p.getConditionTooltip()));
-            for (var condition : recipeConditions) {
-                tooltip.addAll(ConditionRegistry.getTooltip(condition));
-            }
+        var conditionTooltip = getConditionTooltip(recipeHolder);
+        if (conditionTooltip.size() > 1 && mouseInSlot(mouseX, mouseY, 2, 2)) {
+            tooltip.addAll(conditionTooltip);
         }
     }
 

@@ -14,9 +14,9 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RitualRendererRegistryEvent implements KubeEvent {
+public final class RitualRendererRegistryKubeEvent implements KubeEvent {
 
-    private RitualRendererRegistryEvent() {}
+    private RitualRendererRegistryKubeEvent() {}
 
     private final Map<ResourceLocation, CustomRitualRenderer> renderers = new HashMap<>();
 
@@ -32,7 +32,7 @@ public final class RitualRendererRegistryEvent implements KubeEvent {
             AltarRenderer.CUSTOM_RENDERERS.clear();
             BlockPatternRenderer.clear();
             if (KubeEvents.RITUAL_RENDERER_REGISTRY.hasListeners()) {
-                var event = new RitualRendererRegistryEvent();
+                var event = new RitualRendererRegistryKubeEvent();
                 KubeEvents.RITUAL_RENDERER_REGISTRY.post(event);
                 AltarRenderer.CUSTOM_RENDERERS.putAll(event.renderers);
             }

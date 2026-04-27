@@ -10,7 +10,6 @@ import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.condition.ConditionRegistry;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.ChatFormatting;
@@ -188,22 +187,10 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             SummoningLang.BLOCK_PATTERN_EXTENSION
         );
 
-        var recipeConditions = recipe.conditions();
-        if (!recipeConditions.isEmpty() || blockPattern.isPresent()) {
-            var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2))
-                .appendTooltip(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
-
-            if (blockPattern.isPresent()) {
-                var patternTooltip = blockPattern.get().getConditionTooltip();
-                conditionSlot.appendTooltip(patternTooltip);
-            }
-
-            for (var condition : recipeConditions) {
-                var conditionTooltips = ConditionRegistry.getTooltip(condition);
-                for (var conditionTooltip : conditionTooltips) {
-                    conditionSlot.appendTooltip(conditionTooltip);
-                }
-            }
+        var conditionTooltip = getConditionTooltip(recipeHolder);
+        if (conditionTooltip.size() > 1) {
+            var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2));
+            conditionTooltip.forEach(conditionSlot::appendTooltip);
         }
     }
 
