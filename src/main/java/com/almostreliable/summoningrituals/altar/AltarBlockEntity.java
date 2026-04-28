@@ -134,7 +134,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, new AltarInventorySyncPacket(worldPosition, inventoryTag));
     }
 
-    public void removeLastInsertedItem() {
+    private void removeLastInsertedItem() {
         inventory.removeLastInsertedItem();
     }
 
@@ -154,6 +154,11 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
         if (currentRecipeInfo != null) {
             sendOptionalPlayerMessage(player, simulate, SummoningLang.IN_PROGRESS, ChatFormatting.YELLOW);
+            return stack;
+        }
+
+        if (player != null && player.isShiftKeyDown()) {
+            removeLastInsertedItem();
             return stack;
         }
 
