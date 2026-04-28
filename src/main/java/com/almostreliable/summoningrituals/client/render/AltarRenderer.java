@@ -37,8 +37,6 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     private final ItemRenderer itemRenderer;
 
-    private float oldCircleOffset;
-
     public AltarRenderer(Context context) {
         itemRenderer = context.getItemRenderer();
     }
@@ -98,7 +96,6 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
         var recipeProgress = altar.getRecipeProgress();
         var recipeTime = altar.getRecipeTime();
-        var recipeProgressRatio = ratio(recipeProgress, recipeTime, 0f);
 
         var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
 
@@ -110,7 +107,6 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
             playerToAltarAngle,
             recipeProgress,
             recipeTime,
-            recipeProgressRatio,
             poseStack,
             buffer,
             lightAbove,
@@ -126,7 +122,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         renderItemOrbit(renderContext);
 
         if (renderContext.shouldReset()) {
-            renderContext.getAltar().resetStartTick = renderContext.getLevel().getGameTime();
+            renderContext.getAltar().resetStartTick = renderContext.getGameTime();
         }
     }
 
@@ -148,30 +144,33 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var inputs = renderContext.getInputs();
         if (inputs.isEmpty()) return;
 
-        var gameTime = renderContext.getLevel().getGameTime();
+        var gameTime = renderContext.getGameTime();
         var partialTick = renderContext.getPartialTick();
 
         var axisRotation = clampRotation(gameTime + partialTick);
         var recipeProgress = renderContext.getRecipeProgress();
-        var scale = invert(renderContext.getRecipeProgressRatio());
+        var recipeProgressRatio = renderContext.getRecipeProgressRatio();
+        var scale = invert(recipeProgressRatio);
 
-        var resetStartTick = renderContext.getAltar().resetStartTick;
+        var altar = renderContext.getAltar();
+
+        var resetStartTick = altar.resetStartTick;
         if (recipeProgress == 0 && resetStartTick >= 0) {
             var elapsed = gameTime - resetStartTick + partialTick;
             scale = Mth.clamp(elapsed / RESET_TICKS, 0f, 1f);
             if (scale >= 1f) {
-                renderContext.getAltar().resetStartTick = -1;
+                altar.resetStartTick = -1;
             }
         }
 
         renderContext.scale(scale);
 
-        float circleOffset;
+        float waveAnchor;
         if (recipeProgress > 0) {
-            circleOffset = ratio(recipeProgress, renderContext.getRecipeTime(), 1f) * FULL_CIRCLE * 3f + oldCircleOffset;
+            waveAnchor = recipeProgressRatio * FULL_CIRCLE * 3f + altar.lastWaveAnchor;
         } else {
-            circleOffset = renderContext.getPlayerToAltarAngle();
-            oldCircleOffset = circleOffset;
+            waveAnchor = renderContext.getPlayerToAltarAngle();
+            altar.lastWaveAnchor = waveAnchor;
         }
 
         for (var i = 0; i < inputs.size(); i++) {
@@ -179,7 +178,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
             {
                 var itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
 
-                var rotationDiff = clampRotation(axisRotation + itemRotation - circleOffset);
+                var rotationDiff = clampRotation(axisRotation + itemRotation - waveAnchor);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
                 var newHeight = (rotationDiff / HALF_CIRCLE) * MAX_ITEM_HEIGHT;
 
@@ -201,10 +200,6 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     public static float invert(float value) {
         return 1 - value;
-    }
-
-    public static float ratio(float current, float max, float fallback) {
-        return max == 0f ? fallback : current / max;
     }
 
     // exposed for KubeJS

@@ -71,6 +71,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     // BER info
     public long resetStartTick = -1;
+    public long craftStartTick = -1;
+    public float lastWaveAnchor;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
@@ -343,7 +345,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return currentRecipeInfo;
     }
 
-    public void setCurrentRecipeInfo(@Nullable RecipeInfo currentRecipeInfo) {
+    @OnlyIn(Dist.CLIENT)
+    public void receiveRecipeInfoFromServer(@Nullable RecipeInfo currentRecipeInfo) {
         this.currentRecipeInfo = currentRecipeInfo;
     }
 
@@ -351,17 +354,22 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return recipeProgress;
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public void setRecipeProgress(int recipeProgress) {
-        this.recipeProgress = recipeProgress;
-    }
-
     public int getRecipeTime() {
         return recipeTime;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void setRecipeTime(int recipeTime) {
+    public void receiveRecipeProgressFromServer(int recipeProgress, int recipeTime) {
+        this.recipeProgress = recipeProgress;
         this.recipeTime = recipeTime;
+
+        if (recipeTime <= 0) {
+            craftStartTick = -1;
+            return;
+        }
+
+        if (level == null) return;
+        var gameTime = level.getGameTime();
+        craftStartTick = gameTime - recipeProgress;
     }
 }

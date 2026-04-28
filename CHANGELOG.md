@@ -6,9 +6,11 @@ All notable changes to this project will be documented in this file.
 
 - improved type info for KubeRecipe builder methods returning the same instance
 - improved Altar animation smoothness when player moves
+- improved recipe progress calculation for Altar animations
 - replaced functional interface functions with same type parameters with unary operators
 - fixed block entity not being removed when breaking the Altar
 - fixed players being able to retrieve the catalyst while a ritual is running
+- fixed jittery item animation when ritual is in progress
 
 ## [3.13.0] - 2026-04-27
 

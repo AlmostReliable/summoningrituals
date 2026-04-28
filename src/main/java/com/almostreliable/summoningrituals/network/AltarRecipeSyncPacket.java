@@ -42,13 +42,14 @@ public record AltarRecipeSyncPacket(
 
         var blockEntity = level.getBlockEntity(packet.altarPos);
         if (blockEntity instanceof AltarBlockEntity altar) {
-            altar.setRecipeProgress(packet.recipeProgress);
+            var recipeProgress = packet.recipeProgress;
             var recipeTime = packet.recipeTime;
-            altar.setRecipeTime(recipeTime);
+            altar.receiveRecipeProgressFromServer(recipeProgress, recipeTime);
+
             if (recipeTime > 0) {
-                packet.recipeInfo.ifPresent(altar::setCurrentRecipeInfo);
+                packet.recipeInfo.ifPresent(altar::receiveRecipeInfoFromServer);
             } else {
-                altar.setCurrentRecipeInfo(null);
+                altar.receiveRecipeInfoFromServer(null);
             }
         }
     }

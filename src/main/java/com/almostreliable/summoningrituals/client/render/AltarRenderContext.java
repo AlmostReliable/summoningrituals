@@ -4,6 +4,7 @@ import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -22,13 +23,28 @@ public record AltarRenderContext(
     float getPlayerToAltarAngle,
     int getRecipeProgress,
     int getRecipeTime,
-    float getRecipeProgressRatio,
     PoseStack getPoseStack,
     MultiBufferSource getBufferSource,
     int getLightAbove,
     int getPackedOverlay,
     float getPartialTick
 ) {
+
+    public float getRecipeProgressRatio() {
+        if (getRecipeTime <= 0) return 0f;
+
+        var craftStartTick = getAltar.craftStartTick;
+        if (craftStartTick < 0) {
+            return Mth.clamp((getRecipeProgress + getPartialTick) / getRecipeTime, 0f, 1f);
+        }
+
+        var predictedProgress = (getGameTime() - craftStartTick) + getPartialTick;
+        return Mth.clamp(predictedProgress / getRecipeTime, 0f, 1f);
+    }
+
+    public long getGameTime() {
+        return getLevel.getGameTime();
+    }
 
     public void pushPose() {
         getPoseStack().pushPose();
