@@ -148,13 +148,16 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var inputs = renderContext.getInputs();
         if (inputs.isEmpty()) return;
 
-        var axisRotation = clampRotation(renderContext.getLevel().getGameTime());
+        var gameTime = renderContext.getLevel().getGameTime();
+        var partialTick = renderContext.getPartialTick();
+
+        var axisRotation = clampRotation(gameTime + partialTick);
         var recipeProgress = renderContext.getRecipeProgress();
         var scale = invert(renderContext.getRecipeProgressRatio());
 
         var resetStartTick = renderContext.getAltar().resetStartTick;
         if (recipeProgress == 0 && resetStartTick >= 0) {
-            var elapsed = renderContext.getLevel().getGameTime() - resetStartTick + renderContext.getPartialTick();
+            var elapsed = gameTime - resetStartTick + partialTick;
             scale = Mth.clamp(elapsed / RESET_TICKS, 0f, 1f);
             if (scale >= 1f) {
                 renderContext.getAltar().resetStartTick = -1;
@@ -163,18 +166,18 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
         renderContext.scale(scale);
 
+        float circleOffset;
+        if (recipeProgress > 0) {
+            circleOffset = ratio(recipeProgress, renderContext.getRecipeTime(), 1f) * FULL_CIRCLE * 3f + oldCircleOffset;
+        } else {
+            circleOffset = renderContext.getPlayerToAltarAngle();
+            oldCircleOffset = circleOffset;
+        }
+
         for (var i = 0; i < inputs.size(); i++) {
             renderContext.pushPose();
             {
                 var itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
-
-                float circleOffset;
-                if (recipeProgress > 0) {
-                    circleOffset = ratio(recipeProgress, renderContext.getRecipeTime(), 1f) * FULL_CIRCLE * 3f + oldCircleOffset;
-                } else {
-                    circleOffset = renderContext.getPlayerToAltarAngle();
-                    oldCircleOffset = circleOffset;
-                }
 
                 var rotationDiff = clampRotation(axisRotation + itemRotation - circleOffset);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
