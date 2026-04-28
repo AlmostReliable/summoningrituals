@@ -117,10 +117,6 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return;
         }
 
-        if (recipeProgress == 0) {
-            changeActivityState(true, level);
-        }
-
         recipeProgress++;
         syncAltarRecipeProgress(level);
     }
@@ -212,6 +208,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         invokingPlayer = player;
         recipeTime = recipeInfo.getRecipe().ticks();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
+        changeActivityState(true, level);
         syncAltarRecipeStart(level);
 
         return recipeMatch;
