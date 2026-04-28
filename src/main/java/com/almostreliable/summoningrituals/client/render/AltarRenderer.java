@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -87,7 +88,11 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var altarPos = altar.getBlockPos();
         var altarCenterPos = Vec3.atCenterOf(altarPos);
 
-        var playerPos = player.position();
+        var playerPos = new Vec3(
+            Mth.lerp(partialTick, player.xOld, player.getX()),
+            Mth.lerp(partialTick, player.yOld, player.getY()),
+            Mth.lerp(partialTick, player.zOld, player.getZ())
+        );
         var playerToAltarDistance = (float) altarCenterPos.distanceTo(playerPos);
         var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
         var playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);

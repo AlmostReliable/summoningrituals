@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - improved type info for KubeRecipe builder methods returning the same instance
+- improved Altar animation smoothness when player moves
 - replaced functional interface functions with same type parameters with unary operators
 - fixed block entity not being removed when breaking the Altar
 - fixed players being able to retrieve the catalyst while a ritual is running
