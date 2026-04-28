@@ -189,7 +189,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     }
 
     public static float clampRotation(float degree) {
-        return Math.abs(degree) % FULL_CIRCLE;
+        return ((degree % FULL_CIRCLE) + FULL_CIRCLE) % FULL_CIRCLE;
     }
 
     public static float invert(float value) {
