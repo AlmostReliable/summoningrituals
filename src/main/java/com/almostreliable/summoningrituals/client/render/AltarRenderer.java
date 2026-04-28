@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess") // exposed for custom KubeJS renderers
-public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
+public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRenderer<AltarBlockEntity> {
 
     public static final Map<ResourceLocation, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
     public static final float HALF = .5f;
@@ -35,10 +35,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float ITEM_OFFSET = 1.5f;
 
-    private final ItemRenderer itemRenderer;
-
-    public AltarRenderer(Context context) {
-        itemRenderer = context.getItemRenderer();
+    public AltarRenderer(Context itemRenderer) {
+        this(itemRenderer.getItemRenderer());
     }
 
     @Override
@@ -200,11 +198,5 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
     public static float invert(float value) {
         return 1 - value;
-    }
-
-    // exposed for KubeJS
-    @SuppressWarnings("unused")
-    public ItemRenderer getItemRenderer() {
-        return itemRenderer;
     }
 }
