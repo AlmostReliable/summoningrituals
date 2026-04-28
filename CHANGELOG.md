@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- improved type info for KubeRecipe builder methods returning the same instance
+- replaced functional interface functions with same type parameters with unary operators
 
 ## [3.13.0] - 2026-04-27
 

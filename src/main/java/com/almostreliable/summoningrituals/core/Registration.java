@@ -40,6 +40,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 @SuppressWarnings("ConstantConditions")
 public final class Registration {
@@ -126,7 +127,7 @@ public final class Registration {
 
     private static <B extends Block> DeferredBlock<B> registerBlock(
         String id, String name, Function<BlockBehaviour.Properties, B> factory,
-        Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesConfigurator
+        UnaryOperator<BlockBehaviour.Properties> propertiesConfigurator
     ) {
         var block = BLOCKS.registerBlock(
             id,

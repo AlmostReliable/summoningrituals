@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -169,7 +169,7 @@ public final class ConditionsBuilder {
     }
 
     @ReturnsSelf
-    public ConditionsBuilder weather(Context ctx, Function<WeatherCondition.Builder, WeatherCondition.Builder> weather) {
+    public ConditionsBuilder weather(Context ctx, UnaryOperator<WeatherCondition.Builder> weather) {
         try {
             var builder = new WeatherCondition.Builder();
             var weatherCheck = weather.apply(builder).build();
