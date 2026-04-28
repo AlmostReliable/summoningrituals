@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - fixed block entity not being removed when breaking the Altar
 - fixed players being able to retrieve the catalyst while a ritual is running
 - fixed jittery item animation when ritual is in progress
+- fixed jittery item orbit animation when client performance is low
 
 ## [3.13.0] - 2026-04-27
 

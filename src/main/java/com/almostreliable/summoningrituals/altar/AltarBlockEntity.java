@@ -73,6 +73,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     public long resetStartTick = -1;
     public long craftStartTick = -1;
     public float lastWaveAnchor;
+    public float orbitRotation;
+    public long orbitLastNanos = -1;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);

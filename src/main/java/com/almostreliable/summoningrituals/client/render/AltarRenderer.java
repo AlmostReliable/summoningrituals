@@ -32,6 +32,7 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
     public static final float ALTAR_RENDER_HEIGHT = 0.8f;
     private static final int MAX_ITEM_HEIGHT = 2;
     private static final int RESET_TICKS = 20;
+    private static final float ORBIT_DEGREES_PER_SECOND = 20f;
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float ITEM_OFFSET = 1.5f;
 
@@ -144,13 +145,12 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
 
         var gameTime = renderContext.getGameTime();
         var partialTick = renderContext.getPartialTick();
+        var altar = renderContext.getAltar();
 
-        var axisRotation = clampRotation(gameTime + partialTick);
+        var orbitRotation = calculateOrbitRotation(altar);
         var recipeProgress = renderContext.getRecipeProgress();
         var recipeProgressRatio = renderContext.getRecipeProgressRatio();
         var scale = invert(recipeProgressRatio);
-
-        var altar = renderContext.getAltar();
 
         var resetStartTick = altar.resetStartTick;
         if (recipeProgress == 0 && resetStartTick >= 0) {
@@ -176,7 +176,7 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
             {
                 var itemRotation = FULL_CIRCLE - ((i * FULL_CIRCLE) / inputs.size());
 
-                var rotationDiff = clampRotation(axisRotation + itemRotation - waveAnchor);
+                var rotationDiff = clampRotation(orbitRotation + itemRotation - waveAnchor);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
                 var waveProgress = rotationDiff / HALF_CIRCLE;
                 var newHeight = HALF * invert(Mth.cos(Mth.PI * waveProgress)) * MAX_ITEM_HEIGHT;
@@ -184,13 +184,29 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
                 var playerOffset = Math.max(1f - renderContext.getPlayerToAltarDistance() / 8f, 0f);
                 newHeight *= playerOffset;
 
-                renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + axisRotation)));
+                renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + orbitRotation)));
                 renderContext.translate(0, newHeight, -ITEM_OFFSET);
 
                 renderContext.renderItem(itemRenderer, inputs.get(i));
             }
             renderContext.popPose();
         }
+    }
+
+    public float calculateOrbitRotation(AltarBlockEntity altar) {
+        var now = System.nanoTime();
+        if (altar.orbitLastNanos < 0) {
+            altar.orbitLastNanos = now;
+            return altar.orbitRotation;
+        }
+
+        var deltaSeconds = Math.clamp((now - altar.orbitLastNanos) / 1e9f, 0f, 0.05f);
+        altar.orbitLastNanos = now;
+
+        var newOrbitRotation = altar.orbitRotation + (ORBIT_DEGREES_PER_SECOND * deltaSeconds);
+        altar.orbitRotation = (newOrbitRotation % FULL_CIRCLE + FULL_CIRCLE) % FULL_CIRCLE;
+
+        return altar.orbitRotation;
     }
 
     public static float clampRotation(float degree) {
