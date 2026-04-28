@@ -69,6 +69,9 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private int recipeProgress;
     private int recipeTime;
 
+    // BER info
+    public long resetStartTick = -1;
+
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
         this.inventory = new AltarInventory(this);

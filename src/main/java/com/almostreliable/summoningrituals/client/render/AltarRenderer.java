@@ -31,13 +31,12 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     public static final float FULL_CIRCLE = 360f;
     public static final float ALTAR_RENDER_HEIGHT = 0.8f;
     private static final int MAX_ITEM_HEIGHT = 2;
-    private static final int MAX_RESET = 60;
+    private static final int RESET_TICKS = 20;
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float ITEM_OFFSET = 1.5f;
 
     private final ItemRenderer itemRenderer;
 
-    private float resetTimer;
     private float oldCircleOffset;
 
     public AltarRenderer(Context context) {
@@ -127,7 +126,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         renderItemOrbit(renderContext);
 
         if (renderContext.shouldReset()) {
-            resetTimer = MAX_RESET;
+            renderContext.getAltar().resetStartTick = renderContext.getLevel().getGameTime();
         }
     }
 
@@ -152,9 +151,14 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         var axisRotation = clampRotation(renderContext.getLevel().getGameTime());
         var recipeProgress = renderContext.getRecipeProgress();
         var scale = invert(renderContext.getRecipeProgressRatio());
-        if (recipeProgress == 0 && resetTimer > 0) {
-            scale = invert(ratio(resetTimer, MAX_RESET, 0f));
-            resetTimer = Math.max(0, resetTimer - renderContext.getPartialTick());
+
+        var resetStartTick = renderContext.getAltar().resetStartTick;
+        if (recipeProgress == 0 && resetStartTick >= 0) {
+            var elapsed = renderContext.getLevel().getGameTime() - resetStartTick + renderContext.getPartialTick();
+            scale = Mth.clamp(elapsed / RESET_TICKS, 0f, 1f);
+            if (scale >= 1f) {
+                renderContext.getAltar().resetStartTick = -1;
+            }
         }
 
         renderContext.scale(scale);
