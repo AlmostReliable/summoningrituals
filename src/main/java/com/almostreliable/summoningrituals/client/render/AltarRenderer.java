@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess") // exposed for custom KubeJS renderers
-public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRenderer<AltarBlockEntity> {
+public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntityRenderer<AltarBlockEntity> {
 
     public static final Map<ResourceLocation, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
     public static final float HALF = .5f;
@@ -134,7 +134,7 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
             renderContext.translate(0, invert(0.75f * renderContext.getRecipeProgressRatio()), 0);
             renderContext.scale(0.75f);
             renderContext.mulPose(Axis.YN.rotationDegrees(renderContext.getPlayerToAltarAngle()));
-            renderContext.renderItem(itemRenderer, initiator);
+            renderContext.renderItem(getItemRenderer, initiator);
         }
         renderContext.popPose();
     }
@@ -187,7 +187,7 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
                 renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + orbitRotation)));
                 renderContext.translate(0, newHeight, -ITEM_OFFSET);
 
-                renderContext.renderItem(itemRenderer, inputs.get(i));
+                renderContext.renderItem(getItemRenderer, inputs.get(i));
             }
             renderContext.popPose();
         }
