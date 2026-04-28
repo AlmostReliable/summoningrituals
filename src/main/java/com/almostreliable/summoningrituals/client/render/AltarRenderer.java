@@ -178,7 +178,8 @@ public record AltarRenderer(ItemRenderer itemRenderer) implements BlockEntityRen
 
                 var rotationDiff = clampRotation(axisRotation + itemRotation - waveAnchor);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
-                var newHeight = (rotationDiff / HALF_CIRCLE) * MAX_ITEM_HEIGHT;
+                var waveProgress = rotationDiff / HALF_CIRCLE;
+                var newHeight = HALF * invert(Mth.cos(Mth.PI * waveProgress)) * MAX_ITEM_HEIGHT;
 
                 var playerOffset = Math.max(1f - renderContext.getPlayerToAltarDistance() / 8f, 0f);
                 newHeight *= playerOffset;

@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - improved type info for KubeRecipe builder methods returning the same instance
 - improved Altar animation smoothness when player moves
+- improved Altar item orbit vertical shift smoothness
 - improved recipe progress calculation for Altar animations
 - replaced functional interface functions with same type parameters with unary operators
 - fixed block entity not being removed when breaking the Altar
