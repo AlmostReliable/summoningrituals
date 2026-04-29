@@ -147,7 +147,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         var partialTick = renderContext.getPartialTick();
         var altar = renderContext.getAltar();
 
-        var orbitRotation = calculateOrbitRotation(altar);
+        var orbitRotation = calculateOrbitRotation();
         var recipeProgress = renderContext.getRecipeProgress();
         var recipeProgressRatio = renderContext.getRecipeProgressRatio();
         var scale = invert(recipeProgressRatio);
@@ -193,20 +193,12 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         }
     }
 
-    public float calculateOrbitRotation(AltarBlockEntity altar) {
-        var now = System.nanoTime();
-        if (altar.orbitLastNanos < 0) {
-            altar.orbitLastNanos = now;
-            return altar.orbitRotation;
-        }
-
-        var deltaSeconds = Math.clamp((now - altar.orbitLastNanos) / 1e9f, 0f, 0.05f);
-        altar.orbitLastNanos = now;
-
-        var newOrbitRotation = altar.orbitRotation + (ORBIT_DEGREES_PER_SECOND * deltaSeconds);
-        altar.orbitRotation = (newOrbitRotation % FULL_CIRCLE + FULL_CIRCLE) % FULL_CIRCLE;
-
-        return altar.orbitRotation;
+    public float calculateOrbitRotation() {
+        var minecraft = Minecraft.getInstance();
+        var renderTicks = minecraft.levelRenderer.getTicks()
+            + minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+        var renderSeconds = renderTicks / 20f;
+        return clampRotation(ORBIT_DEGREES_PER_SECOND * renderSeconds);
     }
 
     public static float clampRotation(float degree) {
