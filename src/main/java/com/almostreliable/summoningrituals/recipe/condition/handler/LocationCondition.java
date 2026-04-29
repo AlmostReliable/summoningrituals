@@ -7,6 +7,7 @@ import com.almostreliable.summoningrituals.util.RawHolderSet;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -107,7 +108,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
             if (rawHolderSet.ids().isEmpty()) return;
             var ids = rawHolderSet.ids().get();
             for (var id : ids) {
-                var readableId = getReadableId(id);
+                var readableId = appendModId(getReadableId(id), id);
                 tooltip.add(conditionValueComponent(readableId));
             }
             return;
@@ -120,13 +121,24 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         });
         holderValue.ifRight(holderList -> {
             for (var holder : holderList) {
-                var resourceKey = holder.unwrapKey();
-                if (resourceKey.isEmpty()) {
+                var resourceKeyOpt = holder.unwrapKey();
+                if (resourceKeyOpt.isEmpty()) {
                     tooltip.add(conditionValueComponent("unknown"));
                     continue;
                 }
 
-                var readableId = getReadableId(resourceKey.get().location());
+                var resourceKey = resourceKeyOpt.get();
+                var id = resourceKey.location();
+                var readableId = getReadableId(id);
+
+                var registryKey = resourceKey.registryKey();
+                if (Registries.BIOME.equals(registryKey)) {
+                    var componentKey = id.toLanguageKey("biome");
+                    var component = Component.translatableWithFallback(componentKey, readableId);
+                    readableId = component.getString();
+                }
+
+                readableId = appendModId(readableId, id);
                 tooltip.add(conditionValueComponent(readableId));
             }
         });
@@ -135,19 +147,22 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private static String getReadableId(ResourceLocation id) {
         var namespace = id.getNamespace();
         var path = id.getPath();
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
+    }
 
-        var readableName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
-        if (!namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-            var modContainer = ModList.get().getModContainerById(namespace);
-            if (modContainer.isEmpty()) {
-                return readableName + " (" + namespace + ")";
-            }
-
-            var modName = modContainer.get().getModInfo().getDisplayName();
-            return readableName + " (" + modName + ")";
+    private static String appendModId(String text, ResourceLocation id) {
+        var namespace = id.getNamespace();
+        if (namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+            return text;
         }
 
-        return readableName;
+        var modContainer = ModList.get().getModContainerById(namespace);
+        if (modContainer.isEmpty()) {
+            return text + " (" + namespace + ")";
+        }
+
+        var modName = modContainer.get().getModInfo().getDisplayName();
+        return text + " (" + modName + ")";
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

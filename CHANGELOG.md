@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added localization support for biomes in biome conditions
 - changed animation calculation base from system nano time to Minecraft's DeltaTracker
 
 ## [3.13.1] - 2026-04-28
