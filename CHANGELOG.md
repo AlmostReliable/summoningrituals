@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed crash when KubeJS is not installed
 
 ## [3.13.2] - 2026-05-04
 
