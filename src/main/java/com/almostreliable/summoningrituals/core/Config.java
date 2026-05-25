@@ -52,6 +52,7 @@ public final class Config {
         public final ModConfigSpec.IntValue previewTicksMin;
         public final ModConfigSpec.IntValue previewTicksMax;
         public final ModConfigSpec.BooleanValue previewBlockStateAware;
+        public final ModConfigSpec.BooleanValue blocksAsRecipeViewerUsages;
 
         private ClientConfig(ModConfigSpec.Builder builder) {
             builder.push("general");
@@ -75,6 +76,11 @@ public final class Config {
                     "The recipe starting logic will always check for the whole block state."
                 )
                 .define("preview_block_state_aware", false);
+            blocksAsRecipeViewerUsages = builder.comment(
+                    "Whether to register the blocks of the block pattern in recipe viewers as usages.",
+                    "This will allow the player to check the usages of the blocks in the block pattern to find the Altar recipe."
+                )
+                .define("blocks_as_recipe_viewer_usages", true);
             builder.pop();
         }
     }

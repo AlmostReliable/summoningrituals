@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiSta
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InitiatorSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
 import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
@@ -110,6 +111,14 @@ public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe
             var egg = entityIngredient.getEgg();
             if (egg == null) continue;
             catalysts.add(EmiStack.of(egg));
+        }
+
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isPresent() && Config.CLIENT.blocksAsRecipeViewerUsages.getAsBoolean()) {
+            for (var entry : blockPattern.get().getRawEntries()) {
+                var block = entry.predicate().getBlockStates().getFirst().getBlock();
+                catalysts.add(EmiStack.of(block));
+            }
         }
 
         return catalysts;

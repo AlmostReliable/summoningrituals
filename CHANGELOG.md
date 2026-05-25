@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- added config option to register block pattern entries as usages in recipe viewers, enabled by default
 - fixed recipe matching logic if multiple input items are the same
 
 ## [3.13.3] - 2026-05-17

@@ -4,6 +4,7 @@ import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient
 import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.widget.JeiPatternClickListener;
+import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -220,6 +221,14 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 }
             }
         );
+
+        var blockPattern = recipe.blockPattern();
+        if (blockPattern.isPresent() && Config.CLIENT.blocksAsRecipeViewerUsages.getAsBoolean()) {
+            for (var entry : blockPattern.get().getRawEntries()) {
+                var block = entry.predicate().getBlockStates().getFirst().getBlock();
+                builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemLike(block);
+            }
+        }
     }
 
     private static void constructInitiatorTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {
