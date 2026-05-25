@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.14.0] - 2026-05-25
 
 - added config option to register block pattern entries as usages in recipe viewers, enabled by default
 - fixed recipe matching logic if multiple input items are the same
@@ -187,6 +190,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.14.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.0
 [3.13.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.13.3
 [3.13.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.13.2
 [3.13.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.13.1
