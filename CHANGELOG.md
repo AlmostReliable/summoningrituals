@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed recipe matching logic if multiple input items are the same
 
 ## [3.13.3] - 2026-05-17
 

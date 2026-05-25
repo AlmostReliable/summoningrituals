@@ -56,26 +56,34 @@ public record AltarRecipe(
         var itemInputs = inputs.itemInputs();
         if (itemInputs.isEmpty()) return true;
 
-        var matchedItems = new Ingredient[inventory.size()];
-        var matchedIngredients = new ArrayList<Ingredient>();
+        var size = inventory.size();
+        var stacks = new ItemStack[size]; // reference only, do not modify
+        var remainingCounts = new int[size];
 
-        for (var slot = 0; slot < inventory.size(); slot++) {
+        for (var slot = 0; slot < size; slot++) {
             var stack = inventory.getItem(slot);
-            if (!stack.isEmpty() && matchedItems[slot] == null) {
-                for (var input : itemInputs) {
-                    if (
-                        !matchedIngredients.contains(input.ingredient()) &&
-                            input.ingredient().test(stack) &&
-                            stack.getCount() >= input.count()
-                    ) {
-                        matchedItems[slot] = input.ingredient();
-                        matchedIngredients.add(input.ingredient());
-                    }
-                }
-            }
+            stacks[slot] = stack;
+            remainingCounts[slot] = stack.getCount();
         }
 
-        return matchedIngredients.size() == itemInputs.size();
+        for (var input : itemInputs) {
+            var remaining = input.count();
+            for (var slot = 0; slot < size && remaining > 0; slot++) {
+                if (remainingCounts[slot] <= 0) continue;
+
+                var stack = stacks[slot];
+                if (stack.isEmpty()) continue;
+                if (input.ingredient().test(stack)) {
+                    var taken = Math.min(remainingCounts[slot], remaining);
+                    remainingCounts[slot] -= taken;
+                    remaining -= taken;
+                }
+            }
+
+            if (remaining > 0) return false;
+        }
+
+        return true;
     }
 
     @Override
