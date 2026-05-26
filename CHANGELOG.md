@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.14.1] - 2026-05-26
 
 - fixed class loading issues when KubeJS is not installed causing recipe viewers to break
 
@@ -191,6 +194,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.14.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.1
 [3.14.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.0
 [3.13.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.13.3
 [3.13.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.13.2
