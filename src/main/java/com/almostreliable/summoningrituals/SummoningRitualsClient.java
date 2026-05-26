@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.client.render.AltarRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
-import com.almostreliable.summoningrituals.compat.kubejs.event.RitualRendererRegistryKubeEvent;
+import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
 import com.almostreliable.summoningrituals.core.Registration;
 
 import net.neoforged.api.distmarker.Dist;
@@ -40,8 +40,7 @@ public final class SummoningRitualsClient {
     }
 
     private static void registerClientReloadListeners(RegisterClientReloadListenersEvent event) {
-        if (!isKjsLoaded()) return;
-        event.registerReloadListener(new RitualRendererRegistryKubeEvent.ReloadListener());
+        KubeFacade.registerReloadListener(event);
     }
 
     private static void onRenderLevelStage(RenderLevelStageEvent event) {

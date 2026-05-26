@@ -2,8 +2,7 @@ package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
-import com.almostreliable.summoningrituals.compat.kubejs.event.KubeEvents;
-import com.almostreliable.summoningrituals.compat.kubejs.event.ModifyConditionsTooltipEvent;
+import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -42,7 +41,7 @@ public class RecipeViewerAltarLayout {
         BlockPatternRenderer.scheduleTask(blockPattern.get());
     }
 
-    public List<Component> getConditionTooltip(RecipeHolder<AltarRecipe> recipeHolder) {
+    protected List<Component> getConditionTooltip(RecipeHolder<AltarRecipe> recipeHolder) {
         var tooltip = new ArrayList<Component>();
         tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
 
@@ -57,9 +56,7 @@ public class RecipeViewerAltarLayout {
             tooltip.addAll(ConditionRegistry.getTooltip(condition));
         }
 
-        if (KubeEvents.MODIFY_CONDITIONS_TOOLTIP.hasListeners()) {
-            KubeEvents.MODIFY_CONDITIONS_TOOLTIP.post(new ModifyConditionsTooltipEvent(recipeId, recipe, tooltip));
-        }
+        KubeFacade.postModifyConditionsTooltipEvent(recipeId, recipe, tooltip);
         return tooltip;
     }
 
@@ -98,7 +95,7 @@ public class RecipeViewerAltarLayout {
     }
 
     @FunctionalInterface
-    public interface SlotConsumer {
+    protected interface SlotConsumer {
 
         void accept(int x, int y, int slot);
     }

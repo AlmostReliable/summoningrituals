@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- fixed class loading issues when KubeJS is not installed causing recipe viewers to break
 
 ## [3.14.0] - 2026-05-25
 
