@@ -4,8 +4,7 @@ import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.util.MathUtils;
 import com.almostreliable.summoningrituals.util.SerializeUtils;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
@@ -18,6 +17,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
@@ -198,6 +200,12 @@ public final class RecipeOutputs {
 
         abstract void spawn(ServerLevel level, BlockPos origin);
 
+        void spawnEntityInWorld(ServerLevel level, BlockPos origin, Entity entity) {
+            Vec3 randomPos = getRandomPos(origin);
+            entity.setPos(randomPos.x, randomPos.y, randomPos.z);
+            level.addFreshEntity(entity);
+        }
+
         public T getOutput() {
             return output;
         }
@@ -249,7 +257,9 @@ public final class RecipeOutputs {
             }
 
             for (var stack : stacks) {
-                ItemEntity.of(level, stack).spawn(level, getRandomPos(origin), this::writeDataToEntity);
+                ItemEntity itemEntity = new ItemEntity(level, 0, 0, 0, stack);
+                Entity entity = writeDataToEntity(itemEntity);
+                spawnEntityInWorld(level, origin, entity);
             }
         }
 
@@ -304,7 +314,8 @@ public final class RecipeOutputs {
             for (var i = 0; i < mobCount; i++) {
                 var mobEntity = output.create(level);
                 if (mobEntity == null) return;
-                mobEntity.spawn(level, getRandomPos(origin), this::writeDataToEntity);
+                var entity = writeDataToEntity(mobEntity);
+                spawnEntityInWorld(level, origin, entity);
             }
         }
 

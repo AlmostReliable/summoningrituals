@@ -1,10 +1,12 @@
 package com.almostreliable.summoningrituals.inventory;
 
 import com.almostreliable.summoningrituals.Constants;
+import com.almostreliable.summoningrituals.platform.Platform;
 import com.almostreliable.summoningrituals.platform.PlatformBlockEntity;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import com.almostreliable.summoningrituals.recipe.AltarRecipeSerializer;
 import com.almostreliable.summoningrituals.util.GameUtils;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -62,7 +64,7 @@ public class AltarInventory implements ItemHandler {
         var tag = new CompoundTag();
         tag.put(Constants.INSERT_ORDER, insertListTag);
         tag.put(Constants.ITEMS, itemsTag);
-        tag.put(Constants.CATALYST, catalyst.serialize());
+        tag.put(Constants.CATALYST, Platform.serializeItemStack(catalyst));
         return tag;
     }
 
@@ -213,7 +215,7 @@ public class AltarInventory implements ItemHandler {
             return ItemStack.EMPTY;
         }
 
-        if (!currentStack.canStack(stack)) return stack;
+        if (!canStack(currentStack, stack)) return stack;
 
         var maxCount = getMaxStackSize(slot, currentStack);
         var toInsert = Math.min(maxCount - currentStack.getCount(), stack.getCount());
@@ -315,5 +317,12 @@ public class AltarInventory implements ItemHandler {
             backup.add(stack.copy());
         }
         return backup;
+    }
+
+    private static boolean canStack(ItemStack stack, ItemStack other) {
+        if (stack.isEmpty() || !ItemStack.isSameItem(stack, other) || stack.hasTag() != other.hasTag()) return false;
+        if (!stack.hasTag()) return true;
+        assert stack.getTag() != null;
+        return stack.getTag().equals(other.getTag());
     }
 }

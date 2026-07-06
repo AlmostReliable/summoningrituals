@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.altar;
 
 import com.almostreliable.summoningrituals.Constants;
 import com.almostreliable.summoningrituals.util.MathUtils;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,6 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -32,6 +34,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -65,7 +68,8 @@ public class AltarBlock extends Block implements SimpleWaterloggedBlock, EntityB
     ) {
         if (hand == InteractionHand.MAIN_HAND && level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setMainHandItem(altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem()));
+                ItemStack remainder = altar.handleInteraction(serverPlayer, serverPlayer.getMainHandItem());
+                serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }

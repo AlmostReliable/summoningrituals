@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.util;
 
 import com.almostreliable.summoningrituals.SummoningRitualsConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,6 +13,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import javax.annotation.Nullable;
 
@@ -33,12 +35,12 @@ public final class GameUtils {
     }
 
     public static void dropItem(Level level, BlockPos pos, ItemStack stack, boolean offset) {
-        ItemEntity.of(level, stack).spawn(
-            level,
-            pos.getX() + (offset ? 0.5 : 0),
-            pos.getY() + (offset ? 0.5 : 0),
-            pos.getZ() + (offset ? 0.5 : 0)
-        );
+        var itemEntity = new ItemEntity(level, 0, 0, 0, stack);
+        var x = pos.getX() + (offset ? 0.5 : 0);
+        var y = pos.getY() + (offset ? 0.5 : 0);
+        var z = pos.getZ() + (offset ? 0.5 : 0);
+        itemEntity.setPos(x, y, z);
+        level.addFreshEntity(itemEntity);
     }
 
     public static void playSound(@Nullable Level level, BlockPos pos, SoundEvent sound) {
