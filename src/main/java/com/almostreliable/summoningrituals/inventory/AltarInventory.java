@@ -193,7 +193,7 @@ public class AltarInventory implements ItemHandler {
         if (actualRemoved < toRemove) {
             items.clear();
             for (int i = 0; i < itemBackup.size(); i++) {
-                items.add(i, itemBackup.get(i));
+                items.set(i, itemBackup.get(i));
             }
             return false;
         }
