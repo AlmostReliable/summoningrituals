@@ -80,6 +80,7 @@
     </inspection_tool>
     <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AutoUnboxing" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="AvoidDependencyNamedArgumentsNotation" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="AwaitNotInLoop" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AwaitWithoutCorrespondingSignal" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="BadExceptionCaught" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -226,6 +227,7 @@
     <inspection_tool class="ComparableImplementedButEqualsNotOverridden" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ComparatorCombinators" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ComparatorMethodParameterNotUsed" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ComparatorMinMaxCanBeUsed" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ComparatorNotSerializable" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ComparatorResultComparison" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="CompareToUsesNonFinalVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
@@ -291,10 +293,14 @@
     <inspection_tool class="ConvertArgumentToSet" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ConvertCallChainIntoSequence" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="ConvertFromMultiDollarToRegularString" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="ConvertLongToDuration" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ConvertNaNEquality" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ConvertNameBasedDestructuringShortFormToFull" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ConvertPairConstructorToToFunction" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="ConvertRangeCheckToTwoComparisons" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ConvertSecondaryConstructorToPrimary" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="ConvertToBasicLatin" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="ConvertToExplicitBackingFields" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="ConvertToStringTemplate" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ConvertTryFinallyToUseCall" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="ConvertTwoComparisonsToRangeCheck" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
@@ -336,6 +342,7 @@
     <inspection_tool class="CtorHeadPostInit" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CtorHeadUsedForNonConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CustomClassloader" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CustomComponentDestructuringMigration" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="CustomRegExpInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myConfigurations">
         <list>
@@ -426,6 +433,7 @@
     <inspection_tool class="DeprecatedTranslation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="Deprecation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DesignForExtension" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="DestructingShortFormNameMismatch" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="Destructure" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="DestructuringWrongName" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DialogTitleCapitalization" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -550,6 +558,7 @@
     </inspection_tool>
     <inspection_tool class="EnumValuesSoftDeprecate" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="EnumValuesSoftDeprecateInJava" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="EnumValuesTopLevelFunctionSoftDeprecate" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="EnumerationCanBeIteration" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="EqualsAndHashcode" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -901,6 +910,7 @@
     <inspection_tool class="InconsistentTextBlockIndent" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="IncorrectDateTimeFormat" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="IncorrectFormatting" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="IncorrectLazyConstantUsage" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="IncorrectMessageFormat" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="IncorrectPluginDslStructure" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="IncrementDecrementResultUsedJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1128,6 +1138,8 @@
     <inspection_tool class="KDocUnresolvedReference" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="KeySetIterationMayUseEntrySet" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="KotlinAmbiguousActuals" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="KotlinArrayHashCode" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="KotlinArrayToString" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="KotlinBigDecimalEquals" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="KotlinConstantConditions" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="KotlinCovariantEquals" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1160,6 +1172,7 @@
       <option name="CHECK_NON_ANNOTATED_REFERENCES" value="true" />
     </inspection_tool>
     <inspection_tool class="LateinitVarOverridesLateinitVar" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="LatestMinorVersion" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="LawOfDemeter" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="LengthOneStringInIndexOf" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="LengthOneStringsInConcatenation" enabled="true" level="INFORMATION" enabled_by_default="true" />
@@ -1240,6 +1253,7 @@
     <inspection_tool class="MarkedForRemoval" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="MarkerInterface" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MaskedAssertion" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MathClampMigration" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MathRandomCastToInt" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="MathRoundingWithIntArgument" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="Maven4RedundantParentCoordinates" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1290,7 +1304,7 @@
     <inspection_tool class="MigrateAssertToMatcherAssert" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MigrateDiagnosticSuppression" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MigrateFromJavaLangIo" enabled="true" level="INFORMATION" enabled_by_default="true" />
-    <inspection_tool class="MigrateToJavaLangIo" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="MigrateToJavaLangIo" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
     <inspection_tool class="MismatchedArrayReadWrite" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MismatchedCollectionQueryUpdate" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="queryNames">
@@ -1307,6 +1321,7 @@
     <inspection_tool class="MismatchedStringBuilderQueryUpdate" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MismatchedStringCase" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MisorderedAssertEqualsArguments" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MissingAbstractShadowsInEnumMixin" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="MissingDeprecatedAnnotation" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="MissingDeprecatedAnnotationOnScheduledForRemovalApi" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="MissingFinalNewline" enabled="true" level="ERROR" enabled_by_default="true" />
@@ -1730,6 +1745,7 @@
     <inspection_tool class="RedundantInnerClassModifier" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="RedundantInterpolationPrefix" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="RedundantJavaTimeOperations" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="RedundantKotlinStdLibDependency" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="RedundantLabel" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="RedundantLabeledReturnOnLastExpressionInLambda" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="RedundantLabeledSwitchRuleCodeBlock" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
@@ -1804,6 +1820,7 @@
     <inspection_tool class="RemoveUnnecessaryParentheses" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ReplaceAddAllWithMapTo" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ReplaceAllDot" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="ReplaceAllNonRegex" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReplaceArrayEqualityOpWithArraysEquals" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ReplaceArrayOfWithLiteral" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ReplaceAssertBooleanWithAssertEquality" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
@@ -1846,6 +1863,7 @@
     <inspection_tool class="ReplaceUntilWithRangeUntil" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ReplaceWithEnumMap" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReplaceWithIgnoreCaseEquals" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="ReplaceWithImportAlias" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ReplaceWithJavadoc" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="ReplaceWithOperatorAssignment" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ReplaceWithStringBuilderAppendRange" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1922,6 +1940,8 @@
     <inspection_tool class="SimplifiableCallChain" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifiableConditionalExpression" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifiableEqualsExpression" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="SimplifiableFlowCall" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="SimplifiableFlowCallChain" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="SimplifiableIfStatement" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifyAssertNotNull" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="SimplifyBooleanWithConstants" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
@@ -1999,6 +2019,7 @@
     <inspection_tool class="StringEqualsEmptyString" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="StringLiteralBreaksHTMLJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StringOperationCanBeSimplified" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="StringReferentialEquality" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StringRepeatCanBeUsed" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="StringReplaceableByStringBuffer" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="onlyWarnOnLoop" value="true" />
@@ -2028,6 +2049,7 @@
     <inspection_tool class="SuspiciousIndentAfterControlStatement" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousIntegerDivAssignment" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousInvocationHandlerImplementation" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SuspiciousJavaClassCallableReference" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SuspiciousListRemoveInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousLiteralUnderscore" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousLocalesLanguages" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -2331,6 +2353,7 @@
     <inspection_tool class="UsePropertyAccessSyntax" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="UseWithIndex" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="UselessCallOnCollection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UselessCallOnFlow" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UselessCallOnNotNull" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UtilityClass" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UtilityClassCanBeEnum" enabled="true" level="INFORMATION" enabled_by_default="true" />
