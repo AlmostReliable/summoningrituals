@@ -247,7 +247,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var entityInputs = recipe.getSacrifices(worldPosition, recipeId, region -> level.getEntities(player, region));
             if (entityInputs == null) continue;
 
-            var recipeInfo = RecipeInfo.inputInfo(recipeHolder, entityInputs);
+            var recipeInfo = RecipeInfo.inputInfo(recipeHolder, stack.copy(), entityInputs);
 
             var blockPatternExtension = recipe.blockPatternExtension();
             if (blockPatternExtension.isPresent()) {

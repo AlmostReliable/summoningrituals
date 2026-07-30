@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- exposed actual initiator stack in recipe info for events ([#40](https://github.com/AlmostReliable/summoningrituals/issues/40))
 
 ## [3.14.1] - 2026-05-26
 
