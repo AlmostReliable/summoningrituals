@@ -33,5 +33,7 @@ public interface AltarInventoryHost {
 
     @Nullable RecipeMap getRecipeMap();
 
+    boolean isRemoved();
+
     record InsertionResult(ItemStack remainder, boolean startsRitual) {}
 }

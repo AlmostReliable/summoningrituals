@@ -427,11 +427,24 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
             queuedInitiator = null;
             changed = false;
 
-            if (wasChanged) onContentsChanged();
+            // other root commit callbacks can remove the altar first, its contents were already dropped then
+            if (host.isRemoved()) {
+                if (toInsert != null) {
+                    host.spawnItemAboveAltar(toInsert);
+                }
+                return;
+            }
+
+            if (wasChanged) {
+                onContentsChanged();
+            }
+
             if (toInsert == null) return;
 
             var remainder = host.handleItemInsertion(null, toInsert, false).remainder();
-            if (!remainder.isEmpty()) host.spawnItemAboveAltar(remainder);
+            if (!remainder.isEmpty()) {
+                host.spawnItemAboveAltar(remainder);
+            }
         }
     }
 }
