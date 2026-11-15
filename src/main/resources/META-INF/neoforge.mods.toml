@@ -1,3 +1,5 @@
+modLoader = "javafml"
+loaderVersion = "[11,)"
 issueTrackerURL = "https://github.com/${githubUser}/${githubRepo}/issues"
 license = "${license}"
 
@@ -22,7 +24,7 @@ side = "BOTH"
 [[dependencies."${modId}"]]
 modId = "neoforge"
 type = "REQUIRED"
-versionRange = "${neoforgeVersionRange}"
+versionRange = "[${neoforgeVersion},)"
 ordering = "NONE"
 side = "BOTH"
 
