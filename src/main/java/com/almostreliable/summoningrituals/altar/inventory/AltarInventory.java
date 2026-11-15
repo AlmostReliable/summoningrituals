@@ -130,11 +130,11 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         if (amount == 0 || pendingInsertion.queuedInitiator != null) return 0;
 
         var stack = resource.toStack(amount);
-        var remainder = host.handleItemInsertion(null, stack, true);
-        var inserted = amount - remainder.getCount();
+        var insertionResult = host.handleItemInsertion(null, stack, true);
+        var inserted = amount - insertionResult.remainder().getCount();
         if (inserted <= 0) return 0;
 
-        pendingInsertion.queue(stack.copyWithCount(inserted), host.startsRitual(stack), transaction);
+        pendingInsertion.queue(stack.copyWithCount(inserted), insertionResult.startsRitual(), transaction);
         return inserted;
     }
 
@@ -430,7 +430,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
             if (wasChanged) onContentsChanged();
             if (toInsert == null) return;
 
-            var remainder = host.handleItemInsertion(null, toInsert, false);
+            var remainder = host.handleItemInsertion(null, toInsert, false).remainder();
             if (!remainder.isEmpty()) host.spawnItemAboveAltar(remainder);
         }
     }

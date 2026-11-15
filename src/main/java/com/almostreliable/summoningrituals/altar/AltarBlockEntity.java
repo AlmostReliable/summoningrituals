@@ -159,29 +159,32 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public ItemStack handleItemInsertion(@Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
-        if (!(level instanceof ServerLevel serverLevel)) return stack;
+    public InsertionResult handleItemInsertion(@Nullable ServerPlayer player, ItemStack stack, boolean simulate) {
+        var rejected = new InsertionResult(stack, false);
+        if (!(level instanceof ServerLevel serverLevel)) return rejected;
 
         if (currentRecipeInfo != null) {
             sendOptionalPlayerMessage(player, simulate, SummoningLang.IN_PROGRESS, ChatFormatting.YELLOW);
-            return stack;
+            return rejected;
         }
 
         if (player != null && player.isShiftKeyDown()) {
             removeLastInsertedItem();
-            return stack;
+            return rejected;
         }
 
+        var recipeMap = serverLevel.recipeAccess().recipeMap();
         RecipeMatch matchResult = null;
-        if (AltarRecipe.isInitiator(serverLevel.recipeAccess().recipeMap(), stack.getItem())) {
+        if (AltarRecipe.isInitiator(recipeMap, stack.getItem())) {
             matchResult = handleInitiatorInsertion(serverLevel, player, stack, simulate);
             if (matchResult.getInteractionRemainder() != null) {
-                return matchResult.getInteractionRemainder();
+                return new InsertionResult(matchResult.getInteractionRemainder(), true);
             }
         }
 
-        if (AltarRecipe.isInput(serverLevel.recipeAccess().recipeMap(), stack.getItem())) {
-            return handleInputInsertion(serverLevel, player, stack, simulate);
+        if (AltarRecipe.isInput(recipeMap, stack.getItem())) {
+            var remainder = handleInputInsertion(serverLevel, player, stack, simulate);
+            return new InsertionResult(remainder, false);
         }
 
         if (!simulate && matchResult != null && matchResult.hasIssue()) {
@@ -190,13 +193,14 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             sendOptionalPlayerMessage(player, false, matchResult.getMatchIssue().getIssueMessage(), ChatFormatting.RED);
         }
 
-        return stack;
+        return rejected;
     }
 
     private RecipeMatch handleInitiatorInsertion(
         ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate
     ) {
-        var recipeMatch = getMatchingRecipes(level, player, stack);
+        var drawHighlights = player != null && !simulate;
+        var recipeMatch = getMatchingRecipes(level, player, stack, drawHighlights);
         if (recipeMatch.hasIssue()) return recipeMatch;
 
         if (!simulate) inventory.setInitiator(stack.copyWithCount(1));
@@ -236,7 +240,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return remaining;
     }
 
-    private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
+    private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean drawHighlights) {
         var altarRecipes = level.recipeAccess().recipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get()).stream()
             .filter(holder -> holder.value().matches(inventory, level))
             .iterator();
@@ -281,7 +285,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var recipe = recipeInfo.getRecipe();
             var blockPattern = recipe.blockPattern();
             var recipes = matchingRecipes.size();
-            return blockPattern.filter(p -> !p.test(lootContext, recipes == 1)).isPresent();
+            return blockPattern.filter(p -> !p.test(lootContext, drawHighlights && recipes == 1)).isPresent();
         });
         if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;
 
@@ -338,13 +342,6 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return inventory;
         }
         return null;
-    }
-
-    @Override
-    public boolean startsRitual(ItemStack stack) {
-        if (!(level instanceof ServerLevel serverLevel) || currentRecipeInfo != null) return false;
-        if (!AltarRecipe.isInitiator(serverLevel.recipeAccess().recipeMap(), stack.getItem())) return false;
-        return !getMatchingRecipes(serverLevel, null, stack).hasIssue();
     }
 
     @Nullable
