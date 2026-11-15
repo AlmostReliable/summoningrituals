@@ -108,7 +108,10 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
 
     @Override
     public long getCapacityAsLong(int index, ItemResource resource) {
-        return getSlotLimit(index);
+        if (resource.isEmpty()) return getSlotLimit(index);
+        if (!isValid(index, resource)) return 0;
+
+        return Math.min(getSlotLimit(index), resource.getMaxStackSize());
     }
 
     @Override
@@ -223,7 +226,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     /**
      * Attempts to insert the given {@link ItemStack} into a specified slot in the inventory.
      * If the slot is empty, the stack is inserted directly. If the slot already contains items,
-     * it tries to merge the stack with the existing stack, respecting stack size limits.
+     * it tries to merge the stack with the existing stack. Both respect the slot and stack size limits.
      *
      * @param slot     The index of the inventory slot to insert into.
      * @param stack    The {@link ItemStack} to be inserted or merged into the slot. This can safely be used and modified.
@@ -233,20 +236,18 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     private int insertOrFillItemInSlot(int slot, ItemStack stack, boolean simulate) {
         var stackInSlot = inventory.get(slot);
 
-        if (stackInSlot.isEmpty()) {
-            if (!simulate) setStackInSlot(slot, stack);
-            return 0;
-        }
-
-        if (!ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
+        if (!stackInSlot.isEmpty() &&!ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
             return stack.getCount();
         }
 
-        var maxCount = Math.min(getSlotLimit(slot), stackInSlot.getMaxStackSize());
+        var maxCount = Math.min(getSlotLimit(slot), stack.getMaxStackSize());
         var toInsert = Math.min(maxCount - stackInSlot.getCount(), stack.getCount());
         if (toInsert <= 0) return stack.getCount();
+        if (simulate) return stack.getCount() - toInsert;
 
-        if (!simulate) {
+        if (stackInSlot.isEmpty()) {
+            setStackInSlot(slot, stack.copyWithCount(toInsert));
+        } else {
             stackInSlot.grow(toInsert);
             onContentsChanged();
         }
