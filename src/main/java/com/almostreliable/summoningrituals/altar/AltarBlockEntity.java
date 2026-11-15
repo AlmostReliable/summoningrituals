@@ -347,9 +347,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     @Nullable
     @Override
     public RecipeMap getRecipeMap() {
-        if (level == null) return null;
-        if (level instanceof ServerLevel serverLevel) return serverLevel.recipeAccess().recipeMap();
-        return AltarRecipe.getClientRecipeMap();
+        if (!(level instanceof ServerLevel serverLevel)) return null;
+        return serverLevel.recipeAccess().recipeMap();
     }
 
     public AltarInventory getInventory() {

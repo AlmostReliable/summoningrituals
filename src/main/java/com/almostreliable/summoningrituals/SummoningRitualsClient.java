@@ -7,7 +7,6 @@ import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipC
 import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
 import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.dev.PatternGeneratorItem;
-import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeStorage;
@@ -34,6 +33,7 @@ public final class SummoningRitualsClient {
 
     @Nullable
     private static FeatureRenderDispatcher overlayFeatureRenderer;
+    private static RecipeMap recipeMap = RecipeMap.EMPTY;
 
     public SummoningRitualsClient(IEventBus eventBus) {
         eventBus.addListener(SummoningRitualsClient::registerEntityRenderers);
@@ -112,14 +112,14 @@ public final class SummoningRitualsClient {
     }
 
     private static void onRecipesReceived(RecipesReceivedEvent event) {
-        AltarRecipe.setClientRecipeMap(event.getRecipeMap());
+        recipeMap = event.getRecipeMap();
     }
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
-        AltarRecipe.setClientRecipeMap(RecipeMap.EMPTY);
+        recipeMap = RecipeMap.EMPTY;
     }
 
     public static RecipeMap getRecipeMap() {
-        return AltarRecipe.getClientRecipeMap();
+        return recipeMap;
     }
 }

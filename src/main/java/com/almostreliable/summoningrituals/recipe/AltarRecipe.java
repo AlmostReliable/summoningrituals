@@ -53,7 +53,6 @@ public record AltarRecipe(
     private static final Set<Item> INITIATORS = Sets.newIdentityHashSet();
     private static final Set<Item> INPUTS = Sets.newIdentityHashSet();
     private static boolean CACHES_INITIALIZED;
-    private static RecipeMap clientRecipeMap = RecipeMap.EMPTY;
 
     @Override
     public boolean matches(RecipeInput inventory, Level level) {
@@ -173,14 +172,6 @@ public record AltarRecipe(
     public static boolean isInput(RecipeMap recipeMap, Item item) {
         if (!CACHES_INITIALIZED) initializeCaches(recipeMap);
         return INPUTS.contains(item);
-    }
-
-    public static RecipeMap getClientRecipeMap() {
-        return clientRecipeMap;
-    }
-
-    public static void setClientRecipeMap(RecipeMap recipeMap) {
-        clientRecipeMap = recipeMap;
     }
 
     private static void initializeCaches(RecipeMap recipeMap) {
