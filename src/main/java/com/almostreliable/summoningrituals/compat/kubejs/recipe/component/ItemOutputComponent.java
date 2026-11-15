@@ -17,6 +17,8 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
+import org.jspecify.annotations.Nullable;
+
 public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<ItemOutput> {
 
     public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("item_output"));
@@ -38,7 +40,7 @@ public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) impl
     }
 
     @Override
-    public ItemOutput wrap(RecipeScriptContext cx, Object from) {
+    public ItemOutput wrap(RecipeScriptContext cx, @Nullable Object from) {
         if (from instanceof ItemOutput o) {
             return o;
         }

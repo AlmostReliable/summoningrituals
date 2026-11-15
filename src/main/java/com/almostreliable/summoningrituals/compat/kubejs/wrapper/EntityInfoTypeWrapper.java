@@ -17,6 +17,8 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.wrap.TypeWrapperFactory;
 
+import org.jspecify.annotations.Nullable;
+
 public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
 
     public static final EntityInfoTypeWrapper INSTANCE = new EntityInfoTypeWrapper();
@@ -24,7 +26,7 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
     public static final TypeInfo ENTITY_TYPE_INFO = TypeInfo.of(EntityType.class);
 
     @Override
-    public EntityInfo wrap(Context cx, Object from, TypeInfo target) {
+    public EntityInfo wrap(Context cx, @Nullable Object from, TypeInfo target) {
         var o = from;
         if (o instanceof EntityInfo entityInfo) {
             return entityInfo;

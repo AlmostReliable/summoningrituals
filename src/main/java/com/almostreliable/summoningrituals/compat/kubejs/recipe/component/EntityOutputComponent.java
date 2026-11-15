@@ -18,6 +18,8 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Optional;
 
 public record EntityOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<EntityOutput> {
@@ -41,7 +43,7 @@ public record EntityOutputComponent(ResourceKey<RecipeComponentType<?>> type) im
     }
 
     @Override
-    public EntityOutput wrap(RecipeScriptContext cx, Object from) {
+    public EntityOutput wrap(RecipeScriptContext cx, @Nullable Object from) {
         if (from instanceof SummoningEntityOutputBuilder builder) {
             return builder.buildOutput();
         }

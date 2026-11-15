@@ -18,6 +18,8 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
+import org.jspecify.annotations.Nullable;
+
 public record EntityInputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<EntityInput> {
 
     public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("entity_input"));
@@ -39,7 +41,7 @@ public record EntityInputComponent(ResourceKey<RecipeComponentType<?>> type) imp
     }
 
     @Override
-    public EntityInput wrap(RecipeScriptContext cx, Object from) {
+    public EntityInput wrap(RecipeScriptContext cx, @Nullable Object from) {
         if (from instanceof SummoningEntityInputBuilder builder) {
             return builder.buildInput();
         }
