@@ -1,224 +1,224 @@
-package com.almostreliable.summoningrituals.compat.viewer.emi;
-
-import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
-import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
-import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
-import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InitiatorSlotWidget;
-import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
-import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
-import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.data.SummoningLang;
-import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
-import com.almostreliable.summoningrituals.recipe.AltarRecipe;
-import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeHolder;
-
-import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.WidgetHolder;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe {
-
-    private final RecipeHolder<AltarRecipe> recipeHolder;
-
-    AltarEmiRecipe(RecipeHolder<AltarRecipe> recipeHolder) {
-        this.recipeHolder = recipeHolder;
-    }
-
-    @Override
-    public EmiRecipeCategory getCategory() {
-        return EmiPlugin.ALTAR_CATEGORY;
-    }
-
-    @Nullable
-    @Override
-    public ResourceLocation getId() {
-        return recipeHolder.id();
-    }
-
-    @Override
-    public List<EmiIngredient> getInputs() {
-        var recipe = recipeHolder.value();
-        var recipeInputs = recipe.inputs();
-        var inputs = new ArrayList<EmiIngredient>();
-
-        for (var itemInput : recipeInputs.itemInputs()) {
-            inputs.add(EmiIngredient.of(itemInput.ingredient(), itemInput.count()));
-        }
-        for (var entityInput : recipeInputs.entityInputs()) {
-            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
-            inputs.add(EntityEmiStack.input(entityIngredient));
-        }
-        for (var fakeEntityInput : recipeInputs.fakeEntityInputs()) {
-            inputs.add(EmiStack.of(fakeEntityInput.displayItem()));
-        }
-
-        inputs.add(EmiIngredient.of(recipe.initiator()));
-
-        return inputs;
-    }
-
-    @Override
-    public List<EmiStack> getOutputs() {
-        var recipe = recipeHolder.value();
-        var recipeOutputs = recipe.outputs();
-        var outputs = new ArrayList<EmiStack>();
-
-        for (var itemOutput : recipeOutputs.itemOutputs()) {
-            outputs.add(EmiStack.of(itemOutput.item()));
-        }
-        for (var entityOutput : recipeOutputs.entityOutputs()) {
-            var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
-            outputs.add(EntityEmiStack.output(entityIngredient));
-        }
-        for (var displayOutput : recipeOutputs.displayOutputs()) {
-            outputs.add(EmiStack.of(displayOutput));
-        }
-
-        return outputs;
-    }
-
-    @Override
-    public List<EmiIngredient> getCatalysts() {
-        var recipe = recipeHolder.value();
-        var recipeInputs = recipe.inputs();
-        var recipeOutputs = recipe.outputs();
-        var catalysts = new ArrayList<EmiIngredient>();
-
-        for (var entityInput : recipeInputs.entityInputs()) {
-            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
-            var egg = entityIngredient.getEgg();
-            if (egg == null) continue;
-            catalysts.add(EmiStack.of(egg));
-        }
-        for (var entityOutput : recipeOutputs.entityOutputs()) {
-            var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
-            var egg = entityIngredient.getEgg();
-            if (egg == null) continue;
-            catalysts.add(EmiStack.of(egg));
-        }
-
-        var blockPattern = recipe.blockPattern();
-        if (blockPattern.isPresent() && Config.CLIENT.blocksAsRecipeViewerUsages.getAsBoolean()) {
-            for (var entry : blockPattern.get().getRawEntries()) {
-                var block = entry.predicate().getBlockStates().getFirst().getBlock();
-                catalysts.add(EmiStack.of(block));
-            }
-        }
-
-        return catalysts;
-    }
-
-    @Override
-    public int getDisplayWidth() {
-        return getWidth();
-    }
-
-    @Override
-    public int getDisplayHeight() {
-        return getHeight();
-    }
-
-    @Override
-    public void addWidgets(WidgetHolder widgets) {
-        widgets.addTexture(
-            TEXTURE,
-            0,
-            0,
-            getDisplayWidth(),
-            getDisplayHeight(),
-            0,
-            0,
-            getDisplayWidth(),
-            getDisplayHeight(),
-            TEXTURE_WIDTH,
-            TEXTURE_HEIGHT
-        );
-
-        widgets.add(new InvisibleSlotWidget(
-            EmiStack.of(Registration.ALTAR_BLOCK),
-            CENTER_X - SLOT_SIZE / 2,
-            CENTER_Y - SLOT_SIZE / 2 - 10
-        ));
-
-        var recipe = recipeHolder.value();
-
-        createInitiatorSlot((x, y, slot) ->
-            widgets.add(new InitiatorSlotWidget(EmiIngredient.of(recipe.initiator()), x, y)));
-
-        var inputs = getInputs();
-        createInputSlots(
-            recipe, (x, y, slot) ->
-                widgets.add(new InvisibleSlotWidget(inputs.get(slot), x, y))
-        );
-
-        var outputs = getOutputs();
-        createOutputSlots(
-            recipe, (x, y, slot) ->
-                widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
-        );
-
-        var commandOutput = recipe.outputs().commandOutput();
-        if (commandOutput.isPresent()) {
-            var slot = widgets.add(new StackWidget(
-                EmiStack.of(Items.COMMAND_BLOCK),
-                TEXTURE_WIDTH - SLOT_SIZE - 2,
-                TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5
-            )).appendTooltip(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
-
-            for (var commandTooltip : commandOutput.get().getTooltip()) {
-                slot.appendTooltip(commandTooltip);
-            }
-        }
-
-        var blockPattern = recipe.blockPattern();
-        addBlockPatternWidget(widgets, blockPattern, 2, Items.STRUCTURE_BLOCK, SummoningLang.BLOCK_PATTERN);
-        addBlockPatternWidget(
-            widgets,
-            recipe.blockPatternExtension(),
-            2 + SLOT_SIZE,
-            Items.JIGSAW,
-            SummoningLang.BLOCK_PATTERN_EXTENSION
-        );
-
-        var conditionTooltip = getConditionTooltip(recipeHolder);
-        if (conditionTooltip.size() > 1) {
-            var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2));
-            conditionTooltip.forEach(conditionSlot::appendTooltip);
-        }
-    }
-
-    private void addBlockPatternWidget(
-        WidgetHolder widgets, Optional<BlockPatternCondition> blockPattern, int x, Item icon, LangEntry nameTooltip) {
-        if (blockPattern.isEmpty()) return;
-
-        var widget = new StackWidget(EmiStack.of(icon), x, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
-            .appendClickHandler(() -> onPreviewButtonClicked(blockPattern));
-
-        var pattern = blockPattern.get();
-        var patternTooltip = nameTooltip.get().withStyle(ChatFormatting.GOLD);
-        widget.appendTooltip(pattern.appendNameTooltip(patternTooltip));
-        pattern.getTooltip().forEach(widget::appendTooltip);
-
-        widget
-            .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
-            .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
-
-        widgets.add(widget);
-    }
-}
+//package com.almostreliable.summoningrituals.compat.viewer.emi;
+//
+//import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
+//import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAltarLayout;
+//import com.almostreliable.summoningrituals.compat.viewer.emi.entity.EntityEmiStack;
+//import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InitiatorSlotWidget;
+//import com.almostreliable.summoningrituals.compat.viewer.emi.widget.InvisibleSlotWidget;
+//import com.almostreliable.summoningrituals.compat.viewer.emi.widget.StackWidget;
+//import com.almostreliable.summoningrituals.core.Config;
+//import com.almostreliable.summoningrituals.core.Registration;
+//import com.almostreliable.summoningrituals.data.SummoningLang;
+//import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
+//import com.almostreliable.summoningrituals.recipe.AltarRecipe;
+//import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
+//
+//import net.minecraft.ChatFormatting;
+//import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.world.item.Item;
+//import net.minecraft.world.item.Items;
+//import net.minecraft.world.item.crafting.RecipeHolder;
+//
+//import dev.emi.emi.api.recipe.EmiRecipe;
+//import dev.emi.emi.api.recipe.EmiRecipeCategory;
+//import dev.emi.emi.api.stack.EmiIngredient;
+//import dev.emi.emi.api.stack.EmiStack;
+//import dev.emi.emi.api.widget.WidgetHolder;
+//
+//import org.jetbrains.annotations.Nullable;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Optional;
+//
+//public class AltarEmiRecipe extends RecipeViewerAltarLayout implements EmiRecipe {
+//
+//    private final RecipeHolder<AltarRecipe> recipeHolder;
+//
+//    AltarEmiRecipe(RecipeHolder<AltarRecipe> recipeHolder) {
+//        this.recipeHolder = recipeHolder;
+//    }
+//
+//    @Override
+//    public EmiRecipeCategory getCategory() {
+//        return EmiPlugin.ALTAR_CATEGORY;
+//    }
+//
+//    @Nullable
+//    @Override
+//    public ResourceLocation getId() {
+//        return recipeHolder.id();
+//    }
+//
+//    @Override
+//    public List<EmiIngredient> getInputs() {
+//        var recipe = recipeHolder.value();
+//        var recipeInputs = recipe.inputs();
+//        var inputs = new ArrayList<EmiIngredient>();
+//
+//        for (var itemInput : recipeInputs.itemInputs()) {
+//            inputs.add(EmiIngredient.of(itemInput.ingredient(), itemInput.count()));
+//        }
+//        for (var entityInput : recipeInputs.entityInputs()) {
+//            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
+//            inputs.add(EntityEmiStack.input(entityIngredient));
+//        }
+//        for (var fakeEntityInput : recipeInputs.fakeEntityInputs()) {
+//            inputs.add(EmiStack.of(fakeEntityInput.displayItem()));
+//        }
+//
+//        inputs.add(EmiIngredient.of(recipe.initiator()));
+//
+//        return inputs;
+//    }
+//
+//    @Override
+//    public List<EmiStack> getOutputs() {
+//        var recipe = recipeHolder.value();
+//        var recipeOutputs = recipe.outputs();
+//        var outputs = new ArrayList<EmiStack>();
+//
+//        for (var itemOutput : recipeOutputs.itemOutputs()) {
+//            outputs.add(EmiStack.of(itemOutput.item()));
+//        }
+//        for (var entityOutput : recipeOutputs.entityOutputs()) {
+//            var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
+//            outputs.add(EntityEmiStack.output(entityIngredient));
+//        }
+//        for (var displayOutput : recipeOutputs.displayOutputs()) {
+//            outputs.add(EmiStack.of(displayOutput));
+//        }
+//
+//        return outputs;
+//    }
+//
+//    @Override
+//    public List<EmiIngredient> getCatalysts() {
+//        var recipe = recipeHolder.value();
+//        var recipeInputs = recipe.inputs();
+//        var recipeOutputs = recipe.outputs();
+//        var catalysts = new ArrayList<EmiIngredient>();
+//
+//        for (var entityInput : recipeInputs.entityInputs()) {
+//            var entityIngredient = new EntityIngredient(entityInput.entityInfo());
+//            var egg = entityIngredient.getEgg();
+//            if (egg == null) continue;
+//            catalysts.add(EmiStack.of(egg));
+//        }
+//        for (var entityOutput : recipeOutputs.entityOutputs()) {
+//            var entityIngredient = new EntityIngredient(entityOutput.entityInfo());
+//            var egg = entityIngredient.getEgg();
+//            if (egg == null) continue;
+//            catalysts.add(EmiStack.of(egg));
+//        }
+//
+//        var blockPattern = recipe.blockPattern();
+//        if (blockPattern.isPresent() && Config.CLIENT.blocksAsRecipeViewerUsages.getAsBoolean()) {
+//            for (var entry : blockPattern.get().getRawEntries()) {
+//                var block = entry.predicate().getBlockStates().getFirst().getBlock();
+//                catalysts.add(EmiStack.of(block));
+//            }
+//        }
+//
+//        return catalysts;
+//    }
+//
+//    @Override
+//    public int getDisplayWidth() {
+//        return getWidth();
+//    }
+//
+//    @Override
+//    public int getDisplayHeight() {
+//        return getHeight();
+//    }
+//
+//    @Override
+//    public void addWidgets(WidgetHolder widgets) {
+//        widgets.addTexture(
+//            TEXTURE,
+//            0,
+//            0,
+//            getDisplayWidth(),
+//            getDisplayHeight(),
+//            0,
+//            0,
+//            getDisplayWidth(),
+//            getDisplayHeight(),
+//            TEXTURE_WIDTH,
+//            TEXTURE_HEIGHT
+//        );
+//
+//        widgets.add(new InvisibleSlotWidget(
+//            EmiStack.of(Registration.ALTAR_BLOCK),
+//            CENTER_X - SLOT_SIZE / 2,
+//            CENTER_Y - SLOT_SIZE / 2 - 10
+//        ));
+//
+//        var recipe = recipeHolder.value();
+//
+//        createInitiatorSlot((x, y, slot) ->
+//            widgets.add(new InitiatorSlotWidget(EmiIngredient.of(recipe.initiator()), x, y)));
+//
+//        var inputs = getInputs();
+//        createInputSlots(
+//            recipe, (x, y, slot) ->
+//                widgets.add(new InvisibleSlotWidget(inputs.get(slot), x, y))
+//        );
+//
+//        var outputs = getOutputs();
+//        createOutputSlots(
+//            recipe, (x, y, slot) ->
+//                widgets.add(new InvisibleSlotWidget(outputs.get(slot), x, y)).recipeContext(this)
+//        );
+//
+//        var commandOutput = recipe.outputs().commandOutput();
+//        if (commandOutput.isPresent()) {
+//            var slot = widgets.add(new StackWidget(
+//                EmiStack.of(Items.COMMAND_BLOCK),
+//                TEXTURE_WIDTH - SLOT_SIZE - 2,
+//                TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5
+//            )).appendTooltip(SummoningLang.COMMANDS.get().append(":").withStyle(ChatFormatting.GOLD));
+//
+//            for (var commandTooltip : commandOutput.get().getTooltip()) {
+//                slot.appendTooltip(commandTooltip);
+//            }
+//        }
+//
+//        var blockPattern = recipe.blockPattern();
+//        addBlockPatternWidget(widgets, blockPattern, 2, Items.STRUCTURE_BLOCK, SummoningLang.BLOCK_PATTERN);
+//        addBlockPatternWidget(
+//            widgets,
+//            recipe.blockPatternExtension(),
+//            2 + SLOT_SIZE,
+//            Items.JIGSAW,
+//            SummoningLang.BLOCK_PATTERN_EXTENSION
+//        );
+//
+//        var conditionTooltip = getConditionTooltip(recipeHolder);
+//        if (conditionTooltip.size() > 1) {
+//            var conditionSlot = widgets.add(new StackWidget(EmiStack.of(Items.NETHER_STAR), 2, 2));
+//            conditionTooltip.forEach(conditionSlot::appendTooltip);
+//        }
+//    }
+//
+//    private void addBlockPatternWidget(
+//        WidgetHolder widgets, Optional<BlockPatternCondition> blockPattern, int x, Item icon, LangEntry nameTooltip) {
+//        if (blockPattern.isEmpty()) return;
+//
+//        var widget = new StackWidget(EmiStack.of(icon), x, TEXTURE_HEIGHT - SLOT_SIZE * 2 - 5)
+//            .appendClickHandler(() -> onPreviewButtonClicked(blockPattern));
+//
+//        var pattern = blockPattern.get();
+//        var patternTooltip = nameTooltip.get().withStyle(ChatFormatting.GOLD);
+//        widget.appendTooltip(pattern.appendNameTooltip(patternTooltip));
+//        pattern.getTooltip().forEach(widget::appendTooltip);
+//
+//        widget
+//            .appendTooltip(SummoningLang.PREVIEW_CLICK.get().withStyle(ChatFormatting.GRAY))
+//            .appendTooltip(() -> ClientTooltipComponent.create(pattern.getTooltipComponent()));
+//
+//        widgets.add(widget);
+//    }
+//}
