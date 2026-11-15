@@ -39,7 +39,6 @@ public record ItemOutput(ItemStackTemplate item, Optional<BlockPos> offset, Opti
 
         while (toSpawn > 0) {
             var stack = item.withCount(Math.min(toSpawn, 4)).create();
-            if (stack.isEmpty()) break;
             var pos = getRandomPos(origin);
             var entity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack);
             level.addFreshEntity(entity);

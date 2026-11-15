@@ -50,7 +50,7 @@ public class PatternGeneratorItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         var level = context.getLevel();
         var player = context.getPlayer();
-        if (!level.isClientSide() || !(level instanceof ClientLevel clientLevel) || player == null || context.getHand() != InteractionHand.MAIN_HAND) {
+        if (!(level instanceof ClientLevel clientLevel) || player == null || context.getHand() != InteractionHand.MAIN_HAND) {
             return super.useOn(context);
         }
 
