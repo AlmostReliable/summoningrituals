@@ -9,8 +9,7 @@ import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.LoadingModList;
-import net.neoforged.fml.loading.moddiscovery.ModInfo;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public final class KubeFacade {
         var modId = "kubejs";
         var modList = ModList.get();
         if (modList == null) {
-            return LoadingModList.get().getMods().stream().map(ModInfo::getModId).noneMatch(modId::equals);
+            return FMLLoader.getCurrent().getLoadingModList().getModFileById(modId) == null;
         }
         return !modList.isLoaded(modId);
     }

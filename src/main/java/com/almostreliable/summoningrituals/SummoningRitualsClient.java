@@ -15,10 +15,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.LoadingModList;
-import net.neoforged.fml.loading.moddiscovery.ModInfo;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -124,14 +121,5 @@ public final class SummoningRitualsClient {
 
     public static RecipeMap getRecipeMap() {
         return AltarRecipe.getClientRecipeMap();
-    }
-
-    private static boolean isKjsLoaded() {
-        var modId = "kubejs";
-        var modList = ModList.get();
-        if (modList == null) {
-            return LoadingModList.get().getMods().stream().map(ModInfo::getModId).anyMatch(modId::equals);
-        }
-        return modList.isLoaded(modId);
     }
 }
