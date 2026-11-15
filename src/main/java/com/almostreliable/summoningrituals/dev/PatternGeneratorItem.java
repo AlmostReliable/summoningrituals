@@ -100,7 +100,7 @@ public class PatternGeneratorItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    public void inventoryTick(ItemStack stack, Level level) {
+    public void clientTick(ItemStack stack, Level level) {
         if (!level.isClientSide()) return;
 
         var state = stack.getOrDefault(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);

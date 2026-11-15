@@ -106,7 +106,7 @@ public final class SummoningRitualsClient {
         for (var slot = 0; slot < inventory.getContainerSize(); slot++) {
             var stack = inventory.getItem(slot);
             if (stack.getItem() instanceof PatternGeneratorItem patternGenerator) {
-                patternGenerator.inventoryTick(stack, player.level());
+                patternGenerator.clientTick(stack, player.level());
             }
         }
     }

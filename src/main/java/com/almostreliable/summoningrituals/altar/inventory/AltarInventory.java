@@ -124,7 +124,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     @Override
     public int insert(ItemResource resource, int amount, TransactionContext transaction) {
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
-        if (amount == 0 || pendingInsertion.initiator != null) return 0;
+        if (amount == 0 || pendingInsertion.queuedInitiator != null) return 0;
 
         var stack = resource.toStack(amount);
         var remainder = host.handleItemInsertion(null, stack, true);
@@ -376,19 +376,19 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     }
 
     private record PendingState(
-        ItemStack[] items, List<Tuple<ItemStack, Integer>> insertOrder, @Nullable ItemStack initiator, boolean changed
+        ItemStack[] items, List<Tuple<ItemStack, Integer>> insertOrder, @Nullable ItemStack queuedInitiator, boolean changed
     ) {}
 
     private final class PendingInsertion extends SnapshotJournal<PendingState> {
 
         @Nullable
-        private ItemStack initiator;
+        private ItemStack queuedInitiator;
         private boolean changed;
 
         private void queue(ItemStack stack, boolean startsRitual, TransactionContext transaction) {
             updateSnapshots(transaction);
             if (startsRitual) {
-                initiator = stack;
+                queuedInitiator = stack;
                 return;
             }
 
@@ -407,7 +407,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
             for (var entry : insertOrder) {
                 insertOrderCopy.add(new Tuple<>(entry.getA().copy(), entry.getB()));
             }
-            return new PendingState(inventory.snapshot(), insertOrderCopy, initiator, changed);
+            return new PendingState(inventory.snapshot(), insertOrderCopy, queuedInitiator, changed);
         }
 
         @Override
@@ -415,15 +415,15 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
             inventory.restore(snapshot.items());
             insertOrder.clear();
             insertOrder.addAll(snapshot.insertOrder());
-            initiator = snapshot.initiator();
+            queuedInitiator = snapshot.queuedInitiator();
             changed = snapshot.changed();
         }
 
         @Override
         protected void onRootCommit(PendingState originalState) {
-            var toInsert = initiator;
+            var toInsert = queuedInitiator;
             var wasChanged = changed;
-            initiator = null;
+            queuedInitiator = null;
             changed = false;
 
             if (wasChanged) onContentsChanged();
