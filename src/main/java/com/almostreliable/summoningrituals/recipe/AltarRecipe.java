@@ -174,6 +174,7 @@ public record AltarRecipe(
         return INPUTS.contains(item);
     }
 
+    @SuppressWarnings("deprecation")
     private static void initializeCaches(RecipeMap recipeMap) {
         var recipes = recipeMap.byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
 
