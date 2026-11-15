@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeMap;
 
 import org.jspecify.annotations.Nullable;
@@ -30,8 +29,6 @@ public interface AltarInventoryHost {
     void spawnItemAboveAltar(ItemStack stack);
 
     void onInventoryChanged(Function<HolderLookup.Provider, CompoundTag> serializer);
-
-    @Nullable RecipeManager getRecipeManager();
 
     boolean startsRitual(ItemStack stack);
 

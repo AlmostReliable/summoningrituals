@@ -30,7 +30,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -346,13 +345,6 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (!(level instanceof ServerLevel serverLevel) || currentRecipeInfo != null) return false;
         if (!AltarRecipe.isInitiator(serverLevel.recipeAccess().recipeMap(), stack.getItem())) return false;
         return !getMatchingRecipes(serverLevel, null, stack).hasIssue();
-    }
-
-    @Nullable
-    @Override
-    public RecipeManager getRecipeManager() {
-        if (!(level instanceof ServerLevel serverLevel)) return null;
-        return serverLevel.recipeAccess();
     }
 
     @Nullable

@@ -53,10 +53,6 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         this.initiator = ItemStack.EMPTY;
     }
 
-    public CompoundTag serializeNBT(HolderLookup.Provider registryAccess) {
-        return serialize(registryAccess, this::save);
-    }
-
     public CompoundTag serializeWithoutInsertOrder(HolderLookup.Provider registryAccess) {
         return serialize(registryAccess, this::saveWithoutInsertOrder);
     }
@@ -144,10 +140,6 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         return 0;
     }
 
-    public int getSlots() {
-        return size();
-    }
-
     public int getSlotLimit(int slot) {
         if (slot == getInitiatorSlot()) return 1;
         return Item.DEFAULT_MAX_STACK_SIZE;
@@ -169,10 +161,6 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         onContentsChanged();
     }
 
-    public boolean isItemValid(int slot, ItemStack stack) {
-        return isValidItem(slot, stack.getItem());
-    }
-
     private boolean isValidItem(int slot, Item item) {
         var recipeMap = host.getRecipeMap();
         if (recipeMap == null) return false;
@@ -182,15 +170,6 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         }
 
         return AltarRecipe.isInput(recipeMap, item);
-    }
-
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        if (stack.isEmpty()) return ItemStack.EMPTY;
-        return host.handleItemInsertion(null, stack, simulate);
-    }
-
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return ItemStack.EMPTY;
     }
 
     // region RecipeInput delegate
