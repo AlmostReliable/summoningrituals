@@ -16,8 +16,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import java.util.Objects;
-
 public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
 
     private static final MoonPhase[] PHASES = MoonPhase.values();
@@ -37,7 +35,11 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
     @Override
     public boolean test(LootContext lootContext) {
         var level = lootContext.getLevel();
-        var origin = Objects.requireNonNullElse(lootContext.getOptionalParameter(LootContextParams.ORIGIN), Vec3.ZERO);
+        var origin = lootContext.getOptionalParameter(LootContextParams.ORIGIN);
+        if (origin == null) {
+            origin = Vec3.ZERO;
+        }
+
         var moonPhaseOrdinal = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, origin).index();
         return moonPhaseOrdinal == phase.ordinal();
     }
