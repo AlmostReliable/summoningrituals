@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ConditionsBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.input.BaseEntityInput;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
 public class AltarKubeRecipe extends KubeRecipe {
 
     public static final KubeRecipeFactory FACTORY = new KubeRecipeFactory(
-        Registration.ALTAR_RECIPE_TYPE.getId(),
+        ModRegistration.ALTAR_RECIPE_TYPE.getId(),
         AltarKubeRecipe.class,
         AltarKubeRecipe::new
     );

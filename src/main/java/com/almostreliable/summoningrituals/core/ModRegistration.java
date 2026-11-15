@@ -43,7 +43,7 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 @SuppressWarnings("ConstantConditions")
-public final class Registration {
+public final class ModRegistration {
 
     // @formatter:off
 
@@ -100,7 +100,7 @@ public final class Registration {
 
     // @formatter:on
 
-    private Registration() {}
+    private ModRegistration() {}
 
     public static void init(IEventBus eventBus) {
         CREATIVE_TABS.register(eventBus);
@@ -112,8 +112,8 @@ public final class Registration {
         LOOT_CONDITIONS.register(eventBus);
         DATA_COMPONENTS.register(eventBus);
 
-        eventBus.addListener(Registration::onCommonSetup);
-        eventBus.addListener(Registration::registerCapabilities);
+        eventBus.addListener(ModRegistration::onCommonSetup);
+        eventBus.addListener(ModRegistration::registerCapabilities);
     }
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {

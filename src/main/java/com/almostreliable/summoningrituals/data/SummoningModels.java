@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.data;
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -33,7 +33,7 @@ class SummoningModels extends ModelProvider {
 
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-        var altarBlock = Registration.ALTAR_BLOCK;
+        var altarBlock = ModRegistration.ALTAR_BLOCK;
         var altarBlockId = altarBlock.getId();
         var altarBlockModelPath = SummoningRituals.getRL("block/" + altarBlockId.getPath());
         var altarBlockModelPathActive = altarBlockModelPath.withSuffix("_active");
@@ -46,13 +46,13 @@ class SummoningModels extends ModelProvider {
         altarBlockState(blockModels, altarBlock, altarBlockModelPath, altarBlockModelPathActive);
         itemModels.itemModelOutput.accept(altarBlock.asItem(), ItemModelUtils.plainModel(altarBlockModelPath));
 
-        var indestructibleAltarBlock = Registration.INDESTRUCTIBLE_ALTAR_BLOCK;
+        var indestructibleAltarBlock = ModRegistration.INDESTRUCTIBLE_ALTAR_BLOCK;
 
         altarBlockState(blockModels, indestructibleAltarBlock, altarBlockModelPath, altarBlockModelPathActive);
         itemModels.itemModelOutput.accept(indestructibleAltarBlock.asItem(), ItemModelUtils.plainModel(altarBlockModelPath));
 
         var bambooModelPath = ModelLocationUtils.getModelLocation(Items.BAMBOO);
-        itemModels.itemModelOutput.accept(Registration.PATTERN_GENERATOR_ITEM.get(), ItemModelUtils.plainModel(bambooModelPath));
+        itemModels.itemModelOutput.accept(ModRegistration.PATTERN_GENERATOR_ITEM.get(), ItemModelUtils.plainModel(bambooModelPath));
     }
 
     private static void altarBlockState(BlockModelGenerators blockModels, DeferredBlock<?> block, Identifier model, Identifier modelActive) {

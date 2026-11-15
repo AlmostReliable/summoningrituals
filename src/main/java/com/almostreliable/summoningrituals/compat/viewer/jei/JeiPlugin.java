@@ -6,7 +6,7 @@ import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiHelper;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.resources.Identifier;
 
@@ -37,14 +37,14 @@ public class JeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var recipes = SummoningRitualsClient.getRecipeMap().byType(Registration.ALTAR_RECIPE_TYPE.get());
+        var recipes = SummoningRitualsClient.getRecipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
         registration.addRecipes(AltarJeiCategory.TYPE, List.copyOf(recipes));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(Registration.ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
-        registration.addRecipeCatalyst(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
+        registration.addRecipeCatalyst(ModRegistration.ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
+        registration.addRecipeCatalyst(ModRegistration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
     }
 
     @Override

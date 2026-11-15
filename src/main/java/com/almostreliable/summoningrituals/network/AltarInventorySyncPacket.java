@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -32,7 +32,7 @@ public record AltarInventorySyncPacket(BlockPos altarPos, CompoundTag inventoryD
         var level = Minecraft.getInstance().level;
         if (level == null) return;
 
-        level.getBlockEntity(packet.altarPos, Registration.ALTAR_BLOCK_ENTITY.get())
+        level.getBlockEntity(packet.altarPos, ModRegistration.ALTAR_BLOCK_ENTITY.get())
             .ifPresent(altar -> altar.getInventory().deserializeNBT(level.registryAccess(), packet.inventoryData()));
     }
 }

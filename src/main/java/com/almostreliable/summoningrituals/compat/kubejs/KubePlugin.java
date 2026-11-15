@@ -17,7 +17,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOu
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
 import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
@@ -80,6 +80,6 @@ public class KubePlugin implements KubeJSPlugin {
 
     @Override
     public void registerRecipeSchemas(RecipeSchemaRegistry registry) {
-        registry.register(Registration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
+        registry.register(ModRegistration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
     }
 }

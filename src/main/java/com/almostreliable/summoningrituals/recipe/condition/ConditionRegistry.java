@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe.condition;
 
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.condition.handler.AltarTagBlockStateCondition;
 import com.almostreliable.summoningrituals.recipe.condition.handler.ConditionHandler;
 import com.almostreliable.summoningrituals.recipe.condition.handler.LocationCondition;
@@ -28,9 +28,9 @@ public final class ConditionRegistry {
     private ConditionRegistry() {}
 
     public static void init() {
-        CONDITION_REGISTRY.put(Registration.ALTAR_TAG_BLOCK_STATE_CONDITION.get(), AltarTagBlockStateCondition.INSTANCE);
+        CONDITION_REGISTRY.put(ModRegistration.ALTAR_TAG_BLOCK_STATE_CONDITION.get(), AltarTagBlockStateCondition.INSTANCE);
         CONDITION_REGISTRY.put(LocationCheck.MAP_CODEC, LocationCondition.INSTANCE);
-        CONDITION_REGISTRY.put(Registration.MOON_PHASE_CONDITION.get(), MoonPhaseCondition.INSTANCE);
+        CONDITION_REGISTRY.put(ModRegistration.MOON_PHASE_CONDITION.get(), MoonPhaseCondition.INSTANCE);
         CONDITION_REGISTRY.put(TimeCheck.MAP_CODEC, TimeCondition.INSTANCE);
         CONDITION_REGISTRY.put(WeatherCheck.MAP_CODEC, WeatherCondition.INSTANCE);
     }

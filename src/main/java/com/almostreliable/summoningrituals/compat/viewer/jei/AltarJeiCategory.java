@@ -5,7 +5,7 @@ import com.almostreliable.summoningrituals.compat.viewer.common.RecipeViewerAlta
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.compat.viewer.jei.widget.JeiPatternClickListener;
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
 
-    static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createFromVanilla(Registration.ALTAR_RECIPE_TYPE.get());
+    static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createFromVanilla(ModRegistration.ALTAR_RECIPE_TYPE.get());
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -49,7 +49,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         background = guiHelper.drawableBuilder(TEXTURE, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .setTextureSize(TEXTURE_WIDTH, TEXTURE_HEIGHT)
             .build();
-        icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Registration.ALTAR_BLOCK.toStack());
+        icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ModRegistration.ALTAR_BLOCK.toStack());
         conditionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.NETHER_STAR.getDefaultInstance());
         blockPatternIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.STRUCTURE_BLOCK.getDefaultInstance());
         blockPatternExtensionIcon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, Items.JIGSAW.getDefaultInstance());
@@ -63,7 +63,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
     @Override
     public Component getTitle() {
-        return Registration.ALTAR_BLOCK.get().getName();
+        return ModRegistration.ALTAR_BLOCK.get().getName();
     }
 
     @Nullable
@@ -150,7 +150,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - SLOT_SIZE / 2, CENTER_Y - SLOT_SIZE / 2 - 10)
-            .addItemLike(Registration.ALTAR_BLOCK);
+            .addItemLike(ModRegistration.ALTAR_BLOCK);
 
         var recipe = recipeHolder.value();
         createInitiatorSlot((x, y, slot) ->

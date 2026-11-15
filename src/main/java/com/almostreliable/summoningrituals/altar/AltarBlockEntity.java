@@ -6,6 +6,7 @@ import com.almostreliable.summoningrituals.altar.inventory.AltarInventory;
 import com.almostreliable.summoningrituals.altar.inventory.AltarInventoryHost;
 import com.almostreliable.summoningrituals.compat.AltarObservable;
 import com.almostreliable.summoningrituals.core.Constants;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.data.SummoningLang.LangEntry;
 import com.almostreliable.summoningrituals.network.AltarInventorySyncPacket;
@@ -50,9 +51,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.almostreliable.summoningrituals.core.Registration.ALTAR_BLOCK_ENTITY;
-import static com.almostreliable.summoningrituals.core.Registration.ALTAR_RECIPE_TYPE;
-
 public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity, AltarInventoryHost {
 
     public static final AltarObservable SUMMONING_START = new AltarObservable();
@@ -79,7 +77,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     public float lastWaveAnchor;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
-        super(ALTAR_BLOCK_ENTITY.get(), pos, state);
+        super(ModRegistration.ALTAR_BLOCK_ENTITY.get(), pos, state);
         this.inventory = new AltarInventory(this);
     }
 
@@ -240,7 +238,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
-        var altarRecipes = level.recipeAccess().recipeMap().byType(ALTAR_RECIPE_TYPE.get()).stream()
+        var altarRecipes = level.recipeAccess().recipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get()).stream()
             .filter(holder -> holder.value().matches(inventory, level))
             .iterator();
         var recipeHolders = Lists.newArrayList(altarRecipes); // create mutable copy

@@ -5,7 +5,7 @@ import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.dev.PatternGeneratorItem;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
@@ -48,7 +48,7 @@ public final class SummoningRitualsClient {
     }
 
     private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(Registration.ALTAR_BLOCK_ENTITY.get(), AltarRenderer::new);
+        event.registerBlockEntityRenderer(ModRegistration.ALTAR_BLOCK_ENTITY.get(), AltarRenderer::new);
     }
 
     private static void registerTooltipRenderers(RegisterClientTooltipComponentFactoriesEvent event) {

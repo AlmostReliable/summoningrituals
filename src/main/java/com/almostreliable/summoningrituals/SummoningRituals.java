@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Config;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.data.DataGeneration;
 import com.almostreliable.summoningrituals.network.PacketHandler;
 
@@ -28,7 +28,7 @@ public final class SummoningRituals {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public SummoningRituals(IEventBus eventBus, ModContainer modContainer) {
-        Registration.init(eventBus);
+        ModRegistration.init(eventBus);
         PacketHandler.init(eventBus);
         Config.init(modContainer);
         eventBus.addListener(DataGeneration::initClient);
@@ -68,11 +68,11 @@ public final class SummoningRituals {
     }
 
     private static void onDatapackSync(OnDatapackSyncEvent event) {
-        event.sendRecipes(Registration.ALTAR_RECIPE_TYPE.get());
+        event.sendRecipes(ModRegistration.ALTAR_RECIPE_TYPE.get());
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getItemStack().is(Registration.PATTERN_GENERATOR_ITEM)) {
+        if (event.getItemStack().is(ModRegistration.PATTERN_GENERATOR_ITEM)) {
             // prevent pattern generator from opening menus
             event.setUseBlock(TriState.FALSE);
         }

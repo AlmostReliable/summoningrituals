@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.data;
 
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -28,7 +28,7 @@ class SummoningLoot extends LootTableProvider {
 
         @Override
         protected Iterable<Block> getKnownBlocks() {
-            return List.of(Registration.ALTAR_BLOCK.get());
+            return List.of(ModRegistration.ALTAR_BLOCK.get());
         }
 
         @Override

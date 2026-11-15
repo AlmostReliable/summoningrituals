@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.condition.check;
 
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.data.SummoningTags;
 
 import net.minecraft.advancements.criterion.StatePropertiesPredicate;
@@ -26,7 +26,7 @@ public record AltarTagBlockStateCheck(StatePropertiesPredicate properties) imple
 
     @Override
     public MapCodec<AltarTagBlockStateCheck> codec() {
-        return Registration.ALTAR_TAG_BLOCK_STATE_CONDITION.get();
+        return ModRegistration.ALTAR_TAG_BLOCK_STATE_CONDITION.get();
     }
 
     @Override

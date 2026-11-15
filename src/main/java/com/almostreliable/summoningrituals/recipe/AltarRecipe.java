@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 import com.almostreliable.summoningrituals.recipe.container.RecipeInputs;
 import com.almostreliable.summoningrituals.recipe.container.RecipeOutputs;
@@ -92,12 +92,12 @@ public record AltarRecipe(
 
     @Override
     public RecipeSerializer<AltarRecipe> getSerializer() {
-        return Registration.ALTAR_RECIPE_SERIALIZER.get();
+        return ModRegistration.ALTAR_RECIPE_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<AltarRecipe> getType() {
-        return Registration.ALTAR_RECIPE_TYPE.get();
+        return ModRegistration.ALTAR_RECIPE_TYPE.get();
     }
 
     @Nullable
@@ -184,7 +184,7 @@ public record AltarRecipe(
     }
 
     private static void initializeCaches(RecipeMap recipeMap) {
-        var recipes = recipeMap.byType(Registration.ALTAR_RECIPE_TYPE.get());
+        var recipes = recipeMap.byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
 
         for (var recipe : recipes) {
             var r = recipe.value();

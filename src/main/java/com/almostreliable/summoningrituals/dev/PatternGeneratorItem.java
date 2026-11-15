@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.dev;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -64,9 +64,9 @@ public class PatternGeneratorItem extends Item {
         var blockState = level.getBlockState(pos);
         if (blockState.isAir()) return InteractionResult.PASS;
 
-        var state = stack.getOrDefault(Registration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
+        var state = stack.getOrDefault(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
 
-        if (blockState.is(Registration.ALTAR_BLOCK)) {
+        if (blockState.is(ModRegistration.ALTAR_BLOCK)) {
             if (blockState.getValue(AltarBlock.FACING) != Direction.NORTH) {
                 player.sendOverlayMessage(Component.literal("Must be facing north!").withStyle(ChatFormatting.RED));
                 return InteractionResult.FAIL;
@@ -84,7 +84,7 @@ public class PatternGeneratorItem extends Item {
                     Component.literal("Generated pattern with " + count + " blocks.")
                         .withStyle(ChatFormatting.GREEN)
                 );
-                stack.set(Registration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
+                stack.set(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
 
                 return InteractionResult.SUCCESS;
             }
@@ -94,7 +94,7 @@ public class PatternGeneratorItem extends Item {
         }
 
         var newState = state.recordPos(pos);
-        stack.set(Registration.PATTERN_GENERATOR_COMPONENT, newState);
+        stack.set(ModRegistration.PATTERN_GENERATOR_COMPONENT, newState);
         player.sendOverlayMessage(Component.literal(newState.getMessage()).withStyle(ChatFormatting.DARK_GREEN));
 
         return InteractionResult.SUCCESS;
@@ -103,7 +103,7 @@ public class PatternGeneratorItem extends Item {
     public void inventoryTick(ItemStack stack, Level level) {
         if (!level.isClientSide()) return;
 
-        var state = stack.getOrDefault(Registration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
+        var state = stack.getOrDefault(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
         if (state.pos1().isPresent()) {
             // if at least one position is defined, highlight the area
             BlockHighlightRenderer.highlightArea(level.getGameTime(), state.getRenderBounds());
@@ -113,7 +113,7 @@ public class PatternGeneratorItem extends Item {
     }
 
     private void resetPositions(ItemStack stack, Player player) {
-        stack.set(Registration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
+        stack.set(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
         player.sendOverlayMessage(Component.literal("Positions reset.").withStyle(ChatFormatting.YELLOW));
     }
 

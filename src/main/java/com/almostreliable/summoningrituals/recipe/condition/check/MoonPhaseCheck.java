@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.condition.check;
 
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -31,7 +31,7 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
 
     @Override
     public MapCodec<MoonPhaseCheck> codec() {
-        return Registration.MOON_PHASE_CONDITION.get();
+        return ModRegistration.MOON_PHASE_CONDITION.get();
     }
 
     @Override
