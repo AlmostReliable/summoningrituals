@@ -23,7 +23,7 @@ import java.util.Optional;
 public record EntityInfo(Holder<EntityType<?>> entity, int count, Optional<CompoundTag> data, List<Component> tooltip) {
 
     public static final Codec<EntityInfo> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(EntityInfo::entity),
+        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.TAG_ID).forGetter(EntityInfo::entity),
         Codec.INT.optionalFieldOf(Constants.COUNT, 1).forGetter(EntityInfo::count),
         CompoundTag.CODEC.optionalFieldOf(Constants.DATA).forGetter(EntityInfo::data),
         ComponentSerialization.CODEC.listOf().optionalFieldOf(Constants.TOOLTIP, List.of()).forGetter(EntityInfo::tooltip)

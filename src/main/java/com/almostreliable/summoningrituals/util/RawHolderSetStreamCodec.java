@@ -11,8 +11,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
 import com.mojang.serialization.Codec;
@@ -38,30 +38,29 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
     public HolderSet<T> decode(RegistryFriendlyByteBuf buffer) {
         var tag = nbtCodec.decode(buffer);
         var registryAccess = buffer.registryAccess();
-        var registry = registryAccess.registry(registryKey);
+        var registry = registryAccess.lookup(registryKey);
 
         if (registry.isPresent()) {
             var regOps = registryAccess.createSerializationContext(NbtOps.INSTANCE);
             return originalCodec.parse(regOps, tag).getOrThrow();
         }
 
-        if (tag.getType().equals(StringTag.TYPE)) {
-            var idOrTag = tag.getAsString();
+        if (tag instanceof StringTag(var idOrTag)) {
             if (idOrTag.startsWith("#")) {
                 var tagRaw = idOrTag.substring(1);
-                var tagKey = TagKey.create(registryKey, ResourceLocation.parse(tagRaw));
+                var tagKey = TagKey.create(registryKey, Identifier.parse(tagRaw));
                 return new RawHolderSet<>(Optional.empty(), Optional.of(tagKey), Optional.empty());
             }
 
-            var id = ResourceLocation.parse(idOrTag);
+            var id = Identifier.parse(idOrTag);
             return new RawHolderSet<>(Optional.of(List.of(id)), Optional.empty(), Optional.empty());
         }
 
         if (tag instanceof ListTag list) {
-            var ids = new ArrayList<ResourceLocation>();
+            var ids = new ArrayList<Identifier>();
             for (var t : list) {
-                if (!t.getType().equals(StringTag.TYPE)) continue;
-                ids.add(ResourceLocation.parse(t.getAsString()));
+                if (!(t instanceof StringTag(var id))) continue;
+                ids.add(Identifier.parse(id));
             }
             return new RawHolderSet<>(Optional.of(ids), Optional.empty(), Optional.empty());
         }
@@ -72,7 +71,7 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
     @Override
     public void encode(RegistryFriendlyByteBuf buffer, HolderSet<T> value) {
         var registryAccess = buffer.registryAccess();
-        var registry = registryAccess.registry(registryKey);
+        var registry = registryAccess.lookup(registryKey);
         if (registry.isEmpty()) {
             throw new IllegalStateException("registry not found: " + registryKey);
         }

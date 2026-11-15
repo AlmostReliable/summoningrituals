@@ -9,25 +9,25 @@ import com.almostreliable.summoningrituals.data.SummoningTags;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +43,7 @@ public class BlockPatternRenderer {
 
     public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
     private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
+    private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
     private static final int TAG_CYCLE_TICKS = 20;
@@ -50,7 +51,7 @@ public class BlockPatternRenderer {
     @Nullable
     private Task task;
 
-    public void render(PoseStack poseStack, Camera camera) {
+    public void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         if (task == null) return;
 
         var mc = Minecraft.getInstance();
@@ -81,20 +82,11 @@ public class BlockPatternRenderer {
             return;
         }
 
-        try {
-            RenderSystem.disableCull();
-            ModelBlockRenderer.enableCaching();
-            var alphaBuffer = AlphaBufferSource.INSTANCE;
-            alphaBuffer.setAlpha(PREVIEW_ALPHA);
-            renderBlocks(mc, poseStack, camera, alphaBuffer, age / TAG_CYCLE_TICKS);
-            alphaBuffer.endBatch();
-        } finally {
-            RenderSystem.enableCull();
-            ModelBlockRenderer.clearCache();
-        }
+        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
+        renderBlocks(mc, poseStack, alphaBuffer, camera, age / TAG_CYCLE_TICKS);
     }
 
-    private void renderBlocks(Minecraft mc, PoseStack poseStack, Camera camera, AlphaBufferSource alphaBuffer, long cycleStep) {
+    private void renderBlocks(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, long cycleStep) {
         assert mc.level != null;
         assert task != null;
 
@@ -127,7 +119,7 @@ public class BlockPatternRenderer {
 
             BlockHighlightRenderer.highlightWrongPositionOnce(worldPos);
 
-            var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.getPosition());
+            var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.pos);
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
 
             poseStack.pushPose();
@@ -138,7 +130,7 @@ public class BlockPatternRenderer {
                 poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
                 poseStack.translate(-0.5, -0.5, -0.5);
 
-                renderBlock(mc, poseStack, alphaBuffer, worldPos, blockStateToRender);
+                renderBlock(mc, poseStack, alphaBuffer, camera, worldPos, blockStateToRender);
             }
             poseStack.popPose();
         }
@@ -146,27 +138,24 @@ public class BlockPatternRenderer {
         updatePlayerFeedback(mc, task.patternEntries.size(), correctBlocks);
     }
 
-    private static void renderBlock(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BlockState blockState) {
-        if (blockState.getRenderShape() == RenderShape.ENTITYBLOCK_ANIMATED &&
-            blockState.getBlock() instanceof BaseEntityBlock entityBlock) {
-            renderBlockEntity(mc, poseStack, alphaBuffer, pos, entityBlock, blockState);
-            return;
-        }
+    private static void renderBlock(
+        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, BlockPos pos, BlockState blockState
+    ) {
+        var modelRenderState = new BlockModelRenderState();
+        mc.getBlockModelResolver().update(modelRenderState, blockState, DISPLAY_CONTEXT);
 
-        //noinspection DataFlowIssue
-        mc.getBlockRenderer().renderSingleBlock(
-            blockState,
-            poseStack,
-            alphaBuffer,
-            LightTexture.FULL_BRIGHT,
-            OverlayTexture.NO_OVERLAY,
-            ModelData.EMPTY,
-            null
-        );
+        alphaBuffer.resetSubmitted();
+        modelRenderState.submitMultiLayer(poseStack, alphaBuffer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        if (alphaBuffer.hasSubmitted()) return;
+
+        if (blockState.getBlock() instanceof BaseEntityBlock entityBlock) {
+            renderBlockEntity(mc, poseStack, alphaBuffer, camera, pos, entityBlock, blockState);
+        }
     }
 
     private static void renderBlockEntity(
-        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BaseEntityBlock entityBlock, BlockState blockState
+        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, BlockPos pos,
+        BaseEntityBlock entityBlock, BlockState blockState
     ) {
         assert mc.level != null;
 
@@ -178,8 +167,13 @@ public class BlockPatternRenderer {
             blockEntity.setLevel(mc.level);
         }
 
-        mc.getBlockEntityRenderDispatcher()
-            .renderItem(blockEntity, poseStack, alphaBuffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        var dispatcher = mc.getBlockEntityRenderDispatcher();
+        var partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        BlockEntityRenderState renderState = dispatcher.tryExtractRenderState(blockEntity, partialTick, null, null);
+        if (renderState == null) return;
+
+        renderState.lightCoords = LightCoordsUtil.FULL_BRIGHT;
+        dispatcher.submit(renderState, poseStack, alphaBuffer, camera);
     }
 
     private void updatePlayerFeedback(Minecraft mc, int totalBlocks, int correctBlocks) {
@@ -188,7 +182,7 @@ public class BlockPatternRenderer {
 
         if (correctBlocks == totalBlocks) {
             var message = SummoningLang.PREVIEW_SUCCESS.get().withStyle(ChatFormatting.DARK_GREEN);
-            player.displayClientMessage(message, true);
+            player.sendOverlayMessage(message);
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1));
             clear();
             return;
@@ -199,7 +193,7 @@ public class BlockPatternRenderer {
             .append("/")
             .append(totalBlocks + ")")
             .withStyle(ChatFormatting.YELLOW);
-        player.displayClientMessage(message, true);
+        player.sendOverlayMessage(message);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -226,7 +220,7 @@ public class BlockPatternRenderer {
             .orElseGet(() -> altarSearchEntries.isEmpty() ? null : altarSearchEntries.getFirst());
 
         if (altarEntry == null) {
-            player.displayClientMessage(SummoningLang.PREVIEW_NO_ALTAR.get().withStyle(ChatFormatting.RED), true);
+            player.sendOverlayMessage(SummoningLang.PREVIEW_NO_ALTAR.get().withStyle(ChatFormatting.RED));
             return;
         }
 

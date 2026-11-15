@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPattern
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition.PatternEntry;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.ResolvableBlockPredicate;
 
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;

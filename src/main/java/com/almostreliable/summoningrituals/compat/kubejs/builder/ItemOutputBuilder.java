@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.kubejs.builder;
 
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
 import net.minecraft.core.BlockPos;
@@ -38,6 +39,6 @@ public class ItemOutputBuilder {
 
     @HideFromJS
     public ItemOutput build() {
-        return new ItemOutput(item, Optional.ofNullable(offset), Optional.ofNullable(spread));
+        return new ItemOutput(ItemOutputComponent.templateOf(item), Optional.ofNullable(offset), Optional.ofNullable(spread));
     }
 }

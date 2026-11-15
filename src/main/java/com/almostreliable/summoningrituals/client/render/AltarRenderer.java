@@ -6,11 +6,15 @@ import com.almostreliable.summoningrituals.core.Config;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -19,13 +23,15 @@ import net.minecraft.world.phys.Vec3;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess") // exposed for custom KubeJS renderers
-public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntityRenderer<AltarBlockEntity> {
+public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockEntityRenderer<AltarBlockEntity, AltarRenderer.State> {
 
-    public static final Map<ResourceLocation, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
+    public static final Map<Identifier, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
     public static final float HALF = .5f;
     public static final float HALF_CIRCLE = 180f;
     public static final float FULL_CIRCLE = 360f;
@@ -36,14 +42,30 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
     private static final float MAX_PROGRESS_HEIGHT = 2.5f;
     private static final float ITEM_OFFSET = 1.5f;
 
-    public AltarRenderer(Context itemRenderer) {
-        this(itemRenderer.getItemRenderer());
+    public AltarRenderer(Context context) {
+        this(context.itemModelResolver());
     }
 
     @Override
-    public void render(
-        AltarBlockEntity altar, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(
+        AltarBlockEntity altar, State state, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
     ) {
+        BlockEntityRenderer.super.extractRenderState(altar, state, partialTick, cameraPosition, breakProgress);
+        state.altar = altar;
+        state.partialTick = partialTick;
+    }
+
+    @Override
+    public void submit(State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        var altar = state.altar;
+        if (altar == null) return;
+
+        var partialTick = state.partialTick;
         var player = Minecraft.getInstance().player;
         var level = altar.getLevel();
 
@@ -57,7 +79,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         if (recipeInfo != null) {
             customRenderer = CUSTOM_RENDERERS.get(recipeInfo.getRecipeId());
         }
-        var renderContext = createRenderContext(poseStack, buffer, altar, player, level, partialTick, packedOverlay);
+        var renderContext = createRenderContext(poseStack, submitNodeCollector, altar, player, level, partialTick, OverlayTexture.NO_OVERLAY);
 
         renderContext.pushPose();
         {
@@ -78,7 +100,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
     }
 
     private AltarRenderContext createRenderContext(
-        PoseStack poseStack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level, float partialTick,
+        PoseStack poseStack, SubmitNodeCollector submitNodeCollector, AltarBlockEntity altar, Player player, Level level, float partialTick,
         int packedOverlay
     ) {
         var altarPos = altar.getBlockPos();
@@ -96,7 +118,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         var recipeProgress = altar.getRecipeProgress();
         var recipeTime = altar.getRecipeTime();
 
-        var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
+        var lightAbove = LevelRenderer.getLightCoords(level, altarPos.above());
 
         return new AltarRenderContext(
             level,
@@ -107,7 +129,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
             recipeProgress,
             recipeTime,
             poseStack,
-            buffer,
+            submitNodeCollector,
             lightAbove,
             packedOverlay,
             partialTick
@@ -196,7 +218,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
     public float calculateOrbitRotation() {
         var minecraft = Minecraft.getInstance();
         var renderTicks = minecraft.levelRenderer.getTicks()
-            + minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+            + minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         var renderSeconds = renderTicks / 20f;
         return clampRotation(ORBIT_DEGREES_PER_SECOND * renderSeconds);
     }
@@ -207,5 +229,12 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
 
     public static float invert(float value) {
         return 1 - value;
+    }
+
+    public static class State extends BlockEntityRenderState {
+
+        @Nullable
+        private AltarBlockEntity altar;
+        private float partialTick;
     }
 }

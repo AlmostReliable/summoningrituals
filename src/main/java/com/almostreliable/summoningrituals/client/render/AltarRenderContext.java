@@ -2,8 +2,9 @@ package com.almostreliable.summoningrituals.client.render;
 
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -24,7 +25,7 @@ public record AltarRenderContext(
     int getRecipeProgress,
     int getRecipeTime,
     PoseStack getPoseStack,
-    MultiBufferSource getBufferSource,
+    SubmitNodeCollector getBufferSource,
     int getLightAbove,
     int getPackedOverlay,
     float getPartialTick
@@ -82,16 +83,9 @@ public record AltarRenderContext(
         return getAltar().getInventory().getDisplayItems();
     }
 
-    public void renderItem(ItemRenderer itemRenderer, ItemStack item) {
-        itemRenderer.renderStatic(
-            item,
-            ItemDisplayContext.FIXED,
-            getLightAbove,
-            getPackedOverlay,
-            getPoseStack,
-            getBufferSource,
-            getLevel,
-            0
-        );
+    public void renderItem(ItemModelResolver itemModelResolver, ItemStack item) {
+        var itemRenderState = new ItemStackRenderState();
+        itemModelResolver.updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, getLevel, null, 0);
+        itemRenderState.submit(getPoseStack, getBufferSource, getLightAbove, getPackedOverlay, 0);
     }
 }

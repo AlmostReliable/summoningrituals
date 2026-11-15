@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.client.render.AltarRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.render.CustomRitualRenderer;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
@@ -18,9 +18,9 @@ public final class RitualRendererRegistryKubeEvent implements KubeEvent {
 
     private RitualRendererRegistryKubeEvent() {}
 
-    private final Map<ResourceLocation, CustomRitualRenderer> renderers = new HashMap<>();
+    private final Map<Identifier, CustomRitualRenderer> renderers = new HashMap<>();
 
-    public void register(ResourceLocation id, CustomRitualRenderer renderer) {
+    public void register(Identifier id, CustomRitualRenderer renderer) {
         renderers.put(id, renderer);
     }
 

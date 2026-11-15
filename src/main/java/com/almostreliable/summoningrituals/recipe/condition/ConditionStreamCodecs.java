@@ -3,12 +3,10 @@ package com.almostreliable.summoningrituals.recipe.condition;
 import com.almostreliable.summoningrituals.util.CodecUtils;
 import com.almostreliable.summoningrituals.util.RawHolderSetStreamCodec;
 
-import net.minecraft.advancements.critereon.BlockPredicate;
-import net.minecraft.advancements.critereon.LightPredicate;
-import net.minecraft.advancements.critereon.LocationPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.advancements.critereon.NbtPredicate;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.BlockPredicate;
+import net.minecraft.advancements.criterion.LightPredicate;
+import net.minecraft.advancements.criterion.LocationPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -21,6 +19,8 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Optional;
 
 public final class ConditionStreamCodecs {
@@ -29,20 +29,8 @@ public final class ConditionStreamCodecs {
         NumberProviders.CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, IntRange> INT_RANGE_STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(
         IntRange.CODEC);
-    public static final StreamCodec<FriendlyByteBuf, MinMaxBounds.Ints> INTS_BOUNDS_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.INT), MinMaxBounds.Ints::min,
-        ByteBufCodecs.optional(ByteBufCodecs.INT), MinMaxBounds.Ints::max,
-        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), MinMaxBounds.Ints::minSq,
-        ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), MinMaxBounds.Ints::maxSq,
-        MinMaxBounds.Ints::new
-    );
-    public static final StreamCodec<FriendlyByteBuf, MinMaxBounds.Doubles> DOUBLES_BOUNDS_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::min,
-        ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::max,
-        ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::minSq,
-        ByteBufCodecs.optional(ByteBufCodecs.DOUBLE), MinMaxBounds.Doubles::maxSq,
-        MinMaxBounds.Doubles::new
-    );
+    public static final StreamCodec<ByteBuf, MinMaxBounds.Ints> INTS_BOUNDS_STREAM_CODEC = MinMaxBounds.Ints.STREAM_CODEC;
+    public static final StreamCodec<ByteBuf, MinMaxBounds.Doubles> DOUBLES_BOUNDS_STREAM_CODEC = MinMaxBounds.Doubles.STREAM_CODEC;
     public static final StreamCodec<FriendlyByteBuf, LocationPredicate.PositionPredicate> POSITION_PREDICATE_STREAM_CODEC = StreamCodec.composite(
         DOUBLES_BOUNDS_STREAM_CODEC, LocationPredicate.PositionPredicate::x,
         DOUBLES_BOUNDS_STREAM_CODEC, LocationPredicate.PositionPredicate::y,
@@ -53,12 +41,7 @@ public final class ConditionStreamCodecs {
         INTS_BOUNDS_STREAM_CODEC, LightPredicate::composite,
         LightPredicate::new
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, BlockPredicate> BLOCK_PREDICATE_STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BLOCK)), BlockPredicate::blocks,
-        ByteBufCodecs.optional(StatePropertiesPredicate.STREAM_CODEC), BlockPredicate::properties,
-        ByteBufCodecs.optional(NbtPredicate.STREAM_CODEC), BlockPredicate::nbt,
-        BlockPredicate::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlockPredicate> BLOCK_PREDICATE_STREAM_CODEC = BlockPredicate.STREAM_CODEC;
     public static final StreamCodec<RegistryFriendlyByteBuf, LocationPredicate> LOCATION_PREDICATE_STREAM_CODEC = CodecUtils.composite(
         ByteBufCodecs.optional(POSITION_PREDICATE_STREAM_CODEC), LocationPredicate::position,
         ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BIOME)), LocationPredicate::biomes,
@@ -84,9 +67,9 @@ public final class ConditionStreamCodecs {
 
         @Override
         public void encode(RegistryFriendlyByteBuf buffer, LootItemCondition value) {
-            var id = BuiltInRegistries.LOOT_CONDITION_TYPE.getId(value.getType());
+            var id = BuiltInRegistries.LOOT_CONDITION_TYPE.getId(value.codec());
             buffer.writeByte(id);
-            var conditionHandler = ConditionRegistry.getOrThrow(value.getType());
+            var conditionHandler = ConditionRegistry.getOrThrow(value.codec());
             var streamCodec = conditionHandler.getStreamCodec();
             streamCodec.encode(buffer, value);
         }

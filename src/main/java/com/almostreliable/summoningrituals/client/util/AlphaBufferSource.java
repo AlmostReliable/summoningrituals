@@ -1,119 +1,327 @@
 package com.almostreliable.summoningrituals.client.util;
 
-import com.almostreliable.summoningrituals.ModConstants;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.phys.Vec3;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import org.joml.Quaternionf;
 
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
-public final class AlphaBufferSource extends MultiBufferSource.BufferSource {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-    public static final AlphaBufferSource INSTANCE = create();
+public final class AlphaBufferSource implements SubmitNodeCollector {
 
-    private final Map<RenderType, RenderType> delegatedRenderTypes = new Object2ObjectLinkedOpenHashMap<>();
-    private float alpha = 1f;
+    private static final Direction[] QUAD_DIRECTIONS = Arrays.copyOf(Direction.values(), Direction.values().length + 1);
 
-    private static AlphaBufferSource create() {
-        var alphaBufferSource = new AlphaBufferSource(new ByteBufferBuilder(256));
+    private final SubmitNodeCollector root;
+    private final OrderedSubmitNodeCollector target;
+    private final AlphaBufferSource owner;
+    private final float alpha;
+    private boolean submitted;
 
-        for (var rt : RenderType.chunkBufferLayers()) {
-            var delegated = new DelegateRenderType(
-                rt,
-                alphaBufferSource::onShaderSetup,
-                alphaBufferSource::onShaderClear
-            );
-
-            alphaBufferSource.fixedBuffers.put(delegated, new ByteBufferBuilder(rt.bufferSize()));
-            alphaBufferSource.delegatedRenderTypes.put(rt, delegated);
-        }
-
-        return alphaBufferSource;
-    }
-
-    private AlphaBufferSource(ByteBufferBuilder defaultBufferBuilder) {
-        super(defaultBufferBuilder, new Object2ObjectLinkedOpenHashMap<>());
-    }
-
-    public void setAlpha(float alpha) {
+    public AlphaBufferSource(SubmitNodeCollector root, float alpha) {
+        this.root = root;
+        this.target = root;
+        this.owner = this;
         this.alpha = alpha;
     }
 
-    @Override
-    public void endBatch() {
-        super.endBatch();
-        alpha = 1f;
+    private AlphaBufferSource(AlphaBufferSource owner, OrderedSubmitNodeCollector target) {
+        this.root = owner.root;
+        this.target = target;
+        this.owner = owner;
+        this.alpha = owner.alpha;
     }
 
-    private void onShaderSetup() {
-        if (alpha != 1f) {
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1, 1, 1, alpha);
-        }
+    public void resetSubmitted() {
+        owner.submitted = false;
     }
 
-    private void onShaderClear() {
-        if (alpha != 1f) {
-            RenderSystem.disableBlend();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-        }
+    public boolean hasSubmitted() {
+        return owner.submitted;
     }
 
     @Override
-    public VertexConsumer getBuffer(RenderType renderType) {
-        if (renderType instanceof DelegateRenderType) {
-            return super.getBuffer(renderType);
-        }
-
-        var delegated = delegatedRenderTypes.computeIfAbsent(
-            renderType, rt -> {
-                var d = new DelegateRenderType(rt, this::onShaderSetup, this::onShaderClear);
-                fixedBuffers.put(d, new ByteBufferBuilder(rt.bufferSize()));
-                return d;
-            }
-        );
-
-        return super.getBuffer(delegated);
+    public OrderedSubmitNodeCollector order(int order) {
+        return new AlphaBufferSource(owner, root.order(order));
     }
 
-    private static final class DelegateRenderType extends RenderType {
+    @Override
+    public <S> void submitModel(
+        Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
+        int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
+    ) {
+        owner.submitted = true;
+        var color = ARGB.multiplyAlpha(tintedColor, alpha);
+        var translucentType = translucentType(renderType, sprite);
+        if (translucentType == null) {
+            target.submitModel(model, state, poseStack, renderType, lightCoords, overlayCoords, color, sprite, outlineColor, crumblingOverlay);
+            return;
+        }
 
-        private final RenderType delegate;
+        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) -> {
+            model.setupAnim(state);
+            model.renderToBuffer(poseStackOf(pose), sprite == null ? buffer : sprite.wrap(buffer), lightCoords, overlayCoords, color);
+        });
+    }
 
-        private DelegateRenderType(RenderType delegate, Runnable setup, Runnable clear) {
-            super(
-                String.format("%s_delegate", ModConstants.MOD_ID),
-                delegate.format,
-                delegate.mode,
-                delegate.bufferSize,
-                delegate.affectsCrumbling,
-                delegate.sortOnUpload,
-                setup,
-                clear
+    @Override
+    public void submitModelPart(
+        ModelPart modelPart, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
+        @Nullable TextureAtlasSprite sprite, boolean sheeted, boolean hasFoil, int tintedColor,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int outlineColor
+    ) {
+        owner.submitted = true;
+        var color = ARGB.multiplyAlpha(tintedColor, alpha);
+        var translucentType = translucentType(renderType, sprite);
+        if (translucentType == null) {
+            target.submitModelPart(
+                modelPart, poseStack, renderType, lightCoords, overlayCoords, sprite, sheeted, hasFoil, color, crumblingOverlay, outlineColor
             );
+            return;
+        }
+
+        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) ->
+            modelPart.render(poseStackOf(pose), sprite == null ? buffer : sprite.wrap(buffer), lightCoords, overlayCoords, color)
+        );
+    }
+
+    @Override
+    public void submitBlockModel(
+        PoseStack poseStack, RenderType renderType, List<BlockStateModelPart> parts, int[] tintLayers, int lightCoords, int overlayCoords,
+        int outlineColor
+    ) {
+        submitBlockQuads(poseStack, parts, tintLayers, lightCoords, overlayCoords);
+    }
+
+    @Override
+    public void submitMultiLayerBlockModel(
+        PoseStack poseStack, List<BlockStateModelPart> modelParts, boolean translucent, int[] tintLayers, int lightCoords, int overlayCoords,
+        int outlineColor
+    ) {
+        submitBlockQuads(poseStack, modelParts, tintLayers, lightCoords, overlayCoords);
+    }
+
+    @Override
+    public void submitItem(
+        PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers,
+        List<BakedQuad> quads, ItemStackRenderState.FoilType foilType
+    ) {
+        if (quads.isEmpty()) return;
+        owner.submitted = true;
+
+        var quadsByType = new LinkedHashMap<RenderType, List<BakedQuad>>();
+        for (var quad : quads) {
+            var renderType = quad.materialInfo().itemRenderType();
+            var translucentType = translucentType(renderType, null);
+            quadsByType.computeIfAbsent(translucentType == null ? renderType : translucentType, type -> new ArrayList<>()).add(quad);
+        }
+
+        quadsByType.forEach((renderType, typeQuads) -> target.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
+            var quadInstance = new QuadInstance();
+            quadInstance.setLightCoords(lightCoords);
+            quadInstance.setOverlayCoords(overlayCoords);
+            for (var quad : typeQuads) {
+                var material = quad.materialInfo();
+                var tintIndex = material.tintIndex();
+                var color = material.isTinted() && tintIndex >= 0 && tintIndex < tintLayers.length ? tintLayers[tintIndex] : -1;
+                quadInstance.setColor(ARGB.multiplyAlpha(color, alpha));
+                buffer.putBakedQuad(pose, quad, quadInstance);
+            }
+        }));
+    }
+
+    @Override
+    public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
+        owner.submitted = true;
+        target.submitCustomGeometry(
+            poseStack,
+            renderType,
+            (pose, buffer) -> customGeometryRenderer.render(pose, new AlphaVertexConsumer(buffer, alpha))
+        );
+    }
+
+    @Override
+    public void submitText(
+        PoseStack poseStack, float x, float y, FormattedCharSequence string, boolean dropShadow, Font.DisplayMode displayMode, int lightCoords,
+        int color, int backgroundColor, int outlineColor
+    ) {
+        owner.submitted = true;
+        target.submitText(
+            poseStack, x, y, string, dropShadow, displayMode, lightCoords,
+            ARGB.multiplyAlpha(color, alpha), ARGB.multiplyAlpha(backgroundColor, alpha), ARGB.multiplyAlpha(outlineColor, alpha)
+        );
+    }
+
+    @Override
+    public void submitMovingBlock(PoseStack poseStack, MovingBlockRenderState movingBlockRenderState) {
+        owner.submitted = true;
+        target.submitMovingBlock(poseStack, movingBlockRenderState);
+    }
+
+    @Override
+    public void submitShadow(PoseStack poseStack, float radius, List<EntityRenderState.ShadowPiece> pieces) {
+        target.submitShadow(poseStack, radius, pieces);
+    }
+
+    @Override
+    public void submitNameTag(
+        PoseStack poseStack, @Nullable Vec3 nameTagAttachment, int offset, Component name, boolean seeThrough, int lightCoords,
+        double distanceToCameraSq, CameraRenderState camera
+    ) {
+        target.submitNameTag(poseStack, nameTagAttachment, offset, name, seeThrough, lightCoords, distanceToCameraSq, camera);
+    }
+
+    @Override
+    public void submitFlame(PoseStack poseStack, EntityRenderState renderState, Quaternionf rotation) {
+        target.submitFlame(poseStack, renderState, rotation);
+    }
+
+    @Override
+    public void submitLeash(PoseStack poseStack, EntityRenderState.LeashState leashState) {
+        target.submitLeash(poseStack, leashState);
+    }
+
+    @Override
+    public void submitBreakingBlockModel(PoseStack poseStack, BlockStateModel model, long seed, int progress) {
+        target.submitBreakingBlockModel(poseStack, model, seed, progress);
+    }
+
+    @Override
+    public void submitParticleGroup(ParticleGroupRenderer particleGroupRenderer) {
+        target.submitParticleGroup(particleGroupRenderer);
+    }
+
+    private void submitBlockQuads(PoseStack poseStack, List<BlockStateModelPart> parts, int[] tintLayers, int lightCoords, int overlayCoords) {
+        var hasQuads = parts.stream()
+            .anyMatch(part -> Arrays.stream(QUAD_DIRECTIONS).anyMatch(direction -> !part.getQuads(direction).isEmpty()));
+        if (!hasQuads) return;
+        owner.submitted = true;
+
+        target.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false), (pose, buffer) -> {
+            var quadInstance = new QuadInstance();
+            quadInstance.setLightCoords(lightCoords);
+            quadInstance.setOverlayCoords(overlayCoords);
+            for (var part : parts) {
+                for (var direction : QUAD_DIRECTIONS) {
+                    for (var quad : part.getQuads(direction)) {
+                        var tintIndex = quad.materialInfo().tintIndex();
+                        var color = tintIndex != -1 && tintIndex < tintLayers.length ? tintLayers[tintIndex] : -1;
+                        quadInstance.setColor(ARGB.multiplyAlpha(color, alpha));
+                        buffer.putBakedQuad(pose, quad, quadInstance);
+                    }
+                }
+            }
+        });
+    }
+
+    @Nullable
+    private static RenderType translucentType(RenderType renderType, @Nullable TextureAtlasSprite sprite) {
+        var texture = sprite == null ? textureOf(renderType) : sprite.atlasLocation();
+        return texture == null ? null : RenderTypes.entityTranslucent(texture, false);
+    }
+
+    @Nullable
+    private static Identifier textureOf(RenderType renderType) {
+        var textures = renderType.state.textures;
+        var binding = textures.get("Sampler0");
+        if (binding == null) {
+            binding = textures.values().stream().findFirst().orElse(null);
+        }
+        return binding == null ? null : binding.location();
+    }
+
+    private static PoseStack poseStackOf(PoseStack.Pose pose) {
+        var poseStack = new PoseStack();
+        poseStack.last().set(pose);
+        return poseStack;
+    }
+
+    private static final class AlphaVertexConsumer implements VertexConsumer {
+
+        private final VertexConsumer delegate;
+        private final float alpha;
+
+        private AlphaVertexConsumer(VertexConsumer delegate, float alpha) {
             this.delegate = delegate;
+            this.alpha = alpha;
         }
 
         @Override
-        public void setupRenderState() {
-            delegate.setupRenderState();
-            super.setupRenderState();
+        public VertexConsumer addVertex(float x, float y, float z) {
+            delegate.addVertex(x, y, z);
+            return this;
         }
 
         @Override
-        public void clearRenderState() {
-            super.clearRenderState();
-            delegate.clearRenderState();
+        public VertexConsumer setColor(int r, int g, int b, int a) {
+            delegate.setColor(r, g, b, (int) (a * alpha));
+            return this;
         }
 
         @Override
-        public String toString() {
-            return "DelegateRenderType{delegate=" + delegate + "}";
+        public VertexConsumer setColor(int color) {
+            delegate.setColor(ARGB.multiplyAlpha(color, alpha));
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            delegate.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            delegate.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            delegate.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            delegate.setNormal(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setLineWidth(float width) {
+            delegate.setLineWidth(width);
+            return this;
         }
     }
 }

@@ -15,9 +15,8 @@ import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -25,10 +24,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -37,6 +35,8 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import com.mojang.serialization.MapCodec;
 
 import java.util.List;
 import java.util.function.Function;
@@ -54,7 +54,7 @@ public final class Registration {
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ModConstants.MOD_ID);
-    private static final DeferredRegister<LootItemConditionType> LOOT_CONDITIONS = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, ModConstants.MOD_ID);
+    private static final DeferredRegister<MapCodec<? extends LootItemCondition>> LOOT_CONDITIONS = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, ModConstants.MOD_ID);
     private static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ModConstants.MOD_ID);
 
     // blocks
@@ -62,7 +62,7 @@ public final class Registration {
     public static final DeferredBlock<AltarBlock> INDESTRUCTIBLE_ALTAR_BLOCK = registerBlock(Constants.INDESTRUCTIBLE_ALTAR, "Indestructible Summoning Altar", AltarBlock::new, p -> p.strength(-1.0f, 3_600_000.0f));
 
     // items
-    public static final DeferredItem<PatternGeneratorItem> PATTERN_GENERATOR_ITEM = ITEMS.registerItem("pattern_generator", PatternGeneratorItem::new, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
+    public static final DeferredItem<PatternGeneratorItem> PATTERN_GENERATOR_ITEM = ITEMS.registerItem("pattern_generator", PatternGeneratorItem::new, p -> p.stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
 
     // block entities
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY = registerBlockEntity(ALTAR_BLOCK.getId(), AltarBlockEntity::new, ALTAR_BLOCK, INDESTRUCTIBLE_ALTAR_BLOCK);
@@ -76,11 +76,11 @@ public final class Registration {
             }
         }
     );
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(Constants.ALTAR, AltarRecipeSerializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<AltarRecipe>> ALTAR_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register(Constants.ALTAR, () -> AltarRecipeSerializer.INSTANCE);
 
     // conditions
-    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> ALTAR_TAG_BLOCK_STATE_CONDITION = LOOT_CONDITIONS.register(Constants.BLOCK_TAG_BLOCK_STATE, () -> new LootItemConditionType(AltarTagBlockStateCheck.CODEC));
-    public static final DeferredHolder<LootItemConditionType, LootItemConditionType> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register(Constants.MOON_PHASE, () -> new LootItemConditionType(MoonPhaseCheck.CODEC));
+    public static final DeferredHolder<MapCodec<? extends LootItemCondition>, MapCodec<AltarTagBlockStateCheck>> ALTAR_TAG_BLOCK_STATE_CONDITION = LOOT_CONDITIONS.register(Constants.BLOCK_TAG_BLOCK_STATE, () -> AltarTagBlockStateCheck.CODEC);
+    public static final DeferredHolder<MapCodec<? extends LootItemCondition>, MapCodec<MoonPhaseCheck>> MOON_PHASE_CONDITION = LOOT_CONDITIONS.register(Constants.MOON_PHASE, () -> MoonPhaseCheck.CODEC);
 
     // data components
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternGeneratorState>> PATTERN_GENERATOR_COMPONENT = DATA_COMPONENTS.registerComponentType(
@@ -122,7 +122,7 @@ public final class Registration {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ALTAR_BLOCK_ENTITY.get(), AltarBlockEntity::getCapability);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ALTAR_BLOCK_ENTITY.get(), AltarBlockEntity::getCapability);
     }
 
     private static <B extends Block> DeferredBlock<B> registerBlock(
@@ -132,9 +132,8 @@ public final class Registration {
         var block = BLOCKS.registerBlock(
             id,
             factory,
-            propertiesConfigurator.apply(BlockBehaviour.Properties.of()
+            p -> propertiesConfigurator.apply(p
                 .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
                 .sound(SoundType.STONE))
         );
         ITEMS.registerSimpleBlockItem(block);
@@ -146,7 +145,7 @@ public final class Registration {
 
     @SuppressWarnings("DataFlowIssue")
     private static <E extends BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> registerBlockEntity(
-        ResourceLocation id,
+        Identifier id,
         BlockEntityType.BlockEntitySupplier<E> factory, DeferredBlock<?>... blocks
     ) {
         return BLOCK_ENTITIES.register(
@@ -155,7 +154,7 @@ public final class Registration {
                 for (var i = 0; i < blocks.length; i++) {
                     blockArray[i] = blocks[i].get();
                 }
-                return Builder.of(factory, blockArray).build(null);
+                return new BlockEntityType<>(factory, blockArray);
             }
         );
     }

@@ -8,17 +8,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -46,7 +46,7 @@ import java.util.stream.Stream;
 public class AltarBlock extends TickableEntityBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty ACTIVE = BooleanProperty.create(Constants.ACTIVE);
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE = Stream.of(box(3, 0, 3, 13, 2, 13), box(5, 2, 5, 11, 9, 11), box(2, 9, 2, 14, 13, 14))
@@ -82,13 +82,13 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public BlockState updateShape(
-        BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos,
-        BlockPos nPos
+        BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction,
+        BlockPos nPos, BlockState nState, RandomSource random
     ) {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        return super.updateShape(state, direction, nState, level, pos, nPos);
+        return super.updateShape(state, level, ticks, pos, direction, nPos, nState, random);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
+    protected InteractionResult useItemOn(
         ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
         InteractionHand hand, BlockHitResult hitResult
     ) {
@@ -118,17 +118,7 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         var remainder = altar.handleItemInsertion(serverPlayer, stack, false);
         serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
 
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
-    }
-
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (level instanceof ServerLevel serverLevel &&
-            !state.is(newState.getBlock()) &&
-            level.getBlockEntity(pos) instanceof AltarBlockEntity altar) {
-            altar.getInventory().dropContents(serverLevel, pos);
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        return InteractionResult.CONSUME;
     }
 
     @Override

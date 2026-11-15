@@ -57,14 +57,14 @@ public class KubePlugin implements KubeJSPlugin {
 
     @Override
     public void registerRecipeComponents(RecipeComponentTypeRegistry registry) {
-        registry.register(BlockPatternConditionComponent.TYPE);
-        registry.register(BlockPosComponent.TYPE);
-        registry.register(CommandOutputComponent.TYPE);
-        registry.register(EntityInputComponent.TYPE);
-        registry.register(FakeEntityInputComponent.TYPE);
-        registry.register(EntityOutputComponent.TYPE);
-        registry.register(ItemOutputComponent.TYPE);
-        registry.register(LootItemConditionComponent.TYPE);
+        registry.unit(BlockPatternConditionComponent.INSTANCE);
+        registry.unit(BlockPosComponent.INSTANCE);
+        registry.unit(CommandOutputComponent.INSTANCE);
+        registry.unit(EntityInputComponent.INSTANCE);
+        registry.unit(FakeEntityInputComponent.INSTANCE);
+        registry.unit(EntityOutputComponent.INSTANCE);
+        registry.unit(ItemOutputComponent.INSTANCE);
+        registry.unit(LootItemConditionComponent.INSTANCE);
     }
 
     @Override

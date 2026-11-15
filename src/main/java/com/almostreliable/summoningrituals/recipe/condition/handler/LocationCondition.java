@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.condition.ConditionStreamCodecs;
 import com.almostreliable.summoningrituals.util.RawHolderSet;
 
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
@@ -12,7 +12,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 import net.neoforged.fml.ModList;
 
@@ -49,7 +49,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         }
         if (predicate.dimension().isPresent()) {
             var dimension = predicate.dimension().get();
-            tooltip.add(conditionNameValueComponent(SummoningLang.DIMENSION.get(), getReadableId(dimension.location())));
+            tooltip.add(conditionNameValueComponent(SummoningLang.DIMENSION.get(), getReadableId(dimension.identifier())));
         }
         if (predicate.position().isPresent()) {
             var position = predicate.position().get();
@@ -79,8 +79,8 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private void addHeightTooltip(List<Component> tooltip, MinMaxBounds.Doubles yPos) {
         addMinMaxBoundsTooltip(
             tooltip,
-            yPos.min().map(Double::intValue),
-            yPos.max().map(Double::intValue),
+            yPos.bounds().min().map(Double::intValue),
+            yPos.bounds().max().map(Double::intValue),
             SummoningLang.HEIGHT.get(),
             Objects::equals
         );
@@ -89,8 +89,8 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
     private void addLightLevelTooltip(List<Component> tooltip, MinMaxBounds.Ints lightLevel) {
         addMinMaxBoundsTooltip(
             tooltip,
-            lightLevel.min(),
-            lightLevel.max(),
+            lightLevel.bounds().min(),
+            lightLevel.bounds().max(),
             SummoningLang.LIGHT_LEVEL.get(),
             Integer::equals
         );
@@ -128,7 +128,7 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
                 }
 
                 var resourceKey = resourceKeyOpt.get();
-                var id = resourceKey.location();
+                var id = resourceKey.identifier();
                 var readableId = getReadableId(id);
 
                 var registryKey = resourceKey.registryKey();
@@ -144,15 +144,15 @@ public class LocationCondition implements ConditionHandler<LocationCheck> {
         });
     }
 
-    private static String getReadableId(ResourceLocation id) {
+    private static String getReadableId(Identifier id) {
         var namespace = id.getNamespace();
         var path = id.getPath();
         return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, path);
     }
 
-    private static String appendModId(String text, ResourceLocation id) {
+    private static String appendModId(String text, Identifier id) {
         var namespace = id.getNamespace();
-        if (namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+        if (namespace.equals(Identifier.DEFAULT_NAMESPACE)) {
             return text;
         }
 

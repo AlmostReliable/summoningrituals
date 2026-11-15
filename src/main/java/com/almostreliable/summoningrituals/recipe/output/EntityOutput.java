@@ -1,15 +1,19 @@
 package com.almostreliable.summoningrituals.recipe.output;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -41,16 +45,19 @@ public record EntityOutput(
         var toSpawn = entityInfo.count();
 
         while (toSpawn > 0) {
-            var entity = entityInfo.entity().value().create(level);
+            var entity = entityInfo.entity().value().create(level, EntitySpawnReason.MOB_SUMMONED);
             if (entity == null) return List.of();
 
             var pos = getRandomPos(origin);
             entity.setPos(pos);
             entityInfo.data().ifPresent(data -> {
-                var newData = new CompoundTag();
-                entity.saveWithoutId(newData);
-                newData.merge(data);
-                entity.load(newData);
+                try (var problemReporter = new ProblemReporter.ScopedCollector(entity.problemPath(), SummoningRituals.LOGGER)) {
+                    var output = TagValueOutput.createWithContext(problemReporter, level.registryAccess());
+                    entity.saveWithoutId(output);
+                    var newData = output.buildResult();
+                    newData.merge(data);
+                    entity.load(TagValueInput.create(problemReporter, level.registryAccess(), newData));
+                }
             });
             level.addFreshEntity(entity);
 

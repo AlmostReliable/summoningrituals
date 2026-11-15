@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.HolderSet;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("OptionalContainsCollection")
 public record RawHolderSet<T>(
-    Optional<List<ResourceLocation>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
+    Optional<List<Identifier>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
 ) implements HolderSet<T> {
 
     @Override
@@ -34,6 +34,11 @@ public record RawHolderSet<T>(
     @Override
     public int size() {
         return 0;
+    }
+
+    @Override
+    public boolean isBound() {
+        return false;
     }
 
     @Override

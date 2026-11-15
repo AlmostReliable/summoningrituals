@@ -3,17 +3,17 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
+import net.minecraft.resources.ResourceKey;
+
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public record BlockPatternConditionComponent(RecipeComponentType<?> type) implements RecipeComponent<BlockPatternCondition> {
+public record BlockPatternConditionComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<BlockPatternCondition> {
 
-    public static final RecipeComponentType<BlockPatternCondition> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("block_pattern_condition"),
-        BlockPatternConditionComponent::new
-    );
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("block_pattern_condition"));
+    public static final BlockPatternConditionComponent INSTANCE = new BlockPatternConditionComponent(TYPE);
 
     @Override
     public Codec<BlockPatternCondition> codec() {

@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntity
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -31,7 +31,7 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
         }
 
         String sequence = null;
-        if (o instanceof ResourceLocation location) {
+        if (o instanceof Identifier location) {
             sequence = location.toString();
         } else if (o instanceof String s) {
             sequence = s;

@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.recipe.condition.handler;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

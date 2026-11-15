@@ -5,13 +5,17 @@ import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck
 import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.handler.WeatherCondition;
 
-import net.minecraft.advancements.critereon.LightPredicate;
-import net.minecraft.advancements.critereon.LocationPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.LightPredicate;
+import net.minecraft.advancements.criterion.LocationPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.clock.WorldClock;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -23,6 +27,7 @@ import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
@@ -145,26 +150,26 @@ public final class ConditionsBuilder {
     }
 
     @ReturnsSelf
-    public ConditionsBuilder minTime(int min) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.lowerBound(min)));
+    public ConditionsBuilder minTime(Context ctx, int min) {
+        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.lowerBound(min)));
         return this;
     }
 
     @ReturnsSelf
-    public ConditionsBuilder maxTime(int max) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.upperBound(max)));
+    public ConditionsBuilder maxTime(Context ctx, int max) {
+        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.upperBound(max)));
         return this;
     }
 
     @ReturnsSelf
-    public ConditionsBuilder time(int min, int max) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.range(min, max)));
+    public ConditionsBuilder time(Context ctx, int min, int max) {
+        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.range(min, max)));
         return this;
     }
 
     @ReturnsSelf
-    public ConditionsBuilder time(TimeCondition.TimeType timeType) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), timeType.range));
+    public ConditionsBuilder time(Context ctx, TimeCondition.TimeType timeType) {
+        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), timeType.range));
         return this;
     }
 
@@ -217,6 +222,10 @@ public final class ConditionsBuilder {
             blockStatePredicate = StatePropertiesPredicate.Builder.properties();
         }
         return blockStatePredicate;
+    }
+
+    private static Holder<WorldClock> getOverworldClock(Context ctx) {
+        return RegistryAccessContainer.of(ctx).lookupOrThrow(Registries.WORLD_CLOCK).getOrThrow(WorldClocks.OVERWORLD);
     }
 
     private void throwException(Context ctx, String message) throws KubeRuntimeException {

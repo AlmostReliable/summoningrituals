@@ -5,54 +5,62 @@ import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.core.Registration;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.model.ItemModelUtils;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplate;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
-class SummoningModels extends BlockStateProvider {
+import java.util.Optional;
 
-    SummoningModels(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, ModConstants.MOD_ID, existingFileHelper);
+class SummoningModels extends ModelProvider {
+
+    private static final TextureSlot TEXTURE = TextureSlot.create("texture");
+
+    SummoningModels(PackOutput output) {
+        super(output, ModConstants.MOD_ID);
     }
 
     @Override
-    protected void registerStatesAndModels() {
+    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         var altarBlock = Registration.ALTAR_BLOCK;
         var altarBlockId = altarBlock.getId();
         var altarBlockModelPath = SummoningRituals.getRL("block/" + altarBlockId.getPath());
+        var altarBlockModelPathActive = altarBlockModelPath.withSuffix("_active");
+        new ModelTemplate(Optional.of(altarBlockModelPath), Optional.empty(), TEXTURE).create(
+            altarBlockModelPathActive,
+            new TextureMapping().put(TEXTURE, new Material(altarBlockModelPathActive)),
+            blockModels.modelOutput
+        );
 
-        altarBlockStateAndModel(altarBlock, altarBlockModelPath);
-        itemModels().simpleBlockItem(altarBlock.get());
+        altarBlockState(blockModels, altarBlock, altarBlockModelPath, altarBlockModelPathActive);
+        itemModels.itemModelOutput.accept(altarBlock.asItem(), ItemModelUtils.plainModel(altarBlockModelPath));
 
         var indestructibleAltarBlock = Registration.INDESTRUCTIBLE_ALTAR_BLOCK;
 
-        altarBlockStateAndModel(indestructibleAltarBlock, altarBlockModelPath);
-        itemModels().withExistingParent(indestructibleAltarBlock.getId().toString(), altarBlockModelPath);
+        altarBlockState(blockModels, indestructibleAltarBlock, altarBlockModelPath, altarBlockModelPathActive);
+        itemModels.itemModelOutput.accept(indestructibleAltarBlock.asItem(), ItemModelUtils.plainModel(altarBlockModelPath));
 
-        var patternGeneratorId = Registration.PATTERN_GENERATOR_ITEM.getId();
-        var bambooId = BuiltInRegistries.ITEM.getKey(Items.BAMBOO);
-        itemModels().withExistingParent(patternGeneratorId.getPath(), bambooId);
+        var bambooModelPath = ModelLocationUtils.getModelLocation(Items.BAMBOO);
+        itemModels.itemModelOutput.accept(Registration.PATTERN_GENERATOR_ITEM.get(), ItemModelUtils.plainModel(bambooModelPath));
     }
 
-    private void altarBlockStateAndModel(DeferredBlock<?> block, ResourceLocation modelPath) {
-        var model = models().getExistingFile(modelPath);
-        var modelPathActive = modelPath.getPath() + "_active";
-        var modelActive = models().getBuilder(modelPathActive).parent(model).texture("texture", modelPathActive);
-
-        getVariantBuilder(block.get()).forAllStatesExcept(
-            state -> {
-                var facing = state.getValue(AltarBlock.FACING);
-                boolean active = state.getValue(AltarBlock.ACTIVE);
-                return ConfiguredModel.builder()
-                    .modelFile(active ? modelActive : model)
-                    .rotationY(((int) facing.toYRot() + 180) % 360)
-                    .build();
-            }, AltarBlock.WATERLOGGED
+    private static void altarBlockState(BlockModelGenerators blockModels, DeferredBlock<?> block, Identifier model, Identifier modelActive) {
+        blockModels.blockStateOutput.accept(
+            MultiVariantGenerator.dispatch(block.get())
+                .with(PropertyDispatch.initial(AltarBlock.ACTIVE)
+                    .generate(active -> BlockModelGenerators.plainVariant(active ? modelActive : model)))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING)
         );
     }
 }

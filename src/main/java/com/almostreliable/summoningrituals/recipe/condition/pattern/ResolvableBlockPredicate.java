@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.recipe.condition.pattern;
 
 import com.almostreliable.summoningrituals.core.Constants;
 
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
@@ -150,7 +150,7 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
         }
 
         private Builder(TagKey<Block> tag) {
-            this.blocks = BuiltInRegistries.BLOCK.getOrCreateTag(tag);
+            this.blocks = BuiltInRegistries.BLOCK.get(tag).orElseGet(() -> HolderSet.emptyNamed(BuiltInRegistries.BLOCK, tag));
         }
 
         public Builder setProperties(StatePropertiesPredicate.Builder properties) {

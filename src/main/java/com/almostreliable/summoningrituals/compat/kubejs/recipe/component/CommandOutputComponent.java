@@ -3,6 +3,8 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
+import net.minecraft.resources.ResourceKey;
+
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
@@ -10,12 +12,10 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 
 import java.util.List;
 
-public record CommandOutputComponent(RecipeComponentType<?> type) implements RecipeComponent<CommandOutput> {
+public record CommandOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<CommandOutput> {
 
-    public static final RecipeComponentType<CommandOutput> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("command_output"),
-        CommandOutputComponent::new
-    );
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("command_output"));
+    public static final CommandOutputComponent INSTANCE = new CommandOutputComponent(TYPE);
 
     @Override
     public Codec<CommandOutput> codec() {

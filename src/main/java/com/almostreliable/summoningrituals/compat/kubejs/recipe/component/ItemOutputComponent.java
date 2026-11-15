@@ -5,26 +5,35 @@ import com.almostreliable.summoningrituals.compat.kubejs.binding.SummoningItemBi
 import com.almostreliable.summoningrituals.compat.kubejs.builder.ItemOutputBuilder;
 import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public record ItemOutputComponent(RecipeComponentType<?> type) implements RecipeComponent<ItemOutput> {
+public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<ItemOutput> {
 
-    public static final RecipeComponentType<ItemOutput> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("item_output"),
-        ItemOutputComponent::new
-    );
-    private static final ItemOutput EMPTY = SummoningItemBinding.of(ItemStack.EMPTY).build();
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("item_output"));
+    public static final ItemOutputComponent INSTANCE = new ItemOutputComponent(TYPE);
+    public static final ItemStackTemplate EMPTY = new ItemStackTemplate(Items.BARRIER);
+    private static final Codec<ItemOutput> CODEC = ItemOutput.CODEC.validate(output -> output.item() == EMPTY
+        ? DataResult.error(() -> "Item output must not be empty")
+        : DataResult.success(output));
+
+    public static ItemStackTemplate templateOf(ItemStack stack) {
+        return stack.isEmpty() ? EMPTY : ItemStackTemplate.fromNonEmptyStack(stack);
+    }
 
     @Override
     public Codec<ItemOutput> codec() {
-        return ItemOutput.CODEC;
+        return CODEC;
     }
 
     @Override
@@ -43,6 +52,6 @@ public record ItemOutputComponent(RecipeComponentType<?> type) implements Recipe
         }
 
         var stack = ItemWrapper.wrap(cx.cx(), from);
-        return stack.isEmpty() ? EMPTY : SummoningItemBinding.of(stack).build();
+        return SummoningItemBinding.of(stack).build();
     }
 }

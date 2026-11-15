@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.compat.viewer.common;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityBuilder;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
@@ -7,10 +8,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.storage.TagValueInput;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,7 +27,7 @@ import java.util.List;
 public final class EntityIngredient {
 
     public static final Codec<EntityIngredient> CODEC = RecordCodecBuilder.create(i -> i.group(
-        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.ID_TAG).forGetter(e -> e.entityInfo.entity())
+        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().fieldOf(Entity.TAG_ID).forGetter(e -> e.entityInfo.entity())
     ).apply(i, e -> new EntityIngredient(new SummoningEntityBuilder(e).build())));
 
     private final EntityInfo entityInfo;
@@ -34,9 +38,11 @@ public final class EntityIngredient {
         this.entityInfo = entityInfo;
         var level = Minecraft.getInstance().level;
         if (level != null) {
-            entity = entityInfo.entity().value().create(level);
+            entity = entityInfo.entity().value().create(level, EntitySpawnReason.LOAD);
             if (entity != null && entityInfo.data().isPresent()) {
-                entity.load(entityInfo.data().get());
+                try (var problemReporter = new ProblemReporter.ScopedCollector(entity.problemPath(), SummoningRituals.LOGGER)) {
+                    entity.load(TagValueInput.create(problemReporter, level.registryAccess(), entityInfo.data().get()));
+                }
             }
         }
     }
@@ -65,7 +71,7 @@ public final class EntityIngredient {
         return tooltip;
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return BuiltInRegistries.ENTITY_TYPE.getKey(entityInfo.entity().value());
     }
 
@@ -80,8 +86,7 @@ public final class EntityIngredient {
 
     @Nullable
     public ItemStack getEgg() {
-        var item = SpawnEggItem.byId(entityInfo.entity().value());
-        return item == null ? null : new ItemStack(item);
+        return SpawnEggItem.byId(entityInfo.entity().value()).map(ItemStack::new).orElse(null);
     }
 
     public EntityIngredient copy() {

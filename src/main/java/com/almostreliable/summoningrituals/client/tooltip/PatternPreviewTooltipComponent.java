@@ -1,7 +1,7 @@
 package com.almostreliable.summoningrituals.client.tooltip;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ public class PatternPreviewTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         var rows = Math.max(1, (int) Math.ceil(stacks.size() / (double) COLUMNS));
         return rows * CELL_SIZE + PADDING * 2;
     }
@@ -33,7 +33,7 @@ public class PatternPreviewTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+    public void extractImage(Font font, int x, int y, int w, int h, GuiGraphicsExtractor guiGraphics) {
         for (var i = 0; i < stacks.size(); i++) {
             var col = i % COLUMNS;
             var row = i / COLUMNS;
@@ -42,8 +42,8 @@ public class PatternPreviewTooltipComponent implements ClientTooltipComponent {
             var drawY = y + PADDING + row * CELL_SIZE + 1;
 
             var stack = stacks.get(i);
-            guiGraphics.renderItem(stack, drawX, drawY);
-            guiGraphics.renderItemDecorations(font, stack, drawX, drawY);
+            guiGraphics.item(stack, drawX, drawY);
+            guiGraphics.itemDecorations(font, stack, drawX, drawY);
         }
     }
 

@@ -10,7 +10,7 @@ import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -74,7 +74,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
     @Override
     public void draw(
-        RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY
+        RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY
     ) {
         background.draw(guiGraphics);
         var recipe = recipeHolder.value();
@@ -166,12 +166,13 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 if (slot < itemInputs.size()) {
                     // item inputs
                     var itemInput = itemInputs.get(slot);
+                    var inputSlot = builder.addInputSlot(x, y);
                     var itemStacks = new ArrayList<ItemStack>();
-                    for (var stack : itemInput.ingredient().getItems()) {
+                    for (var stack : itemInput.ingredient().display().resolveForStacks(inputSlot.getContextMap())) {
                         itemStacks.add(stack.copyWithCount(itemInput.count()));
                     }
 
-                    builder.addInputSlot(x, y).addItemStacks(itemStacks);
+                    inputSlot.addItemStacks(itemStacks);
                 } else if (slot - itemInputs.size() < entityInputs.size()) {
                     // entity inputs
                     var entityInput = entityInputs.get(slot - itemInputs.size());
@@ -187,7 +188,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 } else {
                     // fake entity inputs
                     var fakeEntityInput = inputs.fakeEntityInputs().get(slot - itemInputs.size() - entityInputs.size());
-                    builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(fakeEntityInput.displayItem());
+                    builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(fakeEntityInput.displayItem().create());
                 }
             }
         );
@@ -199,7 +200,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 var entityOutputs = outputs.entityOutputs();
                 if (slot < itemOutputs.size()) {
                     // item outputs
-                    var stack = itemOutputs.get(slot).item();
+                    var stack = itemOutputs.get(slot).item().create();
                     builder.addOutputSlot(x, y).addItemStack(stack);
                 } else if (slot - itemOutputs.size() < entityOutputs.size()) {
                     // entity outputs
@@ -217,7 +218,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     // display outputs
                     var displayOutputs = outputs.displayOutputs();
                     var displayOutput = displayOutputs.get(slot - itemOutputs.size() - entityOutputs.size());
-                    builder.addOutputSlot(x, y).addItemStack(displayOutput);
+                    builder.addOutputSlot(x, y).addItemStack(displayOutput.create());
                 }
             }
         );

@@ -6,13 +6,17 @@ import com.almostreliable.summoningrituals.core.Registration;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import java.util.Objects;
 
 public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
 
@@ -26,14 +30,15 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
     );
 
     @Override
-    public LootItemConditionType getType() {
+    public MapCodec<MoonPhaseCheck> codec() {
         return Registration.MOON_PHASE_CONDITION.get();
     }
 
     @Override
     public boolean test(LootContext lootContext) {
         var level = lootContext.getLevel();
-        var moonPhaseOrdinal = level.getMoonPhase();
+        var origin = Objects.requireNonNullElse(lootContext.getOptionalParameter(LootContextParams.ORIGIN), Vec3.ZERO);
+        var moonPhaseOrdinal = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, origin).index();
         return moonPhaseOrdinal == phase.ordinal();
     }
 

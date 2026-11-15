@@ -3,7 +3,7 @@ package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredientRenderer;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -18,7 +18,7 @@ public record EntityIngredientJeiRenderer(boolean scissor, boolean count) implem
     public static final EntityIngredientJeiRenderer OUTPUT_RENDERER = new EntityIngredientJeiRenderer(true, true);
 
     @Override
-    public void render(GuiGraphics guiGraphics, EntityIngredient entityIngredient) {
+    public void render(GuiGraphicsExtractor guiGraphics, EntityIngredient entityIngredient) {
         EntityIngredientRenderer.render(guiGraphics, entityIngredient, scissor, count);
     }
 

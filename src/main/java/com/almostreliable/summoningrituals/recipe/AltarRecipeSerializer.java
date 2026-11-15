@@ -23,10 +23,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.List;
 
-public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
+public final class AltarRecipeSerializer {
 
     public static final MapCodec<AltarRecipe> CODEC = RecordCodecBuilder.<AltarRecipe> mapCodec(i -> i.group(
-        Ingredient.CODEC_NONEMPTY.fieldOf(Constants.INITIATOR).forGetter(AltarRecipe::initiator),
+        Ingredient.CODEC.fieldOf(Constants.INITIATOR).forGetter(AltarRecipe::initiator),
         RecipeOutputs.MAP_CODEC.forGetter(AltarRecipe::outputs),
         RecipeInputs.MAP_CODEC.forGetter(AltarRecipe::inputs),
         LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf(Constants.CONDITIONS, List.of()).forGetter(AltarRecipe::conditions),
@@ -46,6 +46,9 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         ByteBufCodecs.VAR_INT, AltarRecipe::ticks,
         AltarRecipe::new
     );
+    public static final RecipeSerializer<AltarRecipe> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+
+    private AltarRecipeSerializer() {}
 
     private static DataResult<AltarRecipe> validateRecipe(AltarRecipe recipe) {
         if (recipe.initiator().isEmpty()) {
@@ -68,15 +71,5 @@ public class AltarRecipeSerializer implements RecipeSerializer<AltarRecipe> {
         }
 
         return DataResult.success(recipe);
-    }
-
-    @Override
-    public MapCodec<AltarRecipe> codec() {
-        return CODEC;
-    }
-
-    @Override
-    public StreamCodec<RegistryFriendlyByteBuf, AltarRecipe> streamCodec() {
-        return STREAM_CODEC;
     }
 }

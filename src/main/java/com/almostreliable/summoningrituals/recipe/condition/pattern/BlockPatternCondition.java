@@ -67,8 +67,8 @@ public final class BlockPatternCondition {
 
     public boolean test(LootContext lootContext, boolean drawHighlights) {
         var level = lootContext.getLevel();
-        var altarPos = BlockPos.containing(lootContext.getParam(LootContextParams.ORIGIN));
-        var altarState = lootContext.getParam(LootContextParams.BLOCK_STATE);
+        var altarPos = BlockPos.containing(lootContext.getParameter(LootContextParams.ORIGIN));
+        var altarState = lootContext.getParameter(LootContextParams.BLOCK_STATE);
         var failedPositions = test(level, altarPos, altarState);
 
         if (!failedPositions.isEmpty() && drawHighlights) {

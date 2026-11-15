@@ -36,7 +36,7 @@ public class AltarKubeRecipe extends KubeRecipe {
                 var predicate = entityInputs.get(i).predicate();
                 //noinspection ConstantValue
                 if (predicate == null) continue;
-                BaseEntityInput.DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
+                BaseEntityInput.PENDING_DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
             }
         }
 
@@ -46,7 +46,7 @@ public class AltarKubeRecipe extends KubeRecipe {
                 var predicate = fakeEntityInputs.get(i).predicate();
                 //noinspection ConstantValue
                 if (predicate == null) continue;
-                BaseEntityInput.FAKE_DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
+                BaseEntityInput.PENDING_FAKE_DATA_VALIDATORS.put(getOrCreateId(), i, predicate);
             }
         }
 

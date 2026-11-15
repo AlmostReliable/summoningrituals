@@ -11,9 +11,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -21,8 +18,8 @@ public class SummoningTags extends BlockTagsProvider {
 
     public static final TagKey<Block> ALTARS = TagKey.create(Registries.BLOCK, SummoningRituals.getRL("altars"));
 
-    SummoningTags(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, registries, ModConstants.MOD_ID, existingFileHelper);
+    SummoningTags(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries, ModConstants.MOD_ID);
     }
 
     @Override

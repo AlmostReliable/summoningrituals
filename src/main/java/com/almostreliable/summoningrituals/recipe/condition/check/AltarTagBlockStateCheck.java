@@ -4,13 +4,12 @@ import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.core.Registration;
 import com.almostreliable.summoningrituals.data.SummoningTags;
 
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -26,13 +25,13 @@ public record AltarTagBlockStateCheck(StatePropertiesPredicate properties) imple
     );
 
     @Override
-    public LootItemConditionType getType() {
+    public MapCodec<AltarTagBlockStateCheck> codec() {
         return Registration.ALTAR_TAG_BLOCK_STATE_CONDITION.get();
     }
 
     @Override
     public boolean test(LootContext lootContext) {
-        var blockstate = lootContext.getParamOrNull(LootContextParams.BLOCK_STATE);
+        var blockstate = lootContext.getOptionalParameter(LootContextParams.BLOCK_STATE);
         return blockstate != null && blockstate.is(SummoningTags.ALTARS) && properties.matches(blockstate);
     }
 }
