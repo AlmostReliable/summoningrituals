@@ -32,7 +32,7 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +45,8 @@ import java.util.stream.Collectors;
 public final class ConditionsBuilder {
 
     private final List<LootItemCondition> conditions = new ArrayList<>();
-    private @Nullable LocationPredicate.Builder locationPredicate;
-    private @Nullable StatePropertiesPredicate.Builder blockStatePredicate;
+    private LocationPredicate.@Nullable Builder locationPredicate;
+    private StatePropertiesPredicate.@Nullable Builder blockStatePredicate;
 
     // region LocationCheck
     @ReturnsSelf

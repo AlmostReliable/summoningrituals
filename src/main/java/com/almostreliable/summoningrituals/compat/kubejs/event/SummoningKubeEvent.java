@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.google.common.base.Preconditions;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;

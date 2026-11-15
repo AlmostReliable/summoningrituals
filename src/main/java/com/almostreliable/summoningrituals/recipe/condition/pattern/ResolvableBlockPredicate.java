@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -142,7 +142,7 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
     public static final class Builder {
 
         private final HolderSet<Block> blocks;
-        private @Nullable StatePropertiesPredicate.Builder propertiesBuilder;
+        private StatePropertiesPredicate.@Nullable Builder propertiesBuilder;
         private Optional<StatePropertiesPredicate> properties = Optional.empty();
 
         private Builder(Block block) {

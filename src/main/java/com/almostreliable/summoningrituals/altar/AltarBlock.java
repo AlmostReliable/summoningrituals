@@ -37,7 +37,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import org.joml.Vector3f;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;

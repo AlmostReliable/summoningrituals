@@ -28,7 +28,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +57,7 @@ public final class BlockPatternCondition {
     private final List<PatternEntry> entries;
     private final Optional<Component> name;
     private final List<Component> tooltip;
-    private @Nullable PatternPreviewTooltipComponent.Data tooltipComponentCache;
+    private PatternPreviewTooltipComponent.@Nullable Data tooltipComponentCache;
 
     public BlockPatternCondition(List<PatternEntry> entries, Optional<Component> name, List<Component> tooltip) {
         this.entries = entries;

@@ -44,7 +44,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import com.google.common.collect.Lists;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
