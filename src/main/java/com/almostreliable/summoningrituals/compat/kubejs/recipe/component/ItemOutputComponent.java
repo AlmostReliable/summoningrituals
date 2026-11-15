@@ -8,10 +8,9 @@ import com.almostreliable.summoningrituals.recipe.output.ItemOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.Items;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
@@ -22,18 +21,15 @@ public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) impl
 
     public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("item_output"));
     public static final ItemOutputComponent INSTANCE = new ItemOutputComponent(TYPE);
-    public static final ItemStackTemplate EMPTY = new ItemStackTemplate(Items.BARRIER);
-    private static final Codec<ItemOutput> CODEC = ItemOutput.CODEC.validate(output -> output.item() == EMPTY
-        ? DataResult.error(() -> "Item output must not be empty")
-        : DataResult.success(output));
 
     public static ItemStackTemplate templateOf(ItemStack stack) {
-        return stack.isEmpty() ? EMPTY : ItemStackTemplate.fromNonEmptyStack(stack);
+        if (stack.isEmpty()) throw new KubeRuntimeException("item must not be empty");
+        return ItemStackTemplate.fromNonEmptyStack(stack);
     }
 
     @Override
     public Codec<ItemOutput> codec() {
-        return CODEC;
+        return ItemOutput.CODEC;
     }
 
     @Override
