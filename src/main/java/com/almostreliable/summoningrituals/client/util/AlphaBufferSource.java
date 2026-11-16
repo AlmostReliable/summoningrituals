@@ -214,6 +214,7 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         target.submitParticleGroup(particleGroupRenderer);
     }
 
+    @SuppressWarnings("deprecation")
     private void submitBlockQuads(
         PoseStack poseStack,
         List<BlockStateModelPart> parts,
