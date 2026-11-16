@@ -102,7 +102,8 @@ public class BlockPatternRenderer {
             var modelRenderState = new BlockModelRenderState();
             mc.getBlockModelResolver().update(modelRenderState, previewBlock.state, DISPLAY_CONTEXT);
             var blockEntityRenderState = extractBlockEntityRenderState(mc, previewBlock, partialTick);
-            renderStates.add(new PreviewRenderState(previewBlock.pos, modelRenderState, blockEntityRenderState));
+            var renderState = new PreviewRenderState(previewBlock.pos, modelRenderState, blockEntityRenderState);
+            renderStates.add(renderState);
         }
 
         levelRenderState.setRenderData(PREVIEW_RENDER_STATES, renderStates);
@@ -160,7 +161,8 @@ public class BlockPatternRenderer {
             BlockHighlights.highlightWrongPosition(worldPos);
 
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
-            wrongBlocks.add(new PreviewBlock(worldPos, blockStateToRender));
+            var previewBlock = new PreviewBlock(worldPos, blockStateToRender);
+            wrongBlocks.add(previewBlock);
         }
 
         previewBlocks = wrongBlocks;
@@ -175,9 +177,10 @@ public class BlockPatternRenderer {
         var blockEntity = BLOCK_ENTITY_CACHE.get(previewBlock.state);
         if (blockEntity == null) {
             blockEntity = entityBlock.newBlockEntity(previewBlock.pos, previewBlock.state);
-            BLOCK_ENTITY_CACHE.put(previewBlock.state, blockEntity);
             if (blockEntity == null) return null;
+
             blockEntity.setLevel(level);
+            BLOCK_ENTITY_CACHE.put(previewBlock.state, blockEntity);
         }
 
         var renderState = mc.getBlockEntityRenderDispatcher().tryExtractRenderState(blockEntity, partialTick, null, null);

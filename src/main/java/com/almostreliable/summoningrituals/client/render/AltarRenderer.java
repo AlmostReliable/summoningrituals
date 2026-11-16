@@ -82,7 +82,8 @@ public record AltarRenderer(ItemModelResolver getItemModelResolver) implements B
 
         var inputs = new ArrayList<ItemStackRenderState>();
         for (var input : altar.getInventory().getDisplayItems()) {
-            inputs.add(extractItem(input, level));
+            var inputRenderState = extractItem(input, level);
+            inputs.add(inputRenderState);
         }
 
         state.altar = altar;
