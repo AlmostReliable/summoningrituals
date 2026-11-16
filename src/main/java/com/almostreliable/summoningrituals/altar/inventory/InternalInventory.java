@@ -48,6 +48,20 @@ final class InternalInventory implements INBTSerializable<CompoundTag>, Iterable
         return items.length;
     }
 
+    ItemStack[] snapshot() {
+        var snapshot = new ItemStack[items.length];
+
+        for (var i = 0; i < items.length; i++) {
+            snapshot[i] = items[i].copy();
+        }
+
+        return snapshot;
+    }
+
+    void restore(ItemStack... snapshot) {
+        items = snapshot;
+    }
+
     @Override
     @UnknownNullability
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {

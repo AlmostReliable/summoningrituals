@@ -18,7 +18,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,7 +31,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -46,6 +44,7 @@ public class BlockPatternRenderer {
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
     private static final int TAG_CYCLE_TICKS = 20;
+    private static final int MAX_PREVIEW_DISTANCE = 10;
 
     @Nullable
     private Task task;
@@ -58,7 +57,8 @@ public class BlockPatternRenderer {
         var player = mc.player;
         if (level == null || player == null) return;
 
-        if (task.altarPos.distSqr(player.blockPosition()) > Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + 5, 2)) {
+        var maxPlayerDistance = Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + MAX_PREVIEW_DISTANCE, 2);
+        if (task.altarPos.distSqr(player.blockPosition()) > maxPlayerDistance) {
             clear();
             return;
         }
@@ -99,11 +99,7 @@ public class BlockPatternRenderer {
         assert task != null;
 
         var checkBlockState = Config.CLIENT.previewBlockStateAware.getAsBoolean();
-        //noinspection ComplexTypesVar
-        List<BlockPos> invalidBlocks = new ArrayList<>();
-        if (checkBlockState) {
-            invalidBlocks = task.blockPredicate.get();
-        }
+        var invalidBlocks = checkBlockState ? task.blockPredicate.get() : List.<BlockPos> of();
 
         var correctBlocks = 0;
         for (var entry : task.patternEntries.entrySet()) {
@@ -173,9 +169,10 @@ public class BlockPatternRenderer {
         var blockEntity = BLOCK_ENTITY_CACHE.get(blockState);
         if (blockEntity == null) {
             blockEntity = entityBlock.newBlockEntity(pos, blockState);
-            BLOCK_ENTITY_CACHE.put(blockState, blockEntity);
             if (blockEntity == null) return;
+
             blockEntity.setLevel(mc.level);
+            BLOCK_ENTITY_CACHE.put(blockState, blockEntity);
         }
 
         mc.getBlockEntityRenderDispatcher()
@@ -234,7 +231,8 @@ public class BlockPatternRenderer {
         var altarState = altarEntry.state;
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
-        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getTransformedEntries(altarFacing), blockPredicate);
+        var patternEntries = blockPattern.getTransformedEntries(altarFacing);
+        INSTANCE.task = new Task(level.getGameTime(), altarPos, patternEntries, blockPredicate);
     }
 
     public static void clear() {
@@ -255,7 +253,9 @@ public class BlockPatternRenderer {
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
     private record Task(
-        long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,
+        long createdAt,
+        BlockPos altarPos,
+        Map<BlockPos, List<BlockState>> patternEntries,
         Supplier<List<BlockPos>> blockPredicate
     ) {}
 }

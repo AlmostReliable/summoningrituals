@@ -9,10 +9,7 @@ import com.almostreliable.summoningrituals.core.Registration;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.LoadingModList;
-import net.neoforged.fml.loading.moddiscovery.ModInfo;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
@@ -54,14 +51,5 @@ public final class SummoningRitualsClient {
     private static void onLevelUnload(LevelEvent.Unload event) {
         BlockPatternRenderer.clear();
         BlockHighlightRenderer.clear();
-    }
-
-    private static boolean isKjsLoaded() {
-        var modId = "kubejs";
-        var modList = ModList.get();
-        if (modList == null) {
-            return LoadingModList.get().getMods().stream().map(ModInfo::getModId).anyMatch(modId::equals);
-        }
-        return modList.isLoaded(modId);
     }
 }

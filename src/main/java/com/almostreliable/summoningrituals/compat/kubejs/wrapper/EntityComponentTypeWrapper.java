@@ -8,6 +8,8 @@ import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.script.SourceLine;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Function;
 
 public final class EntityComponentTypeWrapper {
@@ -15,9 +17,14 @@ public final class EntityComponentTypeWrapper {
     private EntityComponentTypeWrapper() {}
 
     public static <T> T wrap(
-        RecipeComponent<?> component, RecipeScriptContext cx, Object from, Class<T> type,
+        RecipeComponent<?> component,
+        RecipeScriptContext cx,
+        @Nullable Object from,
+        Class<T> type,
         Function<EntityInfo, T> factory
     ) {
+        if (from == null) throw new KubeRuntimeException("invalid summoning entity: null").source(SourceLine.of(cx.cx()));
+
         if (type.isInstance(from)) {
             return type.cast(from);
         }

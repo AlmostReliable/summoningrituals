@@ -15,7 +15,11 @@ public interface BaseEntityInput extends TriPredicate<ResourceLocation, Integer,
     Table<ResourceLocation, Integer, Predicate<Entity>> FAKE_DATA_VALIDATORS = HashBasedTable.create();
 
     default boolean test(
-        Table<ResourceLocation, Integer, Predicate<Entity>> validators, ResourceLocation recipeId, Integer inputIndex, Entity entity) {
+        Table<ResourceLocation, Integer, Predicate<Entity>> validators,
+        ResourceLocation recipeId,
+        Integer inputIndex,
+        Entity entity
+    ) {
         var predicate = validators.get(recipeId, inputIndex);
         return predicate == null || predicate.test(entity);
     }

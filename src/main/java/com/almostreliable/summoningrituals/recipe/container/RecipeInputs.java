@@ -56,7 +56,10 @@ public record RecipeInputs(List<SizedIngredient> itemInputs, List<EntityInput> e
 
     @Nullable
     private static <T extends BaseEntityInput> List<Entity> consumeSacrifices(
-        ResourceLocation recipeId, List<T> inputs, Function<T, Optional<Integer>> countSupplier, List<Entity> entities
+        ResourceLocation recipeId,
+        List<T> inputs,
+        Function<T, Optional<Integer>> countSupplier,
+        List<Entity> entities
     ) {
         var sacrifices = new ArrayList<Entity>();
 

@@ -142,7 +142,6 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
     public static final class Builder {
 
         private final HolderSet<Block> blocks;
-        private @Nullable StatePropertiesPredicate.Builder propertiesBuilder;
         private Optional<StatePropertiesPredicate> properties = Optional.empty();
 
         private Builder(Block block) {

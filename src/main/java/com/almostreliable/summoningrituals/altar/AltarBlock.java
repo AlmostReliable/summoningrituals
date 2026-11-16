@@ -82,12 +82,17 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public BlockState updateShape(
-        BlockState state, Direction direction, BlockState nState, LevelAccessor level, BlockPos pos,
+        BlockState state,
+        Direction direction,
+        BlockState nState,
+        LevelAccessor level,
+        BlockPos pos,
         BlockPos nPos
     ) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
+
         return super.updateShape(state, direction, nState, level, pos, nPos);
     }
 
@@ -104,21 +109,25 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     protected ItemInteractionResult useItemOn(
-        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
-        InteractionHand hand, BlockHitResult hitResult
+        ItemStack stack,
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult hitResult
     ) {
-        if (
-            !(level.getBlockEntity(pos) instanceof AltarBlockEntity altar) ||
-                !(player instanceof ServerPlayer serverPlayer)
-                || hand != InteractionHand.MAIN_HAND
-        ) {
+        if (hand != InteractionHand.MAIN_HAND || !(level.getBlockEntity(pos) instanceof AltarBlockEntity altar)) {
             return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
+
+        // insertion is server-only, need to return for client here to prevent block placement flicker
+        if (!(player instanceof ServerPlayer serverPlayer)) return ItemInteractionResult.SUCCESS;
 
         var remainder = altar.handleItemInsertion(serverPlayer, stack, false);
         serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);
 
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.CONSUME;
     }
 
     @Override

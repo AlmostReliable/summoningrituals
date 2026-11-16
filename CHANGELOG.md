@@ -3,7 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- backported fixes and internal cleanups from the 26.1 port ([#44](https://github.com/AlmostReliable/summoningrituals/pull/44))
+- added `altarPos`, `orbitScale` and `orbitWaveAnchor` to the KubeJS ritual renderer context
+- added `renderInventoryContents` to the KubeJS ritual renderer to draw the default initiator and item orbit
+- changed the block pattern preview to stay active up to 10 blocks beyond the pattern radius instead of 5
+- fixed block pattern highlights showing up when automation inserts into the Altar
+- fixed block items briefly appearing as placed when inserting them into the Altar
+- fixed off-hand items also being used when popping items out of the Altar while sneaking
+- fixed automation still seeing the Altar inventory through cached capabilities during rituals
+- fixed Altar slots accepting more than 64 items when the item has a larger max stack size
 
 ## [3.14.2] - 2026-07-30
 

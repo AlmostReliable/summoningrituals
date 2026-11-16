@@ -134,7 +134,6 @@ public final class Registration {
             factory,
             propertiesConfigurator.apply(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
                 .sound(SoundType.STONE))
         );
         ITEMS.registerSimpleBlockItem(block);
@@ -147,16 +146,17 @@ public final class Registration {
     @SuppressWarnings("DataFlowIssue")
     private static <E extends BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> registerBlockEntity(
         ResourceLocation id,
-        BlockEntityType.BlockEntitySupplier<E> factory, DeferredBlock<?>... blocks
+        BlockEntityType.BlockEntitySupplier<E> factory,
+        DeferredBlock<?>... blocks
     ) {
-        return BLOCK_ENTITIES.register(
-            id.getPath(), () -> {
-                var blockArray = new Block[blocks.length];
-                for (var i = 0; i < blocks.length; i++) {
-                    blockArray[i] = blocks[i].get();
-                }
-                return Builder.of(factory, blockArray).build(null);
+        return BLOCK_ENTITIES.register(id.getPath(), () -> {
+            var blockArray = new Block[blocks.length];
+
+            for (var i = 0; i < blocks.length; i++) {
+                blockArray[i] = blocks[i].get();
             }
-        );
+
+            return Builder.of(factory, blockArray).build(null);
+        });
     }
 }

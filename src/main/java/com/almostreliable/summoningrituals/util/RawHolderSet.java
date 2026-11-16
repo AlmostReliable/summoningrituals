@@ -23,7 +23,9 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("OptionalContainsCollection")
 public record RawHolderSet<T>(
-    Optional<List<ResourceLocation>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
+    Optional<List<ResourceLocation>> ids,
+    Optional<TagKey<T>> tag,
+    Optional<Tag> otherData
 ) implements HolderSet<T> {
 
     @Override

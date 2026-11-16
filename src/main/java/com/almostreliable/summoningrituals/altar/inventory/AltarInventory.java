@@ -16,8 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
@@ -193,7 +191,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     /**
      * Attempts to insert the given {@link ItemStack} into a specified slot in the inventory.
      * If the slot is empty, the stack is inserted directly. If the slot already contains items,
-     * it tries to merge the stack with the existing stack, respecting stack size limits.
+     * it tries to merge the stack with the existing stack. Both respect the slot and stack size limits.
      *
      * @param slot     The index of the inventory slot to insert into.
      * @param stack    The {@link ItemStack} to be inserted or merged into the slot. This can safely be used and modified.
@@ -203,20 +201,18 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     private int insertOrFillItemInSlot(int slot, ItemStack stack, boolean simulate) {
         var stackInSlot = inventory.get(slot);
 
-        if (stackInSlot.isEmpty()) {
-            if (!simulate) setStackInSlot(slot, stack);
-            return 0;
-        }
-
-        if (!ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
+        if (!stackInSlot.isEmpty() && !ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
             return stack.getCount();
         }
 
-        var maxCount = Math.min(getSlotLimit(slot), stackInSlot.getMaxStackSize());
+        var maxCount = Math.min(getSlotLimit(slot), stack.getMaxStackSize());
         var toInsert = Math.min(maxCount - stackInSlot.getCount(), stack.getCount());
         if (toInsert <= 0) return stack.getCount();
+        if (simulate) return stack.getCount() - toInsert;
 
-        if (!simulate) {
+        if (stackInSlot.isEmpty()) {
+            setStackInSlot(slot, stack.copyWithCount(toInsert));
+        } else {
             stackInSlot.grow(toInsert);
             onContentsChanged();
         }
@@ -252,8 +248,8 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         host.spawnItemAboveAltar(stack);
     }
 
-    public boolean consumeRecipeInputs(ServerLevel level, AltarRecipe recipe) {
-        var snapshot = inventory.serializeNBT(level.registryAccess());
+    public boolean consumeRecipeInputs(AltarRecipe recipe) {
+        var snapshot = inventory.snapshot();
 
         var toRemoveTotal = 0;
         var removedTotal = 0;
@@ -278,7 +274,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         }
 
         if (removedTotal < toRemoveTotal) {
-            inventory.deserializeNBT(level.registryAccess(), snapshot);
+            inventory.restore(snapshot);
             return false;
         }
 
@@ -311,7 +307,7 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
     }
 
     private void onContentsChanged() {
-        host.onInventoryChanged(this::serializeWithoutInsertOrder);
+        host.onInventoryChanged();
     }
 
     private void rebuildInsertOrder() {
@@ -336,7 +332,6 @@ public class AltarInventory implements IItemHandlerModifiable, RecipeInput, INBT
         onContentsChanged();
     }
 
-    @OnlyIn(Dist.CLIENT)
     public List<ItemStack> getDisplayItems() {
         var items = new ArrayList<ItemStack>();
         for (var stack : inventory) {

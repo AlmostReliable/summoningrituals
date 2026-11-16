@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * authored by: Almost Reliable, rlnt<br>
  * license: Unlicense
  * <p>
- * Check the README license section for more information.
+ * Check the README license section on the main branch for more information.
  */
 public class MeasuringBufferSource implements MultiBufferSource {
 

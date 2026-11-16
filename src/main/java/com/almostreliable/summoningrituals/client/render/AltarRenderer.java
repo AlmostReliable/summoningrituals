@@ -78,7 +78,12 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
     }
 
     private AltarRenderContext createRenderContext(
-        PoseStack poseStack, MultiBufferSource buffer, AltarBlockEntity altar, Player player, Level level, float partialTick,
+        PoseStack poseStack,
+        MultiBufferSource buffer,
+        AltarBlockEntity altar,
+        Player player,
+        Level level,
+        float partialTick,
         int packedOverlay
     ) {
         var altarPos = altar.getBlockPos();
@@ -95,6 +100,10 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
 
         var recipeProgress = altar.getRecipeProgress();
         var recipeTime = altar.getRecipeTime();
+        var gameTime = level.getGameTime();
+        var recipeProgressRatio = predictRecipeProgressRatio(altar, gameTime, partialTick);
+        var orbitScale = calculateOrbitScale(altar, gameTime, partialTick, recipeProgressRatio);
+        var orbitWaveAnchor = updateOrbitWaveAnchor(altar, playerToAltarAngle, recipeProgressRatio);
 
         var lightAbove = LevelRenderer.getLightColor(level, altarPos.above());
 
@@ -102,10 +111,14 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
             level,
             player,
             altar,
+            altarPos,
             playerToAltarDistance,
             playerToAltarAngle,
             recipeProgress,
             recipeTime,
+            recipeProgressRatio,
+            orbitScale,
+            orbitWaveAnchor,
             poseStack,
             buffer,
             lightAbove,
@@ -114,15 +127,41 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         );
     }
 
-    private void renderInventoryContents(AltarRenderContext renderContext) {
+    private static float predictRecipeProgressRatio(AltarBlockEntity altar, long gameTime, float partialTick) {
+        var recipeTime = altar.getRecipeTime();
+        if (recipeTime <= 0) return 0f;
+
+        var craftStartTick = altar.getCraftStartTick();
+        if (craftStartTick < 0) {
+            return Mth.clamp((altar.getRecipeProgress() + partialTick) / recipeTime, 0f, 1f);
+        }
+
+        var predictedProgress = gameTime - craftStartTick + partialTick;
+        return Mth.clamp(predictedProgress / recipeTime, 0f, 1f);
+    }
+
+    private static float calculateOrbitScale(AltarBlockEntity altar, long gameTime, float partialTick, float recipeProgressRatio) {
+        // the orbit shrinks during a ritual and scales back in after it ended
+        var resetStartTick = altar.getResetStartTick();
+        if (altar.getRecipeTime() > 0 || resetStartTick < 0) return invert(recipeProgressRatio);
+
+        var elapsed = gameTime - resetStartTick + partialTick;
+        return Mth.clamp(elapsed / RESET_TICKS, 0f, 1f);
+    }
+
+    private static float updateOrbitWaveAnchor(AltarBlockEntity altar, float playerToAltarAngle, float recipeProgressRatio) {
+        // the wave follows the player while idle and spins on from the last idle angle during a ritual
+        if (altar.getRecipeProgress() > 0) return recipeProgressRatio * FULL_CIRCLE * 3f + altar.getLastWaveAnchor();
+
+        altar.setLastWaveAnchor(playerToAltarAngle);
+        return playerToAltarAngle;
+    }
+
+    public void renderInventoryContents(AltarRenderContext renderContext) {
         renderContext.translate(0, MAX_PROGRESS_HEIGHT * renderContext.getRecipeProgressRatio(), 0);
 
         renderInitiator(renderContext);
         renderItemOrbit(renderContext);
-
-        if (renderContext.shouldReset()) {
-            renderContext.getAltar().resetStartTick = renderContext.getGameTime();
-        }
     }
 
     public void renderInitiator(AltarRenderContext renderContext) {
@@ -143,33 +182,11 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
         var inputs = renderContext.getInputs();
         if (inputs.isEmpty()) return;
 
-        var gameTime = renderContext.getGameTime();
-        var partialTick = renderContext.getPartialTick();
-        var altar = renderContext.getAltar();
-
         var orbitRotation = calculateOrbitRotation();
-        var recipeProgress = renderContext.getRecipeProgress();
-        var recipeProgressRatio = renderContext.getRecipeProgressRatio();
-        var scale = invert(recipeProgressRatio);
+        var waveAnchor = renderContext.getOrbitWaveAnchor();
+        var playerOffset = Math.max(1f - renderContext.getPlayerToAltarDistance() / 8f, 0f);
 
-        var resetStartTick = altar.resetStartTick;
-        if (recipeProgress == 0 && resetStartTick >= 0) {
-            var elapsed = gameTime - resetStartTick + partialTick;
-            scale = Mth.clamp(elapsed / RESET_TICKS, 0f, 1f);
-            if (scale >= 1f) {
-                altar.resetStartTick = -1;
-            }
-        }
-
-        renderContext.scale(scale);
-
-        float waveAnchor;
-        if (recipeProgress > 0) {
-            waveAnchor = recipeProgressRatio * FULL_CIRCLE * 3f + altar.lastWaveAnchor;
-        } else {
-            waveAnchor = renderContext.getPlayerToAltarAngle();
-            altar.lastWaveAnchor = waveAnchor;
-        }
+        renderContext.scale(renderContext.getOrbitScale());
 
         for (var i = 0; i < inputs.size(); i++) {
             renderContext.pushPose();
@@ -179,10 +196,7 @@ public record AltarRenderer(ItemRenderer getItemRenderer) implements BlockEntity
                 var rotationDiff = clampRotation(orbitRotation + itemRotation - waveAnchor);
                 if (rotationDiff > HALF_CIRCLE) rotationDiff = FULL_CIRCLE - rotationDiff;
                 var waveProgress = rotationDiff / HALF_CIRCLE;
-                var newHeight = HALF * invert(Mth.cos(Mth.PI * waveProgress)) * MAX_ITEM_HEIGHT;
-
-                var playerOffset = Math.max(1f - renderContext.getPlayerToAltarDistance() / 8f, 0f);
-                newHeight *= playerOffset;
+                var newHeight = HALF * invert(Mth.cos(Mth.PI * waveProgress)) * MAX_ITEM_HEIGHT * playerOffset;
 
                 renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + orbitRotation)));
                 renderContext.translate(0, newHeight, -ITEM_OFFSET);

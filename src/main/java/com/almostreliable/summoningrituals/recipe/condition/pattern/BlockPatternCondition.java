@@ -96,8 +96,7 @@ public final class BlockPatternCondition {
             if (rotation != Rotation.NONE) {
                 try {
                     var counterRotation = getCounterRotation(rotation);
-                    //noinspection deprecation
-                    blockState = blockState.rotate(counterRotation);
+                    blockState = blockState.rotate(level, blockPos, counterRotation);
                 } catch (Exception ignored) {
                     // ignore errors for mods throwing exceptions for unsupported rotation
                 }
@@ -131,6 +130,8 @@ public final class BlockPatternCondition {
         return getTransformedEntries(altarFacing, query).keySet();
     }
 
+    // pattern states are not placed in a level, so the level-aware rotate has no position to work with
+    @SuppressWarnings("deprecation")
     private Map<BlockPos, List<BlockState>> getTransformedEntries(Direction altarFacing, @Nullable String query) {
         var rotation = getRotation(altarFacing);
         var result = new HashMap<BlockPos, List<BlockState>>();
@@ -144,7 +145,6 @@ public final class BlockPatternCondition {
                 var transformed = new ArrayList<BlockState>();
                 for (var blockState : blockStates) {
                     try {
-                        //noinspection deprecation
                         transformed.add(blockState.rotate(rotation));
                     } catch (Exception ignored) {
                         // ignore errors for mods throwing exceptions for unsupported rotation

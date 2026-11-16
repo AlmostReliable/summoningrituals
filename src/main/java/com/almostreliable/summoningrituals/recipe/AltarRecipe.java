@@ -87,12 +87,12 @@ public record AltarRecipe(
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<AltarRecipe> getSerializer() {
         return Registration.ALTAR_RECIPE_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<AltarRecipe> getType() {
         return Registration.ALTAR_RECIPE_TYPE.get();
     }
 
@@ -152,12 +152,18 @@ public record AltarRecipe(
 
     //<editor-fold defaultstate="collapsed" desc="Caching">
     public static boolean isInitiator(RecipeManager recipeManager, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeManager);
+        }
+
         return INITIATORS.contains(item);
     }
 
     public static boolean isInput(RecipeManager recipeManager, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeManager);
+        }
+
         return INPUTS.contains(item);
     }
 

@@ -15,8 +15,13 @@ import java.util.Collection;
 import java.util.List;
 
 public record RecipeInfo(
-    ResourceLocation getRecipeId, AltarRecipe getRecipe, ItemStack getInitiator, Collection<Entity> getInputEntities,
-    boolean isBlockPatternExtensionMatched, Collection<ItemEntity> getOutputItems, Collection<Entity> getOutputEntities
+    ResourceLocation getRecipeId,
+    AltarRecipe getRecipe,
+    ItemStack getInitiator,
+    Collection<Entity> getInputEntities,
+    boolean isBlockPatternExtensionMatched,
+    Collection<ItemEntity> getOutputItems,
+    Collection<Entity> getOutputEntities
 ) {
 
     // only used to sync recipe info to custom renderers

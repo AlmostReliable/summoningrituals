@@ -17,7 +17,10 @@ import java.util.List;
 import java.util.Optional;
 
 public record RecipeOutputs(
-    List<ItemOutput> itemOutputs, List<EntityOutput> entityOutputs, Optional<CommandOutput> commandOutput, List<ItemStack> displayOutputs
+    List<ItemOutput> itemOutputs,
+    List<EntityOutput> entityOutputs,
+    Optional<CommandOutput> commandOutput,
+    List<ItemStack> displayOutputs
 ) {
 
     public static final MapCodec<RecipeOutputs> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(

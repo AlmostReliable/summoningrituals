@@ -29,6 +29,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,17 +38,13 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.IItemHandler;
-
-import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity, AltarInventoryHost {
 
@@ -69,10 +66,10 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private int recipeProgress;
     private int recipeTime;
 
-    // BER info
-    public long resetStartTick = -1;
-    public long craftStartTick = -1;
-    public float lastWaveAnchor;
+    // client render animation
+    private long craftStartTick = -1;
+    private long resetStartTick = -1;
+    private float lastWaveAnchor;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(Registration.ALTAR_BLOCK_ENTITY.get(), pos, state);
@@ -107,7 +104,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
         if (recipeProgress >= recipeTime) {
             var recipe = currentRecipeInfo.getRecipe();
-            if (inventory.consumeRecipeInputs(level, recipe)) {
+            if (inventory.consumeRecipeInputs(recipe)) {
                 recipe.invokeCommands(level, invokingPlayer);
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::itemOutputs);
                 var entityOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::entityOutputs);
@@ -127,12 +124,13 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public void onInventoryChanged(Function<HolderLookup.Provider, CompoundTag> serializer) {
+    public void onInventoryChanged() {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         setChanged();
-        var inventoryTag = serializer.apply(serverLevel.registryAccess());
-        PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, new AltarInventorySyncPacket(worldPosition, inventoryTag));
+        var inventoryTag = getUpdateTag(serverLevel.registryAccess());
+        var syncPacket = new AltarInventorySyncPacket(worldPosition, inventoryTag);
+        PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, syncPacket);
     }
 
     private void removeLastInsertedItem() {
@@ -163,15 +161,16 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             return stack;
         }
 
+        var recipeManager = serverLevel.getRecipeManager();
         RecipeMatch matchResult = null;
-        if (AltarRecipe.isInitiator(serverLevel.getRecipeManager(), stack.getItem())) {
+        if (AltarRecipe.isInitiator(recipeManager, stack.getItem())) {
             matchResult = handleInitiatorInsertion(serverLevel, player, stack, simulate);
             if (matchResult.getInteractionRemainder() != null) {
                 return matchResult.getInteractionRemainder();
             }
         }
 
-        if (AltarRecipe.isInput(serverLevel.getRecipeManager(), stack.getItem())) {
+        if (AltarRecipe.isInput(recipeManager, stack.getItem())) {
             return handleInputInsertion(serverLevel, player, stack, simulate);
         }
 
@@ -187,7 +186,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private RecipeMatch handleInitiatorInsertion(
         ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean simulate
     ) {
-        var recipeMatch = getMatchingRecipes(level, player, stack);
+        var drawHighlights = player != null && !simulate;
+        var recipeMatch = getMatchingRecipes(level, player, stack, drawHighlights);
         if (recipeMatch.hasIssue()) return recipeMatch;
 
         if (!simulate) inventory.setInitiator(stack.copyWithCount(1));
@@ -212,6 +212,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         currentRecipeInfo = recipeInfo;
         invokingPlayer = player;
         recipeTime = recipeInfo.getRecipe().ticks();
+        invalidateCapabilities();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         changeActivityState(true, level);
         syncAltarRecipeStart(level);
@@ -227,10 +228,17 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return remaining;
     }
 
-    private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack) {
-        var altarRecipes = level.getRecipeManager().getRecipesFor(Registration.ALTAR_RECIPE_TYPE.get(), inventory, level);
-        var recipeHolders = Lists.newArrayList(altarRecipes); // create mutable copy
-        recipeHolders.removeIf(h -> !h.value().initiator().test(stack));
+    private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean drawHighlights) {
+        var altarRecipes = level.getRecipeManager().getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get());
+        var recipeHolders = new ArrayList<RecipeHolder<AltarRecipe>>();
+
+        for (var recipeHolder : altarRecipes) {
+            var recipe = recipeHolder.value();
+            if (recipe.initiator().test(stack) && recipe.matches(inventory, level)) {
+                recipeHolders.add(recipeHolder);
+            }
+        }
+
         if (recipeHolders.isEmpty()) return RecipeMatch.INVALID_INITIATOR;
 
         var lootParams = new LootParams.Builder(level)
@@ -270,7 +278,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var recipe = recipeInfo.getRecipe();
             var blockPattern = recipe.blockPattern();
             var recipes = matchingRecipes.size();
-            return blockPattern.filter(p -> !p.test(lootContext, recipes == 1)).isPresent();
+
+            return blockPattern.filter(p -> !p.test(lootContext, drawHighlights && recipes == 1)).isPresent();
         });
         if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;
 
@@ -294,6 +303,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         invokingPlayer = null;
         recipeProgress = 0;
         recipeTime = 0;
+        invalidateCapabilities();
         changeActivityState(false, level);
         syncAltarRecipeProgress(level);
     }
@@ -323,10 +333,9 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     @Nullable
     public IItemHandler getCapability(@Nullable Direction ignoredSide) {
-        if (!remove && recipeProgress == 0) {
-            return inventory;
-        }
-        return null;
+        // hidden during rituals, start and reset invalidate the capability caches
+        if (remove || currentRecipeInfo != null) return null;
+        return inventory;
     }
 
     @Nullable
@@ -353,23 +362,43 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         return recipeTime;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void receiveRecipeInfoFromServer(@Nullable RecipeInfo currentRecipeInfo) {
         this.currentRecipeInfo = currentRecipeInfo;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void receiveRecipeProgressFromServer(int recipeProgress, int recipeTime) {
+        var hasRitualEnded = this.recipeTime > 0 && recipeTime <= 0;
         this.recipeProgress = recipeProgress;
         this.recipeTime = recipeTime;
 
         if (recipeTime <= 0) {
             craftStartTick = -1;
+            if (hasRitualEnded && level != null) {
+                // starts the scale-in animation of the remaining inputs
+                resetStartTick = level.getGameTime();
+            }
+
             return;
         }
 
         if (level == null) return;
         var gameTime = level.getGameTime();
         craftStartTick = gameTime - recipeProgress;
+    }
+
+    public long getCraftStartTick() {
+        return craftStartTick;
+    }
+
+    public long getResetStartTick() {
+        return resetStartTick;
+    }
+
+    public float getLastWaveAnchor() {
+        return lastWaveAnchor;
+    }
+
+    public void setLastWaveAnchor(float lastWaveAnchor) {
+        this.lastWaveAnchor = lastWaveAnchor;
     }
 }
