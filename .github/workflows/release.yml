@@ -38,7 +38,7 @@ jobs:
     secrets: inherit
     with:
       java-distribution: "microsoft"
-      java-version: "21"
+      java-version: "25"
       mod_name: "SummoningRituals"
       curseforge_id: "671040"
       modrinth_id: "19smZ71v"

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "1.21.1"
+      - "26.1"
     tags-ignore:
       - "**"
     paths:
@@ -16,7 +16,7 @@ on:
       - "**/accesstransformer.cfg"
   pull_request:
     branches:
-      - "1.21.1"
+      - "26.1"
     paths:
       - "gradle/**"
       - "**.java"
@@ -34,4 +34,4 @@ jobs:
     uses: AlmostReliable/.github/.github/workflows/build.yml@main
     with:
       java-distribution: "microsoft"
-      java-version: "21"
+      java-version: "25"
