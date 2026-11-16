@@ -119,13 +119,12 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (
-            !(level.getBlockEntity(pos) instanceof AltarBlockEntity altar) ||
-                !(player instanceof ServerPlayer serverPlayer)
-                || hand != InteractionHand.MAIN_HAND
-        ) {
+        if (hand != InteractionHand.MAIN_HAND || !(level.getBlockEntity(pos) instanceof AltarBlockEntity altar)) {
             return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
+
+        // insertion is server-only, need to return for client here to prevent block placement flicker
+        if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.SUCCESS;
 
         var remainder = altar.handleItemInsertion(serverPlayer, stack, false).remainder();
         serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, remainder);

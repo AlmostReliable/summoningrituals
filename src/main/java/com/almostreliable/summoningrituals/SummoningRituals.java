@@ -10,6 +10,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.TriState;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -72,9 +74,20 @@ public final class SummoningRituals {
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getItemStack().is(ModRegistration.PATTERN_GENERATOR_ITEM)) {
+        var stack = event.getItemStack();
+        if (stack.is(ModRegistration.PATTERN_GENERATOR_ITEM)) {
             // prevent pattern generator from opening menus
             event.setUseBlock(TriState.FALSE);
+            return;
         }
+
+        // prevent off-hand item making popping items out the altar impossible, allow placing blocks with shift
+        if (event.getHand() != InteractionHand.MAIN_HAND || !event.getEntity().isSecondaryUseActive()) return;
+        if (stack.getItem() instanceof BlockItem || !event.getUseBlock().isDefault()) return;
+
+        var blockState = event.getLevel().getBlockState(event.getPos());
+        if (!blockState.is(ModRegistration.ALTAR_BLOCK)) return;
+
+        event.setUseBlock(TriState.TRUE);
     }
 }
