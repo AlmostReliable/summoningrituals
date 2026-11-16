@@ -176,23 +176,23 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
     private static Map<Direction, Vector3f[]> initCandlePositions() {
         var candlePositions = new EnumMap<Direction, Vector3f[]>(Direction.class);
 
-        var northPositions = new Vector3f[]{
+        var northPositions = new Vector3f[] {
             new Vector3f(3.5f, 1.5f, 9.5f), new Vector3f(9.5f, 3.5f, 12.5f), new Vector3f(11.5f, 4.5f, 10.5f)
         };
         candlePositions.put(Direction.NORTH, northPositions);
 
         candlePositions.put(
             Direction.SOUTH,
-            new Vector3f[]{opposite(northPositions[0]), opposite(northPositions[1]), opposite(northPositions[2])}
+            new Vector3f[] {opposite(northPositions[0]), opposite(northPositions[1]), opposite(northPositions[2])}
         );
 
         candlePositions.put(
             Direction.EAST,
-            new Vector3f[]{neighbor(northPositions[0]), neighbor(northPositions[1]), neighbor(northPositions[2])}
+            new Vector3f[] {neighbor(northPositions[0]), neighbor(northPositions[1]), neighbor(northPositions[2])}
         );
 
         candlePositions.put(
-            Direction.WEST, new Vector3f[]{
+            Direction.WEST, new Vector3f[] {
                 opposite(neighbor(northPositions[0])), opposite(neighbor(northPositions[1])), opposite(neighbor(northPositions[2]))
             }
         );

@@ -149,7 +149,7 @@ public class BlockPatternRenderer {
             return;
         }
 
-        //noinspection DataFlowIssue
+        // noinspection DataFlowIssue
         mc.getBlockRenderer().renderSingleBlock(
             blockState,
             poseStack,

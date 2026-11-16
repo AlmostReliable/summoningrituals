@@ -149,14 +149,16 @@ public final class Registration {
         BlockEntityType.BlockEntitySupplier<E> factory,
         DeferredBlock<?>... blocks
     ) {
-        return BLOCK_ENTITIES.register(id.getPath(), () -> {
-            var blockArray = new Block[blocks.length];
+        return BLOCK_ENTITIES.register(
+            id.getPath(), () -> {
+                var blockArray = new Block[blocks.length];
 
-            for (var i = 0; i < blocks.length; i++) {
-                blockArray[i] = blocks[i].get();
+                for (var i = 0; i < blocks.length; i++) {
+                    blockArray[i] = blocks[i].get();
+                }
+
+                return Builder.of(factory, blockArray).build(null);
             }
-
-            return Builder.of(factory, blockArray).build(null);
-        });
+        );
     }
 }

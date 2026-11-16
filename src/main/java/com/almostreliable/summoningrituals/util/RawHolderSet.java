@@ -40,7 +40,7 @@ public record RawHolderSet<T>(
 
     @Override
     public Either<TagKey<T>, List<Holder<T>>> unwrap() {
-        //noinspection OptionalIsPresent
+        // noinspection OptionalIsPresent
         if (tag.isPresent()) {
             return Either.left(tag.get());
         }
