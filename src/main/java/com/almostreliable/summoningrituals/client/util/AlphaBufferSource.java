@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -33,13 +32,10 @@ import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public final class AlphaBufferSource implements SubmitNodeCollector {
-
-    private static final Direction[] QUAD_DIRECTIONS = Arrays.copyOf(Direction.values(), Direction.values().length + 1);
 
     private final SubmitNodeCollector root;
     private final OrderedSubmitNodeCollector target;
@@ -223,11 +219,7 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         int overlayCoords
     ) {
         var quads = new ArrayList<BakedQuad>();
-        for (var part : parts) {
-            for (var direction : QUAD_DIRECTIONS) {
-                quads.addAll(part.getQuads(direction));
-            }
-        }
+        BlockModelQuads.forEach(parts, quads::add);
 
         if (quads.isEmpty()) return;
         owner.submitted = true;

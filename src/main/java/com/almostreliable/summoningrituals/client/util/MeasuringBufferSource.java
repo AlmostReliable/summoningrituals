@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -30,7 +29,6 @@ import org.joml.Quaternionf;
 
 import org.jspecify.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,8 +45,6 @@ import java.util.List;
  * Check the README license section for more information.
  */
 public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSource {
-
-    private static final Direction[] QUAD_DIRECTIONS = Arrays.copyOf(Direction.values(), Direction.values().length + 1);
 
     private final MeasuringVertexConsumer instance = new MeasuringVertexConsumer();
     private final QuadInstance quadInstance = new QuadInstance();
@@ -161,13 +157,8 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
     public void submitParticleGroup(ParticleGroupRenderer particleGroupRenderer) {}
 
     private void measureBlockParts(PoseStack poseStack, List<BlockStateModelPart> parts) {
-        for (var part : parts) {
-            for (var direction : QUAD_DIRECTIONS) {
-                for (var quad : part.getQuads(direction)) {
-                    instance.putBakedQuad(poseStack.last(), quad, quadInstance);
-                }
-            }
-        }
+        var pose = poseStack.last();
+        BlockModelQuads.forEach(parts, quad -> instance.putBakedQuad(pose, quad, quadInstance));
     }
 
     @Nullable
