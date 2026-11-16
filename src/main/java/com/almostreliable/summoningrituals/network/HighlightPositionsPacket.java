@@ -1,9 +1,8 @@
 package com.almostreliable.summoningrituals.network;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
+import com.almostreliable.summoningrituals.client.render.BlockHighlights;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -27,10 +26,6 @@ public record HighlightPositionsPacket(List<BlockPos> positions) implements Cust
     }
 
     static void handle(HighlightPositionsPacket packet, IPayloadContext ignoredCtx) {
-        var level = Minecraft.getInstance().level;
-        if (level == null) return;
-
-        var gameTime = level.getGameTime();
-        BlockHighlightRenderer.highlightWrongPositions(gameTime, packet.positions);
+        BlockHighlights.highlightWrongPositions(packet.positions);
     }
 }

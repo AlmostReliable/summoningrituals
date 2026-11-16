@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.dev;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
-import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
+import com.almostreliable.summoningrituals.client.render.BlockHighlights;
 import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.ChatFormatting;
@@ -100,16 +100,11 @@ public class PatternGeneratorItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    public void clientTick(ItemStack stack, Level level) {
-        if (!level.isClientSide()) return;
-
+    public void clientTick(ItemStack stack) {
         var state = stack.getOrDefault(ModRegistration.PATTERN_GENERATOR_COMPONENT, PatternGeneratorState.DEFAULT);
-        if (state.pos1().isPresent()) {
-            // if at least one position is defined, highlight the area
-            BlockHighlightRenderer.highlightArea(level.getGameTime(), state.getRenderBounds());
-        } else {
-            BlockHighlightRenderer.clearAreaTask();
-        }
+        if (state.pos1().isEmpty()) return;
+
+        BlockHighlights.highlightArea(state.getRenderBounds());
     }
 
     private void resetPositions(ItemStack stack, Player player) {

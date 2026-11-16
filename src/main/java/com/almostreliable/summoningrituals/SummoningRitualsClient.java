@@ -1,7 +1,6 @@
 package com.almostreliable.summoningrituals;
 
 import com.almostreliable.summoningrituals.client.render.AltarRenderer;
-import com.almostreliable.summoningrituals.client.render.BlockHighlightRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
@@ -21,7 +20,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -39,7 +37,6 @@ public final class SummoningRitualsClient {
         eventBus.addListener(SummoningRitualsClient::registerEntityRenderers);
         eventBus.addListener(SummoningRitualsClient::registerTooltipRenderers);
         eventBus.addListener(SummoningRitualsClient::registerClientReloadListeners);
-        eventBus.addListener(SummoningRitualsClient::registerRenderPipelines);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onRenderLevelStage);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onClientTick);
@@ -59,10 +56,6 @@ public final class SummoningRitualsClient {
         KubeFacade.registerReloadListener(event);
     }
 
-    private static void registerRenderPipelines(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(BlockHighlightRenderer.XRAY_LINES_PIPELINE);
-    }
-
     private static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event) {
         var mc = Minecraft.getInstance();
         var featureRenderer = getOverlayFeatureRenderer(mc);
@@ -70,7 +63,6 @@ public final class SummoningRitualsClient {
         var submitNodeCollector = featureRenderer.getSubmitNodeStorage();
         var camera = event.getLevelRenderState().cameraRenderState;
         BlockPatternRenderer.INSTANCE.render(poseStack, submitNodeCollector, camera);
-        BlockHighlightRenderer.INSTANCE.render(poseStack, submitNodeCollector, camera.pos);
         featureRenderer.renderAllFeatures();
         mc.renderBuffers().bufferSource().endBatch();
     }
@@ -94,20 +86,15 @@ public final class SummoningRitualsClient {
 
     private static void onLevelUnload(LevelEvent.Unload event) {
         BlockPatternRenderer.clear();
-        BlockHighlightRenderer.clear();
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {
-        var mc = Minecraft.getInstance();
-        var player = mc.player;
-        if (player == null || mc.isPaused()) return;
+        var player = Minecraft.getInstance().player;
+        if (player == null) return;
 
-        var inventory = player.getInventory();
-        for (var slot = 0; slot < inventory.getContainerSize(); slot++) {
-            var stack = inventory.getItem(slot);
-            if (stack.getItem() instanceof PatternGeneratorItem patternGenerator) {
-                patternGenerator.clientTick(stack, player.level());
-            }
+        var mainHandStack = player.getMainHandItem();
+        if (mainHandStack.getItem() instanceof PatternGeneratorItem patternGenerator) {
+            patternGenerator.clientTick(mainHandStack);
         }
     }
 

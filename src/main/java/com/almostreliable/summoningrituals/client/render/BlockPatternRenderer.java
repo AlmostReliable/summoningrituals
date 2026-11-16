@@ -117,7 +117,7 @@ public class BlockPatternRenderer {
                 }
             }
 
-            BlockHighlightRenderer.highlightWrongPositionOnce(worldPos);
+            BlockHighlights.highlightWrongPosition(worldPos);
 
             var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.pos);
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
