@@ -119,11 +119,13 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
             return;
         }
 
-        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) -> {
-            var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
-            model.setupAnim(state);
-            model.renderToBuffer(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
-        });
+        target.submitCustomGeometry(
+            poseStack, translucentType, (pose, buffer) -> {
+                var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
+                model.setupAnim(state);
+                model.renderToBuffer(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
+            }
+        );
     }
 
     @Override
@@ -160,10 +162,12 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
             return;
         }
 
-        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) -> {
-            var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
-            modelPart.render(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
-        });
+        target.submitCustomGeometry(
+            poseStack, translucentType, (pose, buffer) -> {
+                var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
+                modelPart.render(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
+            }
+        );
     }
 
     @Override
@@ -226,10 +230,12 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
     @Override
     public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
         owner.submitted = true;
-        target.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
-            var alphaBuffer = new AlphaVertexConsumer(buffer, alpha);
-            customGeometryRenderer.render(pose, alphaBuffer);
-        });
+        target.submitCustomGeometry(
+            poseStack, renderType, (pose, buffer) -> {
+                var alphaBuffer = new AlphaVertexConsumer(buffer, alpha);
+                customGeometryRenderer.render(pose, alphaBuffer);
+            }
+        );
     }
 
     @Override
