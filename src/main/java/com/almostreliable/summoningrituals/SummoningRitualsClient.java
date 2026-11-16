@@ -8,8 +8,6 @@ import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.dev.PatternGeneratorItem;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -18,26 +16,24 @@ import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
-
-import org.jspecify.annotations.Nullable;
 
 @Mod(value = ModConstants.MOD_ID, dist = Dist.CLIENT)
 public final class SummoningRitualsClient {
 
-    @Nullable
-    private static FeatureRenderDispatcher overlayFeatureRenderer;
     private static RecipeMap recipeMap = RecipeMap.EMPTY;
 
     public SummoningRitualsClient(IEventBus eventBus) {
         eventBus.addListener(SummoningRitualsClient::registerEntityRenderers);
         eventBus.addListener(SummoningRitualsClient::registerTooltipRenderers);
         eventBus.addListener(SummoningRitualsClient::registerClientReloadListeners);
-        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onRenderLevelStage);
+        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onExtractLevelRenderState);
+        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onSubmitCustomGeometry);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onRecipesReceived);
@@ -56,32 +52,13 @@ public final class SummoningRitualsClient {
         KubeFacade.registerReloadListener(event);
     }
 
-    private static void onRenderLevelStage(RenderLevelStageEvent.AfterTranslucentBlocks event) {
-        var mc = Minecraft.getInstance();
-        var featureRenderer = getOverlayFeatureRenderer(mc);
-        var poseStack = event.getPoseStack();
-        var submitNodeCollector = featureRenderer.getSubmitNodeStorage();
-        var camera = event.getLevelRenderState().cameraRenderState;
-        BlockPatternRenderer.INSTANCE.render(poseStack, submitNodeCollector, camera);
-        featureRenderer.renderAllFeatures();
-        mc.renderBuffers().bufferSource().endBatch();
+    private static void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
+        var partialTick = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        BlockPatternRenderer.INSTANCE.extractRenderState(event.getRenderState(), partialTick);
     }
 
-    private static FeatureRenderDispatcher getOverlayFeatureRenderer(Minecraft mc) {
-        if (overlayFeatureRenderer == null) {
-            var renderBuffers = mc.renderBuffers();
-            overlayFeatureRenderer = new FeatureRenderDispatcher(
-                new SubmitNodeStorage(),
-                mc.getModelManager(),
-                renderBuffers.bufferSource(),
-                mc.getAtlasManager(),
-                renderBuffers.outlineBufferSource(),
-                renderBuffers.crumblingBufferSource(),
-                mc.font,
-                mc.gameRenderer.getGameRenderState()
-            );
-        }
-        return overlayFeatureRenderer;
+    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
+        BlockPatternRenderer.submit(event.getLevelRenderState(), event.getPoseStack(), event.getSubmitNodeCollector());
     }
 
     private static void onLevelUnload(LevelEvent.Unload event) {

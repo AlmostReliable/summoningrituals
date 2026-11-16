@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.client.render;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.util.AlphaBufferSource;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
@@ -15,12 +16,14 @@ import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -42,6 +45,9 @@ import java.util.function.Supplier;
 public class BlockPatternRenderer {
 
     public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
+    private static final ContextKey<List<PreviewRenderState>> PREVIEW_RENDER_STATES = new ContextKey<>(
+        SummoningRituals.getRL("pattern_preview")
+    );
     private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
     private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
     private static final float PREVIEW_ALPHA = 0.5f;
@@ -86,14 +92,31 @@ public class BlockPatternRenderer {
         updatePreviewBlocks(mc, level, task, age / TAG_CYCLE_TICKS);
     }
 
-    public void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+    public void extractRenderState(LevelRenderState levelRenderState, float partialTick) {
         if (previewBlocks.isEmpty()) return;
 
         var mc = Minecraft.getInstance();
-        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
+        var renderStates = new ArrayList<PreviewRenderState>(previewBlocks.size());
 
         for (var previewBlock : previewBlocks) {
-            var translation = Vec3.atLowerCornerOf(previewBlock.pos).subtract(camera.pos);
+            var modelRenderState = new BlockModelRenderState();
+            mc.getBlockModelResolver().update(modelRenderState, previewBlock.state, DISPLAY_CONTEXT);
+            var blockEntityRenderState = extractBlockEntityRenderState(mc, previewBlock, partialTick);
+            renderStates.add(new PreviewRenderState(previewBlock.pos, modelRenderState, blockEntityRenderState));
+        }
+
+        levelRenderState.setRenderData(PREVIEW_RENDER_STATES, renderStates);
+    }
+
+    public static void submit(LevelRenderState levelRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+        var renderStates = levelRenderState.getRenderData(PREVIEW_RENDER_STATES);
+        if (renderStates == null) return;
+
+        var camera = levelRenderState.cameraRenderState;
+        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
+
+        for (var renderState : renderStates) {
+            var translation = Vec3.atLowerCornerOf(renderState.pos).subtract(camera.pos);
 
             poseStack.pushPose();
             {
@@ -103,7 +126,7 @@ public class BlockPatternRenderer {
                 poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
                 poseStack.translate(-0.5, -0.5, -0.5);
 
-                renderBlock(mc, poseStack, alphaBuffer, camera, previewBlock.pos, previewBlock.state);
+                submitBlock(poseStack, alphaBuffer, camera, renderState);
             }
             poseStack.popPose();
         }
@@ -144,42 +167,37 @@ public class BlockPatternRenderer {
         updatePlayerFeedback(mc, task.patternEntries.size(), correctBlocks);
     }
 
-    private static void renderBlock(
-        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, BlockPos pos, BlockState blockState
-    ) {
-        var modelRenderState = new BlockModelRenderState();
-        mc.getBlockModelResolver().update(modelRenderState, blockState, DISPLAY_CONTEXT);
+    @Nullable
+    private static BlockEntityRenderState extractBlockEntityRenderState(Minecraft mc, PreviewBlock previewBlock, float partialTick) {
+        var level = mc.level;
+        if (level == null || !(previewBlock.state.getBlock() instanceof BaseEntityBlock entityBlock)) return null;
 
-        alphaBuffer.resetSubmitted();
-        modelRenderState.submitMultiLayer(poseStack, alphaBuffer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
-        if (alphaBuffer.hasSubmitted()) return;
-
-        if (blockState.getBlock() instanceof BaseEntityBlock entityBlock) {
-            renderBlockEntity(mc, poseStack, alphaBuffer, camera, pos, entityBlock, blockState);
-        }
-    }
-
-    private static void renderBlockEntity(
-        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, BlockPos pos,
-        BaseEntityBlock entityBlock, BlockState blockState
-    ) {
-        assert mc.level != null;
-
-        var blockEntity = BLOCK_ENTITY_CACHE.get(blockState);
+        var blockEntity = BLOCK_ENTITY_CACHE.get(previewBlock.state);
         if (blockEntity == null) {
-            blockEntity = entityBlock.newBlockEntity(pos, blockState);
-            BLOCK_ENTITY_CACHE.put(blockState, blockEntity);
-            if (blockEntity == null) return;
-            blockEntity.setLevel(mc.level);
+            blockEntity = entityBlock.newBlockEntity(previewBlock.pos, previewBlock.state);
+            BLOCK_ENTITY_CACHE.put(previewBlock.state, blockEntity);
+            if (blockEntity == null) return null;
+            blockEntity.setLevel(level);
         }
 
-        var dispatcher = mc.getBlockEntityRenderDispatcher();
-        var partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        BlockEntityRenderState renderState = dispatcher.tryExtractRenderState(blockEntity, partialTick, null, null);
-        if (renderState == null) return;
+        var renderState = mc.getBlockEntityRenderDispatcher().tryExtractRenderState(blockEntity, partialTick, null, null);
+        if (renderState == null) return null;
 
         renderState.lightCoords = LightCoordsUtil.FULL_BRIGHT;
-        dispatcher.submit(renderState, poseStack, alphaBuffer, camera);
+        return renderState;
+    }
+
+    private static void submitBlock(
+        PoseStack poseStack,
+        AlphaBufferSource alphaBuffer,
+        CameraRenderState camera,
+        PreviewRenderState renderState
+    ) {
+        alphaBuffer.resetSubmitted();
+        renderState.model.submitMultiLayer(poseStack, alphaBuffer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        if (alphaBuffer.hasSubmitted() || renderState.blockEntity == null) return;
+
+        Minecraft.getInstance().getBlockEntityRenderDispatcher().submit(renderState.blockEntity, poseStack, alphaBuffer, camera);
     }
 
     private void updatePlayerFeedback(Minecraft mc, int totalBlocks, int correctBlocks) {
@@ -257,6 +275,8 @@ public class BlockPatternRenderer {
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
     private record PreviewBlock(BlockPos pos, BlockState state) {}
+
+    private record PreviewRenderState(BlockPos pos, BlockModelRenderState model, @Nullable BlockEntityRenderState blockEntity) {}
 
     private record Task(
         long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,
