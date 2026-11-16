@@ -32,9 +32,26 @@ import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Wraps a {@link SubmitNodeCollector} and draws everything submitted to it translucent with a fixed alpha. Used by the
+ * block pattern preview.
+ * <p>
+ * The preview submits block models through {@code BlockModelRenderState#submitMultiLayer}, which also runs the special
+ * renderers of chests, beds, signs, banners, heads and similar blocks. When a block model draws nothing, the preview
+ * falls back to the block entity renderer. Both can call any submit method, so the whole collector is wrapped:
+ * <ul>
+ *     <li>block and item quads are redrawn as custom geometry with the alpha in the quad color</li>
+ *     <li>models and model parts are redrawn with a translucent entity render type of the same texture; models without
+ *     a sprite need the texture of their render type, which is why the access transformer opens
+ *     {@code RenderType.state} and {@code RenderSetup.textures}</li>
+ *     <li>custom geometry and text get the alpha in their colors</li>
+ *     <li>everything else is forwarded unchanged</li>
+ * </ul>
+ * {@link #hasSubmitted()} tells the preview whether the block model drew anything.
+ */
 public final class AlphaBufferSource implements SubmitNodeCollector {
 
     private final SubmitNodeCollector root;
@@ -190,7 +207,7 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
 
         owner.submitted = true;
 
-        var quadsByType = new LinkedHashMap<RenderType, List<BakedQuad>>();
+        var quadsByType = new HashMap<RenderType, List<BakedQuad>>();
 
         for (var quad : quads) {
             var renderType = quad.materialInfo().itemRenderType();
@@ -297,7 +314,7 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         int overlayCoords
     ) {
         var quads = new ArrayList<BakedQuad>();
-        BlockModelQuads.forEach(parts, quads::add);
+        RenderUtils.forEachQuad(parts, quads::add);
 
         if (quads.isEmpty()) return;
 

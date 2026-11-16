@@ -221,7 +221,7 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     private void measureBlockParts(PoseStack poseStack, List<BlockStateModelPart> parts) {
         var pose = poseStack.last();
-        BlockModelQuads.forEach(parts, quad -> instance.putBakedQuad(pose, quad, quadInstance));
+        RenderUtils.forEachQuad(parts, quad -> instance.putBakedQuad(pose, quad, quadInstance));
     }
 
     @Nullable
