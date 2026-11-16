@@ -54,9 +54,11 @@ final class InternalInventory implements Iterable<ItemStack> {
 
     ItemStack[] snapshot() {
         var snapshot = new ItemStack[items.length];
+
         for (var i = 0; i < items.length; i++) {
             snapshot[i] = items[i].copy();
         }
+
         return snapshot;
     }
 
@@ -69,7 +71,9 @@ final class InternalInventory implements Iterable<ItemStack> {
 
         for (var i = 0; i < items.length; i++) {
             if (items[i].isEmpty()) continue;
-            itemsOutput.add(new Tuple<>(items[i], i));
+
+            var slottedStack = new Tuple<>(items[i], i);
+            itemsOutput.add(slottedStack);
         }
 
         output.putInt(Constants.SIZE, items.length);
@@ -81,7 +85,8 @@ final class InternalInventory implements Iterable<ItemStack> {
         items = new ItemStack[size];
         clear();
 
-        for (var entry : input.listOrEmpty(Constants.ITEMS, SLOTTED_STACK_CODEC)) {
+        var slottedStacks = input.listOrEmpty(Constants.ITEMS, SLOTTED_STACK_CODEC);
+        for (var entry : slottedStacks) {
             items[entry.getB()] = entry.getA();
         }
     }

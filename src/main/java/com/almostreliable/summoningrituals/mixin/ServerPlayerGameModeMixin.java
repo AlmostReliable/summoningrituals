@@ -23,14 +23,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeMixin {
 
+    @SuppressWarnings("InvokeAssignCanReplacedWithExpression")
     @Inject(
         method = "useItemOn",
         at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/ItemStack;copy()Lnet/minecraft/world/item/ItemStack;")
     )
     private void summoning$useItemOn(
-        ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult hitResult,
-        CallbackInfoReturnable<InteractionResult> cir, @Local BlockState blockState, @Local PlayerInteractEvent.RightClickBlock event,
-        @Local(ordinal = 0) boolean hasItem, @Local(ordinal = 1) boolean isSecondaryActive, @Local(ordinal = 1) ItemStack itemStack
+        ServerPlayer player,
+        Level level,
+        ItemStack stack,
+        InteractionHand hand,
+        BlockHitResult hitResult,
+        CallbackInfoReturnable<InteractionResult> cir,
+        @Local(name = "state") BlockState blockState,
+        @Local(name = "event") PlayerInteractEvent.RightClickBlock event,
+        @Local(name = "haveSomethingInOurHands") boolean hasItem,
+        @Local(name = "suppressUsingBlock") boolean isSecondaryActive,
+        @Local(name = "usedItemStack") ItemStack itemStack
     ) {
         if (hand != InteractionHand.MAIN_HAND || !hasItem || !isSecondaryActive || itemStack.getItem() instanceof BlockItem) {
             return;
@@ -41,4 +50,3 @@ public abstract class ServerPlayerGameModeMixin {
         }
     }
 }
-

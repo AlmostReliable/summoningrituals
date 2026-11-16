@@ -81,6 +81,7 @@ public record AltarRenderer(ItemModelResolver getItemModelResolver) implements B
         var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
 
         var inputs = new ArrayList<ItemStackRenderState>();
+
         for (var input : altar.getInventory().getDisplayItems()) {
             var inputRenderState = extractItem(input, level);
             inputs.add(inputRenderState);
@@ -101,6 +102,7 @@ public record AltarRenderer(ItemModelResolver getItemModelResolver) implements B
     private ItemStackRenderState extractItem(ItemStack stack, Level level) {
         var itemRenderState = new ItemStackRenderState();
         getItemModelResolver.updateForTopItem(itemRenderState, stack, ItemDisplayContext.FIXED, level, null, 0);
+
         return itemRenderState;
     }
 

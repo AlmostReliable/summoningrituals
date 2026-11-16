@@ -17,7 +17,10 @@ public final class EntityComponentTypeWrapper {
     private EntityComponentTypeWrapper() {}
 
     public static <T> T wrap(
-        RecipeComponent<?> component, RecipeScriptContext cx, @Nullable Object from, Class<T> type,
+        RecipeComponent<?> component,
+        RecipeScriptContext cx,
+        @Nullable Object from,
+        Class<T> type,
         Function<EntityInfo, T> factory
     ) {
         if (from == null) throw new KubeRuntimeException("invalid summoning entity: null").source(SourceLine.of(cx.cx()));

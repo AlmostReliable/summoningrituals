@@ -18,7 +18,8 @@ final class BlockModelQuads {
     static void forEach(List<BlockStateModelPart> parts, Consumer<BakedQuad> action) {
         for (var part : parts) {
             for (var direction : QUAD_DIRECTIONS) {
-                for (var quad : part.getQuads(direction)) {
+                var quads = part.getQuads(direction);
+                for (var quad : quads) {
                     action.accept(quad);
                 }
             }

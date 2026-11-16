@@ -22,9 +22,7 @@ import java.util.stream.Stream;
  * registry is not synchronized, e.g. structures.
  */
 @SuppressWarnings("OptionalContainsCollection")
-public record RawHolderSet<T>(
-    Optional<List<Identifier>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData
-) implements HolderSet<T> {
+public record RawHolderSet<T>(Optional<List<Identifier>> ids, Optional<TagKey<T>> tag, Optional<Tag> otherData) implements HolderSet<T> {
 
     @Override
     public Stream<Holder<T>> stream() {

@@ -72,48 +72,91 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
 
     @Override
     public <S> void submitModel(
-        Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
-        int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor,
+        Model<? super S> model,
+        S state,
+        PoseStack poseStack,
+        RenderType renderType,
+        int lightCoords,
+        int overlayCoords,
+        int tintedColor,
+        @Nullable TextureAtlasSprite sprite,
+        int outlineColor,
         ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
     ) {
         owner.submitted = true;
         var color = ARGB.multiplyAlpha(tintedColor, alpha);
         var translucentType = translucentType(renderType, sprite);
         if (translucentType == null) {
-            target.submitModel(model, state, poseStack, renderType, lightCoords, overlayCoords, color, sprite, outlineColor, crumblingOverlay);
+            target.submitModel(
+                model,
+                state,
+                poseStack,
+                renderType,
+                lightCoords,
+                overlayCoords,
+                color,
+                sprite,
+                outlineColor,
+                crumblingOverlay
+            );
             return;
         }
 
         target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) -> {
+            var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
             model.setupAnim(state);
-            model.renderToBuffer(poseStackOf(pose), sprite == null ? buffer : sprite.wrap(buffer), lightCoords, overlayCoords, color);
+            model.renderToBuffer(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
         });
     }
 
     @Override
     public void submitModelPart(
-        ModelPart modelPart, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
-        @Nullable TextureAtlasSprite sprite, boolean sheeted, boolean hasFoil, int tintedColor,
-        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int outlineColor
+        ModelPart modelPart,
+        PoseStack poseStack,
+        RenderType renderType,
+        int lightCoords,
+        int overlayCoords,
+        @Nullable TextureAtlasSprite sprite,
+        boolean sheeted,
+        boolean hasFoil,
+        int tintedColor,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay,
+        int outlineColor
     ) {
         owner.submitted = true;
         var color = ARGB.multiplyAlpha(tintedColor, alpha);
         var translucentType = translucentType(renderType, sprite);
         if (translucentType == null) {
             target.submitModelPart(
-                modelPart, poseStack, renderType, lightCoords, overlayCoords, sprite, sheeted, hasFoil, color, crumblingOverlay, outlineColor
+                modelPart,
+                poseStack,
+                renderType,
+                lightCoords,
+                overlayCoords,
+                sprite,
+                sheeted,
+                hasFoil,
+                color,
+                crumblingOverlay,
+                outlineColor
             );
             return;
         }
 
-        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) ->
-            modelPart.render(poseStackOf(pose), sprite == null ? buffer : sprite.wrap(buffer), lightCoords, overlayCoords, color)
-        );
+        target.submitCustomGeometry(poseStack, translucentType, (pose, buffer) -> {
+            var spriteBuffer = sprite == null ? buffer : sprite.wrap(buffer);
+            modelPart.render(poseStackOf(pose), spriteBuffer, lightCoords, overlayCoords, color);
+        });
     }
 
     @Override
     public void submitBlockModel(
-        PoseStack poseStack, RenderType renderType, List<BlockStateModelPart> parts, int[] tintLayers, int lightCoords, int overlayCoords,
+        PoseStack poseStack,
+        RenderType renderType,
+        List<BlockStateModelPart> parts,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords,
         int outlineColor
     ) {
         submitBlockQuads(poseStack, parts, tintLayers, lightCoords, overlayCoords);
@@ -121,7 +164,12 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
 
     @Override
     public void submitMultiLayerBlockModel(
-        PoseStack poseStack, List<BlockStateModelPart> modelParts, boolean translucent, int[] tintLayers, int lightCoords, int overlayCoords,
+        PoseStack poseStack,
+        List<BlockStateModelPart> modelParts,
+        boolean translucent,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords,
         int outlineColor
     ) {
         submitBlockQuads(poseStack, modelParts, tintLayers, lightCoords, overlayCoords);
@@ -129,17 +177,26 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
 
     @Override
     public void submitItem(
-        PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers,
-        List<BakedQuad> quads, ItemStackRenderState.FoilType foilType
+        PoseStack poseStack,
+        ItemDisplayContext displayContext,
+        int lightCoords,
+        int overlayCoords,
+        int outlineColor,
+        int[] tintLayers,
+        List<BakedQuad> quads,
+        ItemStackRenderState.FoilType foilType
     ) {
         if (quads.isEmpty()) return;
+
         owner.submitted = true;
 
         var quadsByType = new LinkedHashMap<RenderType, List<BakedQuad>>();
+
         for (var quad : quads) {
             var renderType = quad.materialInfo().itemRenderType();
             var translucentType = translucentType(renderType, null);
-            quadsByType.computeIfAbsent(translucentType == null ? renderType : translucentType, type -> new ArrayList<>()).add(quad);
+            var quadType = translucentType == null ? renderType : translucentType;
+            quadsByType.computeIfAbsent(quadType, _ -> new ArrayList<>()).add(quad);
         }
 
         quadsByType.forEach((renderType, typeQuads) -> target.submitCustomGeometry(
@@ -152,22 +209,37 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
     @Override
     public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
         owner.submitted = true;
-        target.submitCustomGeometry(
-            poseStack,
-            renderType,
-            (pose, buffer) -> customGeometryRenderer.render(pose, new AlphaVertexConsumer(buffer, alpha))
-        );
+        target.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
+            var alphaBuffer = new AlphaVertexConsumer(buffer, alpha);
+            customGeometryRenderer.render(pose, alphaBuffer);
+        });
     }
 
     @Override
     public void submitText(
-        PoseStack poseStack, float x, float y, FormattedCharSequence string, boolean dropShadow, Font.DisplayMode displayMode, int lightCoords,
-        int color, int backgroundColor, int outlineColor
+        PoseStack poseStack,
+        float x,
+        float y,
+        FormattedCharSequence string,
+        boolean dropShadow,
+        Font.DisplayMode displayMode,
+        int lightCoords,
+        int color,
+        int backgroundColor,
+        int outlineColor
     ) {
         owner.submitted = true;
         target.submitText(
-            poseStack, x, y, string, dropShadow, displayMode, lightCoords,
-            ARGB.multiplyAlpha(color, alpha), ARGB.multiplyAlpha(backgroundColor, alpha), ARGB.multiplyAlpha(outlineColor, alpha)
+            poseStack,
+            x,
+            y,
+            string,
+            dropShadow,
+            displayMode,
+            lightCoords,
+            ARGB.multiplyAlpha(color, alpha),
+            ARGB.multiplyAlpha(backgroundColor, alpha),
+            ARGB.multiplyAlpha(outlineColor, alpha)
         );
     }
 
@@ -184,8 +256,14 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
 
     @Override
     public void submitNameTag(
-        PoseStack poseStack, @Nullable Vec3 nameTagAttachment, int offset, Component name, boolean seeThrough, int lightCoords,
-        double distanceToCameraSq, CameraRenderState camera
+        PoseStack poseStack,
+        @Nullable Vec3 nameTagAttachment,
+        int offset,
+        Component name,
+        boolean seeThrough,
+        int lightCoords,
+        double distanceToCameraSq,
+        CameraRenderState camera
     ) {
         target.submitNameTag(poseStack, nameTagAttachment, offset, name, seeThrough, lightCoords, distanceToCameraSq, camera);
     }
@@ -222,11 +300,13 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         BlockModelQuads.forEach(parts, quads::add);
 
         if (quads.isEmpty()) return;
+
         owner.submitted = true;
 
+        var renderType = RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false);
         target.submitCustomGeometry(
             poseStack,
-            RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false),
+            renderType,
             (pose, buffer) -> putQuads(pose, buffer, quads, tintLayers, lightCoords, overlayCoords)
         );
     }
@@ -264,12 +344,14 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         if (binding == null) {
             binding = textures.values().stream().findFirst().orElse(null);
         }
+
         return binding == null ? null : binding.location();
     }
 
     private static PoseStack poseStackOf(PoseStack.Pose pose) {
         var poseStack = new PoseStack();
         poseStack.last().set(pose);
+
         return poseStack;
     }
 

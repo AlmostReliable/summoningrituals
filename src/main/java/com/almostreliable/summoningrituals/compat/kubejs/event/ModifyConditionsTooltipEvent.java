@@ -10,5 +10,7 @@ import dev.latvian.mods.kubejs.event.KubeEvent;
 import java.util.List;
 
 public record ModifyConditionsTooltipEvent(
-    Identifier getRecipeId, AltarRecipe getRecipe, List<Component> getTooltip
+    Identifier getRecipeId,
+    AltarRecipe getRecipe,
+    List<Component> getTooltip
 ) implements KubeEvent {}

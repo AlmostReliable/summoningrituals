@@ -20,7 +20,9 @@ public final class KubeFacade {
 
     public static void registerReloadListener(AddClientReloadListenersEvent event) {
         if (notLoaded()) return;
-        event.addListener(SummoningRituals.getRL("ritual_renderers"), new RitualRendererRegistryKubeEvent.ReloadListener());
+
+        var reloadListener = new RitualRendererRegistryKubeEvent.ReloadListener();
+        event.addListener(SummoningRituals.getRL("ritual_renderers"), reloadListener);
     }
 
     public static void postModifyConditionsTooltipEvent(Identifier recipeId, AltarRecipe recipe, List<Component> tooltip) {

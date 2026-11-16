@@ -37,12 +37,11 @@ class SummoningModels extends ModelProvider {
         var altarBlockId = altarBlock.getId();
         var altarBlockModelPath = SummoningRituals.getRL("block/" + altarBlockId.getPath());
         var altarBlockModelPathActive = altarBlockModelPath.withSuffix("_active");
-        new ModelTemplate(Optional.of(altarBlockModelPath), Optional.empty(), TEXTURE).create(
-            altarBlockModelPathActive,
-            new TextureMapping().put(TEXTURE, new Material(altarBlockModelPathActive)),
-            blockModels.modelOutput
-        );
+        var modelTemplate = new ModelTemplate(Optional.of(altarBlockModelPath), Optional.empty(), TEXTURE);
+        var material = new Material(altarBlockModelPathActive);
+        var textureMapping = new TextureMapping().put(TEXTURE, material);
 
+        modelTemplate.create(altarBlockModelPathActive, textureMapping, blockModels.modelOutput);
         altarBlockState(blockModels, altarBlock, altarBlockModelPath, altarBlockModelPathActive);
         itemModels.itemModelOutput.accept(altarBlock.asItem(), ItemModelUtils.plainModel(altarBlockModelPath));
 
@@ -55,7 +54,12 @@ class SummoningModels extends ModelProvider {
         itemModels.itemModelOutput.accept(ModRegistration.PATTERN_GENERATOR_ITEM.get(), ItemModelUtils.plainModel(bambooModelPath));
     }
 
-    private static void altarBlockState(BlockModelGenerators blockModels, DeferredBlock<?> block, Identifier model, Identifier modelActive) {
+    private static void altarBlockState(
+        BlockModelGenerators blockModels,
+        DeferredBlock<?> block,
+        Identifier model,
+        Identifier modelActive
+    ) {
         blockModels.blockStateOutput.accept(
             MultiVariantGenerator.dispatch(block.get())
                 .with(PropertyDispatch.initial(AltarBlock.ACTIVE)

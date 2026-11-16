@@ -94,7 +94,7 @@ public final class ModRegistration {
             .title(SummoningLang.LangEntry.of("tab", "main", ModConstants.MOD_NAME).get())
             .icon(ALTAR_BLOCK::toStack)
             .noScrollBar()
-            .displayItems((features, output) -> output.acceptAll(List.of(ALTAR_BLOCK.toStack(), INDESTRUCTIBLE_ALTAR_BLOCK.toStack())))
+            .displayItems((_, output) -> output.acceptAll(List.of(ALTAR_BLOCK.toStack(), INDESTRUCTIBLE_ALTAR_BLOCK.toStack())))
             .build()
     );
 
@@ -146,16 +146,17 @@ public final class ModRegistration {
     @SuppressWarnings("DataFlowIssue")
     private static <E extends BlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> registerBlockEntity(
         Identifier id,
-        BlockEntityType.BlockEntitySupplier<E> factory, DeferredBlock<?>... blocks
+        BlockEntityType.BlockEntitySupplier<E> factory,
+        DeferredBlock<?>... blocks
     ) {
-        return BLOCK_ENTITIES.register(
-            id.getPath(), () -> {
-                var blockArray = new Block[blocks.length];
-                for (var i = 0; i < blocks.length; i++) {
-                    blockArray[i] = blocks[i].get();
-                }
-                return new BlockEntityType<>(factory, blockArray);
+        return BLOCK_ENTITIES.register(id.getPath(), () -> {
+            var blockArray = new Block[blocks.length];
+
+            for (var i = 0; i < blocks.length; i++) {
+                blockArray[i] = blocks[i].get();
             }
-        );
+
+            return new BlockEntityType<>(factory, blockArray);
+        });
     }
 }

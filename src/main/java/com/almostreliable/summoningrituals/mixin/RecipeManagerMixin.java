@@ -30,24 +30,30 @@ public abstract class RecipeManagerMixin {
     @Final
     private HolderLookup.Provider registries;
 
-    @Inject(method = "prepare(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)Lnet/minecraft/world/item/crafting/RecipeMap;", at = @At("HEAD"))
-    private void summoning$onPrepare(
-        ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfoReturnable<RecipeMap> cir
-    ) {
+    @Inject(
+        method = "prepare(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)" +
+            "Lnet/minecraft/world/item/crafting/RecipeMap;",
+        at = @At("HEAD")
+    )
+    private void summoning$onPrepare(ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfoReturnable<RecipeMap> cir) {
         AltarRecipe.clearPendingValidators();
     }
 
-    @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("HEAD"))
-    private void summoning$onReload(
-        RecipeMap recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci
-    ) {
+    @Inject(
+        method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;" +
+            "Lnet/minecraft/util/profiling/ProfilerFiller;)V",
+        at = @At("HEAD")
+    )
+    private void summoning$onReload(RecipeMap recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
         AltarRecipe.clearCaches();
     }
 
-    @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
-    private void summoning$postReload(
-        RecipeMap recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci
-    ) {
+    @Inject(
+        method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;" +
+            "Lnet/minecraft/util/profiling/ProfilerFiller;)V",
+        at = @At("TAIL")
+    )
+    private void summoning$postReload(RecipeMap recipes, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
         if (FMLEnvironment.isProduction()) return;
 
         SummoningRituals.LOGGER.info("========== Added Recipes ==========");

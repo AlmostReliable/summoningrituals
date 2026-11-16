@@ -55,7 +55,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     public static final AltarObservable SUMMONING_START = new AltarObservable();
     public static final AltarObservable SUMMONING_COMPLETE = new AltarObservable();
     public static final String SACRIFICE_TAG = SummoningRituals.getRL("marker").toString();
-    private static final ContextKeySet LOOT_CONTEXT_PARAM_SET = new ContextKeySet.Builder()
+    private static final ContextKeySet CONTEXT_KEY_SET = new ContextKeySet.Builder()
         .required(LootContextParams.BLOCK_STATE)
         .required(LootContextParams.BLOCK_ENTITY)
         .required(LootContextParams.ORIGIN)
@@ -107,6 +107,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         if (level instanceof ServerLevel serverLevel) {
             inventory.dropContents(serverLevel, pos);
         }
+
         super.preRemoveSideEffects(pos, state);
     }
 
@@ -243,6 +244,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean drawHighlights) {
         var altarRecipes = level.recipeAccess().recipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
         var recipeHolders = new ArrayList<RecipeHolder<AltarRecipe>>();
+
         for (var recipeHolder : altarRecipes) {
             var recipe = recipeHolder.value();
             if (recipe.initiator().test(stack) && recipe.matches(inventory, level)) {
@@ -256,7 +258,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             .withParameter(LootContextParams.BLOCK_STATE, getBlockState())
             .withParameter(LootContextParams.BLOCK_ENTITY, this)
             .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
-            .create(LOOT_CONTEXT_PARAM_SET);
+            .create(CONTEXT_KEY_SET);
         var lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
 
         var matchingRecipes = new HashSet<RecipeInfo>();
@@ -289,6 +291,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
             var recipe = recipeInfo.getRecipe();
             var blockPattern = recipe.blockPattern();
             var recipes = matchingRecipes.size();
+
             return blockPattern.filter(p -> !p.test(lootContext, drawHighlights && recipes == 1)).isPresent();
         });
         if (matchingRecipes.isEmpty()) return RecipeMatch.WRONG_PATTERN;

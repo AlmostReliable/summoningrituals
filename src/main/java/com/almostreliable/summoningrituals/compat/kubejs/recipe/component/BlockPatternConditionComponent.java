@@ -12,7 +12,9 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 
 public record BlockPatternConditionComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<BlockPatternCondition> {
 
-    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("block_pattern_condition"));
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(
+        SummoningRituals.getRL("block_pattern_condition")
+    );
     public static final BlockPatternConditionComponent INSTANCE = new BlockPatternConditionComponent(TYPE);
 
     @Override

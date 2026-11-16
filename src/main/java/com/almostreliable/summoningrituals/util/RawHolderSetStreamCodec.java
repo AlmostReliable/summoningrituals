@@ -49,6 +49,7 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
             if (idOrTag.startsWith("#")) {
                 var tagRaw = idOrTag.substring(1);
                 var tagKey = TagKey.create(registryKey, Identifier.parse(tagRaw));
+
                 return new RawHolderSet<>(Optional.empty(), Optional.of(tagKey), Optional.empty());
             }
 
@@ -58,6 +59,7 @@ public class RawHolderSetStreamCodec<T> implements StreamCodec<RegistryFriendlyB
 
         if (tag instanceof ListTag list) {
             var ids = new ArrayList<Identifier>();
+
             for (var t : list) {
                 if (!(t instanceof StringTag(var id))) continue;
                 ids.add(Identifier.parse(id));

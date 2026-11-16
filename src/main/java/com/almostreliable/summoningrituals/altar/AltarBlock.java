@@ -82,12 +82,19 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     public BlockState updateShape(
-        BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction,
-        BlockPos nPos, BlockState nState, RandomSource random
+        BlockState state,
+        LevelReader level,
+        ScheduledTickAccess ticks,
+        BlockPos pos,
+        Direction direction,
+        BlockPos nPos,
+        BlockState nState,
+        RandomSource random
     ) {
         if (state.getValue(WATERLOGGED)) {
             ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
+
         return super.updateShape(state, level, ticks, pos, direction, nPos, nState, random);
     }
 
@@ -104,8 +111,13 @@ public class AltarBlock extends TickableEntityBlock implements SimpleWaterlogged
 
     @Override
     protected InteractionResult useItemOn(
-        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
-        InteractionHand hand, BlockHitResult hitResult
+        ItemStack stack,
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult hitResult
     ) {
         if (
             !(level.getBlockEntity(pos) instanceof AltarBlockEntity altar) ||

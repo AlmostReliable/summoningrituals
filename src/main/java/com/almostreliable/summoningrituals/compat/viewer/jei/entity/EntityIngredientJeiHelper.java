@@ -48,6 +48,7 @@ public class EntityIngredientJeiHelper implements IIngredientHelper<EntityIngred
         if (entity == null) {
             return "Null entity";
         }
+
         return "Entity: " + getIdentifier(entity);
     }
 }

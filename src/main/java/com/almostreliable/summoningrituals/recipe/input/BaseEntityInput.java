@@ -17,8 +17,7 @@ public interface BaseEntityInput extends TriPredicate<Identifier, Integer, Entit
     Table<Identifier, Integer, Predicate<Entity>> PENDING_DATA_VALIDATORS = Tables.synchronizedTable(HashBasedTable.create());
     Table<Identifier, Integer, Predicate<Entity>> PENDING_FAKE_DATA_VALIDATORS = Tables.synchronizedTable(HashBasedTable.create());
 
-    default boolean test(
-        Table<Identifier, Integer, Predicate<Entity>> validators, Identifier recipeId, Integer inputIndex, Entity entity) {
+    default boolean test(Table<Identifier, Integer, Predicate<Entity>> validators, Identifier recipeId, Integer inputIndex, Entity entity) {
         var predicate = validators.get(recipeId, inputIndex);
         return predicate == null || predicate.test(entity);
     }

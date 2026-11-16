@@ -17,7 +17,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public record FakeEntityInput(ItemStackTemplate displayItem, Optional<Integer> count, Predicate<Entity> predicate) implements BaseEntityInput {
+public record FakeEntityInput(
+    ItemStackTemplate displayItem,
+    Optional<Integer> count,
+    Predicate<Entity> predicate
+) implements BaseEntityInput {
 
     public static final Codec<FakeEntityInput> CODEC = RecordCodecBuilder.create(i -> i.group(
         CodecUtils.STRICT_ITEM_TEMPLATE_CODEC.fieldOf(Constants.ITEM).forGetter(FakeEntityInput::displayItem),

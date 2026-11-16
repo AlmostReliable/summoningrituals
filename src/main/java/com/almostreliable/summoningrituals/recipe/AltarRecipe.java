@@ -165,12 +165,18 @@ public record AltarRecipe(
 
     //<editor-fold defaultstate="collapsed" desc="Caching">
     public static boolean isInitiator(RecipeMap recipeMap, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeMap);
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeMap);
+        }
+
         return INITIATORS.contains(item);
     }
 
     public static boolean isInput(RecipeMap recipeMap, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeMap);
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeMap);
+        }
+
         return INPUTS.contains(item);
     }
 
@@ -181,6 +187,7 @@ public record AltarRecipe(
         for (var recipe : recipes) {
             var r = recipe.value();
             r.initiator.items().map(Holder::value).forEach(INITIATORS::add);
+
             for (var itemInput : r.inputs.itemInputs()) {
                 itemInput.ingredient().items().map(Holder::value).forEach(INPUTS::add);
             }

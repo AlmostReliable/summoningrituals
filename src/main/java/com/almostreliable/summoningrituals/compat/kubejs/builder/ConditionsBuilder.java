@@ -152,26 +152,22 @@ public final class ConditionsBuilder {
 
     @ReturnsSelf
     public ConditionsBuilder minTime(Context ctx, int min) {
-        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.lowerBound(min)));
-        return this;
+        return addTimeCheck(ctx, IntRange.lowerBound(min));
     }
 
     @ReturnsSelf
     public ConditionsBuilder maxTime(Context ctx, int max) {
-        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.upperBound(max)));
-        return this;
+        return addTimeCheck(ctx, IntRange.upperBound(max));
     }
 
     @ReturnsSelf
     public ConditionsBuilder time(Context ctx, int min, int max) {
-        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), IntRange.range(min, max)));
-        return this;
+        return addTimeCheck(ctx, IntRange.range(min, max));
     }
 
     @ReturnsSelf
     public ConditionsBuilder time(Context ctx, TimeCondition.TimeType timeType) {
-        conditions.add(new TimeCheck(getOverworldClock(ctx), Optional.of(24_000L), timeType.range));
-        return this;
+        return addTimeCheck(ctx, timeType.range);
     }
 
     @ReturnsSelf
@@ -223,6 +219,14 @@ public final class ConditionsBuilder {
             blockStatePredicate = StatePropertiesPredicate.Builder.properties();
         }
         return blockStatePredicate;
+    }
+
+    private ConditionsBuilder addTimeCheck(Context ctx, IntRange range) {
+        var overworldClock = getOverworldClock(ctx);
+        var timeCheck = new TimeCheck(overworldClock, Optional.of(24_000L), range);
+        conditions.add(timeCheck);
+
+        return this;
     }
 
     private static Holder<WorldClock> getOverworldClock(Context ctx) {

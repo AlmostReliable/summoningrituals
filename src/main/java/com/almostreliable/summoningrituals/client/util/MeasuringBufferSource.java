@@ -62,8 +62,15 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     @Override
     public <S> void submitModel(
-        Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
-        int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor,
+        Model<? super S> model,
+        S state,
+        PoseStack poseStack,
+        RenderType renderType,
+        int lightCoords,
+        int overlayCoords,
+        int tintedColor,
+        @Nullable TextureAtlasSprite sprite,
+        int outlineColor,
         ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
     ) {
         model.setupAnim(state);
@@ -72,16 +79,29 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     @Override
     public void submitModelPart(
-        ModelPart modelPart, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords,
-        @Nullable TextureAtlasSprite sprite, boolean sheeted, boolean hasFoil, int tintedColor,
-        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int outlineColor
+        ModelPart modelPart,
+        PoseStack poseStack,
+        RenderType renderType,
+        int lightCoords,
+        int overlayCoords,
+        @Nullable TextureAtlasSprite sprite,
+        boolean sheeted,
+        boolean hasFoil,
+        int tintedColor,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay,
+        int outlineColor
     ) {
         modelPart.render(poseStack, instance, lightCoords, overlayCoords, tintedColor);
     }
 
     @Override
     public void submitBlockModel(
-        PoseStack poseStack, RenderType renderType, List<BlockStateModelPart> parts, int[] tintLayers, int lightCoords, int overlayCoords,
+        PoseStack poseStack,
+        RenderType renderType,
+        List<BlockStateModelPart> parts,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords,
         int outlineColor
     ) {
         measureBlockParts(poseStack, parts);
@@ -89,7 +109,12 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     @Override
     public void submitMultiLayerBlockModel(
-        PoseStack poseStack, List<BlockStateModelPart> modelParts, boolean translucent, int[] tintLayers, int lightCoords, int overlayCoords,
+        PoseStack poseStack,
+        List<BlockStateModelPart> modelParts,
+        boolean translucent,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords,
         int outlineColor
     ) {
         measureBlockParts(poseStack, modelParts);
@@ -97,8 +122,14 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     @Override
     public void submitItem(
-        PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers,
-        List<BakedQuad> quads, ItemStackRenderState.FoilType foilType
+        PoseStack poseStack,
+        ItemDisplayContext displayContext,
+        int lightCoords,
+        int overlayCoords,
+        int outlineColor,
+        int[] tintLayers,
+        List<BakedQuad> quads,
+        ItemStackRenderState.FoilType foilType
     ) {
         for (var quad : quads) {
             instance.putBakedQuad(poseStack.last(), quad, quadInstance);
@@ -112,18 +143,41 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
 
     @Override
     public void submitText(
-        PoseStack poseStack, float x, float y, FormattedCharSequence string, boolean dropShadow, Font.DisplayMode displayMode, int lightCoords,
-        int color, int backgroundColor, int outlineColor
+        PoseStack poseStack,
+        float x,
+        float y,
+        FormattedCharSequence string,
+        boolean dropShadow,
+        Font.DisplayMode displayMode,
+        int lightCoords,
+        int color,
+        int backgroundColor,
+        int outlineColor
     ) {
         Minecraft.getInstance().font.drawInBatch(
-            string, x, y, color, dropShadow, poseStack.last().pose(), this, displayMode, backgroundColor, lightCoords
+            string,
+            x,
+            y,
+            color,
+            dropShadow,
+            poseStack.last().pose(),
+            this,
+            displayMode,
+            backgroundColor,
+            lightCoords
         );
     }
 
     @Override
     public void submitNameTag(
-        PoseStack poseStack, @Nullable Vec3 nameTagAttachment, int offset, Component name, boolean seeThrough, int lightCoords,
-        double distanceToCameraSq, CameraRenderState camera
+        PoseStack poseStack,
+        @Nullable Vec3 nameTagAttachment,
+        int offset,
+        Component name,
+        boolean seeThrough,
+        int lightCoords,
+        double distanceToCameraSq,
+        CameraRenderState camera
     ) {
         if (nameTagAttachment == null) return;
 
@@ -133,7 +187,16 @@ public class MeasuringBufferSource implements SubmitNodeCollector, MultiBufferSo
         poseStack.mulPose(camera.orientation);
         poseStack.scale(0.025f, -0.025f, 0.025f);
         font.drawInBatch(
-            name, -font.width(name) / 2f, offset, -1, false, poseStack.last().pose(), this, Font.DisplayMode.NORMAL, 0, lightCoords
+            name,
+            -font.width(name) / 2f,
+            offset,
+            -1,
+            false,
+            poseStack.last().pose(),
+            this,
+            Font.DisplayMode.NORMAL,
+            0,
+            lightCoords
         );
         poseStack.popPose();
     }

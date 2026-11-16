@@ -71,7 +71,11 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
     @Override
     public void draw(
-        RecipeHolder<AltarRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY
+        RecipeHolder<AltarRecipe> recipeHolder,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphicsExtractor guiGraphics,
+        double mouseX,
+        double mouseY
     ) {
         background.draw(guiGraphics);
         var recipe = recipeHolder.value();
@@ -165,8 +169,10 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                     var itemInput = itemInputs.get(slot);
                     var inputSlot = builder.addInputSlot(x, y);
                     var itemStacks = new ArrayList<ItemStack>();
-                    for (var stack : itemInput.ingredient().display().resolveForStacks(inputSlot.getContextMap())) {
-                        itemStacks.add(stack.copyWithCount(itemInput.count()));
+                    var displayStacks = itemInput.ingredient().display().resolveForStacks(inputSlot.getContextMap());
+                    for (var stack : displayStacks) {
+                        var countedStack = stack.copyWithCount(itemInput.count());
+                        itemStacks.add(countedStack);
                     }
 
                     inputSlot.addItemStacks(itemStacks);
@@ -181,6 +187,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                         .add(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
 
                     if (entityEgg == null) return;
+
                     builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(entityEgg);
                 } else {
                     // fake entity inputs
@@ -210,6 +217,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                         .add(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
 
                     if (entityEgg == null) return;
+
                     builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(entityEgg);
                 } else {
                     // display outputs

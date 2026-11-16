@@ -67,6 +67,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         try (var problemReporter = new ProblemReporter.ScopedCollector(SummoningRituals.LOGGER)) {
             var output = TagValueOutput.createWithContext(problemReporter, registryAccess);
             serializer.accept(output);
+
             return output.buildResult();
         }
     }
@@ -75,6 +76,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         saveWithoutInsertOrder(output);
 
         var insertOrderOutput = output.list(Constants.INSERT_ORDER, InternalInventory.SLOTTED_STACK_CODEC);
+
         for (var entry : insertOrder) {
             insertOrderOutput.add(entry);
         }
@@ -377,7 +379,10 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     }
 
     private record PendingState(
-        ItemStack[] items, List<Tuple<ItemStack, Integer>> insertOrder, @Nullable ItemStack queuedInitiator, boolean changed
+        ItemStack[] items,
+        List<Tuple<ItemStack, Integer>> insertOrder,
+        @Nullable ItemStack queuedInitiator,
+        boolean changed
     ) {}
 
     private final class PendingInsertion extends SnapshotJournal<PendingState> {
@@ -399,15 +404,19 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
             } finally {
                 suppressChanges = false;
             }
+
             changed = true;
         }
 
         @Override
         protected PendingState createSnapshot() {
             var insertOrderCopy = new ArrayList<Tuple<ItemStack, Integer>>();
+
             for (var entry : insertOrder) {
-                insertOrderCopy.add(new Tuple<>(entry.getA().copy(), entry.getB()));
+                var entryCopy = new Tuple<>(entry.getA().copy(), entry.getB());
+                insertOrderCopy.add(entryCopy);
             }
+
             return new PendingState(inventory.snapshot(), insertOrderCopy, queuedInitiator, changed);
         }
 
@@ -432,6 +441,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
                 if (toInsert != null) {
                     host.spawnItemAboveAltar(toInsert);
                 }
+
                 return;
             }
 

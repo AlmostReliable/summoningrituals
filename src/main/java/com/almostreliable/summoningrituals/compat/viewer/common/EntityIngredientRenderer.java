@@ -61,6 +61,7 @@ public final class EntityIngredientRenderer {
 
         var entityCount = entityIngredient.getEntityInfo().count();
         if (!count || entityCount <= 1) return;
+
         var pose = guiGraphics.pose();
         pose.pushMatrix();
         {
@@ -98,14 +99,19 @@ public final class EntityIngredientRenderer {
     }
 
     private static void renderEntity(
-        Minecraft mc, GuiGraphicsExtractor guiGraphics, LivingEntity entity, MeasuringResult measuringResult, boolean scissor
+        Minecraft mc,
+        GuiGraphicsExtractor guiGraphics,
+        LivingEntity entity,
+        MeasuringResult measuringResult,
+        boolean scissor
     ) {
         if (scissor) {
             guiGraphics.enableScissor(0, 0, SLOT_SIZE, SLOT_SIZE);
         }
 
         // entity rendering takes absolute coordinates while scissor applies the pose itself
-        var absolutePos = guiGraphics.pose().transformPosition(0, 0, new Vector2f());
+        var absolutePos = new Vector2f();
+        guiGraphics.pose().transformPosition(0, 0, absolutePos);
         var absX = (int) absolutePos.x;
         var absY = (int) absolutePos.y;
         var overflow = scissor ? 0 : SLOT_SIZE;
@@ -147,8 +153,15 @@ public final class EntityIngredientRenderer {
             .rotateY((float) Math.toRadians(-20))
             .rotateX((float) Math.toRadians(-5));
         guiGraphics.entity(
-            renderState, scale, translation, rotation, null,
-            absX - overflow, absY - overflow, absX + SLOT_SIZE + overflow, absY + SLOT_SIZE + overflow
+            renderState,
+            scale,
+            translation,
+            rotation,
+            null,
+            absX - overflow,
+            absY - overflow,
+            absX + SLOT_SIZE + overflow,
+            absY + SLOT_SIZE + overflow
         );
 
         if (scissor) guiGraphics.disableScissor();
