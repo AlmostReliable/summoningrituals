@@ -7,7 +7,6 @@ import com.almostreliable.summoningrituals.core.ModRegistration;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -50,7 +49,7 @@ public class PatternGeneratorItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         var level = context.getLevel();
         var player = context.getPlayer();
-        if (!(level instanceof ClientLevel clientLevel) || player == null || context.getHand() != InteractionHand.MAIN_HAND) {
+        if (!level.isClientSide() || player == null || context.getHand() != InteractionHand.MAIN_HAND) {
             return super.useOn(context);
         }
 
@@ -79,7 +78,7 @@ public class PatternGeneratorItem extends Item {
                     return InteractionResult.FAIL;
                 }
 
-                var count = generateAndPrintPattern(clientLevel, pos, bounds);
+                var count = generateAndPrintPattern(level, pos, bounds);
                 player.sendOverlayMessage(
                     Component.literal("Generated pattern with " + count + " blocks.")
                         .withStyle(ChatFormatting.GREEN)
@@ -112,7 +111,7 @@ public class PatternGeneratorItem extends Item {
         player.sendOverlayMessage(Component.literal("Positions reset.").withStyle(ChatFormatting.YELLOW));
     }
 
-    private int generateAndPrintPattern(ClientLevel level, BlockPos altarPos, AABB bounds) {
+    private int generateAndPrintPattern(Level level, BlockPos altarPos, AABB bounds) {
         var entries = BlockPos.betweenClosedStream(bounds)
             .filter(pos -> !level.getBlockState(pos).isAir())
             .map(pos -> {

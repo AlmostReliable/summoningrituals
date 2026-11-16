@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+- fixed the dev pattern generator crashing dedicated servers when used on a block
 
 ## [3.15.0] - 2026-11-16
 
