@@ -69,10 +69,10 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     private int recipeProgress;
     private int recipeTime;
 
-    // BER info
-    public long resetStartTick = -1;
-    public long craftStartTick = -1;
-    public float lastWaveAnchor;
+    // client render animation
+    private long craftStartTick = -1;
+    private long resetStartTick = -1;
+    private float lastWaveAnchor;
 
     public AltarBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistration.ALTAR_BLOCK_ENTITY.get(), pos, state);
@@ -376,16 +376,38 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     public void receiveRecipeProgressFromServer(int recipeProgress, int recipeTime) {
+        var hasRitualEnded = this.recipeTime > 0 && recipeTime <= 0;
         this.recipeProgress = recipeProgress;
         this.recipeTime = recipeTime;
 
         if (recipeTime <= 0) {
             craftStartTick = -1;
+            if (hasRitualEnded && level != null) {
+                // starts the scale-in animation of the remaining inputs
+                resetStartTick = level.getGameTime();
+            }
+
             return;
         }
 
         if (level == null) return;
         var gameTime = level.getGameTime();
         craftStartTick = gameTime - recipeProgress;
+    }
+
+    public long getCraftStartTick() {
+        return craftStartTick;
+    }
+
+    public long getResetStartTick() {
+        return resetStartTick;
+    }
+
+    public float getLastWaveAnchor() {
+        return lastWaveAnchor;
+    }
+
+    public void setLastWaveAnchor(float lastWaveAnchor) {
+        this.lastWaveAnchor = lastWaveAnchor;
     }
 }
