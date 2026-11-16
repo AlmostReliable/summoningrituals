@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -144,7 +145,7 @@ public final class ConditionsBuilder {
 
     // region Custom Conditions
     @ReturnsSelf
-    public ConditionsBuilder moonPhase(MoonPhaseCheck.MoonPhase phase) {
+    public ConditionsBuilder moonPhase(MoonPhase phase) {
         conditions.add(new MoonPhaseCheck(phase));
         return this;
     }

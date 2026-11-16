@@ -7,6 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -20,10 +21,10 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
 
     private static final MoonPhase[] PHASES = MoonPhase.values();
     public static final MapCodec<MoonPhaseCheck> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        Codec.INT.fieldOf(Constants.MOON_PHASE).forGetter(check -> check.phase.ordinal())
+        Codec.INT.fieldOf(Constants.MOON_PHASE).forGetter(check -> check.phase.index())
     ).apply(i, phase -> new MoonPhaseCheck(PHASES[phase])));
     public static final StreamCodec<RegistryFriendlyByteBuf, MoonPhaseCheck> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.VAR_INT, check -> check.phase.ordinal(),
+        ByteBufCodecs.VAR_INT, check -> check.phase.index(),
         phase -> new MoonPhaseCheck(PHASES[phase])
     );
 
@@ -45,17 +46,6 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
         var overworld = level.getServer().overworld();
         var moonPhase = overworld.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, origin);
 
-        return moonPhase.index() == phase.ordinal();
-    }
-
-    public enum MoonPhase {
-        FULL_MOON,
-        WANING_GIBBOUS,
-        THIRD_QUARTER,
-        WANING_CRESCENT,
-        NEW_MOON,
-        WAXING_CRESCENT,
-        FIRST_QUARTER,
-        WAXING_GIBBOUS
+        return moonPhase == phase;
     }
 }
