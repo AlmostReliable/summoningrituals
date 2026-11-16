@@ -43,8 +43,7 @@ public class JeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(ModRegistration.ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
-        registration.addRecipeCatalyst(ModRegistration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
+        registration.addCraftingStation(AltarJeiCategory.TYPE, ModRegistration.ALTAR_BLOCK, ModRegistration.INDESTRUCTIBLE_ALTAR_BLOCK);
     }
 
     @Override

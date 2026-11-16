@@ -5,9 +5,13 @@ import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
+
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -22,6 +26,18 @@ public record EntityIngredientJeiRenderer(boolean scissor, boolean count) implem
         EntityIngredientRenderer.render(guiGraphics, entityIngredient, scissor, count);
     }
 
+    @Override
+    public List<Component> getTooltip(
+        EntityIngredient entityIngredient,
+        Item.TooltipContext tooltipContext,
+        @Nullable Player player,
+        TooltipFlag tooltipFlag
+    ) {
+        return entityIngredient.getTooltip(count, tooltipFlag.isAdvanced());
+    }
+
+    // still abstract in JEI, delete together with the deprecated overload
+    @SuppressWarnings("removal")
     @Override
     public List<Component> getTooltip(EntityIngredient entityIngredient, TooltipFlag tooltipFlag) {
         return entityIngredient.getTooltip(count, tooltipFlag.isAdvanced());

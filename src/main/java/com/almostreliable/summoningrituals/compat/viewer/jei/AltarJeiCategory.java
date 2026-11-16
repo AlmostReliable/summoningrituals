@@ -27,16 +27,14 @@ import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-
-import org.jspecify.annotations.Nullable;
+import mezz.jei.api.recipe.types.IRecipeHolderType;
 
 import java.util.ArrayList;
 
 public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipeCategory<RecipeHolder<AltarRecipe>> {
 
-    static final RecipeType<RecipeHolder<AltarRecipe>> TYPE = RecipeType.createFromVanilla(ModRegistration.ALTAR_RECIPE_TYPE.get());
+    static final IRecipeHolderType<AltarRecipe> TYPE = IRecipeHolderType.create(ModRegistration.ALTAR_RECIPE_TYPE.get());
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -57,7 +55,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     }
 
     @Override
-    public RecipeType<RecipeHolder<AltarRecipe>> getRecipeType() {
+    public IRecipeHolderType<AltarRecipe> getRecipeType() {
         return TYPE;
     }
 
@@ -66,7 +64,6 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         return ModRegistration.ALTAR_BLOCK.get().getName();
     }
 
-    @Nullable
     @Override
     public IDrawable getIcon() {
         return icon;
@@ -150,12 +147,12 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AltarRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CENTER_X - SLOT_SIZE / 2, CENTER_Y - SLOT_SIZE / 2 - 10)
-            .addItemLike(ModRegistration.ALTAR_BLOCK);
+            .add(ModRegistration.ALTAR_BLOCK);
 
         var recipe = recipeHolder.value();
-        createInitiatorSlot((x, y, slot) ->
+        createInitiatorSlot((x, y, _) ->
             builder.addInputSlot(x, y)
-                .addIngredients(recipe.initiator())
+                .add(recipe.initiator())
                 .addRichTooltipCallback(AltarJeiCategory::constructInitiatorTooltip));
 
         createInputSlots(
@@ -181,14 +178,14 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
                     builder.addSlot(RecipeIngredientRole.INPUT, x, y)
                         .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.INPUT_RENDERER)
-                        .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
+                        .add(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
 
                     if (entityEgg == null) return;
-                    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStack(entityEgg);
+                    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(entityEgg);
                 } else {
                     // fake entity inputs
                     var fakeEntityInput = inputs.fakeEntityInputs().get(slot - itemInputs.size() - entityInputs.size());
-                    builder.addSlot(RecipeIngredientRole.INPUT, x, y).addItemStack(fakeEntityInput.displayItem().create());
+                    builder.addSlot(RecipeIngredientRole.INPUT, x, y).add(fakeEntityInput.displayItem());
                 }
             }
         );
@@ -200,8 +197,8 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
                 var entityOutputs = outputs.entityOutputs();
                 if (slot < itemOutputs.size()) {
                     // item outputs
-                    var stack = itemOutputs.get(slot).item().create();
-                    builder.addOutputSlot(x, y).addItemStack(stack);
+                    var item = itemOutputs.get(slot).item();
+                    builder.addOutputSlot(x, y).add(item);
                 } else if (slot - itemOutputs.size() < entityOutputs.size()) {
                     // entity outputs
                     var entityOutput = entityOutputs.get(slot - itemOutputs.size()).entityInfo();
@@ -210,15 +207,15 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
 
                     builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                         .setCustomRenderer(JeiPlugin.ENTITY_INGREDIENT, EntityIngredientJeiRenderer.OUTPUT_RENDERER)
-                        .addIngredient(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
+                        .add(JeiPlugin.ENTITY_INGREDIENT, entityIngredient);
 
                     if (entityEgg == null) return;
-                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(entityEgg);
+                    builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(entityEgg);
                 } else {
                     // display outputs
                     var displayOutputs = outputs.displayOutputs();
                     var displayOutput = displayOutputs.get(slot - itemOutputs.size() - entityOutputs.size());
-                    builder.addOutputSlot(x, y).addItemStack(displayOutput.create());
+                    builder.addOutputSlot(x, y).add(displayOutput);
                 }
             }
         );
@@ -227,7 +224,7 @@ public class AltarJeiCategory extends RecipeViewerAltarLayout implements IRecipe
         if (blockPattern.isPresent() && Config.CLIENT.blocksAsRecipeViewerUsages.getAsBoolean()) {
             for (var entry : blockPattern.get().getRawEntries()) {
                 var block = entry.predicate().getBlockStates().getFirst().getBlock();
-                builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemLike(block);
+                builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(block);
             }
         }
     }
