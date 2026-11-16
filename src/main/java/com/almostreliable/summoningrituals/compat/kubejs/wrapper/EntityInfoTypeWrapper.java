@@ -50,9 +50,13 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
             }
         }
 
+        if (!(cx instanceof KubeJSContext kubeContext)) {
+            throw new KubeRuntimeException("invalid summoning entity: " + o).source(SourceLine.of(cx));
+        }
+
         Holder<EntityType<?>> entityHolder;
         try {
-            entityHolder = Cast.to(HolderWrapper.wrap((KubeJSContext) cx, o, ENTITY_TYPE_INFO));
+            entityHolder = Cast.to(HolderWrapper.wrap(kubeContext, o, ENTITY_TYPE_INFO));
         } catch (Exception e) {
             throw new KubeRuntimeException("invalid summoning entity: " + o).source(SourceLine.of(cx));
         }
