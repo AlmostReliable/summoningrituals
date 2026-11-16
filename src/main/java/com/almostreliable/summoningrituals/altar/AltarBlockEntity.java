@@ -30,6 +30,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,10 +43,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
-import com.google.common.collect.Lists;
-
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Function;
@@ -241,11 +241,15 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     private RecipeMatch getMatchingRecipes(ServerLevel level, @Nullable ServerPlayer player, ItemStack stack, boolean drawHighlights) {
-        var altarRecipes = level.recipeAccess().recipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get()).stream()
-            .filter(holder -> holder.value().matches(inventory, level))
-            .iterator();
-        var recipeHolders = Lists.newArrayList(altarRecipes); // create mutable copy
-        recipeHolders.removeIf(h -> !h.value().initiator().test(stack));
+        var altarRecipes = level.recipeAccess().recipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
+        var recipeHolders = new ArrayList<RecipeHolder<AltarRecipe>>();
+        for (var recipeHolder : altarRecipes) {
+            var recipe = recipeHolder.value();
+            if (recipe.initiator().test(stack) && recipe.matches(inventory, level)) {
+                recipeHolders.add(recipeHolder);
+            }
+        }
+
         if (recipeHolders.isEmpty()) return RecipeMatch.INVALID_INITIATOR;
 
         var lootParams = new LootParams.Builder(level)
