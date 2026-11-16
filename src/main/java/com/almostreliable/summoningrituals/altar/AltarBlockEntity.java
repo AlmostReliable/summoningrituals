@@ -221,6 +221,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         currentRecipeInfo = recipeInfo;
         invokingPlayer = player;
         recipeTime = recipeInfo.getRecipe().ticks();
+        invalidateCapabilities();
         playOptionalPlayerSound(level, player, false, SoundEvents.BEACON_ACTIVATE);
         changeActivityState(true, level);
         syncAltarRecipeStart(level);
@@ -311,6 +312,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
         invokingPlayer = null;
         recipeProgress = 0;
         recipeTime = 0;
+        invalidateCapabilities();
         changeActivityState(false, level);
         syncAltarRecipeProgress(level);
     }
@@ -340,10 +342,9 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
     @Nullable
     public ResourceHandler<ItemResource> getCapability(@Nullable Direction ignoredSide) {
-        if (!remove && recipeProgress == 0) {
-            return inventory;
-        }
-        return null;
+        // hidden during rituals, start and reset invalidate the capability caches
+        if (remove || currentRecipeInfo != null) return null;
+        return inventory;
     }
 
     @Nullable
