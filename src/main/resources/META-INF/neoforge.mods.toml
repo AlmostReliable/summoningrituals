@@ -36,6 +36,13 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies."${modId}"]]
+modId = "kubegroovy"
+type = "OPTIONAL"
+versionRange = "[${kgyVersion},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies."${modId}"]]
 modId = "jei"
 type = "OPTIONAL"
 versionRange = "[${jeiVersion},)"

@@ -1,0 +1,41 @@
+package com.almostreliable.summoningrituals.compat.kubegroovy.event;
+
+import com.almostreliable.summoningrituals.client.render.AltarRenderer;
+import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
+import com.almostreliable.summoningrituals.client.render.CustomRitualRenderer;
+
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+
+import dev.uncandango.kubegroovy.event.KubeEvent;
+import dev.uncandango.kubegroovy.script.annotations.HideFromGY;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public final class RitualRendererRegistryKubeEvent implements KubeEvent {
+
+    private RitualRendererRegistryKubeEvent() {}
+
+    private final Map<Identifier, CustomRitualRenderer> renderers = new HashMap<>();
+
+    public void register(Identifier id, CustomRitualRenderer renderer) {
+        renderers.put(id, renderer);
+    }
+
+    @HideFromGY
+    public static final class ReloadListener implements ResourceManagerReloadListener {
+
+        @Override
+        public void onResourceManagerReload(ResourceManager resourceManager) {
+            AltarRenderer.CUSTOM_RENDERERS.clear();
+            BlockPatternRenderer.clear();
+            if (KubeEvents.RITUAL_RENDERER_REGISTRY.hasListeners()) {
+                var event = new RitualRendererRegistryKubeEvent();
+                KubeEvents.RITUAL_RENDERER_REGISTRY.post(event);
+                AltarRenderer.CUSTOM_RENDERERS.putAll(event.renderers);
+            }
+        }
+    }
+}

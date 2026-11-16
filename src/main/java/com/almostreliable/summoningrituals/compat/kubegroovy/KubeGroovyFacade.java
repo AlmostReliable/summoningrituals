@@ -1,9 +1,9 @@
-package com.almostreliable.summoningrituals.compat.kubejs;
+package com.almostreliable.summoningrituals.compat.kubegroovy;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
-import com.almostreliable.summoningrituals.compat.kubejs.event.KubeEvents;
-import com.almostreliable.summoningrituals.compat.kubejs.event.ModifyConditionsTooltipEvent;
-import com.almostreliable.summoningrituals.compat.kubejs.event.RitualRendererRegistryKubeEvent;
+import com.almostreliable.summoningrituals.compat.kubegroovy.event.KubeEvents;
+import com.almostreliable.summoningrituals.compat.kubegroovy.event.ModifyConditionsTooltipEvent;
+import com.almostreliable.summoningrituals.compat.kubegroovy.event.RitualRendererRegistryKubeEvent;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.network.chat.Component;
@@ -14,9 +14,9 @@ import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 
 import java.util.List;
 
-public final class KubeFacade {
+public final class KubeGroovyFacade {
 
-    private KubeFacade() {}
+    private KubeGroovyFacade() {}
 
     public static void registerReloadListener(AddClientReloadListenersEvent event) {
         if (notLoaded()) return;
@@ -31,7 +31,7 @@ public final class KubeFacade {
     }
 
     private static boolean notLoaded() {
-        var modId = "kubejs";
+        var modId = "kubegroovy";
         var modList = ModList.get();
         if (modList == null) {
             return FMLLoader.getCurrent().getLoadingModList().getModFileById(modId) == null;

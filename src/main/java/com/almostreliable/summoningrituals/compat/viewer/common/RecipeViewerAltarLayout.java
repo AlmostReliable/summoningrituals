@@ -2,7 +2,8 @@ package com.almostreliable.summoningrituals.compat.viewer.common;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
-import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
+import com.almostreliable.summoningrituals.compat.kubegroovy.KubeGroovyFacade;
+import com.almostreliable.summoningrituals.compat.kubejs.KubeJsFacade;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.data.SummoningLang;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
@@ -56,7 +57,8 @@ public class RecipeViewerAltarLayout {
             tooltip.addAll(ConditionRegistry.getTooltip(condition));
         }
 
-        KubeFacade.postModifyConditionsTooltipEvent(recipeId, recipe, tooltip);
+        KubeJsFacade.postModifyConditionsTooltipEvent(recipeId, recipe, tooltip);
+        KubeGroovyFacade.postModifyConditionsTooltipEvent(recipeId, recipe, tooltip);
         return tooltip;
     }
 

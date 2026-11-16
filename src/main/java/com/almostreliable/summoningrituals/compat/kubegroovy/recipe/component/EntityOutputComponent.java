@@ -1,0 +1,63 @@
+package com.almostreliable.summoningrituals.compat.kubegroovy.recipe.component;
+
+import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.compat.kubegroovy.binding.SummoningEntityBinding;
+import com.almostreliable.summoningrituals.compat.kubegroovy.builder.SummoningEntityOutputBuilder;
+import com.almostreliable.summoningrituals.compat.kubegroovy.wrapper.EntityComponentTypeWrapper;
+import com.almostreliable.summoningrituals.compat.kubegroovy.wrapper.EntityInfoTypeWrapper;
+import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
+import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
+
+import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+
+import com.mojang.serialization.Codec;
+import dev.uncandango.kubegroovy.recipe.RecipeScriptContext;
+import dev.uncandango.kubegroovy.recipe.component.RecipeComponent;
+import dev.uncandango.kubegroovy.recipe.component.RecipeComponentType;
+import dev.uncandango.kubegroovy.script.type.TypeInfo;
+
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+
+public record EntityOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<EntityOutput> {
+
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("entity_output"));
+    public static final EntityOutputComponent INSTANCE = new EntityOutputComponent(TYPE);
+
+    @Override
+    public Codec<EntityOutput> codec() {
+        return EntityOutput.CODEC;
+    }
+
+    @Override
+    public TypeInfo typeInfo() {
+        return TypeInfo.of(EntityOutput.class)
+            .or(TypeInfo.of(EntityInfo.class))
+            .or(TypeInfo.of(SummoningEntityOutputBuilder.class))
+            .or(TypeInfo.of(Holder.class).withParams(EntityInfoTypeWrapper.ENTITY_TYPE_INFO))
+            .or(TypeInfo.of(Identifier.class))
+            .or(TypeInfo.STRING);
+    }
+
+    @Override
+    public EntityOutput wrap(RecipeScriptContext cx, @Nullable Object from) {
+        if (from instanceof SummoningEntityOutputBuilder builder) {
+            return builder.buildOutput();
+        }
+
+        if (from instanceof EntityInfo info) {
+            return new EntityOutput(info, Optional.empty(), Optional.empty());
+        }
+
+        return EntityComponentTypeWrapper.wrap(
+            this,
+            cx,
+            from,
+            EntityOutput.class,
+            entity -> SummoningEntityBinding.output(entity).buildOutput()
+        );
+    }
+}

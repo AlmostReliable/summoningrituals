@@ -3,7 +3,8 @@ package com.almostreliable.summoningrituals;
 import com.almostreliable.summoningrituals.client.render.AltarRenderer;
 import com.almostreliable.summoningrituals.client.render.BlockPatternRenderer;
 import com.almostreliable.summoningrituals.client.tooltip.PatternPreviewTooltipComponent;
-import com.almostreliable.summoningrituals.compat.kubejs.KubeFacade;
+import com.almostreliable.summoningrituals.compat.kubegroovy.KubeGroovyFacade;
+import com.almostreliable.summoningrituals.compat.kubejs.KubeJsFacade;
 import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.dev.PatternGeneratorItem;
 
@@ -44,7 +45,8 @@ public final class SummoningRitualsClient {
     }
 
     private static void registerClientReloadListeners(AddClientReloadListenersEvent event) {
-        KubeFacade.registerReloadListener(event);
+        KubeJsFacade.registerReloadListener(event);
+        KubeGroovyFacade.registerReloadListener(event);
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {

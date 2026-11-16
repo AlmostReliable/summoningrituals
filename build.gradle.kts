@@ -14,9 +14,16 @@ repositories {
     // KubeJS
     maven("https://maven.latvian.dev/releases")
     maven("https://maven.latvian.dev/mirror")
+    maven("https://cursemaven.com") {
+        content {
+            includeGroup("curse.maven")
+        }
+    }
 }
 
 dependencies {
     // KubeJS
     implementation("dev.latvian.mods:kubejs-neoforge:${almostgradle.getProperty("kjsVersion")}")
+    compileOnly("curse.maven:kubegroovy-1745965:9638005")
+    compileOnly("org.apache.groovy:groovy:6.0.0")
 }
