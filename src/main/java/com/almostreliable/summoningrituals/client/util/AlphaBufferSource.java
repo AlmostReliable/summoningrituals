@@ -146,18 +146,11 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
             quadsByType.computeIfAbsent(translucentType == null ? renderType : translucentType, type -> new ArrayList<>()).add(quad);
         }
 
-        quadsByType.forEach((renderType, typeQuads) -> target.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
-            var quadInstance = new QuadInstance();
-            quadInstance.setLightCoords(lightCoords);
-            quadInstance.setOverlayCoords(overlayCoords);
-            for (var quad : typeQuads) {
-                var material = quad.materialInfo();
-                var tintIndex = material.tintIndex();
-                var color = material.isTinted() && tintIndex >= 0 && tintIndex < tintLayers.length ? tintLayers[tintIndex] : -1;
-                quadInstance.setColor(ARGB.multiplyAlpha(color, alpha));
-                buffer.putBakedQuad(pose, quad, quadInstance);
-            }
-        }));
+        quadsByType.forEach((renderType, typeQuads) -> target.submitCustomGeometry(
+            poseStack,
+            renderType,
+            (pose, buffer) -> putQuads(pose, buffer, typeQuads, tintLayers, lightCoords, overlayCoords)
+        ));
     }
 
     @Override
@@ -221,27 +214,48 @@ public final class AlphaBufferSource implements SubmitNodeCollector {
         target.submitParticleGroup(particleGroupRenderer);
     }
 
-    private void submitBlockQuads(PoseStack poseStack, List<BlockStateModelPart> parts, int[] tintLayers, int lightCoords, int overlayCoords) {
-        var hasQuads = parts.stream()
-            .anyMatch(part -> Arrays.stream(QUAD_DIRECTIONS).anyMatch(direction -> !part.getQuads(direction).isEmpty()));
-        if (!hasQuads) return;
+    private void submitBlockQuads(
+        PoseStack poseStack,
+        List<BlockStateModelPart> parts,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords
+    ) {
+        var quads = new ArrayList<BakedQuad>();
+        for (var part : parts) {
+            for (var direction : QUAD_DIRECTIONS) {
+                quads.addAll(part.getQuads(direction));
+            }
+        }
+
+        if (quads.isEmpty()) return;
         owner.submitted = true;
 
-        target.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false), (pose, buffer) -> {
-            var quadInstance = new QuadInstance();
-            quadInstance.setLightCoords(lightCoords);
-            quadInstance.setOverlayCoords(overlayCoords);
-            for (var part : parts) {
-                for (var direction : QUAD_DIRECTIONS) {
-                    for (var quad : part.getQuads(direction)) {
-                        var tintIndex = quad.materialInfo().tintIndex();
-                        var color = tintIndex != -1 && tintIndex < tintLayers.length ? tintLayers[tintIndex] : -1;
-                        quadInstance.setColor(ARGB.multiplyAlpha(color, alpha));
-                        buffer.putBakedQuad(pose, quad, quadInstance);
-                    }
-                }
-            }
-        });
+        target.submitCustomGeometry(
+            poseStack,
+            RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS, false),
+            (pose, buffer) -> putQuads(pose, buffer, quads, tintLayers, lightCoords, overlayCoords)
+        );
+    }
+
+    private void putQuads(
+        PoseStack.Pose pose,
+        VertexConsumer buffer,
+        List<BakedQuad> quads,
+        int[] tintLayers,
+        int lightCoords,
+        int overlayCoords
+    ) {
+        var quadInstance = new QuadInstance();
+        quadInstance.setLightCoords(lightCoords);
+        quadInstance.setOverlayCoords(overlayCoords);
+
+        for (var quad : quads) {
+            var tintIndex = quad.materialInfo().tintIndex();
+            var color = tintIndex >= 0 && tintIndex < tintLayers.length ? tintLayers[tintIndex] : -1;
+            quadInstance.setColor(ARGB.multiplyAlpha(color, alpha));
+            buffer.putBakedQuad(pose, quad, quadInstance);
+        }
     }
 
     @Nullable
