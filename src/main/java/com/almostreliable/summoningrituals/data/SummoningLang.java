@@ -2,22 +2,24 @@ package com.almostreliable.summoningrituals.data;
 
 import com.almostreliable.summoningrituals.ModConstants;
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
 import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.MoonPhase;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class SummoningLang extends LanguageProvider {
@@ -69,7 +71,7 @@ public final class SummoningLang extends LanguageProvider {
     public static final LangEntry YES = LangEntry.condition("yes", "Yes");
 
     // enums
-    public static final Map<MoonPhaseCheck.MoonPhase, LangEntry> MOON_PHASES = LangEntry.enumValues("condition", "moon_phases", MoonPhaseCheck.MoonPhase.values());
+    public static final Map<MoonPhase, LangEntry> MOON_PHASES = LangEntry.enumValues("condition", "moon_phases", MoonPhase.values());
     public static final Map<TimeCondition.TimeType, LangEntry> TIME_TYPES = LangEntry.enumValues("condition", "time", TimeCondition.TimeType.values());
 
     // @formatter:on
@@ -117,8 +119,7 @@ public final class SummoningLang extends LanguageProvider {
 
             for (var enumValue : enumValues) {
                 var id = enumValue.name().toLowerCase(Locale.ROOT);
-                //noinspection deprecation
-                var value = WordUtils.capitalizeFully(id.replace("_", " "));
+                var value = Arrays.stream(id.split("_")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
                 enumEntries.put(enumValue, of(prefix, idPrefix + "_" + id, value));
             }
 

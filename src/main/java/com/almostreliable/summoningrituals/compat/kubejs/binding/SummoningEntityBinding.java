@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.binding;
 
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityInputBuilder;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntityOutputBuilder;
+import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOutputComponent;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 
@@ -24,11 +25,11 @@ public interface SummoningEntityBinding {
     }
 
     static FakeEntityInput fakeInput(ItemStack displayItem, int count, Predicate<Entity> predicate) {
-        return new FakeEntityInput(displayItem, Optional.of(count), predicate);
+        return new FakeEntityInput(ItemOutputComponent.templateOf(displayItem), Optional.of(count), predicate);
     }
 
     static FakeEntityInput fakeInput(ItemStack displayItem, Predicate<Entity> predicate) {
-        return new FakeEntityInput(displayItem, Optional.empty(), predicate);
+        return new FakeEntityInput(ItemOutputComponent.templateOf(displayItem), Optional.empty(), predicate);
     }
 
     static SummoningEntityOutputBuilder output(EntityInfo entity) {

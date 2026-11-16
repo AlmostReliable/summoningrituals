@@ -3,13 +3,13 @@ package com.almostreliable.summoningrituals.compat.viewer.jei.entity;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.JeiPlugin;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class EntityIngredientJeiHelper implements IIngredientHelper<EntityIngredient> {
 
@@ -23,14 +23,13 @@ public class EntityIngredientJeiHelper implements IIngredientHelper<EntityIngred
         return entity.getDisplayName().getString();
     }
 
-    @SuppressWarnings("removal")
     @Override
-    public String getUniqueId(EntityIngredient entity, UidContext context) {
-        return entity.getId().toString();
+    public Object getUid(EntityIngredient entity, UidContext context) {
+        return entity.getId();
     }
 
     @Override
-    public ResourceLocation getResourceLocation(EntityIngredient entity) {
+    public Identifier getIdentifier(EntityIngredient entity) {
         return entity.getId();
     }
 
@@ -49,6 +48,7 @@ public class EntityIngredientJeiHelper implements IIngredientHelper<EntityIngred
         if (entity == null) {
             return "Null entity";
         }
-        return "Entity: " + getResourceLocation(entity);
+
+        return "Entity: " + getIdentifier(entity);
     }
 }

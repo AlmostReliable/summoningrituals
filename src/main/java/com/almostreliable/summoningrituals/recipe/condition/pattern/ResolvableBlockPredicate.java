@@ -2,7 +2,7 @@ package com.almostreliable.summoningrituals.recipe.condition.pattern;
 
 import com.almostreliable.summoningrituals.core.Constants;
 
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
@@ -11,7 +11,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -19,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,8 +51,8 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
         return new Builder(block);
     }
 
-    public static Builder builder(TagKey<Block> tag) {
-        return new Builder(tag);
+    public static Builder builder(HolderSet<Block> blocks) {
+        return new Builder(blocks);
     }
 
     @Override
@@ -142,15 +141,14 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
     public static final class Builder {
 
         private final HolderSet<Block> blocks;
-        private @Nullable StatePropertiesPredicate.Builder propertiesBuilder;
         private Optional<StatePropertiesPredicate> properties = Optional.empty();
 
         private Builder(Block block) {
             this.blocks = HolderSet.direct(Block::builtInRegistryHolder, block);
         }
 
-        private Builder(TagKey<Block> tag) {
-            this.blocks = BuiltInRegistries.BLOCK.getOrCreateTag(tag);
+        private Builder(HolderSet<Block> blocks) {
+            this.blocks = blocks;
         }
 
         public Builder setProperties(StatePropertiesPredicate.Builder properties) {

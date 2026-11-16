@@ -2,9 +2,11 @@ package com.almostreliable.summoningrituals.client.render;
 
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.util.Mth;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -13,37 +15,36 @@ import net.minecraft.world.level.Level;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Quaternionf;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 
 public record AltarRenderContext(
     Level getLevel,
     Player getPlayer,
-    AltarBlockEntity getAltar,
+    BlockPos getAltarPos,
+    long getGameTime,
+    float getPartialTick,
     float getPlayerToAltarDistance,
     float getPlayerToAltarAngle,
     int getRecipeProgress,
     int getRecipeTime,
-    PoseStack getPoseStack,
-    MultiBufferSource getBufferSource,
+    float getRecipeProgressRatio,
+    float getOrbitScale,
+    float getOrbitWaveAnchor,
     int getLightAbove,
-    int getPackedOverlay,
-    float getPartialTick
+    ItemStack getInitiator,
+    List<ItemStack> getInputs,
+    ItemStackRenderState getInitiatorRenderState,
+    List<ItemStackRenderState> getInputRenderStates,
+    PoseStack getPoseStack,
+    SubmitNodeCollector getSubmitNodeCollector
 ) {
 
-    public float getRecipeProgressRatio() {
-        if (getRecipeTime <= 0) return 0f;
-
-        var craftStartTick = getAltar.craftStartTick;
-        if (craftStartTick < 0) {
-            return Mth.clamp((getRecipeProgress + getPartialTick) / getRecipeTime, 0f, 1f);
-        }
-
-        var predictedProgress = (getGameTime() - craftStartTick) + getPartialTick;
-        return Mth.clamp(predictedProgress / getRecipeTime, 0f, 1f);
-    }
-
-    public long getGameTime() {
-        return getLevel.getGameTime();
+    @Nullable
+    public AltarBlockEntity getAltar() {
+        var blockEntity = getLevel.getBlockEntity(getAltarPos);
+        return blockEntity instanceof AltarBlockEntity altar ? altar : null;
     }
 
     public void pushPose() {
@@ -70,28 +71,13 @@ public record AltarRenderContext(
         getPoseStack().mulPose(quaternion);
     }
 
-    public boolean shouldReset() {
-        return getRecipeTime > 0 && getRecipeProgress >= getRecipeTime;
+    public void renderItem(ItemModelResolver itemModelResolver, ItemStack item) {
+        var itemRenderState = new ItemStackRenderState();
+        itemModelResolver.updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, getLevel, null, 0);
+        renderItem(itemRenderState);
     }
 
-    public ItemStack getInitiator() {
-        return getAltar().getInventory().getInitiator();
-    }
-
-    public List<ItemStack> getInputs() {
-        return getAltar().getInventory().getDisplayItems();
-    }
-
-    public void renderItem(ItemRenderer itemRenderer, ItemStack item) {
-        itemRenderer.renderStatic(
-            item,
-            ItemDisplayContext.FIXED,
-            getLightAbove,
-            getPackedOverlay,
-            getPoseStack,
-            getBufferSource,
-            getLevel,
-            0
-        );
+    public void renderItem(ItemStackRenderState itemRenderState) {
+        itemRenderState.submit(getPoseStack, getSubmitNodeCollector, getLightAbove, OverlayTexture.NO_OVERLAY, 0);
     }
 }

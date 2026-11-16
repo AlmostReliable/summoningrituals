@@ -5,14 +5,19 @@ import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck
 import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.condition.handler.WeatherCondition;
 
-import net.minecraft.advancements.critereon.LightPredicate;
-import net.minecraft.advancements.critereon.LocationPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.LightPredicate;
+import net.minecraft.advancements.criterion.LocationPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.clock.WorldClock;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -23,11 +28,12 @@ import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +46,8 @@ import java.util.stream.Collectors;
 public final class ConditionsBuilder {
 
     private final List<LootItemCondition> conditions = new ArrayList<>();
-    private @Nullable LocationPredicate.Builder locationPredicate;
-    private @Nullable StatePropertiesPredicate.Builder blockStatePredicate;
+    private LocationPredicate.@Nullable Builder locationPredicate;
+    private StatePropertiesPredicate.@Nullable Builder blockStatePredicate;
 
     // region LocationCheck
     @ReturnsSelf
@@ -139,33 +145,29 @@ public final class ConditionsBuilder {
 
     // region Custom Conditions
     @ReturnsSelf
-    public ConditionsBuilder moonPhase(MoonPhaseCheck.MoonPhase phase) {
+    public ConditionsBuilder moonPhase(MoonPhase phase) {
         conditions.add(new MoonPhaseCheck(phase));
         return this;
     }
 
     @ReturnsSelf
-    public ConditionsBuilder minTime(int min) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.lowerBound(min)));
-        return this;
+    public ConditionsBuilder minTime(Context ctx, int min) {
+        return addTimeCheck(ctx, IntRange.lowerBound(min));
     }
 
     @ReturnsSelf
-    public ConditionsBuilder maxTime(int max) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.upperBound(max)));
-        return this;
+    public ConditionsBuilder maxTime(Context ctx, int max) {
+        return addTimeCheck(ctx, IntRange.upperBound(max));
     }
 
     @ReturnsSelf
-    public ConditionsBuilder time(int min, int max) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), IntRange.range(min, max)));
-        return this;
+    public ConditionsBuilder time(Context ctx, int min, int max) {
+        return addTimeCheck(ctx, IntRange.range(min, max));
     }
 
     @ReturnsSelf
-    public ConditionsBuilder time(TimeCondition.TimeType timeType) {
-        conditions.add(new TimeCheck(Optional.of(24_000L), timeType.range));
-        return this;
+    public ConditionsBuilder time(Context ctx, TimeCondition.TimeType timeType) {
+        return addTimeCheck(ctx, timeType.range);
     }
 
     @ReturnsSelf
@@ -217,6 +219,18 @@ public final class ConditionsBuilder {
             blockStatePredicate = StatePropertiesPredicate.Builder.properties();
         }
         return blockStatePredicate;
+    }
+
+    private ConditionsBuilder addTimeCheck(Context ctx, IntRange range) {
+        var overworldClock = getOverworldClock(ctx);
+        var timeCheck = new TimeCheck(overworldClock, Optional.of(24_000L), range);
+        conditions.add(timeCheck);
+
+        return this;
+    }
+
+    private static Holder<WorldClock> getOverworldClock(Context ctx) {
+        return RegistryAccessContainer.of(ctx).lookupOrThrow(Registries.WORLD_CLOCK).getOrThrow(WorldClocks.OVERWORLD);
     }
 
     private void throwException(Context ctx, String message) throws KubeRuntimeException {

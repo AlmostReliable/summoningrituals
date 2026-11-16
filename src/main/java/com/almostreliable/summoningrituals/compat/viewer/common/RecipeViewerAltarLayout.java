@@ -11,7 +11,7 @@ import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPattern
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.Optional;
 public class RecipeViewerAltarLayout {
 
     public static final int SLOT_SIZE = 16;
-    protected static final ResourceLocation TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
+    protected static final Identifier TEXTURE = SummoningRituals.getRL(String.format("textures/gui/%s.png", Constants.RECIPE_VIEWER));
     protected static final int TEXTURE_WIDTH = 172;
     public static final int TEXTURE_HEIGHT = 148;
     protected static final int CENTER_X = TEXTURE_WIDTH / 2;
@@ -45,7 +45,7 @@ public class RecipeViewerAltarLayout {
         var tooltip = new ArrayList<Component>();
         tooltip.add(SummoningLang.CONDITIONS.get().append(":").withStyle(ChatFormatting.GOLD));
 
-        var recipeId = recipeHolder.id();
+        var recipeId = recipeHolder.id().identifier();
         var recipe = recipeHolder.value();
         var conditions = recipe.conditions();
         var blockPattern = recipe.blockPattern();

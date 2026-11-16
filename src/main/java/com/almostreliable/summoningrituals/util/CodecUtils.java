@@ -2,14 +2,23 @@ package com.almostreliable.summoningrituals.util;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 
 import com.mojang.datafixers.util.Function8;
 import com.mojang.datafixers.util.Function9;
+import com.mojang.serialization.Codec;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 public final class CodecUtils {
+
+    public static final Codec<ItemStackTemplate> STRICT_ITEM_TEMPLATE_CODEC = ItemStackTemplate.CODEC.validate(template -> {
+        // not template.create(), it logs and returns an empty stack instead of reporting the error
+        var stack = new ItemStack(template.item(), template.count(), template.components());
+        return ItemStack.validateStrict(stack).map(_ -> template);
+    });
 
     private CodecUtils() {}
 

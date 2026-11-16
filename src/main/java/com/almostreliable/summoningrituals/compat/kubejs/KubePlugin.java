@@ -17,11 +17,12 @@ import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.ItemOu
 import com.almostreliable.summoningrituals.compat.kubejs.recipe.component.LootItemConditionComponent;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.CommandOutputTypeWrapper;
 import com.almostreliable.summoningrituals.compat.kubejs.wrapper.EntityInfoTypeWrapper;
-import com.almostreliable.summoningrituals.core.Registration;
-import com.almostreliable.summoningrituals.recipe.condition.check.MoonPhaseCheck;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.condition.handler.TimeCondition;
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
+
+import net.minecraft.world.level.MoonPhase;
 
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
@@ -51,20 +52,20 @@ public class KubePlugin implements KubeJSPlugin {
         if (!registry.type().isServer()) return;
         registry.add("SummoningItem", SummoningItemBinding.class);
         registry.add("SummoningEntity", SummoningEntityBinding.class);
-        registry.add("SummoningMoonPhase", MoonPhaseCheck.MoonPhase.class);
+        registry.add("SummoningMoonPhase", MoonPhase.class);
         registry.add("SummoningTime", TimeCondition.TimeType.class);
     }
 
     @Override
     public void registerRecipeComponents(RecipeComponentTypeRegistry registry) {
-        registry.register(BlockPatternConditionComponent.TYPE);
-        registry.register(BlockPosComponent.TYPE);
-        registry.register(CommandOutputComponent.TYPE);
-        registry.register(EntityInputComponent.TYPE);
-        registry.register(FakeEntityInputComponent.TYPE);
-        registry.register(EntityOutputComponent.TYPE);
-        registry.register(ItemOutputComponent.TYPE);
-        registry.register(LootItemConditionComponent.TYPE);
+        registry.unit(BlockPatternConditionComponent.INSTANCE);
+        registry.unit(BlockPosComponent.INSTANCE);
+        registry.unit(CommandOutputComponent.INSTANCE);
+        registry.unit(EntityInputComponent.INSTANCE);
+        registry.unit(FakeEntityInputComponent.INSTANCE);
+        registry.unit(EntityOutputComponent.INSTANCE);
+        registry.unit(ItemOutputComponent.INSTANCE);
+        registry.unit(LootItemConditionComponent.INSTANCE);
     }
 
     @Override
@@ -80,6 +81,6 @@ public class KubePlugin implements KubeJSPlugin {
 
     @Override
     public void registerRecipeSchemas(RecipeSchemaRegistry registry) {
-        registry.register(Registration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
+        registry.register(ModRegistration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
     }
 }

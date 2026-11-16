@@ -1,23 +1,19 @@
 plugins {
-    id("net.neoforged.moddev") version "2.0.80"
-    id("com.almostreliable.almostgradle") version "1.4.1"
+    id("net.neoforged.moddev") version "2.0.143"
+    id("com.almostreliable.almostgradle") version "2.4.0"
 }
 
 almostgradle.setup {
     withSourcesJar = false
+    downloadSources = true
+    downloadJavadoc = true
     dataGen = "src/main/generated"
 }
 
 repositories {
     // KubeJS
     maven("https://maven.latvian.dev/releases")
-    maven("https://jitpack.io") { // Animated Gif Library
-        content {
-            includeGroup("com.github.rtyley")
-        }
-    }
-
-    mavenLocal()
+    maven("https://maven.latvian.dev/mirror")
 }
 
 dependencies {

@@ -8,7 +8,7 @@ import com.almostreliable.summoningrituals.recipe.input.FakeEntityInput;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
@@ -16,7 +16,7 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.function.Function;
 public record RecipeInputs(List<SizedIngredient> itemInputs, List<EntityInput> entityInputs, List<FakeEntityInput> fakeEntityInputs) {
 
     public static final MapCodec<RecipeInputs> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        SizedIngredient.FLAT_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(RecipeInputs::itemInputs),
+        SizedIngredient.NESTED_CODEC.listOf().optionalFieldOf(Constants.ITEM_INPUTS, List.of()).forGetter(RecipeInputs::itemInputs),
         EntityInput.CODEC.listOf().optionalFieldOf(Constants.ENTITY_INPUTS, List.of()).forGetter(RecipeInputs::entityInputs),
         FakeEntityInput.CODEC.listOf().optionalFieldOf(Constants.FAKE_ENTITY_INPUTS, List.of()).forGetter(RecipeInputs::fakeEntityInputs)
     ).apply(i, RecipeInputs::new));
@@ -38,7 +38,7 @@ public record RecipeInputs(List<SizedIngredient> itemInputs, List<EntityInput> e
     );
 
     @Nullable
-    public List<Entity> getSacrifices(AABB zoneRegion, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
+    public List<Entity> getSacrifices(AABB zoneRegion, Identifier recipeId, Function<AABB, List<Entity>> entityCollector) {
         if (entityInputs.isEmpty() && fakeEntityInputs.isEmpty()) return List.of();
 
         var remainingEntities = new ArrayList<>(entityCollector.apply(zoneRegion));
@@ -56,7 +56,10 @@ public record RecipeInputs(List<SizedIngredient> itemInputs, List<EntityInput> e
 
     @Nullable
     private static <T extends BaseEntityInput> List<Entity> consumeSacrifices(
-        ResourceLocation recipeId, List<T> inputs, Function<T, Optional<Integer>> countSupplier, List<Entity> entities
+        Identifier recipeId,
+        List<T> inputs,
+        Function<T, Optional<Integer>> countSupplier,
+        List<Entity> entities
     ) {
         var sacrifices = new ArrayList<Entity>();
 

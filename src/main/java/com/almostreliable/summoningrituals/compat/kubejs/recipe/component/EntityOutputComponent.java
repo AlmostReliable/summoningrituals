@@ -9,7 +9,8 @@ import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.EntityOutput;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
@@ -17,14 +18,14 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Optional;
 
-public record EntityOutputComponent(RecipeComponentType<?> type) implements RecipeComponent<EntityOutput> {
+public record EntityOutputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<EntityOutput> {
 
-    public static final RecipeComponentType<EntityOutput> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("entity_output"),
-        EntityOutputComponent::new
-    );
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("entity_output"));
+    public static final EntityOutputComponent INSTANCE = new EntityOutputComponent(TYPE);
 
     @Override
     public Codec<EntityOutput> codec() {
@@ -37,12 +38,12 @@ public record EntityOutputComponent(RecipeComponentType<?> type) implements Reci
             .or(TypeInfo.of(EntityInfo.class))
             .or(TypeInfo.of(SummoningEntityOutputBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(EntityInfoTypeWrapper.ENTITY_TYPE_INFO))
-            .or(TypeInfo.of(ResourceLocation.class))
+            .or(TypeInfo.of(Identifier.class))
             .or(TypeInfo.STRING);
     }
 
     @Override
-    public EntityOutput wrap(RecipeScriptContext cx, Object from) {
+    public EntityOutput wrap(RecipeScriptContext cx, @Nullable Object from) {
         if (from instanceof SummoningEntityOutputBuilder builder) {
             return builder.buildOutput();
         }

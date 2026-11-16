@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[2,)"
+loaderVersion = "[11,)"
 issueTrackerURL = "https://github.com/${githubUser}/${githubRepo}/issues"
 license = "${license}"
 
@@ -39,12 +39,5 @@ side = "BOTH"
 modId = "jei"
 type = "OPTIONAL"
 versionRange = "[${jeiVersion},)"
-ordering = "AFTER"
-side = "BOTH"
-
-[[dependencies."${modId}"]]
-modId = "emi"
-type = "OPTIONAL"
-versionRange = "[${emiVersion},)"
 ordering = "AFTER"
 side = "BOTH"

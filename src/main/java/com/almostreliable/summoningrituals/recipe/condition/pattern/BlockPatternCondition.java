@@ -28,7 +28,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +57,7 @@ public final class BlockPatternCondition {
     private final List<PatternEntry> entries;
     private final Optional<Component> name;
     private final List<Component> tooltip;
-    private @Nullable PatternPreviewTooltipComponent.Data tooltipComponentCache;
+    private PatternPreviewTooltipComponent.@Nullable Data tooltipComponentCache;
 
     public BlockPatternCondition(List<PatternEntry> entries, Optional<Component> name, List<Component> tooltip) {
         this.entries = entries;
@@ -67,8 +67,8 @@ public final class BlockPatternCondition {
 
     public boolean test(LootContext lootContext, boolean drawHighlights) {
         var level = lootContext.getLevel();
-        var altarPos = BlockPos.containing(lootContext.getParam(LootContextParams.ORIGIN));
-        var altarState = lootContext.getParam(LootContextParams.BLOCK_STATE);
+        var altarPos = BlockPos.containing(lootContext.getParameter(LootContextParams.ORIGIN));
+        var altarState = lootContext.getParameter(LootContextParams.BLOCK_STATE);
         var failedPositions = test(level, altarPos, altarState);
 
         if (!failedPositions.isEmpty() && drawHighlights) {
@@ -96,8 +96,7 @@ public final class BlockPatternCondition {
             if (rotation != Rotation.NONE) {
                 try {
                     var counterRotation = getCounterRotation(rotation);
-                    //noinspection deprecation
-                    blockState = blockState.rotate(counterRotation);
+                    blockState = blockState.rotate(level, blockPos, counterRotation);
                 } catch (Exception ignored) {
                     // ignore errors for mods throwing exceptions for unsupported rotation
                 }
@@ -131,6 +130,8 @@ public final class BlockPatternCondition {
         return getTransformedEntries(altarFacing, query).keySet();
     }
 
+    // pattern states are not placed in a level, so the level-aware rotate has no position to work with
+    @SuppressWarnings("deprecation")
     private Map<BlockPos, List<BlockState>> getTransformedEntries(Direction altarFacing, @Nullable String query) {
         var rotation = getRotation(altarFacing);
         var result = new HashMap<BlockPos, List<BlockState>>();
@@ -144,7 +145,6 @@ public final class BlockPatternCondition {
                 var transformed = new ArrayList<BlockState>();
                 for (var blockState : blockStates) {
                     try {
-                        //noinspection deprecation
                         transformed.add(blockState.rotate(rotation));
                     } catch (Exception ignored) {
                         // ignore errors for mods throwing exceptions for unsupported rotation

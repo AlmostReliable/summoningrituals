@@ -1,6 +1,6 @@
 package com.almostreliable.summoningrituals.recipe;
 
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 import com.almostreliable.summoningrituals.recipe.container.RecipeInputs;
 import com.almostreliable.summoningrituals.recipe.container.RecipeOutputs;
@@ -8,17 +8,20 @@ import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 import com.almostreliable.summoningrituals.recipe.output.RecipeOutput;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -29,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,17 +90,17 @@ public record AltarRecipe(
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
-        return Registration.ALTAR_RECIPE_SERIALIZER.get();
+    public RecipeSerializer<AltarRecipe> getSerializer() {
+        return ModRegistration.ALTAR_RECIPE_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
-        return Registration.ALTAR_RECIPE_TYPE.get();
+    public RecipeType<AltarRecipe> getType() {
+        return ModRegistration.ALTAR_RECIPE_TYPE.get();
     }
 
     @Nullable
-    public List<Entity> getSacrifices(BlockPos pos, ResourceLocation recipeId, Function<AABB, List<Entity>> entityCollector) {
+    public List<Entity> getSacrifices(BlockPos pos, Identifier recipeId, Function<AABB, List<Entity>> entityCollector) {
         var zoneRegion = constructRegion(pos);
         return inputs.getSacrifices(zoneRegion, recipeId, entityCollector);
     }
@@ -130,17 +133,7 @@ public record AltarRecipe(
 
     //<editor-fold defaultstate="collapsed" desc="Default recipe stuff">
     @Override
-    public ItemStack assemble(RecipeInput inventory, HolderLookup.Provider registries) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return false;
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
+    public ItemStack assemble(RecipeInput inventory) {
         return ItemStack.EMPTY;
     }
 
@@ -148,31 +141,55 @@ public record AltarRecipe(
     public boolean isSpecial() {
         return true;
     }
+
+    @Override
+    public boolean showNotification() {
+        return true;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return RecipeBookCategories.CRAFTING_MISC;
+    }
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Caching">
-    public static boolean isInitiator(RecipeManager recipeManager, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
+    public static boolean isInitiator(RecipeMap recipeMap, Item item) {
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeMap);
+        }
+
         return INITIATORS.contains(item);
     }
 
-    public static boolean isInput(RecipeManager recipeManager, Item item) {
-        if (!CACHES_INITIALIZED) initializeCaches(recipeManager);
+    public static boolean isInput(RecipeMap recipeMap, Item item) {
+        if (!CACHES_INITIALIZED) {
+            initializeCaches(recipeMap);
+        }
+
         return INPUTS.contains(item);
     }
 
-    private static void initializeCaches(RecipeManager recipeManager) {
-        var recipes = recipeManager.getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get());
+    @SuppressWarnings("deprecation")
+    private static void initializeCaches(RecipeMap recipeMap) {
+        var recipes = recipeMap.byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
 
         for (var recipe : recipes) {
             var r = recipe.value();
-            for (var initiator : r.initiator.getItems()) {
-                INITIATORS.add(initiator.getItem());
-            }
+            r.initiator.items().map(Holder::value).forEach(INITIATORS::add);
+
             for (var itemInput : r.inputs.itemInputs()) {
-                for (var stack : itemInput.getItems()) {
-                    INPUTS.add(stack.getItem());
-                }
+                itemInput.ingredient().items().map(Holder::value).forEach(INPUTS::add);
             }
         }
 
@@ -184,7 +201,15 @@ public record AltarRecipe(
         INPUTS.clear();
         CACHES_INITIALIZED = false;
         EntityInput.DATA_VALIDATORS.clear();
+        EntityInput.DATA_VALIDATORS.putAll(EntityInput.PENDING_DATA_VALIDATORS);
         EntityInput.FAKE_DATA_VALIDATORS.clear();
+        EntityInput.FAKE_DATA_VALIDATORS.putAll(EntityInput.PENDING_FAKE_DATA_VALIDATORS);
+        clearPendingValidators();
+    }
+
+    public static void clearPendingValidators() {
+        EntityInput.PENDING_DATA_VALIDATORS.clear();
+        EntityInput.PENDING_FAKE_DATA_VALIDATORS.clear();
     }
     //</editor-fold>
 }

@@ -1,5 +1,6 @@
 package com.almostreliable.summoningrituals.client.render;
 
+import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlock;
 import com.almostreliable.summoningrituals.client.util.AlphaBufferSource;
 import com.almostreliable.summoningrituals.compat.kubejs.builder.BlockPatternConditionBuilder;
@@ -9,28 +10,33 @@ import com.almostreliable.summoningrituals.data.SummoningTags;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,18 +45,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class BlockPatternRenderer {
+public final class BlockPatternRenderer {
 
-    public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
+    private static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
+
     private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
+    private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
+    private static final ContextKey<List<PreviewRenderState>> PREVIEW_RENDER_STATES = new ContextKey<>(
+        SummoningRituals.getRL("pattern_preview")
+    );
+
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
     private static final int TAG_CYCLE_TICKS = 20;
+    private static final int MAX_PREVIEW_DISTANCE = 10;
 
     @Nullable
     private Task task;
+    private List<PreviewBlock> previewBlocks = List.of();
 
-    public void render(PoseStack poseStack, Camera camera) {
+    private BlockPatternRenderer() {}
+
+    public static void init(IEventBus eventBus) {
+        eventBus.addListener(INSTANCE::onClientTick);
+        eventBus.addListener(INSTANCE::onExtractLevelRenderState);
+        eventBus.addListener(BlockPatternRenderer::onSubmitCustomGeometry);
+        eventBus.addListener(BlockPatternRenderer::onLevelUnload);
+    }
+
+    private void onClientTick(ClientTickEvent.Post event) {
         if (task == null) return;
 
         var mc = Minecraft.getInstance();
@@ -58,7 +81,8 @@ public class BlockPatternRenderer {
         var player = mc.player;
         if (level == null || player == null) return;
 
-        if (task.altarPos.distSqr(player.blockPosition()) > Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + 5, 2)) {
+        var maxPlayerDistance = Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + MAX_PREVIEW_DISTANCE, 2);
+        if (task.altarPos.distSqr(player.blockPosition()) > maxPlayerDistance) {
             clear();
             return;
         }
@@ -81,37 +105,69 @@ public class BlockPatternRenderer {
             return;
         }
 
-        try {
-            RenderSystem.disableCull();
-            ModelBlockRenderer.enableCaching();
-            var alphaBuffer = AlphaBufferSource.INSTANCE;
-            alphaBuffer.setAlpha(PREVIEW_ALPHA);
-            renderBlocks(mc, poseStack, camera, alphaBuffer, age / TAG_CYCLE_TICKS);
-            alphaBuffer.endBatch();
-        } finally {
-            RenderSystem.enableCull();
-            ModelBlockRenderer.clearCache();
+        updatePreviewBlocks(mc, level, task, age / TAG_CYCLE_TICKS);
+    }
+
+    private void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
+        if (previewBlocks.isEmpty()) return;
+
+        var mc = Minecraft.getInstance();
+        var partialTick = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        var renderStates = new ArrayList<PreviewRenderState>(previewBlocks.size());
+
+        for (var previewBlock : previewBlocks) {
+            var modelRenderState = new BlockModelRenderState();
+            mc.getBlockModelResolver().update(modelRenderState, previewBlock.state, DISPLAY_CONTEXT);
+            var blockEntityRenderState = extractBlockEntityRenderState(mc, previewBlock, partialTick);
+            var renderState = new PreviewRenderState(previewBlock.pos, modelRenderState, blockEntityRenderState);
+            renderStates.add(renderState);
+        }
+
+        event.getRenderState().setRenderData(PREVIEW_RENDER_STATES, renderStates);
+    }
+
+    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
+        var levelRenderState = event.getLevelRenderState();
+        var renderStates = levelRenderState.getRenderData(PREVIEW_RENDER_STATES);
+        if (renderStates == null) return;
+
+        var poseStack = event.getPoseStack();
+        var camera = levelRenderState.cameraRenderState;
+        var alphaBuffer = new AlphaBufferSource(event.getSubmitNodeCollector(), PREVIEW_ALPHA);
+
+        for (var renderState : renderStates) {
+            var translation = Vec3.atLowerCornerOf(renderState.pos).subtract(camera.pos);
+
+            poseStack.pushPose();
+            {
+                poseStack.translate(translation);
+
+                poseStack.translate(0.5, 0.5, 0.5);
+                poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+                poseStack.translate(-0.5, -0.5, -0.5);
+
+                submitBlock(poseStack, alphaBuffer, camera, renderState);
+            }
+            poseStack.popPose();
         }
     }
 
-    private void renderBlocks(Minecraft mc, PoseStack poseStack, Camera camera, AlphaBufferSource alphaBuffer, long cycleStep) {
-        assert mc.level != null;
-        assert task != null;
+    private static void onLevelUnload(LevelEvent.Unload event) {
+        clear();
+    }
 
+    private void updatePreviewBlocks(Minecraft mc, Level level, Task task, long cycleStep) {
         var checkBlockState = Config.CLIENT.previewBlockStateAware.getAsBoolean();
-        //noinspection ComplexTypesVar
-        List<BlockPos> invalidBlocks = new ArrayList<>();
-        if (checkBlockState) {
-            invalidBlocks = task.blockPredicate.get();
-        }
+        var invalidBlocks = checkBlockState ? task.blockPredicate.get() : List.<BlockPos> of();
 
+        var wrongBlocks = new ArrayList<PreviewBlock>();
         var correctBlocks = 0;
         for (var entry : task.patternEntries.entrySet()) {
             var blockStates = entry.getValue();
             if (blockStates.isEmpty()) continue;
 
             var worldPos = task.altarPos.offset(entry.getKey());
-            var blockState = mc.level.getBlockState(worldPos);
+            var blockState = level.getBlockState(worldPos);
 
             if (checkBlockState) {
                 if (!invalidBlocks.contains(worldPos)) {
@@ -125,61 +181,49 @@ public class BlockPatternRenderer {
                 }
             }
 
-            BlockHighlightRenderer.highlightWrongPositionOnce(worldPos);
+            BlockHighlights.highlightWrongPosition(worldPos);
 
-            var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.getPosition());
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
-
-            poseStack.pushPose();
-            {
-                poseStack.translate(translation.x, translation.y, translation.z);
-
-                poseStack.translate(0.5, 0.5, 0.5);
-                poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
-                poseStack.translate(-0.5, -0.5, -0.5);
-
-                renderBlock(mc, poseStack, alphaBuffer, worldPos, blockStateToRender);
-            }
-            poseStack.popPose();
+            var previewBlock = new PreviewBlock(worldPos, blockStateToRender);
+            wrongBlocks.add(previewBlock);
         }
 
+        previewBlocks = wrongBlocks;
         updatePlayerFeedback(mc, task.patternEntries.size(), correctBlocks);
     }
 
-    private static void renderBlock(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BlockState blockState) {
-        if (blockState.getRenderShape() == RenderShape.ENTITYBLOCK_ANIMATED &&
-            blockState.getBlock() instanceof BaseEntityBlock entityBlock) {
-            renderBlockEntity(mc, poseStack, alphaBuffer, pos, entityBlock, blockState);
-            return;
+    @Nullable
+    private static BlockEntityRenderState extractBlockEntityRenderState(Minecraft mc, PreviewBlock previewBlock, float partialTick) {
+        var level = mc.level;
+        if (level == null || !(previewBlock.state.getBlock() instanceof BaseEntityBlock entityBlock)) return null;
+
+        var blockEntity = BLOCK_ENTITY_CACHE.get(previewBlock.state);
+        if (blockEntity == null) {
+            blockEntity = entityBlock.newBlockEntity(previewBlock.pos, previewBlock.state);
+            if (blockEntity == null) return null;
+
+            blockEntity.setLevel(level);
+            BLOCK_ENTITY_CACHE.put(previewBlock.state, blockEntity);
         }
 
-        //noinspection DataFlowIssue
-        mc.getBlockRenderer().renderSingleBlock(
-            blockState,
-            poseStack,
-            alphaBuffer,
-            LightTexture.FULL_BRIGHT,
-            OverlayTexture.NO_OVERLAY,
-            ModelData.EMPTY,
-            null
-        );
+        var renderState = mc.getBlockEntityRenderDispatcher().tryExtractRenderState(blockEntity, partialTick, null, null);
+        if (renderState == null) return null;
+
+        renderState.lightCoords = LightCoordsUtil.FULL_BRIGHT;
+        return renderState;
     }
 
-    private static void renderBlockEntity(
-        Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, BlockPos pos, BaseEntityBlock entityBlock, BlockState blockState
+    private static void submitBlock(
+        PoseStack poseStack,
+        AlphaBufferSource alphaBuffer,
+        CameraRenderState camera,
+        PreviewRenderState renderState
     ) {
-        assert mc.level != null;
+        alphaBuffer.resetSubmitted();
+        renderState.model.submitMultiLayer(poseStack, alphaBuffer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        if (alphaBuffer.hasSubmitted() || renderState.blockEntity == null) return;
 
-        var blockEntity = BLOCK_ENTITY_CACHE.get(blockState);
-        if (blockEntity == null) {
-            blockEntity = entityBlock.newBlockEntity(pos, blockState);
-            BLOCK_ENTITY_CACHE.put(blockState, blockEntity);
-            if (blockEntity == null) return;
-            blockEntity.setLevel(mc.level);
-        }
-
-        mc.getBlockEntityRenderDispatcher()
-            .renderItem(blockEntity, poseStack, alphaBuffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        Minecraft.getInstance().getBlockEntityRenderDispatcher().submit(renderState.blockEntity, poseStack, alphaBuffer, camera);
     }
 
     private void updatePlayerFeedback(Minecraft mc, int totalBlocks, int correctBlocks) {
@@ -188,7 +232,7 @@ public class BlockPatternRenderer {
 
         if (correctBlocks == totalBlocks) {
             var message = SummoningLang.PREVIEW_SUCCESS.get().withStyle(ChatFormatting.DARK_GREEN);
-            player.displayClientMessage(message, true);
+            player.sendOverlayMessage(message);
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1));
             clear();
             return;
@@ -199,7 +243,7 @@ public class BlockPatternRenderer {
             .append("/")
             .append(totalBlocks + ")")
             .withStyle(ChatFormatting.YELLOW);
-        player.displayClientMessage(message, true);
+        player.sendOverlayMessage(message);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -226,7 +270,7 @@ public class BlockPatternRenderer {
             .orElseGet(() -> altarSearchEntries.isEmpty() ? null : altarSearchEntries.getFirst());
 
         if (altarEntry == null) {
-            player.displayClientMessage(SummoningLang.PREVIEW_NO_ALTAR.get().withStyle(ChatFormatting.RED), true);
+            player.sendOverlayMessage(SummoningLang.PREVIEW_NO_ALTAR.get().withStyle(ChatFormatting.RED));
             return;
         }
 
@@ -234,11 +278,14 @@ public class BlockPatternRenderer {
         var altarState = altarEntry.state;
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
-        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getTransformedEntries(altarFacing), blockPredicate);
+        var patternEntries = blockPattern.getTransformedEntries(altarFacing);
+        INSTANCE.task = new Task(level.getGameTime(), altarPos, patternEntries, blockPredicate);
+        INSTANCE.previewBlocks = List.of();
     }
 
     public static void clear() {
         INSTANCE.task = null;
+        INSTANCE.previewBlocks = List.of();
         BLOCK_ENTITY_CACHE.clear();
     }
 
@@ -254,8 +301,14 @@ public class BlockPatternRenderer {
 
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
 
+    private record PreviewBlock(BlockPos pos, BlockState state) {}
+
+    private record PreviewRenderState(BlockPos pos, BlockModelRenderState model, @Nullable BlockEntityRenderState blockEntity) {}
+
     private record Task(
-        long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,
+        long createdAt,
+        BlockPos altarPos,
+        Map<BlockPos, List<BlockState>> patternEntries,
         Supplier<List<BlockPos>> blockPredicate
     ) {}
 }

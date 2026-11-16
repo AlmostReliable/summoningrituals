@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.compat.kubejs.builder.SummoningEntity
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -17,6 +17,8 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.wrap.TypeWrapperFactory;
 
+import org.jspecify.annotations.Nullable;
+
 public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
 
     public static final EntityInfoTypeWrapper INSTANCE = new EntityInfoTypeWrapper();
@@ -24,14 +26,14 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
     public static final TypeInfo ENTITY_TYPE_INFO = TypeInfo.of(EntityType.class);
 
     @Override
-    public EntityInfo wrap(Context cx, Object from, TypeInfo target) {
+    public EntityInfo wrap(Context cx, @Nullable Object from, TypeInfo target) {
         var o = from;
         if (o instanceof EntityInfo entityInfo) {
             return entityInfo;
         }
 
         String sequence = null;
-        if (o instanceof ResourceLocation location) {
+        if (o instanceof Identifier location) {
             sequence = location.toString();
         } else if (o instanceof String s) {
             sequence = s;

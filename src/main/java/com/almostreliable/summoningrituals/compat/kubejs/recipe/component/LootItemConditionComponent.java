@@ -2,6 +2,7 @@ package com.almostreliable.summoningrituals.compat.kubejs.recipe.component;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import com.mojang.serialization.Codec;
@@ -9,12 +10,10 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public record LootItemConditionComponent(RecipeComponentType<?> type) implements RecipeComponent<LootItemCondition> {
+public record LootItemConditionComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<LootItemCondition> {
 
-    public static final RecipeComponentType<LootItemCondition> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("loot_condition"),
-        LootItemConditionComponent::new
-    );
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("loot_condition"));
+    public static final LootItemConditionComponent INSTANCE = new LootItemConditionComponent(TYPE);
 
     @Override
     public Codec<LootItemCondition> codec() {

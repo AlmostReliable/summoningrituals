@@ -39,70 +39,64 @@ public interface AltarRecipeSchema {
     RecipeKey<Ingredient> INITIATOR = IngredientComponent.INGREDIENT
         .key(Constants.INITIATOR, ComponentRole.INPUT)
         .noFunctions();
-    RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.TYPE
-        .instance()
+    RecipeKey<List<ItemOutput>> ITEM_OUTPUTS = ItemOutputComponent.INSTANCE
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("itemOutputs", "itemOutput", "outputs", "output"))
         .optional(List.of())
         .exclude();
-    RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.TYPE
-        .instance()
+    RecipeKey<List<EntityOutput>> ENTITY_OUTPUTS = EntityOutputComponent.INSTANCE
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("entityOutputs", "entityOutput", "mobOutputs", "mobOutput"))
         .optional(List.of())
         .exclude();
-    RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.TYPE
+    RecipeKey<CommandOutput> COMMANDS = CommandOutputComponent.INSTANCE
         .key(Constants.COMMANDS, ComponentRole.OUTPUT)
         .noFunctions()
         .optional(CommandOutput.EMPTY)
         .exclude();
     RecipeKey<List<ItemStack>> DISPLAY_OUTPUTS = ItemStackComponent.ITEM_STACK
-        .instance()
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.DISPLAY_OUTPUTS, ComponentRole.OUTPUT)
         .functionNames(List.of("displayOutputs", "displayOutput"))
         .optional(List.of())
         .exclude();
-    RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.FLAT
-        .instance()
+    RecipeKey<List<SizedIngredient>> ITEM_INPUTS = SizedIngredientComponent.SIZED_INGREDIENT
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ITEM_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("itemInputs", "itemInput", "inputs", "input"))
         .optional(List.of())
         .exclude();
-    RecipeKey<List<EntityInput>> ENTITY_INPUTS = EntityInputComponent.TYPE
-        .instance()
+    RecipeKey<List<EntityInput>> ENTITY_INPUTS = EntityInputComponent.INSTANCE
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.ENTITY_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("entityInputs", "entityInput", "mobInputs", "mobInput"))
         .optional(List.of())
         .exclude();
-    RecipeKey<List<FakeEntityInput>> FAKE_ENTITY_INPUTS = FakeEntityInputComponent.TYPE
-        .instance()
+    RecipeKey<List<FakeEntityInput>> FAKE_ENTITY_INPUTS = FakeEntityInputComponent.INSTANCE
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.FAKE_ENTITY_INPUTS, ComponentRole.INPUT)
         .functionNames(List.of("fakeEntityInputs", "fakeEntityInput", "fakeMobInputs", "fakeMobInput"))
         .optional(List.of())
         .exclude();
-    RecipeKey<BlockPatternCondition> BLOCK_PATTERN = BlockPatternConditionComponent.TYPE
+    RecipeKey<BlockPatternCondition> BLOCK_PATTERN = BlockPatternConditionComponent.INSTANCE
         .key(Constants.BLOCK_PATTERN, ComponentRole.OTHER)
         .noFunctions()
         .defaultOptional()
         .exclude();
-    RecipeKey<BlockPatternCondition> BLOCK_PATTERN_EXTENSION = BlockPatternConditionComponent.TYPE
+    RecipeKey<BlockPatternCondition> BLOCK_PATTERN_EXTENSION = BlockPatternConditionComponent.INSTANCE
         .key(Constants.BLOCK_PATTERN_EXTENSION, ComponentRole.OTHER)
         .noFunctions()
         .defaultOptional()
         .exclude();
-    RecipeKey<BlockPos> ZONE = BlockPosComponent.TYPE
+    RecipeKey<BlockPos> ZONE = BlockPosComponent.INSTANCE
         .key(Constants.ZONE, ComponentRole.OTHER)
         .functionNames(List.of("entityInputZone", "mobInputZone", "inputZone", "sacrificeZone", "entityZone", "mobZone", "zone"))
         .optional(AltarRecipe.DEFAULT_ZONE)
@@ -112,8 +106,7 @@ public interface AltarRecipeSchema {
         .functionNames(List.of("ticks", "time", "duration"))
         .optional(AltarRecipe.DEFAULT_TICKS)
         .exclude();
-    RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.TYPE
-        .instance()
+    RecipeKey<List<LootItemCondition>> CONDITIONS = LootItemConditionComponent.INSTANCE
         .asList()
         .withBounds(IntBounds.OPTIONAL)
         .key(Constants.CONDITIONS, ComponentRole.INPUT)

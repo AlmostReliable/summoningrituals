@@ -5,7 +5,7 @@ import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 
 import com.mojang.serialization.Codec;
@@ -28,7 +28,7 @@ public record EntityInput(EntityInfo entityInfo, Predicate<Entity> predicate) im
     }
 
     @Override
-    public boolean test(ResourceLocation recipeId, Integer inputIndex, Entity entity) {
+    public boolean test(Identifier recipeId, Integer inputIndex, Entity entity) {
         return entity.isAlive() && entityInfo.entity().value().equals(entity.getType()) &&
             test(DATA_VALIDATORS, recipeId, inputIndex, entity);
     }

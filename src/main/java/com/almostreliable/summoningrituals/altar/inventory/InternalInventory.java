@@ -2,19 +2,23 @@ package com.almostreliable.summoningrituals.altar.inventory;
 
 import com.almostreliable.summoningrituals.core.Constants;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
-import org.jetbrains.annotations.UnknownNullability;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-final class InternalInventory implements INBTSerializable<CompoundTag>, Iterable<ItemStack> {
+final class InternalInventory implements Iterable<ItemStack> {
+
+    static final Codec<Tuple<ItemStack, Integer>> SLOTTED_STACK_CODEC = RecordCodecBuilder.create(i -> i.group(
+        Codec.INT.fieldOf(Constants.SLOT).forGetter(Tuple::getB),
+        ItemStack.MAP_CODEC.forGetter(Tuple::getA)
+    ).apply(i, (slot, stack) -> new Tuple<>(stack, slot)));
 
     private ItemStack[] items;
 
@@ -48,38 +52,42 @@ final class InternalInventory implements INBTSerializable<CompoundTag>, Iterable
         return items.length;
     }
 
-    @Override
-    @UnknownNullability
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        var itemsListTag = new ListTag();
+    ItemStack[] snapshot() {
+        var snapshot = new ItemStack[items.length];
+
+        for (var i = 0; i < items.length; i++) {
+            snapshot[i] = items[i].copy();
+        }
+
+        return snapshot;
+    }
+
+    void restore(ItemStack... snapshot) {
+        items = snapshot;
+    }
+
+    void save(ValueOutput output) {
+        var itemsOutput = output.list(Constants.ITEMS, SLOTTED_STACK_CODEC);
 
         for (var i = 0; i < items.length; i++) {
             if (items[i].isEmpty()) continue;
-            var itemTag = new CompoundTag();
-            itemTag.putInt(Constants.SLOT, i);
-            var finishedItemTag = items[i].save(provider, itemTag);
-            itemsListTag.add(finishedItemTag);
+
+            var slottedStack = new Tuple<>(items[i], i);
+            itemsOutput.add(slottedStack);
         }
 
-        var compoundTag = new CompoundTag();
-        compoundTag.putInt(Constants.SIZE, items.length);
-        compoundTag.put(Constants.ITEMS, itemsListTag);
-
-        return compoundTag;
+        output.putInt(Constants.SIZE, items.length);
     }
 
-    @Override
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        var size = tag.getInt(Constants.SIZE);
-        var itemsListTag = tag.getList(Constants.ITEMS, Tag.TAG_COMPOUND);
+    void load(ValueInput input) {
+        var size = input.getIntOr(Constants.SIZE, 0);
 
         items = new ItemStack[size];
         clear();
 
-        for (var i = 0; i < itemsListTag.size(); i++) {
-            var itemTag = itemsListTag.getCompound(i);
-            var slot = itemTag.getInt(Constants.SLOT);
-            ItemStack.parse(provider, itemTag).ifPresent(stack -> items[slot] = stack);
+        var slottedStacks = input.listOrEmpty(Constants.ITEMS, SLOTTED_STACK_CODEC);
+        for (var entry : slottedStacks) {
+            items[entry.getB()] = entry.getA();
         }
     }
 }

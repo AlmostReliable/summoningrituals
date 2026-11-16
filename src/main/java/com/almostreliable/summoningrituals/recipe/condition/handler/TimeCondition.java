@@ -7,11 +7,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.level.storage.loot.IntRange;
 import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class TimeCondition implements ConditionHandler<TimeCheck> {
 
     public static final TimeCondition INSTANCE = new TimeCondition();
     private static final StreamCodec<RegistryFriendlyByteBuf, TimeCheck> STREAM_CODEC = StreamCodec.composite(
+        WorldClock.STREAM_CODEC, TimeCheck::clock,
         ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), TimeCheck::period,
         ConditionStreamCodecs.INT_RANGE_STREAM_CODEC, TimeCheck::value,
         TimeCheck::new

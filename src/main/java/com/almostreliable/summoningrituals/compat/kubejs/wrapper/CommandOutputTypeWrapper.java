@@ -9,6 +9,8 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.wrap.TypeWrapperFactory;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
 
 public final class CommandOutputTypeWrapper implements TypeWrapperFactory<CommandOutput> {
@@ -18,7 +20,7 @@ public final class CommandOutputTypeWrapper implements TypeWrapperFactory<Comman
     private CommandOutputTypeWrapper() {}
 
     @Override
-    public CommandOutput wrap(Context cx, Object from, TypeInfo target) {
+    public CommandOutput wrap(Context cx, @Nullable Object from, TypeInfo target) {
         if (from instanceof CommandOutput o) {
             return o;
         }

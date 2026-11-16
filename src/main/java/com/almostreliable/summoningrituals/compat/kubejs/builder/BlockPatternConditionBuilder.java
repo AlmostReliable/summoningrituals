@@ -4,7 +4,7 @@ import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPattern
 import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPatternCondition.PatternEntry;
 import com.almostreliable.summoningrituals.recipe.condition.pattern.ResolvableBlockPredicate;
 
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -14,11 +14,12 @@ import net.minecraft.world.level.block.Block;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -97,7 +98,12 @@ public class BlockPatternConditionBuilder {
     private BlockPatternConditionBuilder addTagEntry(
         Context ctx, BlockPos offset, TagKey<Block> blockTag, @Nullable JsonObject blockState, @Nullable String query
     ) {
-        var predicateBuilder = ResolvableBlockPredicate.builder(blockTag);
+        var blocks = RegistryAccessContainer.of(ctx).block().get(blockTag);
+        if (blocks.isEmpty()) {
+            throwException(ctx, "unknown block tag '" + blockTag.location() + "'");
+        }
+
+        var predicateBuilder = ResolvableBlockPredicate.builder(blocks.get());
         return addEntry(ctx, offset, predicateBuilder, blockState, query);
     }
 

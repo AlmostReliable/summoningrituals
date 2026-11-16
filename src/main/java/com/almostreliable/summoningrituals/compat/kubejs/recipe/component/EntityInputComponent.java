@@ -9,7 +9,8 @@ import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.input.EntityInput;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
@@ -17,12 +18,12 @@ import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
-public record EntityInputComponent(RecipeComponentType<?> type) implements RecipeComponent<EntityInput> {
+import org.jspecify.annotations.Nullable;
 
-    public static final RecipeComponentType<EntityInput> TYPE = RecipeComponentType.unit(
-        SummoningRituals.getRL("entity_input"),
-        EntityInputComponent::new
-    );
+public record EntityInputComponent(ResourceKey<RecipeComponentType<?>> type) implements RecipeComponent<EntityInput> {
+
+    public static final ResourceKey<RecipeComponentType<?>> TYPE = RecipeComponentType.key(SummoningRituals.getRL("entity_input"));
+    public static final EntityInputComponent INSTANCE = new EntityInputComponent(TYPE);
 
     @Override
     public Codec<EntityInput> codec() {
@@ -35,12 +36,12 @@ public record EntityInputComponent(RecipeComponentType<?> type) implements Recip
             .or(TypeInfo.of(EntityInfo.class))
             .or(TypeInfo.of(SummoningEntityInputBuilder.class))
             .or(TypeInfo.of(Holder.class).withParams(EntityInfoTypeWrapper.ENTITY_TYPE_INFO))
-            .or(TypeInfo.of(ResourceLocation.class))
+            .or(TypeInfo.of(Identifier.class))
             .or(TypeInfo.STRING);
     }
 
     @Override
-    public EntityInput wrap(RecipeScriptContext cx, Object from) {
+    public EntityInput wrap(RecipeScriptContext cx, @Nullable Object from) {
         if (from instanceof SummoningEntityInputBuilder builder) {
             return builder.buildInput();
         }

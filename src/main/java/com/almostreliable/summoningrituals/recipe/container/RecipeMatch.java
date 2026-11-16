@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 
 import com.google.common.base.Preconditions;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
@@ -60,9 +60,9 @@ public final class RecipeMatch {
         MULTI(SummoningLang.MULTI_MATCH),
         NONE(null);
 
-        private final @Nullable SummoningLang.LangEntry langEntry;
+        private final SummoningLang.@Nullable LangEntry langEntry;
 
-        MatchIssue(@Nullable SummoningLang.LangEntry langEntry) {
+        MatchIssue(SummoningLang.@Nullable LangEntry langEntry) {
             this.langEntry = langEntry;
         }
 

@@ -1,14 +1,14 @@
 package com.almostreliable.summoningrituals.compat.viewer.jei;
 
 import com.almostreliable.summoningrituals.SummoningRituals;
+import com.almostreliable.summoningrituals.SummoningRitualsClient;
 import com.almostreliable.summoningrituals.compat.viewer.common.EntityIngredient;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiHelper;
 import com.almostreliable.summoningrituals.compat.viewer.jei.entity.EntityIngredientJeiRenderer;
 import com.almostreliable.summoningrituals.core.Constants;
-import com.almostreliable.summoningrituals.core.Registration;
+import com.almostreliable.summoningrituals.core.ModRegistration;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -25,7 +25,7 @@ public class JeiPlugin implements IModPlugin {
     public static final IIngredientType<EntityIngredient> ENTITY_INGREDIENT = () -> EntityIngredient.class;
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return SummoningRituals.getRL(Constants.RECIPE_VIEWER);
     }
 
@@ -37,15 +37,13 @@ public class JeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var level = Minecraft.getInstance().level;
-        if (level == null) return;
-        registration.addRecipes(AltarJeiCategory.TYPE, level.getRecipeManager().getAllRecipesFor(Registration.ALTAR_RECIPE_TYPE.get()));
+        var recipes = SummoningRitualsClient.getRecipeMap().byType(ModRegistration.ALTAR_RECIPE_TYPE.get());
+        registration.addRecipes(AltarJeiCategory.TYPE, List.copyOf(recipes));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(Registration.ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
-        registration.addRecipeCatalyst(Registration.INDESTRUCTIBLE_ALTAR_BLOCK.toStack(), AltarJeiCategory.TYPE);
+        registration.addCraftingStation(AltarJeiCategory.TYPE, ModRegistration.ALTAR_BLOCK, ModRegistration.INDESTRUCTIBLE_ALTAR_BLOCK);
     }
 
     @Override
