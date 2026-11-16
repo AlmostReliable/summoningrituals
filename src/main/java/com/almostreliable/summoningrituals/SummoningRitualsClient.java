@@ -26,7 +26,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 @Mod(value = ModConstants.MOD_ID, dist = Dist.CLIENT)
 public final class SummoningRitualsClient {
 
-    private static RecipeMap recipeMap = RecipeMap.EMPTY;
+    private static RecipeMap RECIPE_MAP = RecipeMap.EMPTY;
 
     public SummoningRitualsClient(IEventBus eventBus) {
         eventBus.addListener(SummoningRitualsClient::registerEntityRenderers);
@@ -78,14 +78,14 @@ public final class SummoningRitualsClient {
     }
 
     private static void onRecipesReceived(RecipesReceivedEvent event) {
-        recipeMap = event.getRecipeMap();
+        RECIPE_MAP = event.getRecipeMap();
     }
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
-        recipeMap = RecipeMap.EMPTY;
+        RECIPE_MAP = RecipeMap.EMPTY;
     }
 
     public static RecipeMap getRecipeMap() {
-        return recipeMap;
+        return RECIPE_MAP;
     }
 }

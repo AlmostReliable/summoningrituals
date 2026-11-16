@@ -45,14 +45,17 @@ import java.util.function.Supplier;
 public class BlockPatternRenderer {
 
     public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
+
+    private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
+    private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
     private static final ContextKey<List<PreviewRenderState>> PREVIEW_RENDER_STATES = new ContextKey<>(
         SummoningRituals.getRL("pattern_preview")
     );
-    private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
-    private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
+
     private static final float PREVIEW_ALPHA = 0.5f;
     private static final float SCALE_FACTOR = 0.75f;
     private static final int TAG_CYCLE_TICKS = 20;
+    private static final int MAX_PREVIEW_DISTANCE = 10;
 
     @Nullable
     private Task task;
@@ -66,7 +69,8 @@ public class BlockPatternRenderer {
         var player = mc.player;
         if (level == null || player == null) return;
 
-        if (task.altarPos.distSqr(player.blockPosition()) > Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + 5, 2)) {
+        var maxPlayerDistance = Math.pow(BlockPatternConditionBuilder.MAX_PATTERN_RADIUS + MAX_PREVIEW_DISTANCE, 2);
+        if (task.altarPos.distSqr(player.blockPosition()) > maxPlayerDistance) {
             clear();
             return;
         }
@@ -121,7 +125,7 @@ public class BlockPatternRenderer {
 
             poseStack.pushPose();
             {
-                poseStack.translate(translation.x, translation.y, translation.z);
+                poseStack.translate(translation);
 
                 poseStack.translate(0.5, 0.5, 0.5);
                 poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);

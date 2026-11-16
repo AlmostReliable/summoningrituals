@@ -9,8 +9,8 @@ import net.minecraft.world.phys.AABB;
 public final class BlockHighlights {
 
     private static final float LINE_WIDTH = 2f;
-    private static final GizmoStyle WRONG_BLOCK_STYLE = GizmoStyle.stroke(0xFFFF0000, LINE_WIDTH);
-    private static final GizmoStyle AREA_STYLE = GizmoStyle.stroke(0xFF00FFFF, LINE_WIDTH);
+    private static final GizmoStyle WRONG_BLOCK_STYLE = GizmoStyle.stroke(0xFFFF_0000, LINE_WIDTH);
+    private static final GizmoStyle AREA_STYLE = GizmoStyle.stroke(0xFF00_FFFF, LINE_WIDTH);
     private static final int HIGHLIGHT_DURATION_MILLIS = 5_000;
 
     private BlockHighlights() {}
