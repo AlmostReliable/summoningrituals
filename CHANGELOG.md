@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.15.0] - 2026-11-16
 
 - ported the mod to 26.1.2 (thanks [JaisDK](https://github.com/JaisDK)@[#44](https://github.com/AlmostReliable/summoningrituals/pull/44))
 - updated information will be available on the 26.1 wiki
@@ -215,6 +218,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.15.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v26.1.2-neoforge-3.15.0
 [3.14.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.2
 [3.14.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.1
 [3.14.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.0
