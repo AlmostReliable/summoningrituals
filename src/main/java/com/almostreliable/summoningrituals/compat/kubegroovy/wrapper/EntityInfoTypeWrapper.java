@@ -27,7 +27,6 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
 
     @Override
     public EntityInfo wrap(@Nullable Object from, TypeInfo target) {
-        var cx = Context.getCurrent();
         var o = from;
         if (o instanceof EntityInfo entityInfo) {
             return entityInfo;
@@ -53,7 +52,7 @@ public class EntityInfoTypeWrapper implements TypeWrapperFactory<EntityInfo> {
 
         Holder<EntityType<?>> entityHolder;
         try {
-            entityHolder = Cast.to(HolderWrapper.wrap((KubeGroovyContext) cx, o, ENTITY_TYPE_INFO));
+            entityHolder = Cast.to(HolderWrapper.wrap((KubeGroovyContext) Context.getCurrent(), o, ENTITY_TYPE_INFO));
         } catch (Exception e) {
             throw new KubeRuntimeException("invalid summoning entity: " + o).source(SourceLine.of());
         }

@@ -29,7 +29,6 @@ import net.minecraft.world.level.storage.loot.predicates.TimeCheck;
 import dev.uncandango.kubegroovy.error.KubeRuntimeException;
 import dev.uncandango.kubegroovy.script.SourceLine;
 import dev.uncandango.kubegroovy.util.RegistryAccessContainer;
-import dev.uncandango.kubegroovy.script.bridge.Context;
 import dev.uncandango.kubegroovy.script.annotations.HideFromGY;
 import dev.uncandango.kubegroovy.script.annotations.ReturnsSelf;
 
@@ -152,22 +151,22 @@ public final class ConditionsBuilder {
 
     @ReturnsSelf
     public ConditionsBuilder minTime(int min) {
-        return addTimeCheck(Context.getCurrent(), IntRange.lowerBound(min));
+        return addTimeCheck(IntRange.lowerBound(min));
     }
 
     @ReturnsSelf
     public ConditionsBuilder maxTime(int max) {
-        return addTimeCheck(Context.getCurrent(), IntRange.upperBound(max));
+        return addTimeCheck(IntRange.upperBound(max));
     }
 
     @ReturnsSelf
     public ConditionsBuilder time(int min, int max) {
-        return addTimeCheck(Context.getCurrent(), IntRange.range(min, max));
+        return addTimeCheck(IntRange.range(min, max));
     }
 
     @ReturnsSelf
     public ConditionsBuilder time(TimeCondition.TimeType timeType) {
-        return addTimeCheck(Context.getCurrent(), timeType.range);
+        return addTimeCheck(timeType.range);
     }
 
     @ReturnsSelf
@@ -177,14 +176,14 @@ public final class ConditionsBuilder {
             var weatherCheck = weather.apply(builder).build();
             conditions.add(weatherCheck);
         } catch (IllegalArgumentException e) {
-            throwException(Context.getCurrent(), e.getMessage());
+            throwException(e.getMessage());
         }
         return this;
     }
     // endregion Custom Conditions
 
     @HideFromGY
-    public List<LootItemCondition> build(Context ctx) {
+    public List<LootItemCondition> build() {
         if (locationPredicate != null) {
             conditions.add(LocationCheck.checkLocation(locationPredicate).build());
         }
@@ -201,7 +200,7 @@ public final class ConditionsBuilder {
             .toList();
 
         if (!duplicates.isEmpty()) {
-            throwException(ctx, "only one condition of each type allowed, duplicates found: " + duplicates);
+            throwException("only one condition of each type allowed, duplicates found: " + duplicates);
         }
 
         return conditions;
@@ -221,19 +220,19 @@ public final class ConditionsBuilder {
         return blockStatePredicate;
     }
 
-    private ConditionsBuilder addTimeCheck(Context ctx, IntRange range) {
-        var overworldClock = getOverworldClock(ctx);
+    private ConditionsBuilder addTimeCheck(IntRange range) {
+        var overworldClock = getOverworldClock();
         var timeCheck = new TimeCheck(overworldClock, Optional.of(24_000L), range);
         conditions.add(timeCheck);
 
         return this;
     }
 
-    private static Holder<WorldClock> getOverworldClock(Context ctx) {
+    private static Holder<WorldClock> getOverworldClock() {
         return RegistryAccessContainer.of().lookupOrThrow(Registries.WORLD_CLOCK).getOrThrow(WorldClocks.OVERWORLD);
     }
 
-    private void throwException(Context ctx, String message) throws KubeRuntimeException {
+    private void throwException(String message) throws KubeRuntimeException {
         throw new KubeRuntimeException(message).source(SourceLine.of());
     }
 }

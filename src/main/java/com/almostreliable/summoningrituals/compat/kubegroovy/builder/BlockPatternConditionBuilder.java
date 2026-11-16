@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 import dev.uncandango.kubegroovy.error.KubeRuntimeException;
 import dev.uncandango.kubegroovy.script.SourceLine;
 import dev.uncandango.kubegroovy.util.RegistryAccessContainer;
-import dev.uncandango.kubegroovy.script.bridge.Context;
 import dev.uncandango.kubegroovy.script.annotations.HideFromGY;
 import dev.uncandango.kubegroovy.script.annotations.ReturnsSelf;
 
@@ -48,92 +47,92 @@ public class BlockPatternConditionBuilder {
 
     @ReturnsSelf
     public BlockPatternConditionBuilder block(BlockPos offset, Block block) {
-        return addBlockEntry(Context.getCurrent(), offset, block, null, null);
+        return addBlockEntry(offset, block, null, null);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder block(BlockPos offset, Block block, JsonObject blockState) {
-        return addBlockEntry(Context.getCurrent(), offset, block, blockState, null);
+        return addBlockEntry(offset, block, blockState, null);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder queryableBlock(BlockPos offset, Block block, String query) {
-        return addBlockEntry(Context.getCurrent(), offset, block, null, query);
+        return addBlockEntry(offset, block, null, query);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder queryableBlock(BlockPos offset, Block block, JsonObject blockState, String query) {
-        return addBlockEntry(Context.getCurrent(), offset, block, blockState, query);
+        return addBlockEntry(offset, block, blockState, query);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder tag(BlockPos offset, TagKey<Block> blockTag) {
-        return addTagEntry(Context.getCurrent(), offset, blockTag, null, null);
+        return addTagEntry(offset, blockTag, null, null);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder tag(BlockPos offset, TagKey<Block> blockTag, JsonObject blockState) {
-        return addTagEntry(Context.getCurrent(), offset, blockTag, blockState, null);
+        return addTagEntry(offset, blockTag, blockState, null);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder queryableTag(BlockPos offset, TagKey<Block> blockTag, String query) {
-        return addTagEntry(Context.getCurrent(), offset, blockTag, null, query);
+        return addTagEntry(offset, blockTag, null, query);
     }
 
     @ReturnsSelf
     public BlockPatternConditionBuilder queryableTag(
         BlockPos offset, TagKey<Block> blockTag, JsonObject blockState, String query
     ) {
-        return addTagEntry(Context.getCurrent(), offset, blockTag, blockState, query);
+        return addTagEntry(offset, blockTag, blockState, query);
     }
 
     private BlockPatternConditionBuilder addBlockEntry(
-        Context ctx, BlockPos offset, Block block, @Nullable JsonObject blockState, @Nullable String query
+        BlockPos offset, Block block, @Nullable JsonObject blockState, @Nullable String query
     ) {
         var predicateBuilder = ResolvableBlockPredicate.builder(block);
-        return addEntry(ctx, offset, predicateBuilder, blockState, query);
+        return addEntry(offset, predicateBuilder, blockState, query);
     }
 
     private BlockPatternConditionBuilder addTagEntry(
-        Context ctx, BlockPos offset, TagKey<Block> blockTag, @Nullable JsonObject blockState, @Nullable String query
+        BlockPos offset, TagKey<Block> blockTag, @Nullable JsonObject blockState, @Nullable String query
     ) {
         var blocks = RegistryAccessContainer.of().block().get(blockTag);
         if (blocks.isEmpty()) {
-            throwException(ctx, "unknown block tag '" + blockTag.location() + "'");
+            throwException("unknown block tag '" + blockTag.location() + "'");
         }
 
         var predicateBuilder = ResolvableBlockPredicate.builder(blocks.get());
-        return addEntry(ctx, offset, predicateBuilder, blockState, query);
+        return addEntry(offset, predicateBuilder, blockState, query);
     }
 
     private BlockPatternConditionBuilder addEntry(
-        Context ctx, BlockPos offset, ResolvableBlockPredicate.Builder predicateBuilder,
+        BlockPos offset, ResolvableBlockPredicate.Builder predicateBuilder,
         @Nullable JsonObject blockState, @Nullable String query
     ) {
         if (Math.abs(offset.getX()) > MAX_PATTERN_RADIUS || Math.abs(offset.getY()) > MAX_PATTERN_RADIUS ||
             Math.abs(offset.getZ()) > MAX_PATTERN_RADIUS) {
-            throwException(ctx, "pattern size exceeds maximum allowed radius of " + MAX_PATTERN_RADIUS + " blocks");
+            throwException("pattern size exceeds maximum allowed radius of " + MAX_PATTERN_RADIUS + " blocks");
         }
 
         if (blockState != null && !blockState.isEmpty()) {
             var blockStates = predicateBuilder.build().getBlockStates();
             if (!blockStates.isEmpty()) {
-                var propertyBuilder = createPropertyBuilder(ctx, blockStates.getFirst().getBlock(), blockState);
+                var propertyBuilder = createPropertyBuilder(blockStates.getFirst().getBlock(), blockState);
                 predicateBuilder.setProperties(propertyBuilder);
             }
         }
 
         var patternEntry = new PatternEntry(offset, predicateBuilder.build(), Optional.ofNullable(query));
         if (entries.contains(patternEntry)) {
-            throwException(ctx, "position '" + offset + "' already defined in pattern");
+            throwException("position '" + offset + "' already defined in pattern");
         }
 
         entries.add(patternEntry);
         return this;
     }
 
-    private StatePropertiesPredicate.Builder createPropertyBuilder(Context ctx, Block block, JsonObject blockState) {
+    private StatePropertiesPredicate.Builder createPropertyBuilder(Block block, JsonObject blockState) {
         var definition = block.getStateDefinition();
         var propertyBuilder = StatePropertiesPredicate.Builder.properties();
 
@@ -141,7 +140,7 @@ public class BlockPatternConditionBuilder {
             var property = definition.getProperty(entry.getKey());
             if (property == null) {
                 var blockId = BuiltInRegistries.BLOCK.wrapAsHolder(block).getRegisteredName();
-                throwException(ctx, "unknown block property '" + entry.getKey() + "' for block '" + blockId + "'");
+                throwException("unknown block property '" + entry.getKey() + "' for block '" + blockId + "'");
             }
             propertyBuilder.hasProperty(property, entry.getValue().getAsString());
         }
@@ -150,9 +149,9 @@ public class BlockPatternConditionBuilder {
     }
 
     @HideFromGY
-    public BlockPatternCondition build(Context ctx) {
+    public BlockPatternCondition build() {
         if (entries.isEmpty()) {
-            throwException(ctx, "block pattern cannot be empty");
+            throwException("block pattern cannot be empty");
         }
 
         return new BlockPatternCondition(
@@ -162,7 +161,7 @@ public class BlockPatternConditionBuilder {
         );
     }
 
-    private void throwException(Context ctx, String message) throws KubeRuntimeException {
+    private void throwException(String message) throws KubeRuntimeException {
         throw new KubeRuntimeException(message).source(SourceLine.of());
     }
 }

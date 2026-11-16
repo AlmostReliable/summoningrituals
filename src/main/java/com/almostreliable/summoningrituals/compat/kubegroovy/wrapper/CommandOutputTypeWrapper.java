@@ -5,7 +5,6 @@ import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 import dev.uncandango.kubegroovy.error.KubeRuntimeException;
 import dev.uncandango.kubegroovy.script.SourceLine;
 import dev.uncandango.kubegroovy.util.ListGY;
-import dev.uncandango.kubegroovy.script.bridge.Context;
 import dev.uncandango.kubegroovy.script.type.TypeInfo;
 import dev.uncandango.kubegroovy.script.bridge.TypeWrapperFactory;
 
@@ -21,7 +20,6 @@ public final class CommandOutputTypeWrapper implements TypeWrapperFactory<Comman
 
     @Override
     public CommandOutput wrap(@Nullable Object from, TypeInfo target) {
-        var cx = Context.getCurrent();
         if (from instanceof CommandOutput o) {
             return o;
         }

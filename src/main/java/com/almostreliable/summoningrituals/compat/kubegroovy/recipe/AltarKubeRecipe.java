@@ -13,7 +13,6 @@ import dev.uncandango.kubegroovy.error.KubeRuntimeException;
 import dev.uncandango.kubegroovy.recipe.KubeRecipe;
 import dev.uncandango.kubegroovy.recipe.schema.KubeRecipeFactory;
 import dev.uncandango.kubegroovy.script.SourceLine;
-import dev.uncandango.kubegroovy.script.bridge.Context;
 import dev.uncandango.kubegroovy.script.annotations.ReturnsSelf;
 
 import java.util.ArrayList;
@@ -75,13 +74,13 @@ public class AltarKubeRecipe extends KubeRecipe {
 
     @ReturnsSelf
     public AltarKubeRecipe conditions(UnaryOperator<ConditionsBuilder> conditions) {
-        setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder()).build(Context.getCurrent()));
+        setValue(AltarRecipeSchema.CONDITIONS, conditions.apply(new ConditionsBuilder()).build());
         return this;
     }
 
     @ReturnsSelf
     public AltarKubeRecipe blockPattern(UnaryOperator<BlockPatternConditionBuilder> blockPattern) {
-        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(Context.getCurrent());
+        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build();
         setValue(AltarRecipeSchema.BLOCK_PATTERN, pattern);
         return this;
     }
@@ -92,7 +91,7 @@ public class AltarKubeRecipe extends KubeRecipe {
             throw new KubeRuntimeException("cannot set block pattern extension without a main block pattern").source(SourceLine.of());
         }
 
-        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build(Context.getCurrent());
+        var pattern = blockPattern.apply(new BlockPatternConditionBuilder()).build();
         setValue(AltarRecipeSchema.BLOCK_PATTERN_EXTENSION, pattern);
         return this;
     }
