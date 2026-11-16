@@ -50,8 +50,9 @@ public class BlockPatternRenderer {
 
     @Nullable
     private Task task;
+    private List<PreviewBlock> previewBlocks = List.of();
 
-    public void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+    public void tick() {
         if (task == null) return;
 
         var mc = Minecraft.getInstance();
@@ -82,28 +83,44 @@ public class BlockPatternRenderer {
             return;
         }
 
-        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
-        renderBlocks(mc, poseStack, alphaBuffer, camera, age / TAG_CYCLE_TICKS);
+        updatePreviewBlocks(mc, level, task, age / TAG_CYCLE_TICKS);
     }
 
-    private void renderBlocks(Minecraft mc, PoseStack poseStack, AlphaBufferSource alphaBuffer, CameraRenderState camera, long cycleStep) {
-        assert mc.level != null;
-        assert task != null;
+    public void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        if (previewBlocks.isEmpty()) return;
 
-        var checkBlockState = Config.CLIENT.previewBlockStateAware.getAsBoolean();
-        //noinspection ComplexTypesVar
-        List<BlockPos> invalidBlocks = new ArrayList<>();
-        if (checkBlockState) {
-            invalidBlocks = task.blockPredicate.get();
+        var mc = Minecraft.getInstance();
+        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
+
+        for (var previewBlock : previewBlocks) {
+            var translation = Vec3.atLowerCornerOf(previewBlock.pos).subtract(camera.pos);
+
+            poseStack.pushPose();
+            {
+                poseStack.translate(translation.x, translation.y, translation.z);
+
+                poseStack.translate(0.5, 0.5, 0.5);
+                poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+                poseStack.translate(-0.5, -0.5, -0.5);
+
+                renderBlock(mc, poseStack, alphaBuffer, camera, previewBlock.pos, previewBlock.state);
+            }
+            poseStack.popPose();
         }
+    }
 
+    private void updatePreviewBlocks(Minecraft mc, Level level, Task task, long cycleStep) {
+        var checkBlockState = Config.CLIENT.previewBlockStateAware.getAsBoolean();
+        var invalidBlocks = checkBlockState ? task.blockPredicate.get() : List.<BlockPos> of();
+
+        var wrongBlocks = new ArrayList<PreviewBlock>();
         var correctBlocks = 0;
         for (var entry : task.patternEntries.entrySet()) {
             var blockStates = entry.getValue();
             if (blockStates.isEmpty()) continue;
 
             var worldPos = task.altarPos.offset(entry.getKey());
-            var blockState = mc.level.getBlockState(worldPos);
+            var blockState = level.getBlockState(worldPos);
 
             if (checkBlockState) {
                 if (!invalidBlocks.contains(worldPos)) {
@@ -119,22 +136,11 @@ public class BlockPatternRenderer {
 
             BlockHighlights.highlightWrongPosition(worldPos);
 
-            var translation = Vec3.atLowerCornerOf(worldPos).subtract(camera.pos);
             var blockStateToRender = blockStates.get((int) (cycleStep % blockStates.size()));
-
-            poseStack.pushPose();
-            {
-                poseStack.translate(translation.x, translation.y, translation.z);
-
-                poseStack.translate(0.5, 0.5, 0.5);
-                poseStack.scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
-                poseStack.translate(-0.5, -0.5, -0.5);
-
-                renderBlock(mc, poseStack, alphaBuffer, camera, worldPos, blockStateToRender);
-            }
-            poseStack.popPose();
+            wrongBlocks.add(new PreviewBlock(worldPos, blockStateToRender));
         }
 
+        previewBlocks = wrongBlocks;
         updatePlayerFeedback(mc, task.patternEntries.size(), correctBlocks);
     }
 
@@ -229,10 +235,12 @@ public class BlockPatternRenderer {
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
         INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getTransformedEntries(altarFacing), blockPredicate);
+        INSTANCE.previewBlocks = List.of();
     }
 
     public static void clear() {
         INSTANCE.task = null;
+        INSTANCE.previewBlocks = List.of();
         BLOCK_ENTITY_CACHE.clear();
     }
 
@@ -247,6 +255,8 @@ public class BlockPatternRenderer {
     }
 
     private record AltarSearchEntry(BlockPos pos, BlockState state) {}
+
+    private record PreviewBlock(BlockPos pos, BlockState state) {}
 
     private record Task(
         long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,

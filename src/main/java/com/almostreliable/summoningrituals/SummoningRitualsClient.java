@@ -89,6 +89,8 @@ public final class SummoningRitualsClient {
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {
+        BlockPatternRenderer.INSTANCE.tick();
+
         var player = Minecraft.getInstance().player;
         if (player == null) return;
 
