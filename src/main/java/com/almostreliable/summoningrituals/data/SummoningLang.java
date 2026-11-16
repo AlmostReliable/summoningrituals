@@ -10,14 +10,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class SummoningLang extends LanguageProvider {
@@ -117,8 +119,7 @@ public final class SummoningLang extends LanguageProvider {
 
             for (var enumValue : enumValues) {
                 var id = enumValue.name().toLowerCase(Locale.ROOT);
-                //noinspection deprecation
-                var value = WordUtils.capitalizeFully(id.replace("_", " "));
+                var value = Arrays.stream(id.split("_")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
                 enumEntries.put(enumValue, of(prefix, idPrefix + "_" + id, value));
             }
 
