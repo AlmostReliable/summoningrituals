@@ -3,7 +3,24 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- /
+
+- ported the mod to 26.1.2 (thanks [JaisDK](https://github.com/JaisDK)@[#44](https://github.com/AlmostReliable/summoningrituals/pull/44))
+- updated information will be available on the 26.1 wiki
+- added `altarPos`, `orbitScale`, `orbitWaveAnchor`, `initiatorRenderState` and `inputRenderStates` to the KubeJS ritual renderer context
+- added `renderInventoryContents` to the KubeJS ritual renderer to draw the default initiator and item orbit
+- changed recipe JSON
+  - item inputs use `{"ingredient": ..., "count": n}`
+  - the initiator uses the new vanilla ingredient format
+  - time conditions (`minecraft:time_check`) need a `clock`
+- changed KubeJS ritual renderers to the new render pipeline
+  - `renderer.itemRenderer` is now `renderer.itemModelResolver`
+  - `context.bufferSource` is now `context.submitNodeCollector`
+  - `packedOverlay` and `shouldReset` were removed
+  - `context.altar` can be null
+- changed KubeJS item outputs and fake entity inputs to reject empty items
+- changed KubeJS block patterns to reject unknown block tags
+- changed recipe viewer support to JEI only since EMI is not available for 26.1 yet
+- fixed block pattern highlights showing up when automation only simulates inserting into the Altar
 
 ## [3.14.2] - 2026-07-30
 

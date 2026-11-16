@@ -52,10 +52,10 @@ Exceptions to the license above are the `MeasuringBufferSource` and the `EntityI
 them in your own projects. More information on how these were implemented can be found in [this blog post][blog-post].
 
 <!-- Badge Images -->
-[version_badge]: https://img.shields.io/github/v/release/almostreliable/summoningrituals?include_prereleases&filter=v1.21.1-*&style=for-the-badge&logo=github&color=%23181717
+[version_badge]: https://img.shields.io/github/v/release/almostreliable/summoningrituals?include_prereleases&filter=v26.1*-*&style=for-the-badge&logo=github&color=%23181717
 [total_downloads_cf_badge]: https://img.shields.io/curseforge/dt/671040?style=for-the-badge&logo=curseforge&label=CurseForge&color=%23F16436
 [total_downloads_mr_badge]: https://img.shields.io/modrinth/dt/19smZ71v?style=for-the-badge&logo=modrinth&label=Modrinth&color=%2300AF5C
-[workflow_status_badge]: https://img.shields.io/github/actions/workflow/status/almostreliable/summoningrituals/build.yml?branch=1.21.1&style=for-the-badge
+[workflow_status_badge]: https://img.shields.io/github/actions/workflow/status/almostreliable/summoningrituals/build.yml?branch=26.1&style=for-the-badge
 [license_badge]: https://img.shields.io/badge/License-ARR-ffa200?style=for-the-badge
 [discord_badge]: https://img.shields.io/discord/917251858974789693?color=5865f2&label=Discord&logo=discord&style=for-the-badge
 [wiki_badge]: https://img.shields.io/badge/Read%20the-Wiki-ba00ff?style=for-the-badge
