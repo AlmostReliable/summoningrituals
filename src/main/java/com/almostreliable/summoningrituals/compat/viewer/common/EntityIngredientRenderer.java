@@ -104,7 +104,7 @@ public final class EntityIngredientRenderer {
             guiGraphics.enableScissor(0, 0, SLOT_SIZE, SLOT_SIZE);
         }
 
-        // gui graphics entity rendering doesn't take pose stack into account, bruh
+        // entity rendering takes absolute coordinates while scissor applies the pose itself
         var absolutePos = guiGraphics.pose().transformPosition(0, 0, new Vector2f());
         var absX = (int) absolutePos.x;
         var absY = (int) absolutePos.y;
