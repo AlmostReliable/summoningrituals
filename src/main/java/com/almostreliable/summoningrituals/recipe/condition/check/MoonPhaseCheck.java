@@ -32,6 +32,7 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
         return ModRegistration.MOON_PHASE_CONDITION.get();
     }
 
+    @SuppressWarnings("resource")
     @Override
     public boolean test(LootContext lootContext) {
         var level = lootContext.getLevel();
@@ -40,8 +41,11 @@ public record MoonPhaseCheck(MoonPhase phase) implements LootItemCondition {
             origin = Vec3.ZERO;
         }
 
-        var moonPhaseOrdinal = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, origin).index();
-        return moonPhaseOrdinal == phase.ordinal();
+        // only the overworld has the moon phase timeline, other dimensions always report the full moon default
+        var overworld = level.getServer().overworld();
+        var moonPhase = overworld.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, origin);
+
+        return moonPhase.index() == phase.ordinal();
     }
 
     public enum MoonPhase {
