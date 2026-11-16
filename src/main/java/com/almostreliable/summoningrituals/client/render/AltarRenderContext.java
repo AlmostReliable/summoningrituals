@@ -5,6 +5,7 @@ import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -25,10 +26,11 @@ public record AltarRenderContext(
     int getRecipeProgress,
     int getRecipeTime,
     PoseStack getPoseStack,
-    SubmitNodeCollector getBufferSource,
+    SubmitNodeCollector getSubmitNodeCollector,
     int getLightAbove,
-    int getPackedOverlay,
-    float getPartialTick
+    float getPartialTick,
+    ItemStackRenderState getInitiatorRenderState,
+    List<ItemStackRenderState> getInputRenderStates
 ) {
 
     public float getRecipeProgressRatio() {
@@ -86,6 +88,10 @@ public record AltarRenderContext(
     public void renderItem(ItemModelResolver itemModelResolver, ItemStack item) {
         var itemRenderState = new ItemStackRenderState();
         itemModelResolver.updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, getLevel, null, 0);
-        itemRenderState.submit(getPoseStack, getBufferSource, getLightAbove, getPackedOverlay, 0);
+        renderItem(itemRenderState);
+    }
+
+    public void renderItem(ItemStackRenderState itemRenderState) {
+        itemRenderState.submit(getPoseStack, getSubmitNodeCollector, getLightAbove, OverlayTexture.NO_OVERLAY, 0);
     }
 }

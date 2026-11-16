@@ -3,6 +3,7 @@ package com.almostreliable.summoningrituals.client.render;
 import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.altar.AltarBlockEntity;
 import com.almostreliable.summoningrituals.core.Config;
+import com.almostreliable.summoningrituals.recipe.container.RecipeInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -12,11 +13,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Con
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -25,11 +27,13 @@ import com.mojang.math.Axis;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess") // exposed for custom KubeJS renderers
-public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockEntityRenderer<AltarBlockEntity, AltarRenderer.State> {
+public record AltarRenderer(ItemModelResolver getItemModelResolver) implements BlockEntityRenderer<AltarBlockEntity, AltarRenderer.State> {
 
     public static final Map<Identifier, CustomRitualRenderer> CUSTOM_RENDERERS = new HashMap<>();
     public static final float HALF = .5f;
@@ -53,11 +57,50 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
 
     @Override
     public void extractRenderState(
-        AltarBlockEntity altar, State state, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
+        AltarBlockEntity altar,
+        State state,
+        float partialTick,
+        Vec3 cameraPosition,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
     ) {
         BlockEntityRenderer.super.extractRenderState(altar, state, partialTick, cameraPosition, breakProgress);
+        state.altar = null;
+
+        var player = Minecraft.getInstance().player;
+        var level = altar.getLevel();
+        var altarPos = altar.getBlockPos();
+        var renderDistance = Config.CLIENT.inventoryRenderDistance.getAsInt();
+        if (player == null || level == null || !altarPos.closerThan(player.blockPosition(), renderDistance)) return;
+
+        var altarCenterPos = Vec3.atCenterOf(altarPos);
+        var playerPos = new Vec3(
+            Mth.lerp(partialTick, player.xOld, player.getX()),
+            Mth.lerp(partialTick, player.yOld, player.getY()),
+            Mth.lerp(partialTick, player.zOld, player.getZ())
+        );
+        var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
+
+        var inputs = new ArrayList<ItemStackRenderState>();
+        for (var input : altar.getInventory().getDisplayItems()) {
+            inputs.add(extractItem(input, level));
+        }
+
         state.altar = altar;
+        state.recipeInfo = altar.getCurrentRecipeInfo();
+        state.initiator = extractItem(altar.getInventory().getInitiator(), level);
+        state.inputs = inputs;
+        state.playerToAltarDistance = (float) altarCenterPos.distanceTo(playerPos);
+        state.playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);
+        state.recipeProgress = altar.getRecipeProgress();
+        state.recipeTime = altar.getRecipeTime();
+        state.lightAbove = LevelRenderer.getLightCoords(level, altarPos.above());
         state.partialTick = partialTick;
+    }
+
+    private ItemStackRenderState extractItem(ItemStack stack, Level level) {
+        var itemRenderState = new ItemStackRenderState();
+        getItemModelResolver.updateForTopItem(itemRenderState, stack, ItemDisplayContext.FIXED, level, null, 0);
+        return itemRenderState;
     }
 
     @Override
@@ -65,21 +108,31 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
         var altar = state.altar;
         if (altar == null) return;
 
-        var partialTick = state.partialTick;
         var player = Minecraft.getInstance().player;
         var level = altar.getLevel();
-
-        if (player == null || level == null ||
-            !altar.getBlockPos().closerThan(player.blockPosition(), Config.CLIENT.inventoryRenderDistance.getAsInt())) {
-            return;
-        }
+        if (player == null || level == null) return;
 
         CustomRitualRenderer customRenderer = null;
-        var recipeInfo = altar.getCurrentRecipeInfo();
+        var recipeInfo = state.recipeInfo;
         if (recipeInfo != null) {
             customRenderer = CUSTOM_RENDERERS.get(recipeInfo.getRecipeId());
         }
-        var renderContext = createRenderContext(poseStack, submitNodeCollector, altar, player, level, partialTick, OverlayTexture.NO_OVERLAY);
+
+        var renderContext = new AltarRenderContext(
+            level,
+            player,
+            altar,
+            state.playerToAltarDistance,
+            state.playerToAltarAngle,
+            state.recipeProgress,
+            state.recipeTime,
+            poseStack,
+            submitNodeCollector,
+            state.lightAbove,
+            state.partialTick,
+            state.initiator,
+            state.inputs
+        );
 
         renderContext.pushPose();
         {
@@ -99,43 +152,6 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
         renderContext.popPose();
     }
 
-    private AltarRenderContext createRenderContext(
-        PoseStack poseStack, SubmitNodeCollector submitNodeCollector, AltarBlockEntity altar, Player player, Level level, float partialTick,
-        int packedOverlay
-    ) {
-        var altarPos = altar.getBlockPos();
-        var altarCenterPos = Vec3.atCenterOf(altarPos);
-
-        var playerPos = new Vec3(
-            Mth.lerp(partialTick, player.xOld, player.getX()),
-            Mth.lerp(partialTick, player.yOld, player.getY()),
-            Mth.lerp(partialTick, player.zOld, player.getZ())
-        );
-        var playerToAltarDistance = (float) altarCenterPos.distanceTo(playerPos);
-        var playerToAltarRatio = Math.atan2(altarCenterPos.x - playerPos.x, playerPos.z - altarCenterPos.z);
-        var playerToAltarAngle = (float) (Math.toDegrees(playerToAltarRatio) + HALF_CIRCLE);
-
-        var recipeProgress = altar.getRecipeProgress();
-        var recipeTime = altar.getRecipeTime();
-
-        var lightAbove = LevelRenderer.getLightCoords(level, altarPos.above());
-
-        return new AltarRenderContext(
-            level,
-            player,
-            altar,
-            playerToAltarDistance,
-            playerToAltarAngle,
-            recipeProgress,
-            recipeTime,
-            poseStack,
-            submitNodeCollector,
-            lightAbove,
-            packedOverlay,
-            partialTick
-        );
-    }
-
     private void renderInventoryContents(AltarRenderContext renderContext) {
         renderContext.translate(0, MAX_PROGRESS_HEIGHT * renderContext.getRecipeProgressRatio(), 0);
 
@@ -148,7 +164,7 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
     }
 
     public void renderInitiator(AltarRenderContext renderContext) {
-        var initiator = renderContext.getInitiator();
+        var initiator = renderContext.getInitiatorRenderState();
         if (initiator.isEmpty()) return;
 
         renderContext.pushPose();
@@ -156,13 +172,13 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
             renderContext.translate(0, invert(0.75f * renderContext.getRecipeProgressRatio()), 0);
             renderContext.scale(0.75f);
             renderContext.mulPose(Axis.YN.rotationDegrees(renderContext.getPlayerToAltarAngle()));
-            renderContext.renderItem(getItemRenderer, initiator);
+            renderContext.renderItem(initiator);
         }
         renderContext.popPose();
     }
 
     public void renderItemOrbit(AltarRenderContext renderContext) {
-        var inputs = renderContext.getInputs();
+        var inputs = renderContext.getInputRenderStates();
         if (inputs.isEmpty()) return;
 
         var gameTime = renderContext.getGameTime();
@@ -209,7 +225,7 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
                 renderContext.mulPose(Axis.YN.rotationDegrees(clampRotation(itemRotation + orbitRotation)));
                 renderContext.translate(0, newHeight, -ITEM_OFFSET);
 
-                renderContext.renderItem(getItemRenderer, inputs.get(i));
+                renderContext.renderItem(inputs.get(i));
             }
             renderContext.popPose();
         }
@@ -235,6 +251,15 @@ public record AltarRenderer(ItemModelResolver getItemRenderer) implements BlockE
 
         @Nullable
         private AltarBlockEntity altar;
+        @Nullable
+        private RecipeInfo recipeInfo;
+        private ItemStackRenderState initiator = new ItemStackRenderState();
+        private List<ItemStackRenderState> inputs = List.of();
+        private float playerToAltarDistance;
+        private float playerToAltarAngle;
+        private int recipeProgress;
+        private int recipeTime;
+        private int lightAbove;
         private float partialTick;
     }
 }
