@@ -11,12 +11,10 @@ import com.almostreliable.summoningrituals.recipe.condition.pattern.BlockPattern
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
@@ -30,6 +28,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -42,9 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class BlockPatternRenderer {
+public final class BlockPatternRenderer {
 
-    public static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
+    private static final BlockPatternRenderer INSTANCE = new BlockPatternRenderer();
 
     private static final Map<BlockState, BlockEntity> BLOCK_ENTITY_CACHE = new IdentityHashMap<>();
     private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
@@ -61,7 +64,16 @@ public class BlockPatternRenderer {
     private Task task;
     private List<PreviewBlock> previewBlocks = List.of();
 
-    public void tick() {
+    private BlockPatternRenderer() {}
+
+    public static void init(IEventBus eventBus) {
+        eventBus.addListener(INSTANCE::onClientTick);
+        eventBus.addListener(INSTANCE::onExtractLevelRenderState);
+        eventBus.addListener(BlockPatternRenderer::onSubmitCustomGeometry);
+        eventBus.addListener(BlockPatternRenderer::onLevelUnload);
+    }
+
+    private void onClientTick(ClientTickEvent.Post event) {
         if (task == null) return;
 
         var mc = Minecraft.getInstance();
@@ -96,10 +108,11 @@ public class BlockPatternRenderer {
         updatePreviewBlocks(mc, level, task, age / TAG_CYCLE_TICKS);
     }
 
-    public void extractRenderState(LevelRenderState levelRenderState, float partialTick) {
+    private void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
         if (previewBlocks.isEmpty()) return;
 
         var mc = Minecraft.getInstance();
+        var partialTick = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         var renderStates = new ArrayList<PreviewRenderState>(previewBlocks.size());
 
         for (var previewBlock : previewBlocks) {
@@ -110,15 +123,17 @@ public class BlockPatternRenderer {
             renderStates.add(renderState);
         }
 
-        levelRenderState.setRenderData(PREVIEW_RENDER_STATES, renderStates);
+        event.getRenderState().setRenderData(PREVIEW_RENDER_STATES, renderStates);
     }
 
-    public static void submit(LevelRenderState levelRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
+        var levelRenderState = event.getLevelRenderState();
         var renderStates = levelRenderState.getRenderData(PREVIEW_RENDER_STATES);
         if (renderStates == null) return;
 
+        var poseStack = event.getPoseStack();
         var camera = levelRenderState.cameraRenderState;
-        var alphaBuffer = new AlphaBufferSource(submitNodeCollector, PREVIEW_ALPHA);
+        var alphaBuffer = new AlphaBufferSource(event.getSubmitNodeCollector(), PREVIEW_ALPHA);
 
         for (var renderState : renderStates) {
             var translation = Vec3.atLowerCornerOf(renderState.pos).subtract(camera.pos);
@@ -135,6 +150,10 @@ public class BlockPatternRenderer {
             }
             poseStack.popPose();
         }
+    }
+
+    private static void onLevelUnload(LevelEvent.Unload event) {
+        clear();
     }
 
     private void updatePreviewBlocks(Minecraft mc, Level level, Task task, long cycleStep) {
@@ -259,7 +278,8 @@ public class BlockPatternRenderer {
         var altarState = altarEntry.state;
         var altarFacing = altarState.getValue(AltarBlock.FACING);
         Supplier<List<BlockPos>> blockPredicate = () -> blockPattern.test(level, altarPos, altarState);
-        INSTANCE.task = new Task(level.getGameTime(), level, altarPos, blockPattern.getTransformedEntries(altarFacing), blockPredicate);
+        var patternEntries = blockPattern.getTransformedEntries(altarFacing);
+        INSTANCE.task = new Task(level.getGameTime(), altarPos, patternEntries, blockPredicate);
         INSTANCE.previewBlocks = List.of();
     }
 
@@ -286,7 +306,9 @@ public class BlockPatternRenderer {
     private record PreviewRenderState(BlockPos pos, BlockModelRenderState model, @Nullable BlockEntityRenderState blockEntity) {}
 
     private record Task(
-        long createdAt, Level level, BlockPos altarPos, Map<BlockPos, List<BlockState>> patternEntries,
+        long createdAt,
+        BlockPos altarPos,
+        Map<BlockPos, List<BlockState>> patternEntries,
         Supplier<List<BlockPos>> blockPredicate
     ) {}
 }

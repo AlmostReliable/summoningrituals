@@ -16,12 +16,9 @@ import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
 
 @Mod(value = ModConstants.MOD_ID, dist = Dist.CLIENT)
 public final class SummoningRitualsClient {
@@ -32,9 +29,7 @@ public final class SummoningRitualsClient {
         eventBus.addListener(SummoningRitualsClient::registerEntityRenderers);
         eventBus.addListener(SummoningRitualsClient::registerTooltipRenderers);
         eventBus.addListener(SummoningRitualsClient::registerClientReloadListeners);
-        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onExtractLevelRenderState);
-        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onSubmitCustomGeometry);
-        NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onLevelUnload);
+        BlockPatternRenderer.init(NeoForge.EVENT_BUS);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onRecipesReceived);
         NeoForge.EVENT_BUS.addListener(SummoningRitualsClient::onLoggingOut);
@@ -52,22 +47,7 @@ public final class SummoningRitualsClient {
         KubeFacade.registerReloadListener(event);
     }
 
-    private static void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
-        var partialTick = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        BlockPatternRenderer.INSTANCE.extractRenderState(event.getRenderState(), partialTick);
-    }
-
-    private static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
-        BlockPatternRenderer.submit(event.getLevelRenderState(), event.getPoseStack(), event.getSubmitNodeCollector());
-    }
-
-    private static void onLevelUnload(LevelEvent.Unload event) {
-        BlockPatternRenderer.clear();
-    }
-
     private static void onClientTick(ClientTickEvent.Post event) {
-        BlockPatternRenderer.INSTANCE.tick();
-
         var player = Minecraft.getInstance().player;
         if (player == null) return;
 
