@@ -1,14 +1,10 @@
 package com.almostreliable.summoningrituals.altar.inventory;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeMap;
 
 import org.jspecify.annotations.Nullable;
-
-import java.util.function.Function;
 
 public interface AltarInventoryHost {
 
@@ -29,7 +25,7 @@ public interface AltarInventoryHost {
 
     void spawnItemAboveAltar(ItemStack stack);
 
-    void onInventoryChanged(Function<HolderLookup.Provider, CompoundTag> serializer);
+    void onInventoryChanged();
 
     @Nullable RecipeMap getRecipeMap();
 

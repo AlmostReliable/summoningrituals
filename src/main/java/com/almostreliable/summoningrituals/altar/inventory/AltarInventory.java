@@ -1,22 +1,16 @@
 package com.almostreliable.summoningrituals.altar.inventory;
 
-import com.almostreliable.summoningrituals.SummoningRituals;
 import com.almostreliable.summoningrituals.core.Config;
 import com.almostreliable.summoningrituals.core.Constants;
 import com.almostreliable.summoningrituals.recipe.AltarRecipe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
@@ -33,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.function.Consumer;
 
 public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInput {
 
@@ -53,49 +46,22 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         this.initiator = ItemStack.EMPTY;
     }
 
-    public CompoundTag serializeWithoutInsertOrder(HolderLookup.Provider registryAccess) {
-        return serialize(registryAccess, this::saveWithoutInsertOrder);
-    }
-
-    public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        try (var problemReporter = new ProblemReporter.ScopedCollector(SummoningRituals.LOGGER)) {
-            load(TagValueInput.create(problemReporter, registryAccess, tag));
-        }
-    }
-
-    private static CompoundTag serialize(HolderLookup.Provider registryAccess, Consumer<ValueOutput> serializer) {
-        try (var problemReporter = new ProblemReporter.ScopedCollector(SummoningRituals.LOGGER)) {
-            var output = TagValueOutput.createWithContext(problemReporter, registryAccess);
-            serializer.accept(output);
-
-            return output.buildResult();
-        }
-    }
-
     public void save(ValueOutput output) {
-        saveWithoutInsertOrder(output);
+        inventory.save(output.child(Constants.INVENTORY));
+        output.store(Constants.INITIATOR, ItemStack.OPTIONAL_CODEC, initiator);
 
         var insertOrderOutput = output.list(Constants.INSERT_ORDER, InternalInventory.SLOTTED_STACK_CODEC);
-
         for (var entry : insertOrder) {
             insertOrderOutput.add(entry);
         }
     }
 
-    public void saveWithoutInsertOrder(ValueOutput output) {
-        inventory.serializeNBT(output.child(Constants.INVENTORY));
-        output.store(Constants.INITIATOR, ItemStack.OPTIONAL_CODEC, initiator);
-    }
-
     public void load(ValueInput input) {
-        inventory.deserializeNBT(input.childOrEmpty(Constants.INVENTORY));
-
-        input.list(Constants.INSERT_ORDER, InternalInventory.SLOTTED_STACK_CODEC).ifPresent(entries -> {
-            insertOrder.clear();
-            entries.forEach(insertOrder::add);
-        });
-
+        inventory.load(input.childOrEmpty(Constants.INVENTORY));
         initiator = input.read(Constants.INITIATOR, ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+
+        insertOrder.clear();
+        input.listOrEmpty(Constants.INSERT_ORDER, InternalInventory.SLOTTED_STACK_CODEC).forEach(insertOrder::add);
     }
 
     @Override
@@ -238,7 +204,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
     private int insertOrFillItemInSlot(int slot, ItemStack stack, boolean simulate) {
         var stackInSlot = inventory.get(slot);
 
-        if (!stackInSlot.isEmpty() &&!ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
+        if (!stackInSlot.isEmpty() && !ItemStack.isSameItemSameComponents(stackInSlot, stack)) {
             return stack.getCount();
         }
 
@@ -285,7 +251,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
         host.spawnItemAboveAltar(stack);
     }
 
-    public boolean consumeRecipeInputs(ServerLevel level, AltarRecipe recipe) {
+    public boolean consumeRecipeInputs(AltarRecipe recipe) {
         var snapshot = inventory.snapshot();
 
         var toRemoveTotal = 0;
@@ -345,7 +311,7 @@ public class AltarInventory implements ResourceHandler<ItemResource>, RecipeInpu
 
     private void onContentsChanged() {
         if (suppressChanges) return;
-        host.onInventoryChanged(this::serializeWithoutInsertOrder);
+        host.onInventoryChanged();
     }
 
     private void rebuildInsertOrder() {

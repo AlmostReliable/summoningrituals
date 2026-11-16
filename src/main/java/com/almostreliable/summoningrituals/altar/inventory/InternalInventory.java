@@ -62,11 +62,11 @@ final class InternalInventory implements Iterable<ItemStack> {
         return snapshot;
     }
 
-    void restore(ItemStack[] snapshot) {
+    void restore(ItemStack... snapshot) {
         items = snapshot;
     }
 
-    void serializeNBT(ValueOutput output) {
+    void save(ValueOutput output) {
         var itemsOutput = output.list(Constants.ITEMS, SLOTTED_STACK_CODEC);
 
         for (var i = 0; i < items.length; i++) {
@@ -79,7 +79,7 @@ final class InternalInventory implements Iterable<ItemStack> {
         output.putInt(Constants.SIZE, items.length);
     }
 
-    void deserializeNBT(ValueInput input) {
+    void load(ValueInput input) {
         var size = input.getIntOr(Constants.SIZE, 0);
 
         items = new ItemStack[size];

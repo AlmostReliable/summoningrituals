@@ -48,7 +48,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity, AltarInventoryHost {
 
@@ -93,13 +92,8 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registryAccess) {
-        return inventory.serializeWithoutInsertOrder(registryAccess);
-    }
-
-    @Override
-    public void handleUpdateTag(ValueInput input) {
-        inventory.load(input);
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
     }
 
     @Override
@@ -117,7 +111,7 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
 
         if (recipeProgress >= recipeTime) {
             var recipe = currentRecipeInfo.getRecipe();
-            if (inventory.consumeRecipeInputs(level, recipe)) {
+            if (inventory.consumeRecipeInputs(recipe)) {
                 recipe.invokeCommands(level, invokingPlayer);
                 var itemOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::itemOutputs);
                 var entityOutputs = recipe.spawnOutputs(level, worldPosition, RecipeOutputs::entityOutputs);
@@ -137,12 +131,13 @@ public class AltarBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public void onInventoryChanged(Function<HolderLookup.Provider, CompoundTag> serializer) {
+    public void onInventoryChanged() {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         setChanged();
-        var inventoryTag = serializer.apply(serverLevel.registryAccess());
-        PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, new AltarInventorySyncPacket(worldPosition, inventoryTag));
+        var updateTag = getUpdateTag(serverLevel.registryAccess());
+        var syncPacket = new AltarInventorySyncPacket(worldPosition, updateTag);
+        PacketHandler.sendToTrackingChunk(serverLevel, worldPosition, syncPacket);
     }
 
     private void removeLastInsertedItem() {
