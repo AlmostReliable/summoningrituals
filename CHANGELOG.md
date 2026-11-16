@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+- /
+
+## [3.14.3] - 2026-11-16
 
 - backported fixes and internal cleanups from the 26.1 port ([#44](https://github.com/AlmostReliable/summoningrituals/pull/44))
 - added `altarPos`, `orbitScale` and `orbitWaveAnchor` to the KubeJS ritual renderer context
@@ -207,6 +210,7 @@ This version is highly experimental and should not be used in production. This a
 is still in the works until the final release because many things are subject to change.
 
 <!-- Versions -->
+[3.14.3]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.3
 [3.14.2]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.2
 [3.14.1]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.1
 [3.14.0]: https://github.com/AlmostReliable/summoningrituals/releases/tag/v1.21.1-neoforge-3.14.0
