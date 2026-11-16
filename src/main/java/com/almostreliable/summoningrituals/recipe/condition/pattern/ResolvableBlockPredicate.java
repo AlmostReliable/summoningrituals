@@ -11,7 +11,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -52,8 +51,8 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
         return new Builder(block);
     }
 
-    public static Builder builder(TagKey<Block> tag) {
-        return new Builder(tag);
+    public static Builder builder(HolderSet<Block> blocks) {
+        return new Builder(blocks);
     }
 
     @Override
@@ -149,8 +148,8 @@ public class ResolvableBlockPredicate implements Predicate<BlockState> {
             this.blocks = HolderSet.direct(Block::builtInRegistryHolder, block);
         }
 
-        private Builder(TagKey<Block> tag) {
-            this.blocks = BuiltInRegistries.BLOCK.get(tag).orElseGet(() -> HolderSet.emptyNamed(BuiltInRegistries.BLOCK, tag));
+        private Builder(HolderSet<Block> blocks) {
+            this.blocks = blocks;
         }
 
         public Builder setProperties(StatePropertiesPredicate.Builder properties) {
