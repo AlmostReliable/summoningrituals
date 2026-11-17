@@ -15,6 +15,9 @@ import dev.uncandango.kubegroovy.plugin.builtin.wrapper.ItemWrapper;
 import dev.uncandango.kubegroovy.recipe.RecipeScriptContext;
 import dev.uncandango.kubegroovy.recipe.component.RecipeComponent;
 import dev.uncandango.kubegroovy.recipe.component.RecipeComponentType;
+import dev.uncandango.kubegroovy.recipe.filter.RecipeMatchContext;
+import dev.uncandango.kubegroovy.recipe.match.ItemMatch;
+import dev.uncandango.kubegroovy.recipe.match.ReplacementMatchInfo;
 import dev.uncandango.kubegroovy.script.type.TypeInfo;
 
 import org.jspecify.annotations.Nullable;
@@ -51,5 +54,20 @@ public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) impl
 
         var stack = ItemWrapper.wrap(from);
         return SummoningItemBinding.of(stack).build();
+    }
+
+    @Override
+    public boolean matches(RecipeMatchContext cx, ItemOutput value, ReplacementMatchInfo match) {
+        return match.match() instanceof ItemMatch m && m.matches(cx, value.item().create(), match.exact());
+    }
+
+    @Override
+    public ItemOutput replace(RecipeScriptContext cx, ItemOutput original, ReplacementMatchInfo match, Object with) {
+        if (!matches(cx, original, match)) {
+            return original;
+        }
+
+        var stack = ItemWrapper.wrap(with).copyWithCount(original.item().count());
+        return new ItemOutput(templateOf(stack), original.offset(), original.spread());
     }
 }

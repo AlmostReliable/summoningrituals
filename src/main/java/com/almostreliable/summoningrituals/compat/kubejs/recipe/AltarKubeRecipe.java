@@ -11,6 +11,9 @@ import net.minecraft.network.chat.Component;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
+import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
+import dev.latvian.mods.kubejs.recipe.filter.RecipeMatchContext;
+import dev.latvian.mods.kubejs.recipe.match.ReplacementMatchInfo;
 import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.rhino.Context;
@@ -51,6 +54,31 @@ public class AltarKubeRecipe extends KubeRecipe {
         }
 
         super.serialize();
+    }
+
+    @Override
+    public boolean hasOutput(RecipeMatchContext cx, ReplacementMatchInfo match) {
+        for (var value : getRecipeComponentValues()) {
+            if (value.key.role.isOutput() && value.matches(cx, match)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean replaceOutput(RecipeScriptContext cx, ReplacementMatchInfo match, Object with) {
+        var replaced = false;
+        for (var value : getRecipeComponentValues()) {
+            if (value.key.role.isOutput()) {
+                replaced = value.replace(cx, match, with) || replaced;
+            }
+        }
+
+        if (replaced) {
+            save();
+        }
+        return replaced;
     }
 
     @ReturnsSelf

@@ -11,6 +11,9 @@ import net.minecraft.network.chat.Component;
 
 import dev.uncandango.kubegroovy.error.KubeRuntimeException;
 import dev.uncandango.kubegroovy.recipe.KubeRecipe;
+import dev.uncandango.kubegroovy.recipe.RecipeScriptContext;
+import dev.uncandango.kubegroovy.recipe.filter.RecipeMatchContext;
+import dev.uncandango.kubegroovy.recipe.match.ReplacementMatchInfo;
 import dev.uncandango.kubegroovy.recipe.schema.KubeRecipeFactory;
 import dev.uncandango.kubegroovy.script.SourceLine;
 import dev.uncandango.kubegroovy.script.annotations.ReturnsSelf;
@@ -50,6 +53,31 @@ public class AltarKubeRecipe extends KubeRecipe {
         }
 
         super.serialize();
+    }
+
+    @Override
+    public boolean hasOutput(RecipeMatchContext cx, ReplacementMatchInfo match) {
+        for (var value : getRecipeComponentValues()) {
+            if (value.key.role.isOutput() && value.matches(cx, match)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean replaceOutput(RecipeScriptContext cx, ReplacementMatchInfo match, Object with) {
+        var replaced = false;
+        for (var value : getRecipeComponentValues()) {
+            if (value.key.role.isOutput()) {
+                replaced = value.replace(cx, match, with) || replaced;
+            }
+        }
+
+        if (replaced) {
+            save();
+        }
+        return replaced;
     }
 
     @ReturnsSelf

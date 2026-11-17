@@ -15,6 +15,9 @@ import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
 import dev.latvian.mods.kubejs.recipe.RecipeScriptContext;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
+import dev.latvian.mods.kubejs.recipe.filter.RecipeMatchContext;
+import dev.latvian.mods.kubejs.recipe.match.ItemMatch;
+import dev.latvian.mods.kubejs.recipe.match.ReplacementMatchInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
 
 import org.jspecify.annotations.Nullable;
@@ -51,5 +54,20 @@ public record ItemOutputComponent(ResourceKey<RecipeComponentType<?>> type) impl
 
         var stack = ItemWrapper.wrap(cx.cx(), from);
         return SummoningItemBinding.of(stack).build();
+    }
+
+    @Override
+    public boolean matches(RecipeMatchContext cx, ItemOutput value, ReplacementMatchInfo match) {
+        return match.match() instanceof ItemMatch m && m.matches(cx, value.item().create(), match.exact());
+    }
+
+    @Override
+    public ItemOutput replace(RecipeScriptContext cx, ItemOutput original, ReplacementMatchInfo match, Object with) {
+        if (!matches(cx, original, match)) {
+            return original;
+        }
+
+        var stack = ItemWrapper.wrap(cx.cx(), with).copyWithCount(original.item().count());
+        return new ItemOutput(templateOf(stack), original.offset(), original.spread());
     }
 }
