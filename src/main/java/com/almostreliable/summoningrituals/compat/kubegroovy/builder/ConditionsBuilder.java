@@ -47,6 +47,10 @@ public final class ConditionsBuilder {
     private final List<LootItemCondition> conditions = new ArrayList<>();
     private LocationPredicate.@Nullable Builder locationPredicate;
     private StatePropertiesPredicate.@Nullable Builder blockStatePredicate;
+    private @Nullable Integer minY;
+    private @Nullable Integer maxY;
+    private @Nullable Integer minLight;
+    private @Nullable Integer maxLight;
 
     // region LocationCheck
     @ReturnsSelf
@@ -63,48 +67,64 @@ public final class ConditionsBuilder {
 
     @ReturnsSelf
     public ConditionsBuilder minHeight(int min) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atLeast(min));
+        minY = min;
+        getOrCreateLocationPredicate().setY(maxY == null ? MinMaxBounds.Doubles.atLeast(min) : MinMaxBounds.Doubles.between(min, maxY));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder maxHeight(int max) {
-        getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.atMost(max));
+        maxY = max;
+        getOrCreateLocationPredicate().setY(minY == null ? MinMaxBounds.Doubles.atMost(max) : MinMaxBounds.Doubles.between(minY, max));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder height(int height) {
+        minY = height;
+        maxY = height;
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.exactly(height));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder height(int min, int max) {
+        minY = min;
+        maxY = max;
         getOrCreateLocationPredicate().setY(MinMaxBounds.Doubles.between(min, max));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder minLightLevel(int min) {
-        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.atLeast(min)));
+        minLight = min;
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(
+            maxLight == null ? MinMaxBounds.Ints.atLeast(min) : MinMaxBounds.Ints.between(min, maxLight)
+        ));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder maxLightLevel(int max) {
-        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.atMost(max)));
+        maxLight = max;
+        getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(
+            minLight == null ? MinMaxBounds.Ints.atMost(max) : MinMaxBounds.Ints.between(minLight, max)
+        ));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder lightLevel(int lightLevel) {
+        minLight = lightLevel;
+        maxLight = lightLevel;
         getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.exactly(lightLevel)));
         return this;
     }
 
     @ReturnsSelf
     public ConditionsBuilder lightLevel(int min, int max) {
+        minLight = min;
+        maxLight = max;
         getOrCreateLocationPredicate().setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.between(min, max)));
         return this;
     }
