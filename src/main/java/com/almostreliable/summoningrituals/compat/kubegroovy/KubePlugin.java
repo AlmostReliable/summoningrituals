@@ -22,13 +22,16 @@ import com.almostreliable.summoningrituals.recipe.condition.handler.TimeConditio
 import com.almostreliable.summoningrituals.recipe.container.EntityInfo;
 import com.almostreliable.summoningrituals.recipe.output.CommandOutput;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.MoonPhase;
 
 import dev.uncandango.kubegroovy.event.EventGroupRegistry;
 import dev.uncandango.kubegroovy.plugin.KubeGroovyPlugin;
+import dev.uncandango.kubegroovy.plugin.TypeSuggestionRegistry;
 import dev.uncandango.kubegroovy.recipe.component.RecipeComponentTypeRegistry;
 import dev.uncandango.kubegroovy.recipe.schema.RecipeFactoryRegistry;
 import dev.uncandango.kubegroovy.recipe.schema.RecipeSchemaRegistry;
+import dev.uncandango.kubegroovy.registry.RegistryType;
 import dev.uncandango.kubegroovy.script.BindingRegistry;
 import dev.uncandango.kubegroovy.script.TypeWrapperRegistry;
 
@@ -82,5 +85,10 @@ public class KubePlugin implements KubeGroovyPlugin {
     @Override
     public void registerRecipeSchemas(RecipeSchemaRegistry registry) {
         registry.register(ModRegistration.ALTAR_RECIPE_TYPE.getId(), AltarRecipeSchema.SCHEMA);
+    }
+
+    @Override
+    public void registerTypeSuggestions(TypeSuggestionRegistry registry) {
+        registry.registerDelegate(EntityInfo.class, RegistryType.ofKey(Registries.ENTITY_TYPE).type());
     }
 }
