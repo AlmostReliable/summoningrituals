@@ -14,6 +14,11 @@ repositories {
     // KubeJS
     maven("https://maven.latvian.dev/releases")
     maven("https://maven.latvian.dev/mirror")
+    maven("https://mods.uncandango.dev/maven/") {
+        content {
+            includeGroup("dev.uncandango")
+        }
+    }
     maven("https://cursemaven.com") {
         content {
             includeGroup("curse.maven")
@@ -24,6 +29,6 @@ repositories {
 dependencies {
     // KubeJS
     implementation("dev.latvian.mods:kubejs-neoforge:${almostgradle.getProperty("kjsVersion")}")
-    compileOnly("curse.maven:kubegroovy-1745965:9638005")
+    compileOnly("dev.uncandango:kubegroovy-neoforge:${almostgradle.getProperty("kgyVersion")}")
     compileOnly("org.apache.groovy:groovy:6.0.0")
 }
